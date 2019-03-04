@@ -33,11 +33,12 @@ import Clips from './Clips';
 import Date from './Date';
 import Schedule from './Schedule';
 import PreviousSchedule from './PreviousSchedule';
+import NextSchedule from './NextSchedule';
 const drawerWidth = 240;
-
+var s = [];
 var icons = [<MailIcon />, <InboxIcon />,  <Payment />, <Picture />, <Lock />, <Opacity />]
 var begin = moment().utcOffset(0);
-var end = moment().add(5, 'days').utcOffset(0);
+var end = moment().utcOffset(0);
 begin.set({hour:0,minute:0,second:0,millisecond:0})
 begin.toISOString() 
 
@@ -108,7 +109,6 @@ class PersistentDrawerLeft extends React.Component {
     Title: '',
     isPaneOpen: false,
     panelShow: null,
-    data: [],
     count: 0,
     items: [],
     specials: [],
@@ -127,7 +127,7 @@ class PersistentDrawerLeft extends React.Component {
     // this.loadPlaylist = this.loadPlaylist.bind(this);
 
     this.setState({
-      display: <Schedule data={this.state.data} deleteItem={this.deleteItem} scheduleDate={moment(this.state.scheduleDate).utcOffset(0).format()}/>
+      display: <Schedule data={s} deleteItem={this.deleteItem}/>
 
     })
       //Clips
@@ -194,69 +194,100 @@ class PersistentDrawerLeft extends React.Component {
   }
 
   previousDay(CDate){
+    
+    if(moment(CDate).format('LL') === moment().format('LL')){
+     
+    this.setState({
+      scheduleDate: CDate,
+      display: <Schedule data={s} deleteItem={this.deleteItem}/>
+    })
+    }else{
 
     this.setState({
       scheduleDate: CDate,
-      display: <PreviousSchedule data={this.state.data} scheduleDate={moment(CDate).utcOffset(0).format()}/>
+      display: <PreviousSchedule scheduleDate={moment(CDate).utcOffset(0).format()}/>
      }) 
   }
+}
   nextDay(CDate){
 
-    this.setState({
-      scheduleDate: CDate,
-      display: <Schedule data={this.state.data} deleteItem={this.deleteItem} scheduleDate={moment(CDate).utcOffset(0).format()}/>
-     }) 
     
+    if(moment(CDate).format('LL') === moment().format('LL')){
+      
+      this.setState({
+        scheduleDate: CDate,
+        display: <Schedule data={s} deleteItem={this.deleteItem}/>
+      })
+      }else{
+  
+      this.setState({
+        scheduleDate: CDate,
+        display: <NextSchedule scheduleDate={moment(CDate).utcOffset(0).format()}/>
+       }) 
+    }
 
   }
-
-  handleClick(item, isLive) {
+  handleClick = (item, isLive) => {
     count++;
+   
     const newItem2 = {
       ...item
     };  
+
    if(isLive){
       if(newItem2.startTime === undefined){
+       
         newItem2.versionPid = item.pid
         newItem2.id = count;
-        newItem2.startTime = moment.utc(this.state.data[this.state.data.length - 1].startTime, "HH:mm:ss").add(moment.duration(this.state.data[this.state.data.length - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
-        this.setState({
-          data: [...this.state.data, newItem2],   
-        });
+        newItem2.isLive = false;
+        newItem2.startTime = moment.utc(s[s.length - 1].startTime, "HH:mm:ss").add(moment.duration(s[s.length - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
+        s.push(newItem2)
+        
       }else{
+        
         newItem2.id = count;
         newItem2.versionPid = item.pid
-        this.setState({
-          data: [...this.state.data, newItem2],    
-        });
+        newItem2.isLive = true;
+        console.log(s)
+        s.push(newItem2)
+       
       }
     }else{
 
-    if(this.state.data.length === 0){
-
+    if(s.length === 0){
+      
+     
       newItem2.id = count;
       newItem2.startTime = moment.utc("00:00", "HH:mm:ss").format("HH:mm:ss");
       newItem2.duration = item.available_versions.version[0].duration
       newItem2.versionPid = item.available_versions.version[0].pid
+      newItem2.isLive = false;
+      s.push(newItem2)
+      
+     
     }else{
+    
       newItem2.id = count;
-      newItem2.startTime = moment.utc(this.state.data[this.state.data.length - 1].startTime, "HH:mm:ss").add(moment.duration(this.state.data[this.state.data.length - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
+      newItem2.startTime = moment.utc(s[s.length - 1].startTime, "HH:mm:ss").add(moment.duration(s[s.length - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
       newItem2.duration = item.available_versions.version[0].duration
       newItem2.versionPid = item.available_versions.version[0].pid
-    }
-    this.setState({
-      data: [...this.state.data, newItem2],    
-    });
-    
-  } 
+      newItem2.isLive = false;
+      s.push(newItem2)
 
   }
+    
+
+   this.setState({
+      display:<Schedule data={s} deleteItem={this.deleteItem}/>  })
+  } 
+  }
+
 
   iHandleClick = (text) => {
 
     
     if(text === 'Clips'){
-      console.log("tsd", this.state.data)
+      console.log("tsd", s)
       this.setState({ isPaneOpen: true })
       this.setState({title: "Available Clips"})
       this.setState({ panelShow:   <Clips items={this.state.items}  handleClick={this.handleClick} />});
@@ -300,7 +331,8 @@ class PersistentDrawerLeft extends React.Component {
     const { classes, theme } = this.props;
     const { open } = this.state;
     
-
+    
+    
     return (
       <div className={classes.root}>
     
@@ -393,8 +425,8 @@ class PersistentDrawerLeft extends React.Component {
           <Typography paragraph>
          
           <Date nextDay ={this.nextDay} previousDay = {this.previousDay} scheduleDate={this.state.scheduleDate}/>
-          <Schedule data={this.state.data} deleteItem={this.deleteItem} scheduleDate={moment(this.state.scheduleDate).utcOffset(0).format()}/>  
-       
+          {this.state.display}
+          
           </Typography>
           
         </main>

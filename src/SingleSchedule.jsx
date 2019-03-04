@@ -14,7 +14,7 @@ class SingleSchedule extends React.Component {
 
 }
         render() {
-     
+           
     return (
         <Fragment>
             <tr>
@@ -26,7 +26,7 @@ class SingleSchedule extends React.Component {
            </td>
            <td>{this.props.startTime}</td>
            <td>{this.props.title}</td>
-           <td>{this.props.duration}</td> 
+           <td>{moment.duration(this.props.duration)._data.minutes}:{this.timeFormat()}</td>  
             <td><button className="Add" onClick={() => this.props.deleteItem(this.props.id)}>Delete</button>
            </td>
        </tr>

@@ -6,30 +6,30 @@ import moment from 'moment';
 var returnedData = [];
 
 
-class PreviousSchedule extends React.Component {
-    state = {
-        broadcast: []
-      };
+class NextSchedule extends React.Component {
+
+  componentDidUpdate() {
+    
+    var end = moment(this.props.scheduleDate).set({hour:23,minute:59,second:59,millisecond:59}).utcOffset(0).format();
+    axios.get('https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/broadcast?sid=bbc_marathi_tv&start=' +
+    this.props.scheduleDate + "&end=" + end).then((response) => {
+      returnedData = response.data
+      
+      console.log("BResponse", returnedData)
+      console.log("AXIOS", 'https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/broadcast?sid=bbc_marathi_tv&start=' +
+      this.props.scheduleDate + "&end=" + end)
+     
+  
+  
+    }).catch(e => {
+       console.log(e);
+    });
+  }
 
 
     render() {
-        var end = moment(this.props.scheduleDate).set({hour:23,minute:59,second:59,millisecond:59}).utcOffset(0).format();
-        axios.get('https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/broadcast?sid=bbc_marathi_tv&start=' +
-        this.props.scheduleDate + "&end=" + end).then((response) => {
-          returnedData = response.data
-
-    
-          console.log("BResponse", returnedData)
-          console.log("AXIOS", 'https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/broadcast?sid=bbc_marathi_tv&start=' +
-          this.props.scheduleDate + "&end=" + end)
-         
-      
-      
-        }).catch(e => {
-           console.log(e);
-        });
       var videos = [];
-     
+  
      
       for(let i =0; i < returnedData.length; i++){
        
@@ -37,7 +37,8 @@ class PreviousSchedule extends React.Component {
         duration={returnedData[i].published_time.duration}  />)
         
        }
-    
+       
+      
       return (
         <div>
           <center><h2>Today's Schedule</h2></center>
@@ -75,4 +76,4 @@ class PreviousSchedule extends React.Component {
     }
      
 }
-export default PreviousSchedule;            
+export default NextSchedule;            

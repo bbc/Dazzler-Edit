@@ -150,6 +150,7 @@ export class Live extends React.Component {
       
       this.props.live[i].isLive = true;
       this.props.live[i].startTime = moment(this.props.live[i].scheduled_time.start).format("HH:mm:ss");
+      console.log('start time' ,moment(this.props.live[i].startTime));
       this.props.live[i].title = "Live Programme " + [i+ 1];
       this.props.live[i].duration = moment.duration(durationTime, "milliseconds")
      

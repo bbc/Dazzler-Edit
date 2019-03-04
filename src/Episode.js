@@ -121,7 +121,7 @@ export const styles = theme => ({
   }
 });
 var cells = [];
-var isEpisode = true;
+var isEpisode = false;
 export class Episode extends React.Component {
   
     constructor(props){
@@ -149,8 +149,8 @@ export class Episode extends React.Component {
     for(let i = 0; i < this.props.episodes.length; i++){
 
       var durationTime = moment(this.props.episodes[i].scheduled_time.end) - moment(this.props.episodes[i].scheduled_time.start);
-    
-      this.props.episodes[i].isEpisode = true;
+      
+      
       this.props.episodes[i].title = "Episode" + [i+ 1];
       this.props.episodes[i].duration = moment.duration(durationTime, "milliseconds")
 
