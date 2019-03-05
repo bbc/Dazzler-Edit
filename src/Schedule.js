@@ -33,29 +33,36 @@ class Schedule extends React.Component {
 
            test.push( {
               "broadcast_of": this.props.data[i].versionPid,
-              "start": this.props.data[i].startTime,
+              "start": "2019-03-05T00:00:00Z",
               "duration": this.props.data[i].duration,
               "live": this.props.data[i].isLive,
               "repeat": false
             },)
-        
+            
+           console.log('Start Time!',moment.utc(this.props.data[i].startTime));
      }
 
-     axios.post("https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/broadcasts?sid=bbc_marathi_tv&start="
-    + start.format() + '&end=' + end, {
-      test
+  axios({
+    method: 'post',
+    url: "https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/broadcasts?sid=bbc_marathi_tv&start="
+    + start.format() + '&end=' + end,
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    data: test
     })
     .then(function (response) {
-      console.log(response);
+        console.log(response);
     })
     .catch(function (error) {
-      console.log(error);
+        console.log(error);
     });
-    
+
   }
     render() {
  
       console.log('ARRAY', test)
+     
       
 
       var videos = [];

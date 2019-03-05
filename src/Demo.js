@@ -131,7 +131,7 @@ class PersistentDrawerLeft extends React.Component {
 
     })
       //Clips
-    axios.get('https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/test/clip?language=marathi').then((response) => {
+    axios.get('https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/clip?language=marathi').then((response) => {
         this.setState({
             items: response.data,
         })
@@ -141,7 +141,7 @@ class PersistentDrawerLeft extends React.Component {
     });
 
     //get request for specials
-    axios.get('https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/test/special').then((response) => {
+    axios.get('https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/special').then((response) => {
      
       this.setState({
         specials: response.data
@@ -153,7 +153,7 @@ class PersistentDrawerLeft extends React.Component {
 
 
     //get request for webcasts 
-    axios.get('https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/test/webcast?brand=w13xttvl&start=' 
+    axios.get('https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/webcast?brand=w13xttvl&start=' 
     + begin.format() + '&end=' + end.format()).then((response) => {
 
             for(let i =0; i < response.data.length; i++){
@@ -235,6 +235,7 @@ class PersistentDrawerLeft extends React.Component {
     };  
 
    if(isLive){
+     
       if(newItem2.startTime === undefined){
        
         newItem2.versionPid = item.pid
@@ -244,11 +245,11 @@ class PersistentDrawerLeft extends React.Component {
         s.push(newItem2)
         
       }else{
-        
+        alert('LIVE')
         newItem2.id = count;
         newItem2.versionPid = item.pid
         newItem2.isLive = true;
-        console.log(s)
+      
         s.push(newItem2)
        
       }
@@ -273,13 +274,13 @@ class PersistentDrawerLeft extends React.Component {
       newItem2.versionPid = item.available_versions.version[0].pid
       newItem2.isLive = false;
       s.push(newItem2)
+      console.log('Start Time', moment.utc().set(("00:00")))
 
   }
-    
-
-   this.setState({
-      display:<Schedule data={s} deleteItem={this.deleteItem}/>  })
   } 
+  this.setState({
+      display:<Schedule data={s} deleteItem={this.deleteItem}/>  })
+      
   }
 
 
