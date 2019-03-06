@@ -19,29 +19,35 @@ class Schedule extends React.Component {
 
   componentDidMount(){
     this.savePlaylist = this.savePlaylist.bind(this);
-
+    
   }
 
 
     savePlaylist(){
       var start = moment().utcOffset(0);
+      var newStart = moment().utcOffset(0);
       start.set({hour:0,minute:0,second:0,millisecond:0})
       var end =  moment.utc(this.props.data[this.props.data.length - 1].startTime, "HH:mm:ss").add(moment.duration(this.props.data[this.props.data.length - 1].duration)._milliseconds, 'milliseconds').format()
      
       console.log('START', start)
       console.log('end', end)
       for(let i =0; i < this.props.data.length; i++){
-
+           newStart.set({hour:this.props.data[i].startTime.charAt(0) + this.props.data[i].startTime.charAt(1),
+            minute:this.props.data[i].startTime.charAt(3) + this.props.data[i].startTime.charAt(4),
+            second:this.props.data[i].startTime.charAt(6) + this.props.data[i].startTime.charAt(7)})
            test.push( {
               "broadcast_of": this.props.data[i].versionPid,
-              "start": "2019-03-05T00:00:00Z",
+              "start": newStart.format(),
               "duration": this.props.data[i].duration,
               "live": this.props.data[i].isLive,
               "repeat": false
             },)
             
-           console.log('Start Time!',moment.utc(this.props.data[i].startTime));
+          
      }
+     console.log('TEST', test)
+     console.log('START', start.format())
+     console.log('NEWSTART', newStart.format())
 
   axios({
     method: 'post',

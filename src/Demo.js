@@ -120,7 +120,7 @@ class PersistentDrawerLeft extends React.Component {
   };
 
   componentDidMount() {
-  
+   
     this.handleClick = this.handleClick.bind(this);
     this.deleteItem = this.deleteItem.bind(this);
     this.previousDay = this.previousDay.bind(this);
@@ -198,6 +198,17 @@ class PersistentDrawerLeft extends React.Component {
         s.splice(i, 1)
       }
     }
+
+    //when item deleted, start times change.
+    if(s.length > 0){
+    s[0].startTime = moment.utc("00:00", "HH:mm:ss").format("HH:mm:ss");
+    }
+    for(let i = 1; i < s.length; i++){
+      if(s[i].isLive !== true){
+      s[i].startTime = moment.utc(s[i - 1].startTime, "HH:mm:ss").add(moment.duration(s[i - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
+    }
+  }
+
     this.setState({
       display:  <Schedule data={s} deleteItem={this.deleteItem} text={text}/>
     })
@@ -224,8 +235,9 @@ class PersistentDrawerLeft extends React.Component {
   }
 }
   nextDay(CDate){
+    
      text = moment(CDate).isBefore(moment()) ? "Previous " : "Future ";
- 
+    
     if(moment(CDate).format('LL') === moment().format('LL')){
      text = "Today's ";
       this.setState({
@@ -281,23 +293,32 @@ class PersistentDrawerLeft extends React.Component {
       
      
     }else{
-    
+      
       newItem2.id = count;
       newItem2.startTime = moment.utc(s[s.length - 1].startTime, "HH:mm:ss").add(moment.duration(s[s.length - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
+      if(newItem2.available_versions === undefined){
+        newItem2.duration = moment(item.scheduled_time.end) - moment(item.scheduled_time.start);
+        newItem2.versionPid = item.pid
+        newItem2.isLive = false;
+        s.push(newItem2)
+      }else{
       newItem2.duration = item.available_versions.version[0].duration
       newItem2.versionPid = item.available_versions.version[0].pid
       newItem2.isLive = false;
       s.push(newItem2)
-      console.log('Start Time', moment.utc().set(("00:00")))
+      }
 
   }
-  } 
+  console.log(newItem2.startTime)
+
+  
   this.setState({
       display:<Schedule data={s} deleteItem={this.deleteItem}/>  })
       
+    }
   }
 
-
+  
   iHandleClick = (text) => {
 
     

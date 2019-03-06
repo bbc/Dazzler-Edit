@@ -10,25 +10,34 @@ class NextSchedule extends React.Component {
   state = {
     broadcast: []
   };
-  componentDidMount(){
-        
+  componentDidUpdate(prevProps){
+    videos.splice(0, videos.length)
+    if (this.props.scheduleDate !== prevProps.scheduleDate) {
+   
+    //alert('not the same')
     var end = moment(this.props.scheduleDate).set({hour:23,minute:59,second:59,millisecond:59}).utcOffset(0).format();
     axios.get('https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/broadcast?sid=bbc_marathi_tv&start=' +
     this.props.scheduleDate + "&end=" + end).then((response) => {
       returnedData = response.data
+      console.log('https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/broadcast?sid=bbc_marathi_tv&start=' +
+      this.props.scheduleDate + "&end=" + end)
+      console.log(returnedData)
       for(let i =0; i < returnedData.length; i++){
+        
        
         videos.push( <SingleSchedule title="From Broadcast" startTime = {returnedData[i].published_time.start}
         duration={returnedData[i].published_time.duration}  />)
-        this.setState({
-          broadcast: [...this.state.broadcast, videos]
-        })
+     
        }
-
+       this.setState({
+        broadcast: [...this.state.broadcast, videos]
+      })
+  
+     
     }).catch(e => {
        console.log(e);
     });
- 
+  }
   
   }
 
