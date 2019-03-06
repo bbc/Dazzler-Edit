@@ -35,6 +35,7 @@ import Schedule from './Schedule';
 import PreviousSchedule from './PreviousSchedule';
 import NextSchedule from './NextSchedule';
 const drawerWidth = 240;
+var text = "Today's ";
 var s = [];
 var icons = [<MailIcon />, <InboxIcon />,  <Payment />, <Picture />, <Lock />, <Opacity />]
 var begin = moment().utcOffset(0);
@@ -44,7 +45,7 @@ begin.toISOString()
 
 end.set({hour:23,minute:59,second:5,millisecond:9})
 end.toISOString() 
-var count = 0;
+var count = -1;
 
 const styles = theme => ({
   root: {
@@ -127,7 +128,7 @@ class PersistentDrawerLeft extends React.Component {
     // this.loadPlaylist = this.loadPlaylist.bind(this);
 
     this.setState({
-      display: <Schedule data={s} deleteItem={this.deleteItem}/>
+      display: <Schedule data={s} deleteItem={this.deleteItem} text="Today's "/>
 
     })
       //Clips
@@ -191,38 +192,51 @@ class PersistentDrawerLeft extends React.Component {
 
   deleteItem(id){
     
+    //change this to map function
+    for(let i = 0; i < s.length; i++){
+      if(s[i].id ===id ){
+        s.splice(i, 1)
+      }
+    }
+    this.setState({
+      display:  <Schedule data={s} deleteItem={this.deleteItem} text={text}/>
+    })
+   
+  
   }
 
   previousDay(CDate){
     
+     text = moment(CDate).isAfter(moment()) ? "Future " : "Previous ";
+   
     if(moment(CDate).format('LL') === moment().format('LL')){
-     
+     text = "Today's ";
     this.setState({
       scheduleDate: CDate,
-      display: <Schedule data={s} deleteItem={this.deleteItem}/>
+      display: <Schedule data={s} deleteItem={this.deleteItem} text={text}/>
     })
     }else{
-
+    
     this.setState({
       scheduleDate: CDate,
-      display: <PreviousSchedule scheduleDate={moment(CDate).utcOffset(0).format()}/>
+      display: <PreviousSchedule scheduleDate={moment(CDate).utcOffset(0).format()} text={text}/>
      }) 
   }
 }
   nextDay(CDate){
-
-    
+     text = moment(CDate).isBefore(moment()) ? "Previous " : "Future ";
+ 
     if(moment(CDate).format('LL') === moment().format('LL')){
-      
+     text = "Today's ";
       this.setState({
         scheduleDate: CDate,
-        display: <Schedule data={s} deleteItem={this.deleteItem}/>
+        display: <Schedule data={s} deleteItem={this.deleteItem} text={text}/>
       })
       }else{
   
       this.setState({
         scheduleDate: CDate,
-        display: <NextSchedule scheduleDate={moment(CDate).utcOffset(0).format()}/>
+        display: <NextSchedule scheduleDate={moment(CDate).utcOffset(0).format()}text={text}/>
        }) 
     }
 
@@ -245,7 +259,7 @@ class PersistentDrawerLeft extends React.Component {
         s.push(newItem2)
         
       }else{
-        alert('LIVE')
+        
         newItem2.id = count;
         newItem2.versionPid = item.pid
         newItem2.isLive = true;

@@ -13,12 +13,13 @@ class Schedule extends React.Component {
     super(props)
 }
   state = {
-    scheduleArray: []
+    scheduleArray: [],
+    text: null
   };
 
   componentDidMount(){
     this.savePlaylist = this.savePlaylist.bind(this);
-    
+
   }
 
 
@@ -60,14 +61,9 @@ class Schedule extends React.Component {
 
   }
     render() {
- 
-      console.log('ARRAY', test)
-     
-      
-
       var videos = [];
       
-    
+      
       for(let i =0; i < this.props.data.length; i++){
       
        videos.push( <SingleSchedule title={this.props.data[i].title} startTime = {this.props.data[i].startTime}
@@ -75,10 +71,11 @@ class Schedule extends React.Component {
        
       }
     
-
+     
       return (
+      
         <div>
-          <center><h2>Today's Schedule</h2></center>
+          <center><h2>{this.props.text}Schedule</h2></center>
           <table className="ui compact celled definition table">
         <thead>
             <tr>

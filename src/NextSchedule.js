@@ -36,7 +36,7 @@ class NextSchedule extends React.Component {
     render() { 
       return (
         <div>
-          <center><h2>Today's Schedule</h2></center>
+          <center><h2>{this.props.text} Schedule</h2></center>
           <table className="ui compact celled definition table">
         <thead>
             <tr>

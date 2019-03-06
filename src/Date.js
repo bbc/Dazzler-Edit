@@ -1,8 +1,10 @@
 
 import React from 'react';
-
 import moment from 'moment';
-
+import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
+import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import FastForward from '@material-ui/icons/FastForward';
+import FastRewind from '@material-ui/icons/FastRewind';
 
 var current  = 0;
 class Date extends React.Component {
@@ -13,26 +15,26 @@ class Date extends React.Component {
         this.handleOtherClick = this.handleOtherClick.bind(this);
       }
       
-      handleClick(){
-        current += 1;
+      handleClick(days){
+        current += days;
         return moment().add(current, 'd').format('LL')
         
       };
-      handleOtherClick(){
-        current -= 1;
+      handleOtherClick(days){
+        current -= days;
       return moment().add(current, 'd').format('LL')
       };
   
-      render() {
-
-
-          
+      render() {   
     return(
-     <div>
+      <div className ="dateContainer"> 
+   
       <center>
-      <button onClick= {() => {this.props.previousDay(  this.handleOtherClick()  )}  }> Previous </button>
-        {this.props.scheduleDate}
-      <button onClick={() => {this.props.nextDay( this.handleClick() )} }  >Next</button>
+      <button><FastRewind onClick= {() => {this.props.previousDay(  this.handleOtherClick(7)  )}  }/></button>
+      <button><ChevronLeftIcon onClick= {() => {this.props.previousDay(  this.handleOtherClick(1)  )}  }/> </button>
+       {this.props.scheduleDate}
+      <button><ChevronRightIcon onClick={() => {this.props.nextDay( this.handleClick(1) )} }  /></button>
+      <button><FastForward onClick= {() => {this.props.nextDay(  this.handleClick(7)  )}  }/></button>
       </center>
     </div>
     )
