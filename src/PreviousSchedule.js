@@ -11,23 +11,30 @@ class PreviousSchedule extends React.Component {
         broadcast: []
       };
       
-      componentWillReceiveProps(){
-        
+      componentDidUpdate(prevProps){
+        if (this.props.scheduleDate !== prevProps.scheduleDate) {
+        videos.splice(0, videos.length)
+        //alert('not the same')
         var end = moment(this.props.scheduleDate).set({hour:23,minute:59,second:59,millisecond:59}).utcOffset(0).format();
         axios.get('https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/broadcast?sid=bbc_marathi_tv&start=' +
         this.props.scheduleDate + "&end=" + end).then((response) => {
           returnedData = response.data
           for(let i =0; i < returnedData.length; i++){
+            
            
             videos.push( <SingleSchedule title="From Broadcast" startTime = {returnedData[i].published_time.start}
             duration={returnedData[i].published_time.duration}  />)
-           
+         
            }
-
+           this.setState({
+            broadcast: [...this.state.broadcast, videos]
+          })
+      
+         
         }).catch(e => {
            console.log(e);
         });
-     
+      }
       
       }
 
@@ -51,7 +58,7 @@ class PreviousSchedule extends React.Component {
           {
             videos
           }
-        
+    
         
         </tbody>
           <tfoot className="full-width">
