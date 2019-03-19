@@ -3,7 +3,9 @@ import SingleSchedule from '../SingleSchedule/SingleSchedule';
 import moment from 'moment'
 import axios from 'axios'
 
+var count = -2;
 var loadedContent = [];
+var scheduleContent = [];
 var test = [];
 var videos = [];  
 var start = moment().utcOffset(0);
@@ -13,42 +15,22 @@ var finish = moment().set({hour:23,minute:59,second:59,millisecond:59}).utcOffse
 var returnedData = [];
 var oldVideos = [];
 
+
+
 class Schedule extends React.Component {
 
   state = {
     scheduleArray: [],
     text: null,
-    refresh: 2
+    refresh: 2,
+    data: []
   };
 
   componentDidMount(){
-    
+    var count = -2;
     this.savePlaylist = this.savePlaylist.bind(this);
     this.pasteContent = this.pasteContent.bind(this);
-
-    // axios.get('https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/broadcast?sid=bbc_marathi_tv&start=' +
-    // start.format() + "&end=" + finish).then((response) => {
-    //   returnedData = response.data
-    //  console.log('https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/broadcast?sid=bbc_marathi_tv&start=' +
-    //  start.format() + "&end=" + finish)
-    //   for(let i =0; i < returnedData.length; i++){
-        
-       
-    //     oldVideos.push( <SingleSchedule title="From Broadcast" startTime = {moment(returnedData[i].published_time.start).format("HH:mm:ss")}
-    //     duration={returnedData[i].published_time.duration} />)
-     
-    //    }
-    //    this.setState({
-    //     broadcast: [...this.state.broadcast, oldVideos]
-    //   })
-  
-     
-    // }).catch(e => {
-    //    console.log(e);
-    // });
-
   }
-
 
     savePlaylist(){
      var end =  moment.utc(this.props.data[this.props.data.length - 1].startTime, "HH:mm:ss").add(moment.duration(this.props.data[this.props.data.length - 1].duration)._milliseconds, 'milliseconds').format()
@@ -86,20 +68,22 @@ class Schedule extends React.Component {
   }
 
   pasteContent(content){
-    alert(loadedContent.length)
+   
       for(let i =0; i < content.length; i++){
 
-        if(i === 0 && content[i].isLive === false && loadedContent.length === 0){
+        if(content[i].isLive === false && loadedContent.length === 0){
           content[0].startTime = moment.utc("00:00", "HH:mm:ss").format("HH:mm:ss");
-          loadedContent.push(content[0])
+          content[i].id = count += 1;
+          loadedContent.push(content[0]);
+         
           
-        }
-        if(loadedContent.length > 0){
+        }else{
           content[i].startTime = moment.utc(loadedContent[loadedContent.length - 1].startTime, "HH:mm:ss").add(moment.duration(loadedContent[loadedContent.length - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
+          content[i].id = count += 1;
           loadedContent.push(content[i])
-          
-        }
 
+        }
+        
        videos.push( <SingleSchedule title={loadedContent[i].title} startTime = {loadedContent[i].startTime}
        duration={loadedContent[i].duration} deleteItem = {this.props.deleteItem} id = {loadedContent[i].id} />)
        
@@ -107,18 +91,28 @@ class Schedule extends React.Component {
       this.setState({refresh: 1})
       
   }
-    render() {
-      
-      console.log('Videos', videos)
-      
-      // for(let i =0; i < this.props.data.length; i++){
-      
-      //  videos.push( <SingleSchedule title={this.props.data[i].title} startTime = {this.props.data[i].startTime}
-      //  duration={this.props.data[i].duration} deleteItem = {this.props.deleteItem} id = {this.props.data[i].id} />)
-       
-      // }
+  componentDidUpdate(prevProps){
 
-      return (
+   if (this.props.remove !== prevProps.remove) {
+   
+    for(let i = 0; i < videos.length; i++){
+
+      if(videos[i].props.id === this.props.remove){
+        var content = <SingleSchedule title="" startTime = ""
+        duration={videos[i].props.duration} deleteItem = {this.props.deleteItem} id = {videos[i].props.id} style='tableStyle' />
+        
+        videos[i] = content;
+         this.setState({refresh: 1})
+      }
+    }
+    
+   }
+   
+  }
+
+    render() { 
+      
+     return (
       
         <div>
           <center><h2>{this.props.text}Schedule</h2></center>

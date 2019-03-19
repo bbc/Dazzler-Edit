@@ -17,14 +17,18 @@ class SingleSchedule extends React.Component {
            if(this.props.prev === 1){
                var additional = null;
            }else {
+             
              additional = 
-            <td><button className="Add" onClick={() => this.props.deleteItem(this.props.id)}>Delete</button>
-            <button className="Add"  onClick={() => this.props.deleteItem(this.props.id, 1)}>Delete w/gaps</button>
+            <td><button className="Add" onClick={() => this.props.deleteItem(this.props.id, 0)}>Delete</button> 
            </td>;
+           
+       
+
            }
     return (
         <Fragment>
-            <tr>
+          
+            <tr className = {this.props.style}>
            
            <td className="collapsing">
           

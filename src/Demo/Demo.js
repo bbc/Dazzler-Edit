@@ -38,8 +38,10 @@ import Schedule from '../Schedule/Schedule';
 import PreviousSchedule from '../PreviousSchedule/PreviousSchedule';
 import NextSchedule from '../NextSchedule/NextSchedule';
 const drawerWidth = 240;
-var text = "Today's ";
+var menuText;
+var text;
 var s = [];
+var n = [];
 var copiedContent = [];
 var icons = [<MailIcon />, <Movie />,  <Payment />, <Picture />, <Lock />, <Opacity />]
 var viewIcons = [<InboxIcon />, <Assignment />]
@@ -136,7 +138,7 @@ class Demo extends React.Component {
 
 
     this.setState({
-      display: <Schedule pasted ={copiedContent} data={s} deleteItem={this.deleteItem} text="Today's " loadPlaylist = {this.loadPlaylist}/>
+      display: <Schedule data={n} pasted ={copiedContent} data={s} deleteItem={this.deleteItem} text="Today's " loadPlaylist = {this.loadPlaylist}/>
 
     })
       //Clips
@@ -164,7 +166,7 @@ class Demo extends React.Component {
     //get request for webcasts 
     axios.get('https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/webcast?brand=w13xttvl&start=' 
     + begin.format() + '&end=' + end.format()).then((response) => {
-
+      console.log(response)
             for(let i =0; i < response.data.length; i++){
 
         if(!moment().isAfter(response.data[i].scheduled_time.start)){
@@ -205,41 +207,47 @@ class Demo extends React.Component {
     console.log('S', s)
 
     this.setState({
-      display: <Schedule pasted ={copiedContent} data={s} deleteItem={this.deleteItem} text={text} loadPlaylist = {this.loadPlaylist}/>
+      display: <Schedule  data={n} pasted ={copiedContent} data={s} deleteItem={this.deleteItem} text={text} loadPlaylist = {this.loadPlaylist}/>
     })
   }
 
   copyContent(rows){
-    if(rows.length > 0){
+    if(rows.length > 0){  
       rows.map((row, index) => (
       copiedContent.push(rows[index])
     ))
   }
 }
-  deleteItem(id, gaps){
+  deleteItem(id){
     //change this to map function
-    for(let i = 0; i < s.length; i++){
-      if(s[i].id ===id ){
-        s.splice(i, 1)
-      }
-    }
+    
+    // alert(id)
+    this.setState({
+      display:  <Schedule data={n} remove = {id} pasted ={copiedContent} data={s} deleteItem={this.deleteItem} text={text} loadPlaylist = {this.loadPlaylist}/>
+    })
 
-    //when item deleted, start times change.
-    if(!gaps){
+  //   for(let i = 0; i < s.length; i++){
+  //     if(s[i].id ===id ){
+  //       s.splice(i, 1)
+  //     }
+  //   }
+
+  //   //when item deleted, start times change.
+  //   if(!gaps){
       
     
-    if(s.length > 0){
-    s[0].startTime = moment.utc("00:00", "HH:mm:ss").format("HH:mm:ss");
-    }
-    for(let i = 1; i < s.length; i++){
-      if(s[i].isLive !== true){
-      s[i].startTime = moment.utc(s[i - 1].startTime, "HH:mm:ss").add(moment.duration(s[i - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
-    }
-  }
-    }
-    this.setState({
-      display:  <Schedule pasted ={copiedContent} data={s} deleteItem={this.deleteItem} text={text} loadPlaylist = {this.loadPlaylist}/>
-    })
+  //   if(s.length > 0){
+  //   s[0].startTime = moment.utc("00:00", "HH:mm:ss").format("HH:mm:ss");
+  //   }
+  //   for(let i = 1; i < s.length; i++){
+  //     if(s[i].isLive !== true){
+  //     s[i].startTime = moment.utc(s[i - 1].startTime, "HH:mm:ss").add(moment.duration(s[i - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
+  //   }
+  // }
+  //   }
+  //   this.setState({
+  //     display:  <Schedule pasted ={copiedContent} data={s} deleteItem={this.deleteItem} text={text} loadPlaylist = {this.loadPlaylist}/>
+  //   })
    
   
   }
@@ -252,7 +260,7 @@ class Demo extends React.Component {
      text = "Today's ";
     this.setState({
       scheduleDate: CDate,
-      display: <Schedule pasted ={copiedContent} data={s} deleteItem={this.deleteItem} text={text} loadPlaylist = {this.loadPlaylist}/>
+      display: <Schedule data={n} pasted ={copiedContent} data={s} deleteItem={this.deleteItem} text={text} loadPlaylist = {this.loadPlaylist}/>
     })
     }else{
     
@@ -270,7 +278,7 @@ class Demo extends React.Component {
      text = "Today's ";
       this.setState({
         scheduleDate: CDate,
-        display: <Schedule pasted ={copiedContent} data={s} deleteItem={this.deleteItem} text={text} loadPlaylist = {this.loadPlaylist}/>
+        display: <Schedule data={n} pasted ={copiedContent} data={s} deleteItem={this.deleteItem} text={text} loadPlaylist = {this.loadPlaylist}/>
       })
       }else{
   
@@ -282,6 +290,7 @@ class Demo extends React.Component {
 
   }
   handleClick = (item, isLive) => {
+    
     count++;
    
     const newItem2 = {
@@ -293,38 +302,50 @@ class Demo extends React.Component {
       if(newItem2.startTime === undefined){
        
         newItem2.versionPid = item.pid
-        newItem2.id = count;
+        
         newItem2.isLive = false;
       //  newItem2.startTime = moment.utc(s[s.length - 1].startTime, "HH:mm:ss").add(moment.duration(s[s.length - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
-        s.push(newItem2)
+        
+      if(menuText === 'Scratchpad') {s.push(newItem2)}else{n.push(newItem2)};
+      
         
       }else{
         
-        newItem2.id = count;
+        
         newItem2.versionPid = item.pid
         newItem2.isLive = true;
       
-        s.push(newItem2)
+        if(menuText === 'Scratchpad') {s.push(newItem2)}else{n.push(newItem2)};
        
       }
     }else{
 
-      newItem2.id = count;
+      
    //   newItem2.startTime = moment.utc("00:00", "HH:mm:ss").format("HH:mm:ss");
+      if(item.available_versions !== undefined){
       newItem2.duration = item.available_versions.version[0].duration
       newItem2.versionPid = item.available_versions.version[0].pid
+      }else {
+        newItem2.duration = moment(item.scheduled_time.end) - moment(item.scheduled_time.start);
+        newItem2.versionPid = item.pid;
+      }
       newItem2.isLive = false;
-      s.push(newItem2)
+      if(menuText === 'Scratchpad') {s.push(newItem2)}else{n.push(newItem2)};
       
     //  newItem2.startTime = moment.utc(s[s.length - 1].startTime, "HH:mm:ss").add(moment.duration(s[s.length - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
    
-      }
+      }  
       
-  
-  this.setState({ display: <Scratchpad data={s} deleteItem={this.deleteItem} copyContent={this.copyContent}/>})
-      
+      if(menuText === 'Scratchpad'){
+        this.setState({ display: <Scratchpad data={s} deleteItem={this.deleteItem} copyContent={this.copyContent}/>})
+    } 
+    if (menuText === 'Schedule'){
+      this.setState({ display: <Schedule data={n} pasted = {copiedContent} text="Today's "  deleteItem={this.deleteItem} /> });
     }
-  
+
+    console.log(s, 's')
+    console.log(n, 'n')
+  }
 
   
   iHandleClick = (text) => {
@@ -365,13 +386,15 @@ class Demo extends React.Component {
       return this.setState({ show: <Date /> });
     }
     if(text === 'Schedule'){
-     
-      return this.setState({ display: <Schedule pasted = {copiedContent} text="Today's " /> });
+      menuText = text;
+      return this.setState({ display: <Schedule data={n} pasted = {copiedContent} text="Today's "  deleteItem={this.deleteItem} /> });
     }
     if(text === 'Scratchpad'){
-     
+      menuText = text;
       return this.setState({ display: <Scratchpad data={s} deleteItem={this.deleteItem} copyContent={this.copyContent}/>});
     }
+
+    
   }
   
   
