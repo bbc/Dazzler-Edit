@@ -33,6 +33,7 @@ class Scratchpad extends React.Component {
       }
     return (
     <div>
+      <h1> Scratchpad </h1>
     <ReactDataGrid
       columns={columns}
       rowGetter={i => rows[i]}
