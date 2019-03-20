@@ -6,6 +6,7 @@ import axios from 'axios'
 var count = -2;
 var loadedContent = [];
 var scheduleContent = [];
+var updateCounter = -1;
 var test = [];
 var videos = [];  
 var vids = [];
@@ -92,7 +93,7 @@ class Schedule extends React.Component {
        duration={loadedContent[loadedContent.length - 1].duration} deleteItem = {this.props.deleteItem} id = {loadedContent[loadedContent.length - 1].id} />)
        
       }
-      alert(loadedContent.length)
+      
       this.setState({refresh: 1})
       
   }
@@ -100,21 +101,22 @@ class Schedule extends React.Component {
   
     if(prevProps.dataLength !== this.props.dataLength){
       
-
+    updateCounter++;
 
       scheduleContent = this.props.data;
       
 
-      for(let i = prevProps.dataLength || 0; i < this.props.data.length; i++){
-  
+      for(let i = updateCounter; i < this.props.data.length; i++){
+        
        if(scheduleContent[i].isLive === false && videos.length === 0){
-         scheduleContent[0].startTime = moment.utc("00:00", "HH:mm:ss").format("HH:mm:ss");
+         scheduleContent[i].startTime = moment.utc("00:00", "HH:mm:ss").format("HH:mm:ss");
          scheduleContent[i].id = count += 1;
          loadedContent.push(scheduleContent[i]);
         
   
        }else{
-         scheduleContent[i].startTime = moment.utc(scheduleContent[i - 1].startTime, "HH:mm:ss").add(moment.duration(scheduleContent[i - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
+        
+         scheduleContent[i].startTime = moment.utc(loadedContent[loadedContent.length - 1].startTime, "HH:mm:ss").add(moment.duration(scheduleContent[i - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
          scheduleContent[i].id = count += 1;
          loadedContent.push(scheduleContent[i]);
 
