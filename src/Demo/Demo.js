@@ -38,7 +38,7 @@ import Schedule from '../Schedule/Schedule';
 import PreviousSchedule from '../PreviousSchedule/PreviousSchedule';
 import NextSchedule from '../NextSchedule/NextSchedule';
 const drawerWidth = 240;
-var menuText;
+var menuText = "Schedule";
 var text;
 var s = [];
 var n = [];
@@ -336,15 +336,14 @@ class Demo extends React.Component {
    
       }  
       
-      if(menuText === 'Scratchpad'){
+    if(menuText === 'Scratchpad'){
         this.setState({ display: <Scratchpad data={s} deleteItem={this.deleteItem} copyContent={this.copyContent}/>})
-    } 
+    }   
     if (menuText === 'Schedule'){
-      this.setState({ display: <Schedule data={n} pasted = {copiedContent} text="Today's "  deleteItem={this.deleteItem} /> });
+      this.setState({ display: <Schedule data={n} dataLength = {n.length} pasted = {copiedContent} text="Today's "  deleteItem={this.deleteItem} /> });
     }
 
-    console.log(s, 's')
-    console.log(n, 'n')
+    
   }
 
   

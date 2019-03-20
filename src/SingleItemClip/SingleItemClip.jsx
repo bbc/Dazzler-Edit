@@ -12,9 +12,7 @@ const SingleItemClip = (props) => {
     var timeDiff = Math.abs(date2.getTime() - date1.getTime());
   
     var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24) - 1); 
-    // if(diffDays < 1){
-    //     var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24) - 1); 
-    // }
+
    
     return (
 

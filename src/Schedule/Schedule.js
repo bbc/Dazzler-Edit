@@ -8,6 +8,7 @@ var loadedContent = [];
 var scheduleContent = [];
 var test = [];
 var videos = [];  
+var vids = [];
 var start = moment().utcOffset(0);
 var newStart = moment().utcOffset(0);
 start.set({hour:0,minute:0,second:0,millisecond:0})
@@ -29,7 +30,9 @@ class Schedule extends React.Component {
   componentDidMount(){
     var count = -2;
     this.savePlaylist = this.savePlaylist.bind(this);
-    this.pasteContent = this.pasteContent.bind(this);
+    this.pasteContent = this.pasteContent.bind(this);    
+    this.setState({data: this.props.data})
+    
   }
 
     savePlaylist(){
@@ -56,7 +59,7 @@ class Schedule extends React.Component {
     headers: {
       'Content-Type': 'application/json'
     },
-    data: test
+    // data: test
     })
     .then(function (response) {
         console.log(response);
@@ -68,7 +71,8 @@ class Schedule extends React.Component {
   }
 
   pasteContent(content){
-   
+
+       
       for(let i =0; i < content.length; i++){
 
         if(content[i].isLive === false && loadedContent.length === 0){
@@ -92,7 +96,35 @@ class Schedule extends React.Component {
       
   }
   componentDidUpdate(prevProps){
+  
+    if(prevProps.dataLength !== this.props.dataLength){
+      
 
+      scheduleContent = this.props.data;
+      
+
+      for(let i = prevProps.dataLength || 0; i < this.props.data.length; i++){
+  
+       if(scheduleContent[i].isLive === false && videos.length === 0){
+         scheduleContent[0].startTime = moment.utc("00:00", "HH:mm:ss").format("HH:mm:ss");
+         scheduleContent[i].id = count += 1;
+    
+        
+  
+       }else{
+         scheduleContent[i].startTime = moment.utc(scheduleContent[i - 1].startTime, "HH:mm:ss").add(moment.duration(scheduleContent[i - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
+         scheduleContent[i].id = count += 1;
+
+
+       }
+       
+      videos.push( <SingleSchedule title={scheduleContent[i].title} startTime = {scheduleContent[i].startTime}
+      duration={scheduleContent[i].duration} deleteItem = {this.props.deleteItem} id = {scheduleContent[i].id} />)
+      
+     }
+     this.setState({refresh: 1})
+    }
+    
    if (this.props.remove !== prevProps.remove) {
    
     for(let i = 0; i < videos.length; i++){
@@ -107,14 +139,17 @@ class Schedule extends React.Component {
     }
     
    }
-   
-  }
 
+
+  }
     render() { 
-      
+   
+
      return (
+       
       
         <div>
+            
           <center><h2>{this.props.text}Schedule</h2></center>
           <table className="ui compact celled definition table">
         <thead>
@@ -130,8 +165,9 @@ class Schedule extends React.Component {
         <tbody>
           {
             videos
-          }
-        
+            
+          } 
+
         </tbody>
           <tfoot className="full-width">
             <tr>
@@ -145,7 +181,7 @@ class Schedule extends React.Component {
              
                 <div className="ui left floated small primary labeled icon button"  onClick  = { () => {this.pasteContent(this.props.pasted)} }   >
                   Paste  
-                </div>
+                  </div>
 
               </th>
             </tr>

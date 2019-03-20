@@ -21,10 +21,10 @@ class SingleSchedule extends React.Component {
              additional = 
             <td><button className="Add" onClick={() => this.props.deleteItem(this.props.id, 0)}>Delete</button> 
            </td>;
-           
-       
-
            }
+           
+             
+           
     return (
         <Fragment>
           
