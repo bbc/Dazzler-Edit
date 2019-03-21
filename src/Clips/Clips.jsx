@@ -14,6 +14,7 @@ import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import LastPageIcon from "@material-ui/icons/LastPage";
 import moment from 'moment';
+import Spinner from "../Spinner/Spinner";
 
 
  const actionsStyles = theme => ({
@@ -122,6 +123,7 @@ export const styles = theme => ({
   }
 });
 var cells = [];
+var idType
 export class Clips extends React.Component {
   
     constructor(props){
@@ -182,6 +184,10 @@ export class Clips extends React.Component {
     {console.log(rows)};
     const emptyRows =
       rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
+
+      if(this.state.rows === null || undefined){
+        return <Spinner />
+      }
 
     return (
         <div>

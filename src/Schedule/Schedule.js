@@ -2,21 +2,20 @@ import React from 'react';
 import SingleSchedule from '../SingleSchedule/SingleSchedule';
 import moment from 'moment'
 import axios from 'axios'
+import Arrow from '@material-ui/icons/ArrowRightAlt';
 
 var count = -2;
 var loadedContent = [];
 var scheduleContent = [];
 var updateCounter = -1;
 var test = [];
+var reduce = 0;
 var videos = [];  
 var vids = [];
 var start = moment().utcOffset(0);
 var newStart = moment().utcOffset(0);
 start.set({hour:0,minute:0,second:0,millisecond:0})
 var finish = moment().set({hour:23,minute:59,second:59,millisecond:59}).utcOffset(0).format();
-var returnedData = [];
-var oldVideos = [];
-
 
 
 class Schedule extends React.Component {
@@ -33,21 +32,35 @@ class Schedule extends React.Component {
     this.savePlaylist = this.savePlaylist.bind(this);
     this.pasteContent = this.pasteContent.bind(this);    
     this.setState({data: this.props.data})
+    this.getCrid = this.getCrid.bind(this);
     
   }
 
+  getCrid(item) {
+    var idType = '';
+    item.identifiers.identifier.forEach(id => {
+      
+      if(id.type === 'crid'){
+        idType = id.$
+      }
+    })
+   return idType;
+  }
     savePlaylist(){
-     var end =  moment.utc(this.props.data[this.props.data.length - 1].startTime, "HH:mm:ss").add(moment.duration(this.props.data[this.props.data.length - 1].duration)._milliseconds, 'milliseconds').format()
+      test  = [];
+     var end =  moment.utc(loadedContent[loadedContent.length - 1].startTime, "HH:mm:ss").add(moment.duration(loadedContent[loadedContent.length - 1].duration)._milliseconds, 'milliseconds').format()
      
-      for(let i =0; i < this.props.data.length; i++){
-           newStart.set({hour:this.props.data[i].startTime.charAt(0) + this.props.data[i].startTime.charAt(1),
-            minute:this.props.data[i].startTime.charAt(3) + this.props.data[i].startTime.charAt(4),
-            second:this.props.data[i].startTime.charAt(6) + this.props.data[i].startTime.charAt(7)})
+      for(let i =0; i < loadedContent.length; i++){
+           newStart.set({hour:loadedContent[i].startTime.charAt(0) + loadedContent[i].startTime.charAt(1),
+            minute:loadedContent[i].startTime.charAt(3) + loadedContent[i].startTime.charAt(4),
+            second:loadedContent[i].startTime.charAt(6) + loadedContent[i].startTime.charAt(7)})
            test.push( {
-              "broadcast_of": this.props.data[i].versionPid,
+              "broadcast_of": loadedContent[i].versionPid,
+              "broadcast_of_crid": this.getCrid(loadedContent[i]),
               "start": newStart.format(),
-              "duration": this.props.data[i].duration,
-              "live": this.props.data[i].isLive,
+              "duration": loadedContent[i].duration,
+              "live": loadedContent[i].isLive, 
+              //"entity_type": "clip" (when its an episode it will have episode in there, if clip it will be CLIP)
               "repeat": false
             },)
   
@@ -60,7 +73,7 @@ class Schedule extends React.Component {
     headers: {
       'Content-Type': 'application/json'
     },
-    // data: test
+    data: test
     })
     .then(function (response) {
         console.log(response);
@@ -72,16 +85,22 @@ class Schedule extends React.Component {
   }
 
   pasteContent(content){
-    
+    // videos.pop()
       for(let i = 0; i < content.length; i++){
 
         if(content[i].isLive === false && loadedContent.length === 0){
-          content[0].startTime = moment.utc("00:00", "HH:mm:ss").format("HH:mm:ss");
+          content[i].startTime = moment.utc("00:00", "HH:mm:ss").format("HH:mm:ss");
           content[i].id = count += 1;
           loadedContent.push(content[i]);
          
           
-        }else{
+        }else if (content[i].isLive === true ){
+          content[i].id = count += 1;
+          loadedContent.push(content[i]);
+        
+        
+        
+      }else{
           
           content[i].startTime = moment.utc(loadedContent[loadedContent.length - 1].startTime, "HH:mm:ss").add(moment.duration(loadedContent[loadedContent.length - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
           content[i].id = count += 1;
@@ -93,58 +112,97 @@ class Schedule extends React.Component {
        duration={loadedContent[loadedContent.length - 1].duration} deleteItem = {this.props.deleteItem} id = {loadedContent[loadedContent.length - 1].id} />)
        
       }
-      
+      // videos.push( <SingleSchedule select="Chosen" />)
       this.setState({refresh: 1})
       
   }
-  componentDidUpdate(prevProps){
-  
-    if(prevProps.dataLength !== this.props.dataLength){
+  componentDidUpdate(prevProps){  
+    
+    if(prevProps.dataLength !== (this.props.dataLength - reduce)){
+      updateCounter++;
+      // videos.pop()
       
-    updateCounter++;
 
       scheduleContent = this.props.data;
       
+      console.log("update counter - reduce", updateCounter - 1)
+      console.log("props length", this.props.dataLength)
+      console.log("props length + reduce", this.props.dataLength - reduce)
+      console.log("loaded COntent", loadedContent)
+      console.log('updateCounter', updateCounter)
+      console.log('pp del', prevProps.dataLength - reduce)
 
-      for(let i = updateCounter; i < this.props.data.length; i++){
+      for(let i = updateCounter; i < (this.props.dataLength - reduce); i++){
         
        if(scheduleContent[i].isLive === false && videos.length === 0){
          scheduleContent[i].startTime = moment.utc("00:00", "HH:mm:ss").format("HH:mm:ss");
          scheduleContent[i].id = count += 1;
          loadedContent.push(scheduleContent[i]);
+         this.setState({refresh: 1})
         
   
-       }else{
+       }else if(scheduleContent[i].isLive === true){
+        scheduleContent[i].id = count += 1;
+        loadedContent.push(scheduleContent[i]);
+        this.setState({refresh: 1})
+       }
+       
+       else{
         
          scheduleContent[i].startTime = moment.utc(loadedContent[loadedContent.length - 1].startTime, "HH:mm:ss").add(moment.duration(scheduleContent[i - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
          scheduleContent[i].id = count += 1;
          loadedContent.push(scheduleContent[i]);
-
+         this.setState({refresh: 1})
        }
        
-      videos.push( <SingleSchedule title={loadedContent[i].title} startTime = {loadedContent[i].startTime}
-      duration={loadedContent[i].duration} deleteItem = {this.props.deleteItem} id = {loadedContent [i].id} />)
+      videos.push( <SingleSchedule title={loadedContent[loadedContent.length - 1].title} startTime = {loadedContent[loadedContent.length - 1].startTime}
+      duration={loadedContent[loadedContent.length - 1].duration} deleteItem = {this.props.deleteItem} id = {loadedContent [loadedContent.length - 1].id} />)
       
      }
-     this.setState({refresh: 1})
+
+    //  videos.push( <SingleSchedule select="Chosen" />)
+     
     }
     
    if (this.props.remove !== prevProps.remove) {
-   
-    for(let i = 0; i < videos.length; i++){
+      // var content = <SingleSchedule title="" startTime = ""
+        // duration={videos[i].props.duration} deleteItem = {this.props.deleteItem} id = {videos[i].props.id} style='tableStyle' />
+        // videos[i] = content;
+        // updateCounter --;
+  
+    for(let i = 0; i < loadedContent.length; i++){
 
-      if(videos[i].props.id === this.props.remove){
-        var content = <SingleSchedule title="" startTime = ""
-        duration={videos[i].props.duration} deleteItem = {this.props.deleteItem} id = {videos[i].props.id} style='tableStyle' />
-        
-        videos[i] = content;
-         this.setState({refresh: 1})
+      if(loadedContent[i].id  === this.props.remove){
+        videos = [];
+        loadedContent.splice(i, 1)
+        updateCounter--;
+        reduce++;
+        this.setState({refresh: 1})
       }
     }
+    if(loadedContent.length > 0){
+  
+      loadedContent[0].startTime = moment.utc("00:00", "HH:mm:ss").format("HH:mm:ss");
+    
+
+      videos.push( <SingleSchedule title={loadedContent[0].title} startTime = {loadedContent[0].startTime}
+        duration={loadedContent[0].duration} deleteItem = {this.props.deleteItem} id = {loadedContent[0].id} />)
+        
+        }
+        for(let i = 1; i < loadedContent.length; i++){
+          
+          if(loadedContent[i].isLive !== true){
+            loadedContent[i].startTime = moment.utc(loadedContent[i - 1].startTime, "HH:mm:ss").add(moment.duration(loadedContent[i - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
+            videos.push( <SingleSchedule title={loadedContent[i].title} startTime = {loadedContent[i].startTime}
+              duration={loadedContent[i].duration} deleteItem = {this.props.deleteItem} id = {loadedContent [i].id} />)
+              
+              this.setState({refresh: 1})
+          }
     
    }
+  //  videos.push( <SingleSchedule select="Chosen" />)
 
-
+  }
   }
     render() { 
    console.log(loadedContent)
@@ -158,6 +216,7 @@ class Schedule extends React.Component {
           <table className="ui compact celled definition table">
         <thead>
             <tr>
+            <th>Select</th>
             <th></th>
             <th>Start</th>
             <th>Title</th>
@@ -176,7 +235,7 @@ class Schedule extends React.Component {
           <tfoot className="full-width">
             <tr>
               <th></th>
-              <th colSpan="5">
+              <th colSpan="6">
         
                 <div className="ui right floated small primary labeled icon button" onClick={this.savePlaylist}>
                   Save Playlist 

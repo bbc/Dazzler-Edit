@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react';
 import moment from 'moment';
+import Arrow from '@material-ui/icons/ArrowRightAlt';
 
 
 class SingleSchedule extends React.Component {
@@ -14,6 +15,7 @@ class SingleSchedule extends React.Component {
 
 }
         render() {
+          var chosen ='';
            if(this.props.prev === 1){
                var additional = null;
            }else {
@@ -22,14 +24,18 @@ class SingleSchedule extends React.Component {
             <td><button className="Add" onClick={() => this.props.deleteItem(this.props.id, 0)}>Delete</button> 
            </td>;
            }
-           
+           if(this.props.select === "Chosen"){
+            chosen = <Arrow />
+           }
+          
              
            
     return (
         <Fragment>
           
             <tr className = {this.props.style}>
-           
+
+            <td>{chosen}</td>
            <td className="collapsing">
           
            <input type="checkbox"/> <label></label>

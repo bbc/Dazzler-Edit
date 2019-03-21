@@ -135,14 +135,17 @@ class Demo extends React.Component {
     this.nextDay = this.nextDay.bind(this);
     this.loadPlaylist = this.loadPlaylist.bind(this);
     this.copyContent = this.copyContent.bind(this);
+    this.clearContent = this.clearContent.bind(this);
+   
 
 
     this.setState({
-      display: <Schedule data={n} pasted ={copiedContent} data={s} deleteItem={this.deleteItem} text="Today's " loadPlaylist = {this.loadPlaylist}/>
+      display: <Schedule data={n} dataLength = {n.length} pasted ={copiedContent} data={s} deleteItem={this.deleteItem} text="Today's " loadPlaylist = {this.loadPlaylist}/>
 
     })
       //Clips
     axios.get('https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/clip?language=marathi').then((response) => {
+      console.log(response, 'response')
         this.setState({
             items: response.data,
         })
@@ -166,7 +169,7 @@ class Demo extends React.Component {
     //get request for webcasts 
     axios.get('https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/webcast?brand=w13xttvl&start=' 
     + begin.format() + '&end=' + end.format()).then((response) => {
-      console.log(response)
+      console.log("WEBCAST", response)
             for(let i =0; i < response.data.length; i++){
 
         if(!moment().isAfter(response.data[i].scheduled_time.start)){
@@ -207,7 +210,7 @@ class Demo extends React.Component {
     console.log('S', s)
 
     this.setState({
-      display: <Schedule  data={n} pasted ={copiedContent} data={s} deleteItem={this.deleteItem} text={text} loadPlaylist = {this.loadPlaylist}/>
+      display: <Schedule  data={n} dataLength = {n.length} pasted ={copiedContent} data={s} deleteItem={this.deleteItem} text={text} loadPlaylist = {this.loadPlaylist}/>
     })
   }
 
@@ -218,12 +221,19 @@ class Demo extends React.Component {
     ))
   }
 }
+clearContent(){
+  s = [];
+  this.setState({ display: <Scratchpad data={s} deleteItem={this.deleteItem} copyContent={this.copyContent} clearContent={this.clearContent}/>})
+
+
+}
   deleteItem(id){
     //change this to map function
     
     // alert(id)
+
     this.setState({
-      display:  <Schedule data={n} remove = {id} pasted ={copiedContent} data={s} deleteItem={this.deleteItem} text={text} loadPlaylist = {this.loadPlaylist}/>
+      display:  <Schedule data={n} dataLength = {n.length} remove = {id} pasted ={copiedContent} data={s} deleteItem={this.deleteItem} text={text} loadPlaylist = {this.loadPlaylist}/>
     })
 
   //   for(let i = 0; i < s.length; i++){
@@ -260,7 +270,7 @@ class Demo extends React.Component {
      text = "Today's ";
     this.setState({
       scheduleDate: CDate,
-      display: <Schedule data={n} pasted ={copiedContent} data={s} deleteItem={this.deleteItem} text={text} loadPlaylist = {this.loadPlaylist}/>
+      display: <Schedule data={n} dataLength = {n.length} pasted ={copiedContent} data={s} deleteItem={this.deleteItem} text={text} loadPlaylist = {this.loadPlaylist}/>
     })
     }else{
     
@@ -278,7 +288,7 @@ class Demo extends React.Component {
      text = "Today's ";
       this.setState({
         scheduleDate: CDate,
-        display: <Schedule data={n} pasted ={copiedContent} data={s} deleteItem={this.deleteItem} text={text} loadPlaylist = {this.loadPlaylist}/>
+        display: <Schedule data={n} dataLength = {n.length} pasted ={copiedContent} data={s} deleteItem={this.deleteItem} text={text} loadPlaylist = {this.loadPlaylist}/>
       })
       }else{
   
@@ -337,7 +347,7 @@ class Demo extends React.Component {
       }  
       
     if(menuText === 'Scratchpad'){
-        this.setState({ display: <Scratchpad data={s} deleteItem={this.deleteItem} copyContent={this.copyContent}/>})
+        this.setState({ display: <Scratchpad data={s} deleteItem={this.deleteItem} copyContent={this.copyContent} clearContent={this.clearContent}/>})
     }   
     if (menuText === 'Schedule'){
       this.setState({ display: <Schedule data={n} dataLength = {n.length} pasted = {copiedContent} text="Today's "  deleteItem={this.deleteItem} /> });
@@ -351,7 +361,7 @@ class Demo extends React.Component {
 
     
     if(text === 'Clips'){
-      console.log("tsd", s)
+      
       this.setState({ isPaneOpen: true })
       this.setState({title: "Available Clips"})
       this.setState({ panelShow:   <Clips items={this.state.items}  handleClick={this.handleClick} />});
@@ -386,11 +396,11 @@ class Demo extends React.Component {
     }
     if(text === 'Schedule'){
       menuText = text;
-      return this.setState({ display: <Schedule data={n} pasted = {copiedContent} text="Today's "  deleteItem={this.deleteItem} /> });
+      return this.setState({ display: <Schedule data={n} dataLength = {n.length} pasted = {copiedContent} text="Today's "  deleteItem={this.deleteItem} /> });
     }
     if(text === 'Scratchpad'){
       menuText = text;
-      return this.setState({ display: <Scratchpad data={s} deleteItem={this.deleteItem} copyContent={this.copyContent}/>});
+      return this.setState({ display: <Scratchpad data={s} deleteItem={this.deleteItem} clearContent = {this.clearContent} copyContent={this.copyContent}/>});
     }
 
     
