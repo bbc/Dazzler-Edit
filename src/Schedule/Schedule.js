@@ -85,7 +85,7 @@ class Schedule extends React.Component {
   }
 
   pasteContent(content){
-    // videos.pop()
+    videos.pop()
       for(let i = 0; i < content.length; i++){
 
         if(content[i].isLive === false && loadedContent.length === 0){
@@ -112,7 +112,7 @@ class Schedule extends React.Component {
        duration={loadedContent[loadedContent.length - 1].duration} deleteItem = {this.props.deleteItem} id = {loadedContent[loadedContent.length - 1].id} />)
        
       }
-      // videos.push( <SingleSchedule select="Chosen" />)
+      videos.push( <SingleSchedule select="Chosen" />)
       this.setState({refresh: 1})
       
   }
@@ -120,7 +120,7 @@ class Schedule extends React.Component {
     
     if(prevProps.dataLength !== (this.props.dataLength - reduce)){
       updateCounter++;
-      // videos.pop()
+       videos.pop()
       
 
       scheduleContent = this.props.data;
@@ -160,15 +160,12 @@ class Schedule extends React.Component {
       
      }
 
-    //  videos.push( <SingleSchedule select="Chosen" />)
+    videos.push( <SingleSchedule select="Chosen" />)
      
     }
     
    if (this.props.remove !== prevProps.remove) {
-      // var content = <SingleSchedule title="" startTime = ""
-        // duration={videos[i].props.duration} deleteItem = {this.props.deleteItem} id = {videos[i].props.id} style='tableStyle' />
-        // videos[i] = content;
-        // updateCounter --;
+
   
     for(let i = 0; i < loadedContent.length; i++){
 
@@ -200,7 +197,7 @@ class Schedule extends React.Component {
           }
     
    }
-  //  videos.push( <SingleSchedule select="Chosen" />)
+   videos.push( <SingleSchedule select="Chosen" />)
 
   }
   }

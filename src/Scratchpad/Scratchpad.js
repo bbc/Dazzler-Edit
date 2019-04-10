@@ -43,15 +43,11 @@ class Scratchpad extends React.Component {
     rows = [];
     
       if(this.props.data.length > 0){
-        console.log(this.props.data)
+      console.log(this.props.data)
       length = this.props.data.length;
       this.props.data.map((item, idx) => (
       rows.push(this.props.data[idx]) ))
       }
-
-      
-   
-
       
     return (
     <div>
