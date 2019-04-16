@@ -38,15 +38,15 @@ class Date extends React.Component {
 
       
       {/* <button><ChevronLeftIcon onClick= {() => {this.props.previousDay(  this.handleOtherClick(1)  )}  }/> </button> */}
-      <button class="ui labeled icon button" onClick= {() => {this.props.previousDay(  this.handleOtherClick(1)  )}  } >
+      <button class="ui icon button" onClick= {() => {this.props.previousDay(  this.handleOtherClick(1)  )}  } >
       <i class="left arrow icon"></i>
-       Previous
+      
       </button>
        {this.props.scheduleDate} 
       {/* <button><ChevronRightIcon onClick={() => {this.props.nextDay( this.handleClick(1) )} }  /></button> */}
-      <button class="ui right labeled icon button" onClick={() => {this.props.nextDay( this.handleClick(1) )} } >
+      <button class="ui icon button" onClick={() => {this.props.nextDay( this.handleClick(1) )} } >
       <i class="right arrow icon"></i>
-       Next
+     
       </button>
       {/* <button><FastForward onClick= {() => {this.props.nextDay(  this.handleClick(7)  )}  }/></button> */}
       <button class="ui icon button" onClick={() => {this.props.nextDay(  this.handleClick(7)  )}  } >

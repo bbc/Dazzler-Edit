@@ -2,6 +2,7 @@ import React from 'react';
 import SingleSchedule from '../SingleSchedule/SingleSchedule';
 import moment from 'moment'
 import axios from 'axios'
+import bigInteger from 'big-integer';
 import Arrow from '@material-ui/icons/ArrowRightAlt';
 
 var count = -2;
@@ -12,6 +13,11 @@ var test = [];
 var reduce = 0;
 var videos = [];  
 var vids = [];
+var pid_character_set = [
+  '0','1','2','3','4','5','6','7','8','9','b','c','d','f','g','h','j','k','l',
+  'm','n','p','q','r','s','t','v','w','x','y','z'
+];
+var PID_BASE = bigInteger.valueOf(pid_character_set.length);
 var start = moment().utcOffset(0);
 var newStart = moment().utcOffset(0);
 start.set({hour:0,minute:0,second:0,millisecond:0})
@@ -43,7 +49,24 @@ class Schedule extends React.Component {
       if(id.type === 'crid'){
         idType = id.$
       }
+      if(item.item_type = "window"){
+        var cridStart = "crid://bbc.co.uk/" + 
+        item.pid.charAt(0) + '/';
+        var value = item.pid.substring(1).split("");
+        var n = bigInteger.zero;
+        for(var i = 0; i < value.length; i++){
+            var p = pid_character_set.indexOf(value[i]);
+            console.log('newp', p)
+            n = n.multiply(pid_character_set.length).add(p);
+        }
+       
+        idType = cridStart + n.toString()
+      
+      }
+      
     })
+   
+    
    return idType;
   }
     savePlaylist(){
@@ -150,51 +173,13 @@ if(this.props.remove !== undefined ){ updateCounter--;}else{ updateCounter++;}
       videos.push( <SingleSchedule title={loadedContent[loadedContent.length - 1].title} startTime = {loadedContent[loadedContent.length - 1].startTime}
       duration={loadedContent[loadedContent.length - 1].duration} deleteItem = {this.props.deleteItem} id = {loadedContent [loadedContent.length - 1].id} />)
       
-     }
-
-  
-     
+     }     
     }
-    
-  //  if (this.props.remove !== prevProps.remove) {
 
-  
-  //   for(let i = 0; i < loadedContent.length; i++){
-
-  //     if(loadedContent[i].id  === this.props.remove){
-  //       videos = [];
-  //       loadedContent.splice(i, 1)
-  //       updateCounter--;
-  //       reduce++;
-  //       this.setState({refresh: 1})
-  //     }
-  //   }
-  //   if(loadedContent.length > 0){
-  
-  //     loadedContent[0].startTime = moment.utc("00:00", "HH:mm:ss").format("HH:mm:ss");
-    
-
-  //     videos.push( <SingleSchedule title={loadedContent[0].title} startTime = {loadedContent[0].startTime}
-  //       duration={loadedContent[0].duration} deleteItem = {this.props.deleteItem} id = {loadedContent[0].id} />)
-        
-  //       }
-  //       for(let i = 1; i < loadedContent.length; i++){
-          
-  //         if(loadedContent[i].isLive !== true){
-  //           loadedContent[i].startTime = moment.utc(loadedContent[i - 1].startTime, "HH:mm:ss").add(moment.duration(loadedContent[i - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
-  //           videos.push( <SingleSchedule title={loadedContent[i].title} startTime = {loadedContent[i].startTime}
-  //             duration={loadedContent[i].duration} deleteItem = {this.props.deleteItem} id = {loadedContent [i].id} />)
-              
-  //             this.setState({refresh: 1})
-  //         }
-    
-  //  }
-  //  videos.push( <SingleSchedule select="Chosen" />)
-
-  // }
   }
     render() { 
       console.log(loadedContent, 'LC')
+     
      return (
        
       
