@@ -30,7 +30,8 @@ class Schedule extends React.Component {
     scheduleArray: [],
     text: null,
     refresh: 2,
-    data: []
+    data: [],
+    savePlaylist: "Save"
   };
 
   componentDidMount(){
@@ -43,33 +44,44 @@ class Schedule extends React.Component {
   }
 
   getCrid(item) {
-    var idType = '';
+    var idType;
     item.identifiers.identifier.forEach(id => {
-      
+
       if(id.type === 'crid'){
         idType = id.$
       }
-      if(item.item_type = "window"){
-        var cridStart = "crid://bbc.co.uk/" + 
-        item.pid.charAt(0) + '/';
-        var value = item.pid.substring(1).split("");
-        var n = bigInteger.zero;
-        for(var i = 0; i < value.length; i++){
-            var p = pid_character_set.indexOf(value[i]);
-            console.log('newp', p)
-            n = n.multiply(pid_character_set.length).add(p);
-        }
+      //   if(item.item_type === "window"){
+      //     idType = undefined;
+      
+      // }
+            //         **Pid2Crid Function
+      // if(item.item_type = "window"){
+      //   var cridStart = "crid://bbc.co.uk/" + 
+      //   item.pid.charAt(0) + '/';
+      //   var value = item.pid.substring(1).split("");
+      //   var n = bigInteger.zero;
+      //   for(var i = 0; i < value.length; i++){
+      //       var p = pid_character_set.indexOf(value[i]);
+      //       console.log('newp', p)
+      //       n = n.multiply(pid_character_set.length).add(p);
+      //   }
        
-        idType = cridStart + n.toString()
+      //   idType = cridStart + n.toString()
       
-      }
+      // }
       
-    })
-   
     
+    })
+    console.log('crid', idType)
    return idType;
   }
+
+
+
+
+
     savePlaylist(){
+      this.setState({savePlaylist: "Saving"});
       test  = [];
      var end =  moment.utc(loadedContent[loadedContent.length - 1].startTime, "HH:mm:ss").add(moment.duration(loadedContent[loadedContent.length - 1].duration)._milliseconds, 'milliseconds').format()
      
@@ -77,17 +89,30 @@ class Schedule extends React.Component {
            newStart.set({hour:loadedContent[i].startTime.charAt(0) + loadedContent[i].startTime.charAt(1),
             minute:loadedContent[i].startTime.charAt(3) + loadedContent[i].startTime.charAt(4),
             second:loadedContent[i].startTime.charAt(6) + loadedContent[i].startTime.charAt(7)})
-           test.push( {
-              "broadcast_of": loadedContent[i].versionPid,
-              "broadcast_of_crid": this.getCrid(loadedContent[i]),
+            var payLoad = {
               "start": newStart.format(),
-              "duration": loadedContent[i].duration,
+              "duration": moment.duration(loadedContent[i].duration).toIsoString(),
               "live": loadedContent[i].isLive, 
               //"entity_type": "clip" (when its an episode it will have episode in there, if clip it will be CLIP)
               "repeat": false
-            },)
+            }
+            if(loadedContent[i].item_type === "clip"){
+              payLoad.broadcast_of = loadedContent[i].versionPid;
+              payLoad.broadcast_of_crid = this.getCrid(loadedContent[i])
+            }
+            if(loadedContent[i].item_type === "window"){
+              loadedContent[i].window_of.forEach(id => {
+
+                if(id.result_type === 'version'){
+                  payLoad.broadcast_of = id.pid
+                }
+              });
+            }
+           test.push(payLoad);
+           console.log(test, 'LC')
   
      }
+    
 
   axios({
     method: 'post',
@@ -96,13 +121,16 @@ class Schedule extends React.Component {
     headers: {
       'Content-Type': 'application/json'
     },
-    data: test
+    data: test,
+    
+    
     })
     .then(function (response) {
-        console.log(response);
+        this.setState({savePlaylist: "Saved"});
+        alert('Saved')
     })
     .catch(function (error) {
-        console.log(error);
+        // alert('Error Saving')
     });
 
   }

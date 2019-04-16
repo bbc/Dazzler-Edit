@@ -286,28 +286,15 @@ clearContent(){
    if(isLive){
      
       if(newItem2.startTime === undefined){
-       
         newItem2.versionPid = item.pid
-        
         newItem2.isLive = false;
-      //  newItem2.startTime = moment.utc(s[s.length - 1].startTime, "HH:mm:ss").add(moment.duration(s[s.length - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
-        
-      if(menuText === 'Scratchpad') {s.push(newItem2)}else{n.push(newItem2)};
-      
-        
+
       }else{
-        
-        
         newItem2.versionPid = item.pid
         newItem2.isLive = true;
-      
-        if(menuText === 'Scratchpad') {s.push(newItem2)}else{n.push(newItem2)};
-       
       }
     }else{
 
-      
-   //   newItem2.startTime = moment.utc("00:00", "HH:mm:ss").format("HH:mm:ss");
       if(item.available_versions !== undefined){
       newItem2.duration = item.available_versions.version[0].duration
       newItem2.versionPid = item.available_versions.version[0].pid
@@ -315,11 +302,11 @@ clearContent(){
         newItem2.duration = moment(item.scheduled_time.end) - moment(item.scheduled_time.start);
         newItem2.versionPid = item.pid;
       }
+
       newItem2.isLive = false;
-      if(menuText === 'Scratchpad') {s.push(newItem2)}else{n.push(newItem2)};
       
-    //  newItem2.startTime = moment.utc(s[s.length - 1].startTime, "HH:mm:ss").add(moment.duration(s[s.length - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
-   
+      if(menuText === 'Scratchpad') {s.push(newItem2)}else{n.push(newItem2)};
+         
       }  
       
     if(menuText === 'Scratchpad'){
