@@ -7,22 +7,14 @@ import Arrow from '@material-ui/icons/ArrowRightAlt';
 
 var count = -2;
 var loadedContent = [];
+var reducer = 0;
 var scheduleContent = [];
 var updateCounter = -1;
 var test = [];
-var reduce = 0;
 var videos = [];  
-var vids = [];
-var pid_character_set = [
-  '0','1','2','3','4','5','6','7','8','9','b','c','d','f','g','h','j','k','l',
-  'm','n','p','q','r','s','t','v','w','x','y','z'
-];
-var PID_BASE = bigInteger.valueOf(pid_character_set.length);
 var start = moment().utcOffset(0);
 var newStart = moment().utcOffset(0);
 start.set({hour:0,minute:0,second:0,millisecond:0})
-var finish = moment().set({hour:23,minute:59,second:59,millisecond:59}).utcOffset(0).format();
-
 
 class Schedule extends React.Component {
 
@@ -39,8 +31,7 @@ class Schedule extends React.Component {
     this.savePlaylist = this.savePlaylist.bind(this);
     this.pasteContent = this.pasteContent.bind(this);    
     this.setState({data: this.props.data})
-    this.getCrid = this.getCrid.bind(this);
-  
+    this.getCrid = this.getCrid.bind(this);  
   }
 
   getCrid(item) {
@@ -49,37 +40,11 @@ class Schedule extends React.Component {
 
       if(id.type === 'crid'){
         idType = id.$
-      }
-      //   if(item.item_type === "window"){
-      //     idType = undefined;
-      
-      // }
-            //         **Pid2Crid Function
-      // if(item.item_type = "window"){
-      //   var cridStart = "crid://bbc.co.uk/" + 
-      //   item.pid.charAt(0) + '/';
-      //   var value = item.pid.substring(1).split("");
-      //   var n = bigInteger.zero;
-      //   for(var i = 0; i < value.length; i++){
-      //       var p = pid_character_set.indexOf(value[i]);
-      //       console.log('newp', p)
-      //       n = n.multiply(pid_character_set.length).add(p);
-      //   }
-       
-      //   idType = cridStart + n.toString()
-      
-      // }
-      
-    
+      } 
     })
     console.log('crid', idType)
    return idType;
   }
-
-
-
-
-
     savePlaylist(){
       this.setState({savePlaylist: "Saving"});
       test  = [];
@@ -122,8 +87,6 @@ class Schedule extends React.Component {
       'Content-Type': 'application/json'
     },
     data: test,
-    
-    
     })
     .then(function (response) {
         this.setState({savePlaylist: "Saved"});
@@ -168,13 +131,15 @@ class Schedule extends React.Component {
   }
   componentDidUpdate(prevProps){  
     
+
     if(prevProps.dataLength !== this.props.dataLength){
 // why is dataLength different to data.length??
-if(this.props.remove !== undefined ){ updateCounter--;}else{ updateCounter++;}
+    updateCounter++;
     
       scheduleContent = this.props.data;
       
-      for(let i = updateCounter; i < this.props.data.length; i++){
+
+      for(let i = loadedContent.length; i < this.props.data.length; i++){
         
        if(scheduleContent[i].isLive === false && videos.length === 0){
          scheduleContent[i].startTime = moment.utc("00:00", "HH:mm:ss").format("HH:mm:ss");
@@ -182,16 +147,14 @@ if(this.props.remove !== undefined ){ updateCounter--;}else{ updateCounter++;}
          loadedContent.push(scheduleContent[i]);
          this.setState({refresh: 1})
     
-  
+
        }else if(scheduleContent[i].isLive === true){
         scheduleContent[i].id = count += 1;
         loadedContent.push(scheduleContent[i]);
         this.setState({refresh: 1})
-     
        }
-       
        else{
-        
+
          scheduleContent[i].startTime = moment.utc(loadedContent[loadedContent.length - 1].startTime, "HH:mm:ss").add(moment.duration(scheduleContent[i - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
          scheduleContent[i].id = count += 1;
          loadedContent.push(scheduleContent[i]);
@@ -202,9 +165,32 @@ if(this.props.remove !== undefined ){ updateCounter--;}else{ updateCounter++;}
       duration={loadedContent[loadedContent.length - 1].duration} deleteItem = {this.props.deleteItem} id = {loadedContent [loadedContent.length - 1].id} />)
       
      }     
-    }
 
+    }
+    if(this.props.schStart !== prevProps.schStart){ 
+      
+      videos.map((item, idx) => {
+        if(item.props.startTime === this.props.schStart){
+          reducer++;
+          videos.splice(idx, 1);
+          this.setState({refresh: 1})
+        }
+    });
+    loadedContent.map((item, idx) => {
+      if(loadedContent.startTime === this.props.schStart){
+        loadedContent.splice(idx, 1);
+        this.setState({refresh: 1})
+      }
+  });
+  scheduleContent.map((item, idx) => {
+    if(scheduleContent.startTime === this.props.schStart){
+      scheduleContent.splice(idx, 1);
+      this.setState({refresh: 1})
+    }
+});
   }
+
+}
     render() { 
       console.log(loadedContent, 'LC')
      

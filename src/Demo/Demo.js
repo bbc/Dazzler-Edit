@@ -230,10 +230,8 @@ clearContent(){
 
 }
   deleteItem(id){
-
-   
     this.setState({
-      display:  <Schedule schStart={id} data={n} dataLength = {n.length} text='proof it changes' pasted ={copiedContent} data={s} deleteItem={this.deleteItem} text={text} loadPlaylist = {this.loadPlaylist}/>
+      display:  <Schedule schStart={id} data={n} dataLength = {n.length} pasted ={copiedContent} data={s} deleteItem={this.deleteItem} text={text} loadPlaylist = {this.loadPlaylist}/>
     })  
 
   }

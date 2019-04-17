@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import Hamburger from '@material-ui/icons/Menu';
 import ReactDataGrid from 'react-data-grid';
 import moment from 'moment';
 var rows = [];
@@ -10,7 +9,7 @@ var duration = 0;
 const columns = [
   { key: 'pid', name: 'pid' },
   { key: 'title', name: 'Title' },
-  { key: 'duration', name: 'duration' },
+  { key: 'newDuration', name: 'duration' },
   { key: 'Delete', name: 'Delete' }
  ];
 class Scratchpad extends React.Component {
@@ -34,7 +33,7 @@ class Scratchpad extends React.Component {
 
     if(prevProps.data.length !== this.props.data.length){
       if(this.props.data.length === 0){
-      this.setState({current: 'clear'})
+      this.setState({current: 'Cleared'})
       this.setState({refresh : 1})
       
     
@@ -44,15 +43,18 @@ class Scratchpad extends React.Component {
   render() {
     rows = [];
     duration = 0;
-      if(this.props.data.length > 0){
+    copiedContent = this.props.data;
+      if(copiedContent.length > 0){
       
-      length = this.props.data.length;
-      this.props.data.map((item, idx) => {
+      length = copiedContent.length;
+      copiedContent.map((item, idx) => {
         return(
       duration += moment.duration(item.duration)._milliseconds,
-      rows.push(this.props.data[idx])) })
+      item.newDuration = moment.duration(item.duration)._data.minutes + " minutes " + 
+      moment.duration(item.duration)._data.seconds + " seconds",
+      rows.push(item)) })
+      console.log('COPIED CONTENT', copiedContent)
       }
-      
     return (
     <div>
       <h1> Scratchpad</h1>
@@ -64,7 +66,6 @@ class Scratchpad extends React.Component {
       <button class="ui button active" onClick  = { () => {this.props.copyContent(rows)}} ><i class="download icon"></i> {this.state.status}</button>
       <button class="ui button active" onClick  = { () => {this.props.clearContent()}} ><i class="trash icon"></i> {this.state.current}</button>
       <button class="ui right floated button"> Duration: {moment(duration).format("HH:mm:ss")} </button>
-
       </div>
       
     );
