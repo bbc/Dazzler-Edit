@@ -2,8 +2,6 @@ import React from 'react';
 import SingleSchedule from '../SingleSchedule/SingleSchedule';
 import moment from 'moment'
 import axios from 'axios'
-import bigInteger from 'big-integer';
-import Arrow from '@material-ui/icons/ArrowRightAlt';
 
 var count = -2;
 var loadedContent = [];
@@ -122,7 +120,7 @@ class Schedule extends React.Component {
         }
         
        videos.push( <SingleSchedule title={loadedContent[loadedContent.length - 1].title} startTime = {loadedContent[loadedContent.length - 1].startTime}
-       duration={loadedContent[loadedContent.length - 1].duration} deleteItem = {this.props.deleteItem} id = {loadedContent[loadedContent.length - 1].id} />)
+       duration={loadedContent[loadedContent.length - 1].duration} deleteItem = {this.props.deleteItem} id = {this.props.id} />)
        
       }
      
@@ -139,7 +137,7 @@ class Schedule extends React.Component {
       scheduleContent = this.props.data;
       
 
-      for(let i = loadedContent.length; i < this.props.data.length; i++){
+      for(let i = loadedContent.length; i < this.props.dataLength; i++){
         
        if(scheduleContent[i].isLive === false && videos.length === 0){
          scheduleContent[i].startTime = moment.utc("00:00", "HH:mm:ss").format("HH:mm:ss");
@@ -149,12 +147,11 @@ class Schedule extends React.Component {
     
 
        }else if(scheduleContent[i].isLive === true){
-        scheduleContent[i].id = count += 1;
-        loadedContent.push(scheduleContent[i]);
-        this.setState({refresh: 1})
+            scheduleContent[i].id = count += 1;
+            loadedContent.push(scheduleContent[i]);
+            this.setState({refresh: 1})
        }
        else{
-
          scheduleContent[i].startTime = moment.utc(loadedContent[loadedContent.length - 1].startTime, "HH:mm:ss").add(moment.duration(scheduleContent[i - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
          scheduleContent[i].id = count += 1;
          loadedContent.push(scheduleContent[i]);
@@ -162,7 +159,7 @@ class Schedule extends React.Component {
        }
        
       videos.push( <SingleSchedule title={loadedContent[loadedContent.length - 1].title} startTime = {loadedContent[loadedContent.length - 1].startTime}
-      duration={loadedContent[loadedContent.length - 1].duration} deleteItem = {this.props.deleteItem} id = {loadedContent [loadedContent.length - 1].id} />)
+      duration={loadedContent[loadedContent.length - 1].duration} deleteItem = {this.props.deleteItem} id = {this.props.id} />)
       
      }     
 
@@ -171,29 +168,31 @@ class Schedule extends React.Component {
       
       videos.map((item, idx) => {
         if(item.props.startTime === this.props.schStart){
-          reducer++;
-          videos.splice(idx, 1);
+          reducer++; 
+          videos[idx] = <SingleSchedule deleteItem = {this.props.deleteItem} style = "blankScheduleItem" schStart = {this.props.schStart} duration={loadedContent[idx].duration}/>
           this.setState({refresh: 1})
         }
     });
+    videos.map((item, idx) => {
+      if(item.props.id === this.props.schStart){
+        reducer++;
+        videos.splice(idx, 1)
+        this.setState({refresh: 1})
+      }
+  });
     loadedContent.map((item, idx) => {
-      if(loadedContent.startTime === this.props.schStart){
+      if(loadedContent.id === this.props.schStart){
         loadedContent.splice(idx, 1);
         this.setState({refresh: 1})
       }
   });
-  scheduleContent.map((item, idx) => {
-    if(scheduleContent.startTime === this.props.schStart){
-      scheduleContent.splice(idx, 1);
-      this.setState({refresh: 1})
-    }
-});
+
   }
 
 }
     render() { 
       console.log(loadedContent, 'LC')
-     
+      console.log(this.props.data, 'data')
      return (
        
       

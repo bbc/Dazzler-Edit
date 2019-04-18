@@ -230,8 +230,14 @@ clearContent(){
 
 }
   deleteItem(id){
+  //   n.map((item, idx) => {
+  //     if(item.id === id){
+  //       n.splice(idx, 1);
+  //       this.setState({refresh: 1})
+  //     }
+  // });
     this.setState({
-      display:  <Schedule schStart={id} data={n} dataLength = {n.length} pasted ={copiedContent} data={s} deleteItem={this.deleteItem} text={text} loadPlaylist = {this.loadPlaylist}/>
+      display:  <Schedule schStart={id}  data={n} dataLength = {n.length} pasted ={copiedContent} data={s} deleteItem={this.deleteItem} text={text} loadPlaylist = {this.loadPlaylist}/>
     })  
 
   }
@@ -286,19 +292,24 @@ clearContent(){
       if(newItem2.startTime === undefined){
         newItem2.versionPid = item.pid
         newItem2.isLive = false;
+        newItem2.id = count;
 
       }else{
         newItem2.versionPid = item.pid
         newItem2.isLive = true;
+        newItem2.id = count;
       }
     }else{
 
       if(item.available_versions !== undefined){
       newItem2.duration = item.available_versions.version[0].duration
       newItem2.versionPid = item.available_versions.version[0].pid
+      newItem2.id = count;
+
       }else {
         newItem2.duration = moment(item.scheduled_time.end) - moment(item.scheduled_time.start);
         newItem2.versionPid = item.pid;
+        newItem2.id = count;
       }
 
       newItem2.isLive = false;
