@@ -175,8 +175,13 @@ class Schedule extends React.Component {
     videos.map((item, idx) => {
       if(item.props.id === this.props.schStart){
         reducer++;
-        videos.splice(idx, 1)
+        videos.splice(idx, videos.length)
         loadedContent.splice(idx, 1)
+        for(let i = idx; i < loadedContent.length; i++){
+          loadedContent[i].startTime = moment.utc(loadedContent[i - 1].startTime, "HH:mm:ss").add(moment.duration(loadedContent[i - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
+          videos.push( <SingleSchedule title={loadedContent[i].title} startTime = {loadedContent[i].startTime}
+            duration={loadedContent[i].duration} deleteItem = {this.props.deleteItem} id = {loadedContent[i].id} />)
+        }
         this.setState({refresh: 1})
       }
   });
