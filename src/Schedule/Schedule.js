@@ -7,7 +7,6 @@ var count = -2;
 var loadedContent = [];
 var reducer = 0;
 var scheduleContent = [];
-var updateCounter = -1;
 var test = [];
 var videos = [];  
 var start = moment().utcOffset(0);
@@ -30,8 +29,9 @@ class Schedule extends React.Component {
     this.savePlaylist = this.savePlaylist.bind(this);
     this.pasteContent = this.pasteContent.bind(this);    
     this.handleClick = this.handleClick.bind(this); 
-    this.setState({data: this.props.data})
+    this.deleteItem = this.deleteItem.bind(this); 
     this.getCrid = this.getCrid.bind(this);  
+    
     
   }
 
@@ -121,7 +121,7 @@ class Schedule extends React.Component {
         }
         
        videos.push( <SingleSchedule title={loadedContent[loadedContent.length - 1].title} startTime = {loadedContent[loadedContent.length - 1].startTime}
-       duration={loadedContent[loadedContent.length - 1].duration} deleteItem = {this.props.deleteItem} handleClick ={this.handleClick} id = {loadedContent[loadedContent.length - 1].id} />)
+       duration={loadedContent[loadedContent.length - 1].duration} deleteItem = {this.deleteItem} handleClick ={this.handleClick} id = {loadedContent[loadedContent.length - 1].id} />)
        
       }
      
@@ -130,24 +130,49 @@ class Schedule extends React.Component {
   }
 
   handleClick(startTime){
-  
+    index = null;
     for(let i = 0; i < videos.length; i++) {
       if(videos[i].props.startTime === startTime && videos[i].props.flag !== true){
       
        videos[i] =  <SingleSchedule title={loadedContent[i].title} startTime = {loadedContent[i].startTime}
-        duration={loadedContent[i].duration} deleteItem = {this.props.deleteItem} handleClick ={this.handleClick} id = {loadedContent[i].id} flag = {true} />
+        duration={loadedContent[i].duration} deleteItem = {this.deleteItem} handleClick ={this.handleClick} id = {loadedContent[i].id} flag = {true} border="border_bottom"/>
         index = i;
         this.setState({refresh: 1})
-        break;
       }else {
         videos[i] =  <SingleSchedule title={loadedContent[i].title} startTime = {loadedContent[i].startTime}
-        duration={loadedContent[i].duration} deleteItem = {this.props.deleteItem} handleClick ={this.handleClick} id = {loadedContent[i].id} flag = {false} />
-        index = null;
+        duration={loadedContent[i].duration} deleteItem = {this.deleteItem} handleClick ={this.handleClick} id = {loadedContent[i].id} flag = {false} />
       }
       
     }
       
       this.setState({refresh: 1})
+  }
+
+  deleteItem(id){
+
+      videos.map((item, idx) => {
+        if(item.props.startTime === id){
+          videos[idx] = <SingleSchedule deleteItem = {this.deleteItem} style = "blankScheduleItem" duration={loadedContent[idx].duration} id = {loadedContent[idx].id} handleClick ={this.handleClick} />
+          this.setState({refresh: 1})
+          return;
+          
+        }
+    });
+    videos.map((item, idx) => {
+      if(item.props.id === id){
+        videos.splice(idx, videos.length)
+        loadedContent.splice(idx, 1)
+        for(let i = idx; i < loadedContent.length; i++){
+          if(idx > 0){ 
+          loadedContent[i].startTime = moment.utc(loadedContent[i - 1].startTime, "HH:mm:ss").add(moment.duration(loadedContent[i - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
+          videos.push( <SingleSchedule title={loadedContent[i].title} startTime = {loadedContent[i].startTime}
+            duration={loadedContent[i].duration} deleteItem = {this.deleteItem} id = {loadedContent[i].id} handleClick ={this.handleClick} />)
+        }}
+        this.setState({refresh: 1})
+      } 
+  });
+
+
   }
   componentDidUpdate(prevProps){  
     
@@ -155,8 +180,7 @@ class Schedule extends React.Component {
     if(prevProps.dataLength !== this.props.dataLength){
 
 // why is dataLength different to data.length??
-    updateCounter++;
-    
+ 
       scheduleContent = this.props.data;
       
 
@@ -181,42 +205,21 @@ class Schedule extends React.Component {
          this.setState({refresh: 1})
        }
        
-       if(index !== null && videos[index].props.isLive === false){
+       if(index !== null || undefined && videos[index].props.isLive === false){
+         
          videos.splice(index + 1, 0, <SingleSchedule title={loadedContent[loadedContent.length - 1].title} startTime = {loadedContent[loadedContent.length - 1].startTime}
-          duration={loadedContent[loadedContent.length - 1].duration} deleteItem = {this.props.deleteItem} id = {loadedContent[loadedContent.length - 1].id} handleClick ={this.handleClick}/>)
-        }else{
+          duration={loadedContent[loadedContent.length - 1].duration} deleteItem = {this.deleteItem} id = {loadedContent[loadedContent.length - 1].id} handleClick ={this.handleClick}/>)
+         
+          loadedContent.splice(index +1, 0, scheduleContent[i]);
+         }else{
       videos.push( <SingleSchedule title={loadedContent[loadedContent.length - 1].title} startTime = {loadedContent[loadedContent.length - 1].startTime}
-      duration={loadedContent[loadedContent.length - 1].duration} deleteItem = {this.props.deleteItem} id = {loadedContent[loadedContent.length - 1].id} handleClick ={this.handleClick} />)
+      duration={loadedContent[loadedContent.length - 1].duration} deleteItem = {this.deleteItem} id = {loadedContent[loadedContent.length - 1].id} handleClick ={this.handleClick} />)
        }
       
      }     
 
     }
-    if(this.props.schStart !== prevProps.schStart){ 
-      
-      videos.map((item, idx) => {
-        if(item.props.startTime === this.props.schStart){
-          reducer++; 
-          videos[idx] = <SingleSchedule deleteItem = {this.props.deleteItem} style = "blankScheduleItem" schStart = {this.props.schStart} duration={loadedContent[idx].duration} id = {loadedContent[idx].id} handleClick ={this.handleClick}/>
-          this.setState({refresh: 1})
-        }
-    });
-    videos.map((item, idx) => {
-      if(item.props.id === this.props.schStart){
-        reducer++;
-        videos.splice(idx, videos.length)
-        loadedContent.splice(idx, 1)
-        for(let i = idx; i < loadedContent.length; i++){
-          loadedContent[i].startTime = moment.utc(loadedContent[i - 1].startTime, "HH:mm:ss").add(moment.duration(loadedContent[i - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
-          videos.push( <SingleSchedule title={loadedContent[i].title} startTime = {loadedContent[i].startTime}
-            duration={loadedContent[i].duration} deleteItem = {this.props.deleteItem} id = {loadedContent[i].id} handleClick ={this.handleClick} />)
-        }
-        this.setState({refresh: 1})
-      }
-  });
 
-
-  }
 
 }
     render() { 

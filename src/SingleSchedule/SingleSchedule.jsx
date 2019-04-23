@@ -16,7 +16,7 @@ class SingleSchedule extends React.Component {
             var additional = null;
        }else if (this.props.prev !== 1 && this.props.style !== undefined) {
             additional = 
-            <td><button className="Add" onClick={() => this.props.deleteItem(this.props.id)}>Delete</button> 
+            <td><button className="Add" onClick={() => this.props.deleteItem(this.props.id)}>Delete</button>
             </td>;
         }else{
             additional = 
@@ -26,7 +26,7 @@ class SingleSchedule extends React.Component {
   
 return (
     <Fragment>
-        <tr>
+        <tr className = {this.props.border}>
         <td onClick={() => this.props.handleClick(this.props.startTime)}> {this.props.flag === true ? <Arrow /> : null }</td>
         <td className="collapsing" className = {this.props.style}>
         <input type="checkbox"/> <label></label>
