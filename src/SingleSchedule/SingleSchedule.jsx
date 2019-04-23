@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react';
 import moment from 'moment';
+import Arrow from '@material-ui/icons/ArrowRightAlt';
 
 class SingleSchedule extends React.Component {
 
@@ -26,7 +27,7 @@ class SingleSchedule extends React.Component {
 return (
     <Fragment>
         <tr>
-        <td></td>
+        <td onClick={() => this.props.handleClick(this.props.startTime)}> {this.props.flag === true ? <Arrow /> : null }</td>
         <td className="collapsing" className = {this.props.style}>
         <input type="checkbox"/> <label></label>
         </td>

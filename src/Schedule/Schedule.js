@@ -28,8 +28,10 @@ class Schedule extends React.Component {
     var count = -2;
     this.savePlaylist = this.savePlaylist.bind(this);
     this.pasteContent = this.pasteContent.bind(this);    
+    this.handleClick = this.handleClick.bind(this); 
     this.setState({data: this.props.data})
     this.getCrid = this.getCrid.bind(this);  
+    
   }
 
   getCrid(item) {
@@ -118,12 +120,27 @@ class Schedule extends React.Component {
         }
         
        videos.push( <SingleSchedule title={loadedContent[loadedContent.length - 1].title} startTime = {loadedContent[loadedContent.length - 1].startTime}
-       duration={loadedContent[loadedContent.length - 1].duration} deleteItem = {this.props.deleteItem} id = {loadedContent[loadedContent.length - 1].id} />)
+       duration={loadedContent[loadedContent.length - 1].duration} deleteItem = {this.props.deleteItem} handleClick ={this.handleClick} id = {loadedContent[loadedContent.length - 1].id} />)
        
       }
      
       this.setState({refresh: 1})
       
+  }
+
+  handleClick(startTime){
+  
+    videos.map((item, idx) => {
+      if(item.props.startTime === startTime){
+       videos[idx] =  <SingleSchedule title={loadedContent[idx].title} startTime = {loadedContent[idx].startTime}
+        duration={loadedContent[idx].duration} deleteItem = {this.props.deleteItem} handleClick ={this.handleClick} id = {loadedContent[idx].id} flag = {true} />
+      }else {
+        videos[idx] =  <SingleSchedule title={loadedContent[idx].title} startTime = {loadedContent[idx].startTime}
+        duration={loadedContent[idx].duration} deleteItem = {this.props.deleteItem} handleClick ={this.handleClick} id = {loadedContent[idx].id} flag = {false} />
+      }
+      this.setState({refresh: 1})
+  });
+
   }
   componentDidUpdate(prevProps){  
     
@@ -158,7 +175,7 @@ class Schedule extends React.Component {
        }
        
       videos.push( <SingleSchedule title={loadedContent[loadedContent.length - 1].title} startTime = {loadedContent[loadedContent.length - 1].startTime}
-      duration={loadedContent[loadedContent.length - 1].duration} deleteItem = {this.props.deleteItem} id = {loadedContent[loadedContent.length - 1].id} />)
+      duration={loadedContent[loadedContent.length - 1].duration} deleteItem = {this.props.deleteItem} id = {loadedContent[loadedContent.length - 1].id} handleClick ={this.handleClick} />)
       
      }     
 
@@ -168,7 +185,7 @@ class Schedule extends React.Component {
       videos.map((item, idx) => {
         if(item.props.startTime === this.props.schStart){
           reducer++; 
-          videos[idx] = <SingleSchedule deleteItem = {this.props.deleteItem} style = "blankScheduleItem" schStart = {this.props.schStart} duration={loadedContent[idx].duration} id = {loadedContent[idx].id}/>
+          videos[idx] = <SingleSchedule deleteItem = {this.props.deleteItem} style = "blankScheduleItem" schStart = {this.props.schStart} duration={loadedContent[idx].duration} id = {loadedContent[idx].id} handleClick ={this.handleClick}/>
           this.setState({refresh: 1})
         }
     });
@@ -180,7 +197,7 @@ class Schedule extends React.Component {
         for(let i = idx; i < loadedContent.length; i++){
           loadedContent[i].startTime = moment.utc(loadedContent[i - 1].startTime, "HH:mm:ss").add(moment.duration(loadedContent[i - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
           videos.push( <SingleSchedule title={loadedContent[i].title} startTime = {loadedContent[i].startTime}
-            duration={loadedContent[i].duration} deleteItem = {this.props.deleteItem} id = {loadedContent[i].id} />)
+            duration={loadedContent[i].duration} deleteItem = {this.props.deleteItem} id = {loadedContent[i].id} handleClick ={this.handleClick} />)
         }
         this.setState({refresh: 1})
       }
@@ -191,8 +208,7 @@ class Schedule extends React.Component {
 
 }
     render() { 
-      console.log(loadedContent, 'LC')
-      console.log(videos, 'data')
+     
      return (
        
       
@@ -213,6 +229,7 @@ class Schedule extends React.Component {
         
         <tbody>
           {
+           
             videos
             
           } 
