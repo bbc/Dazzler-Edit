@@ -296,10 +296,10 @@ clearContent(){
 
       newItem2.isLive = false;
       
-      if(menuText === 'Scratchpad') {s.push(newItem2)}else{n.push(newItem2)};
+     
          
       }  
-      
+    if(menuText === 'Scratchpad') {s.push(newItem2)}else{n.push(newItem2)};
     if(menuText === 'Scratchpad'){
         this.setState({ display: <Scratchpad data={s} deleteItem={this.deleteItem} copyContent={this.copyContent} clearContent={this.clearContent}/>})
     }   
