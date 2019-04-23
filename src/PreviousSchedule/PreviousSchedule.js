@@ -82,10 +82,10 @@ class PreviousSchedule extends React.Component {
         <thead>
             <tr>
             <th></th>
+            <th></th>
             <th>Start</th>
             <th>Title</th>
             <th>Duration </th>
-            <th>Action </th>
             </tr>
         </thead>
         
@@ -100,10 +100,6 @@ class PreviousSchedule extends React.Component {
             <tr>
               <th></th>
               <th colSpan="5">
-        
-                <div className="ui right floated small primary labeled icon button" onClick={this.savePlaylist}>
-                  Save Playlist 
-                </div>
      
               </th>
             </tr>

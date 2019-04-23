@@ -133,7 +133,6 @@ class Demo extends React.Component {
     this.deleteItem = this.deleteItem.bind(this);
     this.previousDay = this.previousDay.bind(this);
     this.nextDay = this.nextDay.bind(this);
-    this.loadPlaylist = this.loadPlaylist.bind(this);
     this.copyContent = this.copyContent.bind(this);
     this.clearContent = this.clearContent.bind(this);
    
@@ -202,18 +201,6 @@ class Demo extends React.Component {
   handleDrawerClose = () => {
     this.setState({ open: false });
   };
-
-  loadPlaylist(oldData){
-    
-    for(let i = 0; i < oldData.length; i++){
-      s.push(oldData)
-    }
-    console.log('S', s)
-
-    this.setState({
-      display: <Schedule  data={n} dataLength = {n.length} pasted ={copiedContent} data={s} deleteItem={this.deleteItem} text={text} loadPlaylist = {this.loadPlaylist}/>
-    })
-  }
 
   copyContent(rows){
     copiedContent = [];
