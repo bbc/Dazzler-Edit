@@ -11,6 +11,14 @@ class SingleSchedule extends React.Component {
         return (moment.duration(this.props.duration)._data.seconds)
       }
   }
+
+  componentDidUpdate(prevProps){  
+    if(prevProps.flag !== this.props.flag){
+         this.forceUpdate();
+    }
+
+
+  }
     render() {
         if(this.props.prev === 1){
             var additional = null;

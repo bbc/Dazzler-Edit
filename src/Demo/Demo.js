@@ -130,6 +130,7 @@ class Demo extends React.Component {
   componentDidMount() {
    
     this.handleClick = this.handleClick.bind(this);
+    this.deleteItem = this.deleteItem.bind(this);
     this.previousDay = this.previousDay.bind(this);
     this.nextDay = this.nextDay.bind(this);
     this.copyContent = this.copyContent.bind(this);
@@ -215,7 +216,13 @@ clearContent(){
 
 
 }
+  deleteItem(id){
 
+    this.setState({
+      display:  <Schedule schStart={id}  data={n} dataLength = {n.length} pasted ={copiedContent} data={s} deleteItem={this.deleteItem} text={text} loadPlaylist = {this.loadPlaylist}/>
+    })  
+
+  }
 
  previousDay = (CDate) => {
      
@@ -292,7 +299,7 @@ clearContent(){
      
          
       }  
-    if(menuText === 'Scratchpad') {s.push(newItem2)}else{n.push(newItem2)};
+       if(menuText === 'Scratchpad') {s.push(newItem2)}else{n.push(newItem2)};
     if(menuText === 'Scratchpad'){
         this.setState({ display: <Scratchpad data={s} deleteItem={this.deleteItem} copyContent={this.copyContent} clearContent={this.clearContent}/>})
     }   

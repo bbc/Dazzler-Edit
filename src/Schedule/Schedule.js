@@ -5,13 +5,11 @@ import axios from 'axios'
 
 var count = -2;
 var loadedContent = [];
-var reducer = 0;
 var scheduleContent = [];
 var test = [];
 var videos = [];  
 var start = moment().utcOffset(0);
 var newStart = moment().utcOffset(0);
-var index = null;
 start.set({hour:0,minute:0,second:0,millisecond:0})
 
 class Schedule extends React.Component {
@@ -21,7 +19,8 @@ class Schedule extends React.Component {
     text: null,
     refresh: 2,
     data: [],
-    savePlaylist: "Save"
+    savePlaylist: "Save",
+    index: null
   };
 
   componentDidMount(){
@@ -31,8 +30,6 @@ class Schedule extends React.Component {
     this.handleClick = this.handleClick.bind(this); 
     this.deleteItem = this.deleteItem.bind(this); 
     this.getCrid = this.getCrid.bind(this);  
-    
-    
   }
 
   getCrid(item) {
@@ -130,22 +127,22 @@ class Schedule extends React.Component {
   }
 
   handleClick(startTime){
-    index = null;
+    
+    this.setState({index : null})
     for(let i = 0; i < videos.length; i++) {
       if(videos[i].props.startTime === startTime && videos[i].props.flag !== true){
       
        videos[i] =  <SingleSchedule title={loadedContent[i].title} startTime = {loadedContent[i].startTime}
         duration={loadedContent[i].duration} deleteItem = {this.deleteItem} handleClick ={this.handleClick} id = {loadedContent[i].id} flag = {true} border="border_bottom"/>
-        index = i;
-        this.setState({refresh: 1})
+        this.setState({index : i})
+       
       }else {
         videos[i] =  <SingleSchedule title={loadedContent[i].title} startTime = {loadedContent[i].startTime}
         duration={loadedContent[i].duration} deleteItem = {this.deleteItem} handleClick ={this.handleClick} id = {loadedContent[i].id} flag = {false} />
       }
-      
     }
-      
-      this.setState({refresh: 1})
+     this.setState({refresh : 1}) 
+    
   }
 
   deleteItem(id){
@@ -153,7 +150,7 @@ class Schedule extends React.Component {
       videos.map((item, idx) => {
         if(item.props.startTime === id){
           videos[idx] = <SingleSchedule deleteItem = {this.deleteItem} style = "blankScheduleItem" duration={loadedContent[idx].duration} id = {loadedContent[idx].id} handleClick ={this.handleClick} />
-          this.setState({refresh: 1})
+          this.forceUpdate();
           return;
           
         }
@@ -176,7 +173,6 @@ class Schedule extends React.Component {
   }
   componentDidUpdate(prevProps){  
     
-
     if(prevProps.dataLength !== this.props.dataLength){
 
 // why is dataLength different to data.length??
@@ -205,12 +201,12 @@ class Schedule extends React.Component {
          this.setState({refresh: 1})
        }
        
-       if(index !== null || undefined && videos[index].props.isLive === false){
+       if(this.state.index !== null && videos[this.state.index].props.isLive === false){
          
-         videos.splice(index + 1, 0, <SingleSchedule title={loadedContent[loadedContent.length - 1].title} startTime = {loadedContent[loadedContent.length - 1].startTime}
+         videos.splice(this.state.index + 1, 0, <SingleSchedule title={loadedContent[loadedContent.length - 1].title} startTime = {loadedContent[loadedContent.length - 1].startTime}
           duration={loadedContent[loadedContent.length - 1].duration} deleteItem = {this.deleteItem} id = {loadedContent[loadedContent.length - 1].id} handleClick ={this.handleClick}/>)
          
-          loadedContent.splice(index +1, 0, scheduleContent[i]);
+          loadedContent.splice(this.state.index + 1, 0, scheduleContent[i]);
          }else{
       videos.push( <SingleSchedule title={loadedContent[loadedContent.length - 1].title} startTime = {loadedContent[loadedContent.length - 1].startTime}
       duration={loadedContent[loadedContent.length - 1].duration} deleteItem = {this.deleteItem} id = {loadedContent[loadedContent.length - 1].id} handleClick ={this.handleClick} />)
@@ -223,7 +219,7 @@ class Schedule extends React.Component {
 
 }
     render() { 
-     
+
      return (
        
       
