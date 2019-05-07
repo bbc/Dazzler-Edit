@@ -169,6 +169,7 @@ class Demo extends React.Component {
     axios.get('https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/webcast?brand=w13xttvl&start=' 
     + begin.format() + '&end=' + end.format()).then((response) => {
       console.log("WEBCAST", response)
+   
             for(let i =0; i < response.data.length; i++){
 
         if(!moment().isAfter(response.data[i].scheduled_time.start)){

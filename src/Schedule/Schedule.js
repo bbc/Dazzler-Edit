@@ -71,7 +71,6 @@ class Schedule extends React.Component {
               });
             }
            test.push(payLoad);
-  
      }
     
 
@@ -83,6 +82,7 @@ class Schedule extends React.Component {
       'Content-Type': 'application/json'
     },
     data: test,
+   
     })
     .then(function (response) {
         this.setState({savePlaylist: "Saved"});
@@ -135,6 +135,7 @@ class Schedule extends React.Component {
        videos[i] =  <SingleSchedule title={loadedContent[i].title} startTime = {loadedContent[i].startTime}
         duration={loadedContent[i].duration} deleteItem = {this.deleteItem} handleClick ={this.handleClick} id = {loadedContent[i].id} flag = {true} border="border_bottom"/>
         this.setState({index : i})
+        break;
        
       }else {
         videos[i] =  <SingleSchedule title={loadedContent[i].title} startTime = {loadedContent[i].startTime}
@@ -201,13 +202,14 @@ class Schedule extends React.Component {
          this.setState({refresh: 1})
        }
        
-       if(this.state.index !== null && videos[this.state.index].props.isLive === false){
+       if(this.state.index !== null && loadedContent[this.state.index].isLive === false || undefined){
          
          videos.splice(this.state.index + 1, 0, <SingleSchedule title={loadedContent[loadedContent.length - 1].title} startTime = {loadedContent[loadedContent.length - 1].startTime}
           duration={loadedContent[loadedContent.length - 1].duration} deleteItem = {this.deleteItem} id = {loadedContent[loadedContent.length - 1].id} handleClick ={this.handleClick}/>)
          
           loadedContent.splice(this.state.index + 1, 0, scheduleContent[i]);
          }else{
+           console.log(videos)
       videos.push( <SingleSchedule title={loadedContent[loadedContent.length - 1].title} startTime = {loadedContent[loadedContent.length - 1].startTime}
       duration={loadedContent[loadedContent.length - 1].duration} deleteItem = {this.deleteItem} id = {loadedContent[loadedContent.length - 1].id} handleClick ={this.handleClick} />)
        }

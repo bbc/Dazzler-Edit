@@ -156,6 +156,7 @@ export class Live extends React.Component {
                         title: "Live Programme " + [i+ 1],
                         info: moment(this.props.live[i].scheduled_time.start).format("HH:mm"),
                         pid: this.props.live[i].pid,
+                        stream: this.props.live[i].service.sid.replace(/_/g, " "),
                         add: <button onClick  = { () => {this.props.handleClick(this.props.live[i], isLive)} }   > add</button>})
                         
 
@@ -197,6 +198,7 @@ export class Live extends React.Component {
             <TableBody>
             <th>Title</th>
             <th>Start Time</th>
+            <th>Stream</th>
             <th>Add</th>
             
         
@@ -208,6 +210,7 @@ export class Live extends React.Component {
                       {row.title}
                     </TableCell>
                     <TableCell align="right">{row.info}</TableCell>
+                    <TableCell align="right">{row.stream}</TableCell>
                     <TableCell align="right">{row.add}</TableCell>
                   </TableRow>
                 ))}
