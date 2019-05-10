@@ -1,0 +1,59 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Resources": {
+    "RecordSetGroup": {
+      "Type": "AWS::Route53::RecordSetGroup",
+      "Properties": {
+        "HostedZoneName": {
+          "Ref": "HostedZoneName"
+        },
+        "RecordSets": [
+          {
+            "TTL": "3600",
+            "Type": "CNAME",
+            "ResourceRecords": [
+              {
+                "Ref": "ExternalHostName"
+              }
+            ],
+            "Name": {
+              "Fn::Join": [
+                ".",
+                [
+                  {
+                    "Ref": "Subdomain"
+                  },
+                  {
+                    "Ref": "HostedZoneName"
+                  }
+                ]
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "Parameters": {
+    "HostedZoneName": {
+      "Default": "tools.bbc.co.uk.",
+      "Type": "String",
+      "Description": "The base of the hostname",
+      "AllowedValues": [
+        "api.bbc.com.",
+        "api.bbc.co.uk.",
+        "api.bbci.co.uk.",
+        "tools.bbc.co.uk."
+      ]
+    },
+    "Subdomain": {
+      "AllowedPattern": "^[a-z].*[a-z0-9]$",
+      "Type": "String",
+      "Description": "The 'Subdomain' value used in the main stack, eg dazzler.test"
+    },
+    "ExternalHostName": {
+      "Type": "String",
+      "Description": "This must match the 'ExternalHostName' output from the infrastructure stack"
+    }
+  }
+}
