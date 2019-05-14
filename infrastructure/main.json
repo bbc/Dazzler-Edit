@@ -1,0 +1,333 @@
+{
+  "Description": "A BBC Component template for Dazzler Edit. Includes autoscaled instances",
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Resources": {
+    "ComponentScalingPolicy": {
+      "Type": "AWS::AutoScaling::ScalingPolicy",
+      "Properties": {
+        "ScalingAdjustment": 1,
+        "AutoScalingGroupName": {
+          "Ref": "ComponentAutoScalingGroup"
+        },
+        "AdjustmentType": "ChangeInCapacity"
+      }
+    },
+    "ComponentAutoScalingGroup": {
+      "Type": "AWS::AutoScaling::AutoScalingGroup",
+      "Properties": {
+        "HealthCheckGracePeriod": 300,
+        "Tags": [
+          {
+            "Key": "BBCEnvironment",
+            "Value": { "Ref": "Environment" },
+            "PropagateAtLaunch": true
+          },
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "Environment"
+                  },
+                  "ws-dazzler-edit"
+                ]
+              ]
+            },
+            "PropagateAtLaunch": true
+          },
+          {
+            "Key": "BBCComponent",
+            "Value": "ws-dazzler-edit",
+            "PropagateAtLaunch": true
+          }
+        ],
+        "LaunchConfigurationName": {
+          "Ref": "ComponentLaunchConfiguration"
+        },
+        "MinSize": { "Ref": "MinSize" },
+        "MaxSize": { "Ref": "MaxSize" },
+        "VPCZoneIdentifier": [
+          {
+            "Fn::ImportValue": { "Fn::Sub": "${CoreInfrastructureStackName}-PrivateSubnet0" }
+          },
+          {
+            "Fn::ImportValue": { "Fn::Sub": "${CoreInfrastructureStackName}-PrivateSubnet1" }
+          },
+          {
+            "Fn::ImportValue": { "Fn::Sub": "${CoreInfrastructureStackName}-PrivateSubnet2" }
+          }
+        ],
+        "LoadBalancerNames": [ { "Ref": "ComponentElasticLoadBalancer" } ],
+        "AvailabilityZones": [ "eu-west-1a", "eu-west-1b", "eu-west-1c" ],
+        "HealthCheckType": "ELB"
+      },
+      "UpdatePolicy": {
+        "AutoScalingRollingUpdate": {
+          "PauseTime": { "Ref": "UpdatePauseTime" },
+          "MaxBatchSize": { "Ref": "UpdateMaxBatchSize" },
+          "MinInstancesInService": { "Ref": "UpdateMinInService" }
+        }
+      }
+    },
+    "ComponentElasticLoadBalancer": {
+      "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
+      "Properties": {
+        "HealthCheck": {
+          "HealthyThreshold": "3",
+          "Interval": "15",
+          "Target": "HTTP:7080/status/",
+          "Timeout": "10",
+          "UnhealthyThreshold": "3"
+        },
+        "Listeners": [
+          {
+            "InstancePort": "7443",
+            "LoadBalancerPort": "443",
+            "Protocol": "tcp",
+            "InstanceProtocol": "tcp"
+          }
+        ],
+        "SecurityGroups": [ { "Ref": "LoadBalancerSecurityGroup" }
+        ],
+        "Subnets": [
+          { "Fn::ImportValue": { "Fn::Sub": "${CoreInfrastructureStackName}-PublicSubnet0" } },
+          { "Fn::ImportValue": { "Fn::Sub": "${CoreInfrastructureStackName}-PublicSubnet1" } },
+          { "Fn::ImportValue": { "Fn::Sub": "${CoreInfrastructureStackName}-PublicSubnet2" } }
+        ]
+      }
+    },
+    "ComponentLaunchConfiguration": {
+      "Type": "AWS::AutoScaling::LaunchConfiguration",
+      "Properties": {
+        "KeyName": { "Ref": "KeyName" },
+        "SecurityGroups": [
+          { "Fn::ImportValue": { "Fn::Sub": "${CoreInfrastructureStackName}-SSHFromBastionsSecGroup" } },
+          { "Ref": "ComponentSecurityGroup" }
+        ],
+        "InstanceType": { "Ref": "InstanceType" },
+        "IamInstanceProfile": { "Ref": "ComponentInstanceProfile" },
+        "ImageId": { "Ref": "ImageId" }
+      }
+    },
+    "ComponentInstanceProfile": {
+      "Type": "AWS::IAM::InstanceProfile",
+      "Properties": {
+        "Path": "/",
+        "Roles": [ { "Ref": "ComponentRole" } ]
+      }
+    },
+    "LoadBalancerSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "GroupDescription": "An ELB group allowing access only to from the corresponding component",
+      "Properties": {
+        "SecurityGroupIngress": [
+          {
+            "ToPort": "443",
+            "FromPort": "443",
+            "IpProtocol": "tcp",
+            "CidrIp": "0.0.0.0/0"
+          }
+        ],
+        "VpcId": {
+          "Fn::ImportValue": {
+            "Fn::Sub": "${CoreInfrastructureStackName}-VpcId"
+          }
+        }
+      }
+    },
+    "ComponentDNS": {
+      "Type": "AWS::Route53::RecordSet",
+      "Properties": {
+        "HostedZoneName": {
+          "Ref": "DomainNameBase"
+        },
+        "TTL": "60",
+        "Type": "CNAME",
+        "Name": {
+          "Fn::Join": [
+            ".",
+            [
+              {
+                "Ref": "CnameEntry"
+              },
+              {
+                "Ref": "DomainNameBase"
+              }
+            ]
+          ]
+        },
+        "ResourceRecords": [ { "Fn::GetAtt": [ "ComponentElasticLoadBalancer", "DNSName" ] } ]
+      }
+    },
+    "ComponentPolicy": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "ComponentPolicy",
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [ "sts:AssumeRole" ],
+              "Resource": [ "*" ],
+              "Effect": "Allow"
+            },
+            {
+              "Action": [ "cloudwatch:PutMetricData" ],
+              "Resource": [ "*" ],
+              "Effect": "Allow"
+            },
+            {
+              "Action": [
+                "s3:GetBucketLocation",
+                "s3:GetBucketNotification",
+                "s3:GetObject",
+                "s3:ListBucket",
+                "s3:ListBucketMultipartUploads",
+                "s3:ListMultipartUploadParts"
+              ],
+              "Resource": [ { "Ref": "S3BucketArn" } ],
+              "Effect": "Allow"
+            },
+            {
+              "Action": [
+                "s3:GetObject",
+                "s3:GetBucketLocation",
+                "s3:AbortMultipartUpload",
+                "s3:PutBucketNotification",
+                "s3:PutObject",
+                "s3:DeleteObject"
+              ],
+              "Resource": [
+                {
+                  "Fn::Join": [ "", [ { "Ref": "S3BucketArn" }, "/ws-dazzler-edit/", { "Ref": "Environment" }, "/logs/*" ] ]
+                }
+              ],
+              "Effect": "Allow"
+            },
+            {
+              "Action": [ "cloudformation:Describe*" ],
+              "Resource": [ "*" ],
+              "Effect": "Allow"
+            },
+            {
+              "Action": [ "ec2:Describe*" ],
+              "Resource": [ "*" ],
+              "Effect": "Allow"
+            }
+          ]
+        },
+        "Roles": [ { "Ref": "ComponentRole" } ]
+      }
+    },
+    "ComponentSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "SecurityGroupIngress": [
+          {
+            "SourceSecurityGroupId": { "Ref": "LoadBalancerSecurityGroup" },
+            "FromPort": "7080",
+            "ToPort": "7080",
+            "IpProtocol": "tcp"
+          },
+          {
+            "SourceSecurityGroupId": { "Ref": "LoadBalancerSecurityGroup" },
+            "FromPort": "7443",
+            "ToPort": "7443",
+            "IpProtocol": "tcp"
+          },
+          {
+            "SourceSecurityGroupId": { "Ref": "LoadBalancerSecurityGroup" },
+            "FromPort": "123",
+            "ToPort": "123",
+            "IpProtocol": "udp"
+          }
+        ],
+        "VpcId": { "Fn::ImportValue": { "Fn::Sub": "${CoreInfrastructureStackName}-VpcId" } },
+        "GroupDescription": "A component security group allowing access only from the corresponding ELB"
+      }
+    },
+    "ComponentRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "Path": "/",
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [ "sts:AssumeRole" ],
+              "Effect": "Allow",
+              "Principal": { "Service": [ "ec2.amazonaws.com" ] }
+            }
+          ]
+        }
+      }
+    }
+  },
+  "Parameters": {
+    "DomainNameBase": {
+      "Default": "1c9eb4db7739eb1a.xhst.bbci.co.uk.",
+      "Type": "String",
+      "Description": "Base domain name (ending with a '.') under which new DNS entries are added"
+    },
+    "MinSize": {
+      "Default": "1",
+      "Type": "String",
+      "Description": "The minimum number of instances"
+    },
+    "CnameEntry": {
+      "Default": "dazzler.test",
+      "Type": "String",
+      "Description": "The cname entry for the component"
+    },
+    "UpdatePauseTime": {
+      "Default": "PT0S",
+      "Type": "String",
+      "Description": "The time to wait between new instances coming online and the next batch being killed during an ASG update."
+    },
+    "UpdateMinInService": {
+      "Default": "0",
+      "Type": "String",
+      "Description": "The minimum number of instances in service during an ASG update."
+    },
+    "MaxSize": {
+      "Default": "1",
+      "Type": "String",
+      "Description": "The maximum number of instances"
+    },
+    "ImageId": {
+      "Default": "ami-0c7872372088f74f6",
+      "Type": "String",
+      "Description": "The AMI to use for this component"
+    },
+    "Environment": {
+      "Default": "test",
+      "Type": "String",
+      "Description": "The name of the environment. Test or Live"
+    },
+    "KeyName": {
+      "Default": "cosmos",
+      "Type": "String",
+      "Description": "Name of existing EC2 keypair to enable SSH access to the created instances"
+    },
+    "S3BucketArn": {
+      "Default": "arn:aws:s3:::dazzleredit",
+      "Type": "String",
+      "Description": "The location of the default private storage bucket for all applications."
+    },
+    "UpdateMaxBatchSize": {
+      "Default": "1",
+      "Type": "String",
+      "Description": "The maximum number of instances to be killed at one time during an ASG update."
+    },
+    "InstanceType": {
+      "Default": "t2.micro",
+      "Type": "String",
+      "Description": "The size of the instances"
+    },
+    "CoreInfrastructureStackName": {
+      "Default": "core-infrastructure",
+      "Type": "String",
+      "Description": "Name of the AWS account's core-infrastructure stack. Used to import other network parameters (vpc id, subnets etc)"
+    }
+  }
+}
