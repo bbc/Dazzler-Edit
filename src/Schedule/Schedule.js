@@ -129,7 +129,6 @@ class Schedule extends React.Component {
   handleClick(startTime){
     
     this.setState({index : null})
-    alert('hit')
     for(let i = 0; i < videos.length; i++) {
       if(videos[i].props.startTime === startTime && videos[i].props.flag !== true){
       
