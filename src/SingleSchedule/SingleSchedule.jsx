@@ -35,7 +35,7 @@ class SingleSchedule extends React.Component {
 return (
     <Fragment>
         <tr className = {this.props.border}>
-        <td onClick={() => this.props.fetchTime(this.props.id)}> {this.props.flag === true ? <Arrow /> : null }</td>
+        <td onClick={() => this.props.selector(this.props.id)}> {this.props.flag === true ? <Arrow /> : null }</td>
         <td className="collapsing" className = {this.props.style}>
         <input type="checkbox"/> <label></label>
         </td>

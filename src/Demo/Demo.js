@@ -131,7 +131,7 @@ class Demo extends React.Component {
   componentDidMount() {
    
     this.handleClick = this.handleClick.bind(this);
-    this.fetchTime = this.fetchTime.bind(this);
+    this.selector = this.selector.bind(this);
     this.deleteItem = this.deleteItem.bind(this);
     this.previousDay = this.previousDay.bind(this);
     this.nextDay = this.nextDay.bind(this);
@@ -141,7 +141,7 @@ class Demo extends React.Component {
 
 
     this.setState({
-      display: <Schedule fetchTime = {this.fetchTime} clipTime = {time} data={n} dataLength = {n.length} pasted ={copiedContent} data={s} deleteItem={this.deleteItem} text="Today's " loadPlaylist = {this.loadPlaylist}/>
+      display: <Schedule selector = {this.selector} clipTime = {time} data={n} dataLength = {n.length} pasted ={copiedContent} data={s} deleteItem={this.deleteItem} text="Today's " loadPlaylist = {this.loadPlaylist}/>
 
     })
       //Clips
@@ -232,7 +232,7 @@ clearContent(){
   deleteItem(id){
 
     this.setState({
-      display:  <Schedule fetchTime = {this.fetchTime} clipTime = {time} schStart={id}  data={n} dataLength = {n.length} pasted ={copiedContent} data={s} deleteItem={this.deleteItem} text={text} loadPlaylist = {this.loadPlaylist}/>
+      display:  <Schedule selector = {this.selector} clipTime = {time} schStart={id}  data={n} dataLength = {n.length} pasted ={copiedContent} data={s} deleteItem={this.deleteItem} text={text} loadPlaylist = {this.loadPlaylist}/>
     })  
 
   }
@@ -245,7 +245,7 @@ clearContent(){
      text = "Today's ";
     this.setState({
       scheduleDate: CDate,
-      display: <Schedule fetchTime = {this.fetchTime} clipTime = {time} data={n} dataLength = {n.length} pasted ={copiedContent} data={s} deleteItem={this.deleteItem} text={text} loadPlaylist = {this.loadPlaylist}/>
+      display: <Schedule selector = {this.selector} clipTime = {time} data={n} dataLength = {n.length} pasted ={copiedContent} data={s} deleteItem={this.deleteItem} text={text} loadPlaylist = {this.loadPlaylist}/>
     })
     }else{
     
@@ -263,7 +263,7 @@ clearContent(){
      text = "Today's ";
       this.setState({
         scheduleDate: CDate,
-        display: <Schedule fetchTime = {this.fetchTime} clipTime = {time} data={n} dataLength = {n.length} pasted ={copiedContent} data={s} deleteItem={this.deleteItem} text={text} loadPlaylist = {this.loadPlaylist}/>
+        display: <Schedule selector = {this.selector} clipTime = {time} data={n} dataLength = {n.length} pasted ={copiedContent} data={s} deleteItem={this.deleteItem} text={text} loadPlaylist = {this.loadPlaylist}/>
       })
       }else{
   
@@ -318,7 +318,7 @@ clearContent(){
 
         }
         else{n.push(newItem2)
-          this.setState({ display: <Schedule fetchTime = {this.fetchTime} clipTime = {time} data={n} dataLength = {n.length} pasted = {copiedContent} text="Today's "  deleteItem={this.deleteItem} /> });
+          this.setState({ display: <Schedule selector = {this.selector} clipTime = {time} data={n} dataLength = {n.length} pasted = {copiedContent} text="Today's "  deleteItem={this.deleteItem} /> });
 
         };
   }
@@ -362,18 +362,14 @@ clearContent(){
     }
     if(text === 'Schedule'){
       menuText = text;
-      return this.setState({ display: <Schedule fetchTime = {this.fetchTime} clipTime = {time} data={n} dataLength = {n.length} pasted = {copiedContent} text="Today's "  deleteItem={this.deleteItem} /> });
+      return this.setState({ display: <Schedule selector = {this.selector} clipTime = {time} data={n} dataLength = {n.length} pasted = {copiedContent} text="Today's "  deleteItem={this.deleteItem} /> });
     }
     if(text === 'Scratchpad'){
       menuText = text;
       return this.setState({ display: <Scratchpad data={s} deleteItem={this.deleteItem} clearContent = {this.clearContent} copyContent={this.copyContent}/>});
     }  
   }
-  fetchTime(clipTime){
-    var time = clipTime;
-    this.setState({ display: <Schedule fetchTime = {this.fetchTime} clipTime = {time} data={n} dataLength = {n.length} pasted = {copiedContent} text="Today's "  deleteItem={this.deleteItem} /> });
-    
-  }
+ selector(id){}
   
   render() {
     const { items, data, count } = this.state;
