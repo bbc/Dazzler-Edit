@@ -145,11 +145,18 @@ class Schedule extends React.Component {
     if(prevProps.clipTime !== this.props.clipTime){
     for(let i = 0; i < videos.length; i++) {
       if(videos[i].props.id === this.props.clipTime && videos[i].props.flag !== true){
+
+        if(videos[i].props.style === 'blankScheduleItem'){
+          videos[i] = <SingleSchedule flag = {true} fetchTime = {this.props.fetchTime} deleteItem = {this.deleteItem} style = "blankScheduleItem" duration={loadedContent[i].duration} id = {loadedContent[i].id} />
+          var newState = i;
+          this.setState({index : i})
+        }else{
      
        videos[i] =  <SingleSchedule fetchTime = {this.props.fetchTime} title={loadedContent[i].title} startTime = {loadedContent[i].startTime}
         duration={loadedContent[i].duration} deleteItem = {this.deleteItem} id = {loadedContent[i].id} flag = {true} border="border_bottom"/>
         var newState = i;
         this.setState({index : i})
+        }
         
       }else {
         videos[i] =  <SingleSchedule fetchTime = {this.props.fetchTime} title={loadedContent[i].title} startTime = {loadedContent[i].startTime}
@@ -187,13 +194,13 @@ class Schedule extends React.Component {
          this.setState({refresh: 1})
        }
        
-       if(newState !== null && loadedContent[this.state.index].isLive === false || undefined){
+       if(newState !== null && loadedContent[this.state.index - 1].isLive === false || undefined){
           loadedContent.pop()
-         videos.splice(this.state.index + 1, 0, <SingleSchedule fetchTime = {this.props.fetchTime} title={loadedContent[loadedContent.length - 1].title} startTime = {loadedContent[loadedContent.length - 1].startTime}
+         videos.splice(this.state.index, 0, <SingleSchedule fetchTime = {this.props.fetchTime} title={loadedContent[loadedContent.length - 1].title} startTime = {loadedContent[loadedContent.length - 1].startTime}
           duration={loadedContent[loadedContent.length - 1].duration} deleteItem = {this.deleteItem} id = {loadedContent[loadedContent.length - 1].id}/>)
-          loadedContent.splice(this.state.index + 1, 0, scheduleContent[i]);
-          videos.splice(this.state.index + 1, videos.length)
-          for(let j = this.state.index + 1; j < loadedContent.length; j++){
+          loadedContent.splice(this.state.index, 0, scheduleContent[i]);
+          videos.splice(this.state.index, videos.length)
+          for(let j = this.state.index; j < loadedContent.length; j++){
             
             loadedContent[j].startTime = moment.utc(loadedContent[j - 1].startTime, "HH:mm:ss").add(moment.duration(loadedContent[j - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
             loadedContent[j].id = count+=1;
