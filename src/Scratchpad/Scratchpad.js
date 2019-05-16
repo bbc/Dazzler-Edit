@@ -25,6 +25,7 @@ class Scratchpad extends React.Component {
     this.setState({data: this.props.data})
     this.setState({status: 'Copy'})
     this.setState({current: 'Clear'})
+    
    
   } 
 
@@ -51,10 +52,11 @@ class Scratchpad extends React.Component {
       moment.duration(item.duration)._data.seconds + " seconds",
       rows.push(item)) })
       }
+  
     return (
     <div>
      <center> <h1>  Scratchpad</h1></center>
-      <button class="ui left floated button"> Duration: {moment(duration).format("HH:mm:ss")} </button>
+      <button class="ui left floated button"> Duration: {moment(duration).utcOffset(0).format("HH:mm:ss")} </button>
     <ReactDataGrid
       columns={columns}
       rowGetter={i => rows[i]}
