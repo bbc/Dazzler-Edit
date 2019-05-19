@@ -24,10 +24,10 @@ class Schedule extends React.Component {
   };
 
   componentDidMount(){
+    
     var count = -2;
     this.savePlaylist = this.savePlaylist.bind(this);
     this.pasteContent = this.pasteContent.bind(this);    
-    this.handleClick = this.handleClick.bind(this); 
     this.deleteItem = this.deleteItem.bind(this); 
     this.getCrid = this.getCrid.bind(this);  
   }
@@ -101,56 +101,26 @@ class Schedule extends React.Component {
           content[i].startTime = moment.utc("00:00", "HH:mm:ss").format("HH:mm:ss");
           content[i].id = count += 1;
           loadedContent.push(content[i]);
-         
-          
         }else if (content[i].isLive === true ){
           content[i].id = count += 1;
           loadedContent.push(content[i]);
-        
-        
-        
       }else{
           
           content[i].startTime = moment.utc(loadedContent[loadedContent.length - 1].startTime, "HH:mm:ss").add(moment.duration(loadedContent[loadedContent.length - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
           content[i].id = count += 1;
           loadedContent.push(content[i])
-
         }
         
-       videos.push( <SingleSchedule title={loadedContent[loadedContent.length - 1].title} startTime = {loadedContent[loadedContent.length - 1].startTime}
-       duration={loadedContent[loadedContent.length - 1].duration} deleteItem = {this.deleteItem} handleClick ={this.handleClick} id = {loadedContent[loadedContent.length - 1].id} />)
-       
+       videos.push( <SingleSchedule fetchTime = {this.props.fetchTime} title={loadedContent[loadedContent.length - 1].title} startTime = {loadedContent[loadedContent.length - 1].startTime}
+       duration={loadedContent[loadedContent.length - 1].duration} deleteItem = {this.deleteItem} id = {loadedContent[loadedContent.length - 1].id} />)
       }
-     
       this.setState({refresh: 1})
-      
   }
-
-  handleClick(startTime){
-    
-    this.setState({index : null})
-    for(let i = 0; i < videos.length; i++) {
-      if(videos[i].props.startTime === startTime && videos[i].props.flag !== true){
-      
-       videos[i] =  <SingleSchedule title={loadedContent[i].title} startTime = {loadedContent[i].startTime}
-        duration={loadedContent[i].duration} deleteItem = {this.deleteItem} handleClick ={this.handleClick} id = {loadedContent[i].id} flag = {true} border="border_bottom"/>
-        this.setState({index : i})
-        break;
-       
-      }else {
-        videos[i] =  <SingleSchedule title={loadedContent[i].title} startTime = {loadedContent[i].startTime}
-        duration={loadedContent[i].duration} deleteItem = {this.deleteItem} handleClick ={this.handleClick} id = {loadedContent[i].id} flag = {false} />
-      }
-    }
-     this.setState({refresh : 1}) 
-    
-  }
-
   deleteItem(id){
 
       videos.map((item, idx) => {
         if(item.props.startTime === id){
-          videos[idx] = <SingleSchedule deleteItem = {this.deleteItem} style = "blankScheduleItem" duration={loadedContent[idx].duration} id = {loadedContent[idx].id} handleClick ={this.handleClick} />
+          videos[idx] = <SingleSchedule fetchTime = {this.props.fetchTime} deleteItem = {this.deleteItem} style = "blankScheduleItem" duration={loadedContent[idx].duration} id = {loadedContent[idx].id} />
           this.forceUpdate();
           return;
           
@@ -163,19 +133,41 @@ class Schedule extends React.Component {
         for(let i = idx; i < loadedContent.length; i++){
           if(idx > 0){ 
           loadedContent[i].startTime = moment.utc(loadedContent[i - 1].startTime, "HH:mm:ss").add(moment.duration(loadedContent[i - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
-          videos.push( <SingleSchedule title={loadedContent[i].title} startTime = {loadedContent[i].startTime}
-            duration={loadedContent[i].duration} deleteItem = {this.deleteItem} id = {loadedContent[i].id} handleClick ={this.handleClick} />)
+          videos.push( <SingleSchedule fetchTime = {this.props.fetchTime} title={loadedContent[i].title} startTime = {loadedContent[i].startTime}
+            duration={loadedContent[i].duration} deleteItem = {this.deleteItem} id = {loadedContent[i].id} />)
         }}
         this.setState({refresh: 1})
       } 
   });
-
-
   }
   componentDidUpdate(prevProps){  
     
-    if(prevProps.dataLength !== this.props.dataLength){
+    if(prevProps.clipTime !== this.props.clipTime){
+    for(let i = 0; i < videos.length; i++) {
+      if(videos[i].props.id === this.props.clipTime && videos[i].props.flag !== true){
 
+        if(videos[i].props.style === 'blankScheduleItem'){
+          videos[i] = <SingleSchedule flag = {true} fetchTime = {this.props.fetchTime} deleteItem = {this.deleteItem} style = "blankScheduleItem" duration={loadedContent[i].duration} id = {loadedContent[i].id} />
+          var newState = i;
+          this.setState({index : i})
+        }else{
+     
+       videos[i] =  <SingleSchedule fetchTime = {this.props.fetchTime} title={loadedContent[i].title} startTime = {loadedContent[i].startTime}
+        duration={loadedContent[i].duration} deleteItem = {this.deleteItem} id = {loadedContent[i].id} flag = {true} border="border_bottom"/>
+        var newState = i;
+        this.setState({index : i})
+        }
+        
+      }else {
+        videos[i] =  <SingleSchedule fetchTime = {this.props.fetchTime} title={loadedContent[i].title} startTime = {loadedContent[i].startTime}
+        duration={loadedContent[i].duration} deleteItem = {this.deleteItem} id = {loadedContent[i].id} flag = {false} />
+      }
+    }
+    }else{
+      var newState = null;
+    }
+    if(prevProps.dataLength !== this.props.dataLength){
+     
 // why is dataLength different to data.length??
  
       scheduleContent = this.props.data;
@@ -202,29 +194,38 @@ class Schedule extends React.Component {
          this.setState({refresh: 1})
        }
        
-       if(this.state.index !== null && loadedContent[this.state.index].isLive === false || undefined){
-         
-         videos.splice(this.state.index + 1, 0, <SingleSchedule title={loadedContent[loadedContent.length - 1].title} startTime = {loadedContent[loadedContent.length - 1].startTime}
-          duration={loadedContent[loadedContent.length - 1].duration} deleteItem = {this.deleteItem} id = {loadedContent[loadedContent.length - 1].id} handleClick ={this.handleClick}/>)
-         
-          loadedContent.splice(this.state.index + 1, 0, scheduleContent[i]);
+       if(newState !== null && loadedContent[this.state.index - 1].isLive === false || undefined){
+          loadedContent.pop()
+         videos.splice(this.state.index, 0, <SingleSchedule fetchTime = {this.props.fetchTime} title={loadedContent[loadedContent.length - 1].title} startTime = {loadedContent[loadedContent.length - 1].startTime}
+          duration={loadedContent[loadedContent.length - 1].duration} deleteItem = {this.deleteItem} id = {loadedContent[loadedContent.length - 1].id}/>)
+          loadedContent.splice(this.state.index, 0, scheduleContent[i]);
+          videos.splice(this.state.index, videos.length)
+          for(let j = this.state.index; j < loadedContent.length; j++){
+            
+            loadedContent[j].startTime = moment.utc(loadedContent[j - 1].startTime, "HH:mm:ss").add(moment.duration(loadedContent[j - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
+            loadedContent[j].id = count+=1;
+            
+            this.props.data.map((item, idx) => {
+              if(item.title === loadedContent[j].title){
+                loadedContent[j].duration = item.available_versions.version[0].duration
+              }
+          });
+
+            videos.push( <SingleSchedule fetchTime = {this.props.fetchTime} title={loadedContent[j].title} startTime = {loadedContent[j].startTime}
+            duration={loadedContent[j].duration} deleteItem = {this.deleteItem} id = {loadedContent[j].id} />)
+          }
+
          }else{
-           console.log(videos)
-      videos.push( <SingleSchedule title={loadedContent[loadedContent.length - 1].title} startTime = {loadedContent[loadedContent.length - 1].startTime}
-      duration={loadedContent[loadedContent.length - 1].duration} deleteItem = {this.deleteItem} id = {loadedContent[loadedContent.length - 1].id} handleClick ={this.handleClick} />)
-       }
-      
-     }     
-
+           
+      videos.push(<SingleSchedule fetchTime = {this.props.fetchTime} title={loadedContent[loadedContent.length - 1].title} startTime = {loadedContent[loadedContent.length - 1].startTime}
+      duration={loadedContent[loadedContent.length - 1].duration} deleteItem = {this.deleteItem} id = {loadedContent[loadedContent.length - 1].id} />)
+       } 
+      }
     }
-
-
 }
     render() { 
-
      return (
-       
-      
+
         <div>
             
           <center><h2>{this.props.text}Schedule</h2></center>
@@ -242,9 +243,7 @@ class Schedule extends React.Component {
         
         <tbody>
           {
-           
-            videos
-            
+           videos 
           } 
 
         </tbody>
@@ -256,8 +255,6 @@ class Schedule extends React.Component {
                 <div className="ui right floated small primary labeled icon button" onClick={this.savePlaylist}>
                   Save Playlist 
                 </div>
-          
-             
                 <div className="ui left floated small primary labeled icon button"  onClick  = { () => {this.pasteContent(this.props.pasted)} }   >
                   Paste  
                   </div>
@@ -271,4 +268,4 @@ class Schedule extends React.Component {
     }
      
 }
-export default Schedule;            
+export default Schedule;      

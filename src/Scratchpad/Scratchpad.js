@@ -26,7 +26,7 @@ class Scratchpad extends React.Component {
     this.setState({status: 'Copy'})
     this.setState({current: 'Clear'})
     
-
+   
   } 
 
   componentDidUpdate(prevProps){
@@ -35,8 +35,6 @@ class Scratchpad extends React.Component {
       if(this.props.data.length === 0){
       this.setState({current: 'Clear'})
       this.setState({refresh : 1})
-      
-    
     }
   }
 }
@@ -53,11 +51,12 @@ class Scratchpad extends React.Component {
       item.newDuration = moment.duration(item.duration)._data.minutes + " minutes " + 
       moment.duration(item.duration)._data.seconds + " seconds",
       rows.push(item)) })
-      console.log('COPIED CONTENT', copiedContent)
       }
+  
     return (
     <div>
-      <h1> Scratchpad</h1>
+     <center> <h1>  Scratchpad</h1></center>
+      <button class="ui left floated button"> Duration: {moment(duration).utcOffset(0).format("HH:mm:ss")} </button>
     <ReactDataGrid
       columns={columns}
       rowGetter={i => rows[i]}
@@ -65,7 +64,7 @@ class Scratchpad extends React.Component {
       minHeight={300} />
       <button class="ui button active" onClick  = { () => {this.props.copyContent(rows)}} ><i class="download icon"></i> {this.state.status}</button>
       <button class="ui button active" onClick  = { () => {this.props.clearContent()}} ><i class="trash icon"></i> {this.state.current}</button>
-      <button class="ui right floated button"> Duration: {moment(duration).format("HH:mm:ss")} </button>
+      
       </div>
       
     );
