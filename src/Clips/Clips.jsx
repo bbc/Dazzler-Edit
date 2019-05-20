@@ -116,10 +116,10 @@ export const styles = theme => ({
     marginTop: theme.spacing.unit * 3
   },
   table: {
-    minWidth: 500
+    minWidth: 250
   },
   tableWrapper: {
-    overflowX: "auto"
+    overflowX: "hidden"
   }
 });
 var cells = [];
@@ -141,10 +141,6 @@ export class Clips extends React.Component {
     rowsPerPage: 6,
     data: []
   };
-
-
-
-  
   componentDidMount = () => {
     
     for(let i = 0; i < this.props.items.length; i++){
@@ -160,8 +156,7 @@ export class Clips extends React.Component {
                         from: diffDays + " days ago",
                         pid: this.props.items[i].pid,
                         versions: this.props.items[i].available_versions.version.length,
-                        add: <button onClick  = { () => {this.props.handleClick(this.props.items[i])} }   > add</button>})
-                        
+                        add: <button className="ui compact icon button" onClick  = { () => {this.props.handleClick(this.props.items[i])} }   ><i class="plus icon"></i></button>})
 
      
     }
@@ -185,13 +180,13 @@ export class Clips extends React.Component {
     const emptyRows =
       rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
 
-      if(this.state.rows === null || undefined){
+      if(cells.length === 0){
         return <Spinner />
       }
 
     return (
+      
         <div>
-          
       <Paper className={classes.root}>
         <div className={classes.tableWrapper}>
           <Table className={classes.table}>
@@ -199,22 +194,21 @@ export class Clips extends React.Component {
             <TableBody>
             <th>Title</th>
             <th>Duration</th>
-            <th>From</th>
-            <th>Pid</th>
-            <th>Version</th>
             <th>Add</th>
+
         
               {rows
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map(row => (
                   <TableRow key={row.id}>
                     <TableCell component="th" scope="row">
-                      {row.title}
+                      <div className="tooltip"> {row.title} 
+                      <span className="tooltiptext">pid = {row.pid}       version = {row.versions}</span>
+                      </div>
+                      
                     </TableCell>
                     <TableCell align="right">{row.duration}</TableCell>
-                    <TableCell align="right">{row.from}</TableCell>
-                    <TableCell align="right">{row.pid}</TableCell>
-                    <TableCell align="right">{row.versions}</TableCell>
+
                     <TableCell align="right">{row.add}</TableCell>
                   </TableRow>
                 ))}
@@ -227,6 +221,7 @@ export class Clips extends React.Component {
             </TableBody>
             <TableFooter>
               <TableRow>
+                
                 <TablePagination
                   rowsPerPageOptions={[5, 10, 25]}
                   colSpan={3}

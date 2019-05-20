@@ -307,10 +307,7 @@ clearContent(){
         newItem2.id = count;
       }
 
-      newItem2.isLive = false;
-      
-     
-         
+      newItem2.isLive = false;  
       }  
        if(menuText === 'Scratchpad') {
          s.push(newItem2)
@@ -387,7 +384,7 @@ clearContent(){
                 className='some-custom-class'
                 overlayClassName='some-custom-overlay-class'
                 isOpen={ this.state.isPaneOpen }
-                width = '35%'
+                width = '33%'
                 onRequestClose={ () => {
                     // triggered on "<" on left top click or on outside click
                     this.setState({ isPaneOpen: false });
@@ -406,6 +403,7 @@ clearContent(){
           className={classNames(classes.appBar, {
             [classes.appBarShift]: open,
           })}
+
         >
           <Toolbar disableGutters={!open}>
          <IconButton

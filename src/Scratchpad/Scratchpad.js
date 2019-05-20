@@ -3,7 +3,6 @@ import ReactDataGrid from 'react-data-grid';
 import moment from 'moment';
 var rows = [];
 var copiedContent = [];
-var deleted = 0;
 var length = 0;
 var duration = 0;
 const columns = [
@@ -21,14 +20,10 @@ class Scratchpad extends React.Component {
   };
 
   componentDidMount(){
-
     this.setState({data: this.props.data})
     this.setState({status: 'Copy'})
     this.setState({current: 'Clear'})
-    
-   
-  } 
-
+  }
   componentDidUpdate(prevProps){
 
     if(prevProps.data.length !== this.props.data.length){
@@ -64,7 +59,6 @@ class Scratchpad extends React.Component {
       minHeight={300} />
       <button class="ui button active" onClick  = { () => {this.props.copyContent(rows)}} ><i class="download icon"></i> {this.state.status}</button>
       <button class="ui button active" onClick  = { () => {this.props.clearContent()}} ><i class="trash icon"></i> {this.state.current}</button>
-      
       </div>
       
     );

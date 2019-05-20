@@ -24,11 +24,11 @@ class SingleSchedule extends React.Component {
             var additional = null;
        }else if (this.props.prev !== 1 && this.props.style !== undefined) {
             additional = 
-            <td><button className="Add" onClick={() => this.props.deleteItem(this.props.id)}>Delete</button>
+            <td><button className="mini ui button" onClick={() => this.props.deleteItem(this.props.id)}><i class="trash alternate outline icon"></i></button>
             </td>;
         }else{
             additional = 
-            <td><button className="Add" onClick={() => this.props.deleteItem(this.props.startTime)}>Delete</button> 
+            <td><button className="mini ui button" onClick={() => this.props.deleteItem(this.props.startTime)}>Delete</button> 
             </td>;
         }
   

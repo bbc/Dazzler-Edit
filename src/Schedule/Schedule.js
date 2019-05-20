@@ -19,7 +19,7 @@ class Schedule extends React.Component {
     text: null,
     refresh: 2,
     data: [],
-    savePlaylist: "Save",
+    savePlaylist: "Save Playlist",
     index: null
   };
 
@@ -85,13 +85,11 @@ class Schedule extends React.Component {
    
     })
     .then(function (response) {
-        this.setState({savePlaylist: "Saved"});
-        alert('Saved')
+
     })
     .catch(function (error) {
-        // alert('Error Saving')
     });
-
+    this.setState({savePlaylist: "Saved"});
   }
 
   pasteContent(content){
@@ -102,6 +100,7 @@ class Schedule extends React.Component {
           content[i].id = count += 1;
           loadedContent.push(content[i]);
         }else if (content[i].isLive === true ){
+          
           content[i].id = count += 1;
           loadedContent.push(content[i]);
       }else{
@@ -194,17 +193,20 @@ class Schedule extends React.Component {
          this.setState({refresh: 1})
        }
        
-       if(newState !== null && loadedContent[this.state.index - 1].isLive === false || undefined){
+       if(newState !== null){
           loadedContent.pop()
          videos.splice(this.state.index, 0, <SingleSchedule fetchTime = {this.props.fetchTime} title={loadedContent[loadedContent.length - 1].title} startTime = {loadedContent[loadedContent.length - 1].startTime}
           duration={loadedContent[loadedContent.length - 1].duration} deleteItem = {this.deleteItem} id = {loadedContent[loadedContent.length - 1].id}/>)
           loadedContent.splice(this.state.index, 0, scheduleContent[i]);
           videos.splice(this.state.index, videos.length)
           for(let j = this.state.index; j < loadedContent.length; j++){
-            
+            if(j == 0){
+            loadedContent[j].startTime = moment.utc("00:00", "HH:mm:ss").format("HH:mm:ss");
+            loadedContent[j].id = count+=1;
+            }else{
             loadedContent[j].startTime = moment.utc(loadedContent[j - 1].startTime, "HH:mm:ss").add(moment.duration(loadedContent[j - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
             loadedContent[j].id = count+=1;
-            
+            }
             this.props.data.map((item, idx) => {
               if(item.title === loadedContent[j].title){
                 loadedContent[j].duration = item.available_versions.version[0].duration
@@ -253,7 +255,7 @@ class Schedule extends React.Component {
               <th colSpan="6">
         
                 <div className="ui right floated small primary labeled icon button" onClick={this.savePlaylist}>
-                  Save Playlist 
+                    {this.state.savePlaylist}
                 </div>
                 <div className="ui left floated small primary labeled icon button"  onClick  = { () => {this.pasteContent(this.props.pasted)} }   >
                   Paste  
