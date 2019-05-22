@@ -178,8 +178,7 @@ class Demo extends React.Component {
 
 
     //get request for webcasts 
-    axios.get('https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/webcast?brand=w13xttvl&start=' 
-    + begin.format() + '&end=' + end.format()).then((response) => {
+    axios.get('https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/webcast?brand=w13xttvl&start=2019-05-23T00:00:00Z&end=2019-05-23T23:59:05Z').then((response) => {
       console.log("WEBCAST", response)
    
             for(let i =0; i < response.data.length; i++){
@@ -359,16 +358,16 @@ clearContent(){
     }
     if(text === 'Schedule'){
       menuText = text;
-      return this.setState({ display: <Schedule fetchTime = {this.fetchTime} status='turnOff' clipTime = {time} data={n} dataLength = {n.length} pasted = {copiedContent} text="Today's "  deleteItem={this.deleteItem} /> });
+      return this.setState({ display: <Schedule fetchTime = {this.fetchTime}  clipTime = {time} data={n} dataLength = {n.length} pasted = {copiedContent} text="Today's "  deleteItem={this.deleteItem} /> });
     }
     if(text === 'Scratchpad'){
       menuText = text;
       return this.setState({ display: <Scratchpad data={s} deleteItem={this.deleteItem} clearContent = {this.clearContent} copyContent={this.copyContent}/>});
     }  
   }
-  fetchTime(clipTime, status){
+  fetchTime(clipTime){
     var time = clipTime;
-    this.setState({ display: <Schedule fetchTime = {this.fetchTime} status = {status} clipTime = {time} data={n} dataLength = {n.length} pasted = {copiedContent} text="Today's "  deleteItem={this.deleteItem} /> });
+    this.setState({ display: <Schedule fetchTime = {this.fetchTime}  clipTime = {time} data={n} dataLength = {n.length} pasted = {copiedContent} text="Today's "  deleteItem={this.deleteItem} /> });
     
   }
   
@@ -384,7 +383,7 @@ clearContent(){
                 className='some-custom-class'
                 overlayClassName='some-custom-overlay-class'
                 isOpen={ this.state.isPaneOpen }
-                width = '34%'
+                width = '36%'
                 onRequestClose={ () => {
                     // triggered on "<" on left top click or on outside click
                     this.setState({ isPaneOpen: false });

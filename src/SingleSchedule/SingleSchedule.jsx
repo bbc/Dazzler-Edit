@@ -2,6 +2,7 @@ import React, { Fragment } from 'react';
 import moment from 'moment';
 import Arrow from '@material-ui/icons/ArrowRightAlt';
 
+var status;
 class SingleSchedule extends React.Component {
 
     timeFormat(){
@@ -31,11 +32,12 @@ class SingleSchedule extends React.Component {
             <td><button className="mini ui button" onClick={() => this.props.deleteItem(this.props.startTime)}>Delete</button> 
             </td>;
         }
+        this.props.flag === true ? status = <Arrow/> : status =  null;
   
 return (
     <Fragment>
         <tr className = {this.props.border}>
-        <td onClick={() => this.props.fetchTime(this.props.id, this.props.flag === true ? 'turnOff' : null )}> {this.props.flag === true ? <Arrow /> : null }</td>
+        <td onClick={() => this.props.fetchTime(this.props.id, status)}> {status}</td>
         <td className="collapsing" className = {this.props.style}>
         <input type="checkbox"/> <label></label>
         </td>

@@ -127,9 +127,6 @@ var idType
 export class Clips extends React.Component {
   
     constructor(props){
-       
-        
-        
         super(props)
     }
     
@@ -156,7 +153,7 @@ export class Clips extends React.Component {
                         from: diffDays + " days ago",
                         pid: this.props.items[i].pid,
                         versions: this.props.items[i].available_versions.version.length,
-                        add: <button className="ui compact icon button" onClick  = { () => {this.props.handleClick(this.props.items[i])} }   ><i class="plus icon"></i></button>})
+                        add: <button className="ui compact icon button" onClick  = { () => {this.props.handleClick(this.props.items[i])} }><i className="plus icon"></i></button>})
 
      
     }
@@ -203,7 +200,7 @@ export class Clips extends React.Component {
                   <TableRow key={row.id}>
                     <TableCell component="th" scope="row">
                       <div className="tooltip"> {row.title} 
-                      <span className="tooltiptext">pid = {row.pid}       version = {row.versions}</span>
+                      <span className="tooltiptext">PID = {row.pid} - Version = {row.versions}</span>
                       </div>
                       
                     </TableCell>

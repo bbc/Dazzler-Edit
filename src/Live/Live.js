@@ -110,10 +110,10 @@ export const styles = theme => ({
     marginTop: theme.spacing.unit * 3
   },
   table: {
-    minWidth: 500
+    minWidth: 250
   },
   tableWrapper: {
-    overflowX: "auto"
+    overflowX: "hidden"
   }
 });
 var cells = [];
@@ -121,9 +121,6 @@ var isLive = true;
 export class Live extends React.Component {
   
     constructor(props){
-       
-        
-        
         super(props)
     }
     
@@ -157,7 +154,7 @@ export class Live extends React.Component {
                         info: moment(this.props.live[i].scheduled_time.start).format("HH:mm"),
                         pid: this.props.live[i].pid,
                         stream: this.props.live[i].service.sid.replace(/_/g, " "),
-                        add: <button onClick  = { () => {this.props.handleClick(this.props.live[i], isLive)} }   > add</button>})
+                        add: <button className="ui compact icon button" onClick  = { () => {this.props.handleClick(this.props.live[i], isLive)} }><i className="plus icon"></i></button>})
                         
 
      
@@ -198,7 +195,6 @@ export class Live extends React.Component {
             <TableBody>
             <th>Title</th>
             <th>Start Time</th>
-            <th>Stream</th>
             <th>Add</th>
             
         
@@ -207,10 +203,13 @@ export class Live extends React.Component {
                 .map(row => (
                   <TableRow key={row.id}>
                     <TableCell component="th" scope="row">
-                      {row.title}
+                      <div className="tooltip"> {row.title} 
+                      <span className="tooltiptext">{row.stream}}</span>
+                      </div>
+                      
                     </TableCell>
                     <TableCell align="right">{row.info}</TableCell>
-                    <TableCell align="right">{row.stream}</TableCell>
+
                     <TableCell align="right">{row.add}</TableCell>
                   </TableRow>
                 ))}

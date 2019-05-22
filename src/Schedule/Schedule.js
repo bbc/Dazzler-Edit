@@ -30,6 +30,12 @@ class Schedule extends React.Component {
     this.pasteContent = this.pasteContent.bind(this);    
     this.deleteItem = this.deleteItem.bind(this); 
     this.getCrid = this.getCrid.bind(this);  
+    for(let i = 0; i < videos.length; i++) {
+       videos[i] =  <SingleSchedule fetchTime = {this.props.fetchTime} title={loadedContent[i].title} startTime = {loadedContent[i].startTime}
+        duration={loadedContent[i].duration} deleteItem = {this.deleteItem} id = {loadedContent[i].id} flag = {false} />
+        var newState = null;
+        this.setState({index : null})
+    }
   }
 
   getCrid(item) {
@@ -165,22 +171,13 @@ class Schedule extends React.Component {
     }else{
       var newState = null;
     }
-    if(this.props.status === 'turnOff'){
-      newState = null;
-      for(let i = 0; i < videos.length; i++) {
-        if(videos[i].props.id === this.props.clipTime){
-          videos[i] =  <SingleSchedule fetchTime = {this.props.fetchTime} title={loadedContent[i].title} startTime = {loadedContent[i].startTime}
-        duration={loadedContent[i].duration} deleteItem = {this.deleteItem} id = {loadedContent[i].id} flag = {false}/>
-      }
-        
-      }
-    }
     if(prevProps.dataLength !== this.props.dataLength){
      
 // why is dataLength different to data.length??
  
       scheduleContent = this.props.data;
       
+      // this.props.data.length === ? scheduleContent = loadedContent : scheduleContent = this.props.data
 
       for(let i = prevProps.dataLength; i < this.props.dataLength; i++){
         
@@ -196,14 +193,36 @@ class Schedule extends React.Component {
             loadedContent.push(scheduleContent[i]);
             this.setState({refresh: 1})
        }
+       
        else{
-         scheduleContent[i].startTime = moment.utc(loadedContent[loadedContent.length - 1].startTime, "HH:mm:ss").add(moment.duration(scheduleContent[i - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
+         
+         scheduleContent[i].startTime = moment.utc(loadedContent[loadedContent.length - 1].startTime, "HH:mm:ss").add(moment.duration(loadedContent[loadedContent.length - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
+         console.log(scheduleContent)
          scheduleContent[i].id = count += 1;
          loadedContent.push(scheduleContent[i]);
          this.setState({refresh: 1})
        }
        
        if(newState !== null){
+         var newTime = moment(loadedContent[this.state.index].startTime, "HH:mm:ss").add(moment.duration(loadedContent[loadedContent.length - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
+         
+          if(loadedContent[this.state.index + 1].isLive === true &&
+             newTime < loadedContent[this.state.index + 1].startTime)
+              {
+              loadedContent.pop()
+              videos.splice(this.state.index, 0, <SingleSchedule fetchTime = {this.props.fetchTime} title={loadedContent[loadedContent.length - 1].title} startTime = {loadedContent[loadedContent.length - 1].startTime}
+              duration={loadedContent[loadedContent.length - 1].duration} deleteItem = {this.deleteItem} id = {loadedContent[loadedContent.length - 1].id}/>)
+              loadedContent.splice(this.state.index, 0, scheduleContent[i]);
+          }else if (loadedContent[this.state.index + 1].isLive === true &&
+            newTime > loadedContent[this.state.index + 1].startTime)
+            {
+              alert("Cannot change live show, remove")
+              loadedContent.pop()
+              break
+          }else{
+            console.log('index is ', this.state.index)
+            console.log('newTime is ' + newTime)
+            console.log('yari', loadedContent[loadedContent.length - 1])
           loadedContent.pop()
          videos.splice(this.state.index, 0, <SingleSchedule fetchTime = {this.props.fetchTime} title={loadedContent[loadedContent.length - 1].title} startTime = {loadedContent[loadedContent.length - 1].startTime}
           duration={loadedContent[loadedContent.length - 1].duration} deleteItem = {this.deleteItem} id = {loadedContent[loadedContent.length - 1].id}/>)
@@ -213,7 +232,11 @@ class Schedule extends React.Component {
             if(j == 0){
             loadedContent[j].startTime = moment.utc("00:00", "HH:mm:ss").format("HH:mm:ss");
             loadedContent[j].id = count+=1;
-            }else{
+            }
+            else if(loadedContent[j].isLive === true){
+              
+            }
+            else{
             loadedContent[j].startTime = moment.utc(loadedContent[j - 1].startTime, "HH:mm:ss").add(moment.duration(loadedContent[j - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
             loadedContent[j].id = count+=1;
             }
@@ -230,7 +253,7 @@ class Schedule extends React.Component {
             videos.push( <SingleSchedule fetchTime = {this.props.fetchTime} title={loadedContent[j].title} startTime = {loadedContent[j].startTime}
             duration={loadedContent[j].duration} deleteItem = {this.deleteItem} id = {loadedContent[j].id} />)
           }
-
+        }
          }else{
            
       videos.push(<SingleSchedule fetchTime = {this.props.fetchTime} title={loadedContent[loadedContent.length - 1].title} startTime = {loadedContent[loadedContent.length - 1].startTime}

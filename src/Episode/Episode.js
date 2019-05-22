@@ -111,10 +111,10 @@ export const styles = theme => ({
     marginTop: theme.spacing.unit * 3
   },
   table: {
-    minWidth: 500
+    minWidth: 250
   },
   tableWrapper: {
-    overflowX: "auto"
+    overflowX: "hidden"
   }
 });
 var cells = [];
@@ -122,9 +122,6 @@ var isEpisode = false;
 export class Episode extends React.Component {
   
     constructor(props){
-       
-        
-        
         super(props)
     }
     
@@ -155,7 +152,7 @@ export class Episode extends React.Component {
                         title: "Programme" + [i + 1],
                         Info: "Broadcast at " + moment(this.props.episodes[i].scheduled_time.start).format("HH:mm"),
                         pid: this.props.episodes[i].pid,
-                        add: <button onClick  = { () => {this.props.handleClick(this.props.episodes[i], isEpisode)} }   > add</button>})
+                        add: <button className="ui compact icon button" onClick  = { () => {this.props.handleClick(this.props.episodes[i], isEpisode)} }><i className="plus icon"></i></button>})
                         
 
                         

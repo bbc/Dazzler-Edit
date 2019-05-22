@@ -113,19 +113,16 @@ export const styles = theme => ({
     marginTop: theme.spacing.unit * 3
   },
   table: {
-    minWidth: 500
+    minWidth: 250
   },
   tableWrapper: {
-    overflowX: "auto"
+    overflowX: "hidden"
   }
 });
 var cells = [];
 export class Specials extends React.Component {
   
     constructor(props){
-       
-        
-        
         super(props)
     }
     
@@ -156,7 +153,7 @@ export class Specials extends React.Component {
                         from: diffDays + " days ago",
                         pid: this.props.specials[i].pid,
                         versions: this.props.specials[i].available_versions.version.length,
-                        add: <button onClick  = { () => {this.props.handleClick(this.props.specials[i])} }   > add</button>})
+                        add: <button className="ui compact icon button" onClick  = { () => {this.props.handleClick(this.props.specials[i])} }><i className="plus icon"></i></button>})
                         
 
      
@@ -191,9 +188,6 @@ export class Specials extends React.Component {
             <TableBody>
             <th>Title</th>
             <th>Duration</th>
-            <th>From</th>
-            <th>Pid</th>
-            <th>Version</th>
             <th>Add</th>
         
               {rows
@@ -201,12 +195,12 @@ export class Specials extends React.Component {
                 .map(row => (
                   <TableRow key={row.id}>
                     <TableCell component="th" scope="row">
-                      {row.title}
+                      <div className="tooltip"> {row.title} 
+                      <span className="tooltiptext">pid = {row.pid}       version = {row.versions}</span>
+                      </div>
                     </TableCell>
                     <TableCell align="right">{row.duration}</TableCell>
-                    <TableCell align="right">{row.from}</TableCell>
-                    <TableCell align="right">{row.pid}</TableCell>
-                    <TableCell align="right">{row.versions}</TableCell>
+
                     <TableCell align="right">{row.add}</TableCell>
                   </TableRow>
                 ))}
