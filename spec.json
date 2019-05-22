@@ -1,0 +1,17 @@
+{
+  "name": "ws-dazzler-edit",
+  "version": "0.1.0",
+  "requires": [
+    "cloud-httpd24-ssl-services-devs-staff", "nginx"
+  ],
+  "files": [
+    {
+      "src": "build",
+      "dest": "/var/www/dazzler",
+      "user": "nginx",
+      "group": "nginx",
+      "file_permissions": 644,
+      "dir_permissions": 644
+    }
+  ]
+}

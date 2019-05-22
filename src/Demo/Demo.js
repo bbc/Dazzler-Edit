@@ -154,13 +154,11 @@ class Demo extends React.Component {
     }).catch(e => {
        console.log(e);
     });
-    
     axios.get('https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/placings?version=p078fmvz').then((response) => {
      console.log('live', response)
       this.setState({
         specials: response.data
     })
-    
     }).catch(e => {
        console.log(e);
     });
