@@ -189,6 +189,12 @@ class Schedule extends React.Component {
     
 
        }else if(scheduleContent[i].isLive === true){
+            if(moment(loadedContent[loadedContent.length - 1].startTime, "HH:mm:ss").
+            add(moment.duration(loadedContent[loadedContent.length - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss")
+            > scheduleContent[i].startTime){
+              alert('you have a gap')
+            }
+
             scheduleContent[i].id = count += 1;
             loadedContent.push(scheduleContent[i]);
             this.setState({refresh: 1})
@@ -205,7 +211,6 @@ class Schedule extends React.Component {
        
        if(newState !== null){
          var newTime = moment(loadedContent[this.state.index].startTime, "HH:mm:ss").add(moment.duration(loadedContent[loadedContent.length - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
-         
           if(loadedContent[this.state.index + 1].isLive === true &&
              newTime < loadedContent[this.state.index + 1].startTime)
               {
