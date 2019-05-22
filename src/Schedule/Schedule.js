@@ -24,7 +24,7 @@ class Schedule extends React.Component {
   };
 
   componentDidMount(){
-    
+
     var count = -2;
     this.savePlaylist = this.savePlaylist.bind(this);
     this.pasteContent = this.pasteContent.bind(this);    
@@ -140,10 +140,10 @@ class Schedule extends React.Component {
   });
   }
   componentDidUpdate(prevProps){  
-    
+
     if(prevProps.clipTime !== this.props.clipTime){
     for(let i = 0; i < videos.length; i++) {
-      if(videos[i].props.id === this.props.clipTime && videos[i].props.flag !== true){
+      if(videos[i].props.id === this.props.clipTime && videos[i].props.flag !== true && videos[i].props.isLive !== true){
 
         if(videos[i].props.style === 'blankScheduleItem'){
           videos[i] = <SingleSchedule flag = {true} fetchTime = {this.props.fetchTime} deleteItem = {this.deleteItem} style = "blankScheduleItem" duration={loadedContent[i].duration} id = {loadedContent[i].id} />
@@ -164,6 +164,16 @@ class Schedule extends React.Component {
     }
     }else{
       var newState = null;
+    }
+    if(this.props.status === 'turnOff'){
+      newState = null;
+      for(let i = 0; i < videos.length; i++) {
+        if(videos[i].props.id === this.props.clipTime){
+          videos[i] =  <SingleSchedule fetchTime = {this.props.fetchTime} title={loadedContent[i].title} startTime = {loadedContent[i].startTime}
+        duration={loadedContent[i].duration} deleteItem = {this.deleteItem} id = {loadedContent[i].id} flag = {false}/>
+      }
+        
+      }
     }
     if(prevProps.dataLength !== this.props.dataLength){
      
@@ -209,7 +219,11 @@ class Schedule extends React.Component {
             }
             this.props.data.map((item, idx) => {
               if(item.title === loadedContent[j].title){
+                if(item.available_versions !== undefined){
                 loadedContent[j].duration = item.available_versions.version[0].duration
+                }else{
+                  loadedContent[j].duration = item.duration
+                }
               }
           });
 

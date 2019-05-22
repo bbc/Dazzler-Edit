@@ -311,7 +311,7 @@ clearContent(){
       }  
        if(menuText === 'Scratchpad') {
          s.push(newItem2)
-         this.setState({ display: <Scratchpad data={s} deleteItem={this.deleteItem} copyContent={this.copyContent} clearContent={this.clearContent}/>})
+         this.setState({ display: <Scratchpad data={s}  deleteItem={this.deleteItem} copyContent={this.copyContent} clearContent={this.clearContent}/>})
 
         }
         else{n.push(newItem2)
@@ -359,16 +359,16 @@ clearContent(){
     }
     if(text === 'Schedule'){
       menuText = text;
-      return this.setState({ display: <Schedule fetchTime = {this.fetchTime} clipTime = {time} data={n} dataLength = {n.length} pasted = {copiedContent} text="Today's "  deleteItem={this.deleteItem} /> });
+      return this.setState({ display: <Schedule fetchTime = {this.fetchTime} status='turnOff' clipTime = {time} data={n} dataLength = {n.length} pasted = {copiedContent} text="Today's "  deleteItem={this.deleteItem} /> });
     }
     if(text === 'Scratchpad'){
       menuText = text;
       return this.setState({ display: <Scratchpad data={s} deleteItem={this.deleteItem} clearContent = {this.clearContent} copyContent={this.copyContent}/>});
     }  
   }
-  fetchTime(clipTime){
+  fetchTime(clipTime, status){
     var time = clipTime;
-    this.setState({ display: <Schedule fetchTime = {this.fetchTime} clipTime = {time} data={n} dataLength = {n.length} pasted = {copiedContent} text="Today's "  deleteItem={this.deleteItem} /> });
+    this.setState({ display: <Schedule fetchTime = {this.fetchTime} status = {status} clipTime = {time} data={n} dataLength = {n.length} pasted = {copiedContent} text="Today's "  deleteItem={this.deleteItem} /> });
     
   }
   
@@ -384,7 +384,7 @@ clearContent(){
                 className='some-custom-class'
                 overlayClassName='some-custom-overlay-class'
                 isOpen={ this.state.isPaneOpen }
-                width = '33%'
+                width = '34%'
                 onRequestClose={ () => {
                     // triggered on "<" on left top click or on outside click
                     this.setState({ isPaneOpen: false });
