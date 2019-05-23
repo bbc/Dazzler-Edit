@@ -136,11 +136,14 @@ class Schedule extends React.Component {
         videos.splice(idx, videos.length)
         loadedContent.splice(idx, 1)
         for(let i = idx; i < loadedContent.length; i++){
-          if(idx > 0){ 
+          if(i === 0){
+            loadedContent[i].startTime = moment.utc("00:00", "HH:mm:ss").format("HH:mm:ss");
+        }else{
           loadedContent[i].startTime = moment.utc(loadedContent[i - 1].startTime, "HH:mm:ss").add(moment.duration(loadedContent[i - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
+        }
           videos.push( <SingleSchedule fetchTime = {this.props.fetchTime} title={loadedContent[i].title} startTime = {loadedContent[i].startTime}
             duration={loadedContent[i].duration} deleteItem = {this.deleteItem} id = {loadedContent[i].id} />)
-        }}
+        }
         this.setState({refresh: 1})
       } 
   });
@@ -259,9 +262,6 @@ class Schedule extends React.Component {
               loadedContent.pop()
               break
           }else{
-            console.log('index is ', this.state.index)
-            console.log('currentStartTime is ' + currentStartTime)
-            console.log('yari', loadedContent[loadedContent.length - 1])
           loadedContent.pop()
          videos.splice(this.state.index, 0, <SingleSchedule fetchTime = {this.props.fetchTime} title={loadedContent[loadedContent.length - 1].title} startTime = {loadedContent[loadedContent.length - 1].startTime}
           duration={loadedContent[loadedContent.length - 1].duration} deleteItem = {this.deleteItem} id = {loadedContent[loadedContent.length - 1].id}/>)
@@ -302,6 +302,9 @@ class Schedule extends React.Component {
     }
 }
     render() { 
+      for(let i = 0; i < videos.length;i++){
+        console.log(videos[i].props.id)
+      }
      return (
 
         <div>
