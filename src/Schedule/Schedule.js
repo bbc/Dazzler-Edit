@@ -192,9 +192,10 @@ class Schedule extends React.Component {
             if(moment(loadedContent[loadedContent.length - 1].startTime, "HH:mm:ss").
             add(moment.duration(loadedContent[loadedContent.length - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss")
             > scheduleContent[i].startTime){
-              alert('you have a gap')
+              //highlight on the actual listing.
+              alert('Programme at ' + loadedContent[loadedContent.length - 1].startTime +  " will be cut short")
+              alert('Programme at ' + loadedContent[loadedContent.length - 1].startTime +  " will be cut short")
             }
-
             scheduleContent[i].id = count += 1;
             loadedContent.push(scheduleContent[i]);
             this.setState({refresh: 1})
@@ -210,23 +211,56 @@ class Schedule extends React.Component {
        }
        
        if(newState !== null){
-         var newTime = moment(loadedContent[this.state.index].startTime, "HH:mm:ss").add(moment.duration(loadedContent[loadedContent.length - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
-          if(loadedContent[this.state.index + 1].isLive === true &&
-             newTime < loadedContent[this.state.index + 1].startTime)
+         var currentStartTime = moment(loadedContent[this.state.index].startTime, "HH:mm:ss").add(moment.duration(loadedContent[this.state.index].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
+        //  var newTime = (moment.duration(loadedContent[loadedContent.length - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
+          
+         if(loadedContent[this.state.index + 1].isLive === true &&
+          moment(currentStartTime, "HH:mm:ss").add(moment.duration(loadedContent[loadedContent.length - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss") 
+          < loadedContent[this.state.index + 1].startTime)
               {
+                alert('bang')
               loadedContent.pop()
               videos.splice(this.state.index, 0, <SingleSchedule fetchTime = {this.props.fetchTime} title={loadedContent[loadedContent.length - 1].title} startTime = {loadedContent[loadedContent.length - 1].startTime}
               duration={loadedContent[loadedContent.length - 1].duration} deleteItem = {this.deleteItem} id = {loadedContent[loadedContent.length - 1].id}/>)
               loadedContent.splice(this.state.index, 0, scheduleContent[i]);
+              videos.splice(this.state.index, videos.length)
+              for(let j = this.state.index; j < loadedContent.length; j++){
+                if(j == 0){
+                loadedContent[j].startTime = moment.utc("00:00", "HH:mm:ss").format("HH:mm:ss");
+                loadedContent[j].id = count+=1;
+                }
+                else if(loadedContent[j].isLive === true){
+                  
+                }
+                else{
+                loadedContent[j].startTime = moment.utc(loadedContent[j - 1].startTime, "HH:mm:ss").add(moment.duration(loadedContent[j - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
+                loadedContent[j].id = count+=1;
+                }
+                this.props.data.map((item, idx) => {
+                  if(item.title === loadedContent[j].title){
+                    if(item.available_versions !== undefined){
+                    loadedContent[j].duration = item.available_versions.version[0].duration
+                    }else{
+                      loadedContent[j].duration = item.duration
+                    }
+                  }
+              });
+    
+                videos.push( <SingleSchedule fetchTime = {this.props.fetchTime} title={loadedContent[j].title} startTime = {loadedContent[j].startTime}
+                duration={loadedContent[j].duration} deleteItem = {this.deleteItem} id = {loadedContent[j].id} />)
+              }
           }else if (loadedContent[this.state.index + 1].isLive === true &&
-            newTime > loadedContent[this.state.index + 1].startTime)
+            moment(currentStartTime, "HH:mm:ss").add(moment.duration(loadedContent[loadedContent.length - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss") 
+          > loadedContent[this.state.index + 1].startTime)
             {
+              console.log('current start time is ', currentStartTime)
+              console.log('calculation',  moment.utc(currentStartTime, "HH:mm:ss").add(moment.duration(loadedContent[loadedContent.length - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss"))
               alert("Cannot change live show, remove")
               loadedContent.pop()
               break
           }else{
             console.log('index is ', this.state.index)
-            console.log('newTime is ' + newTime)
+            console.log('currentStartTime is ' + currentStartTime)
             console.log('yari', loadedContent[loadedContent.length - 1])
           loadedContent.pop()
          videos.splice(this.state.index, 0, <SingleSchedule fetchTime = {this.props.fetchTime} title={loadedContent[loadedContent.length - 1].title} startTime = {loadedContent[loadedContent.length - 1].startTime}
