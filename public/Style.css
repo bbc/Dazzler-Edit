@@ -40,6 +40,8 @@
 .tooltip:hover .tooltiptext {
   visibility: visible;
 }
-
+.overwriter{
+  background-color: red !important; 
+}
 
     

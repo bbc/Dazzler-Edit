@@ -2,6 +2,7 @@ import React from 'react';
 import SingleSchedule from '../SingleSchedule/SingleSchedule';
 import moment from 'moment'
 import axios from 'axios'
+import Spinner from '../Spinner/Spinner'
 
 var count = -2;
 var loadedContent = [];
@@ -15,7 +16,7 @@ start.set({hour:0,minute:0,second:0,millisecond:0})
 class Schedule extends React.Component {
 
   state = {
-    scheduleArray: [],
+    spinner: false,
     text: null,
     refresh: 2,
     data: [],
@@ -49,7 +50,7 @@ class Schedule extends React.Component {
    return idType;
   }
     savePlaylist(){
-      this.setState({savePlaylist: "Saving"});
+      
       test  = [];
      var end =  moment.utc(loadedContent[loadedContent.length - 1].startTime, "HH:mm:ss").add(moment.duration(loadedContent[loadedContent.length - 1].duration)._milliseconds, 'milliseconds').format()
      
@@ -79,7 +80,7 @@ class Schedule extends React.Component {
            test.push(payLoad);
      }
     
-
+     this.setState({spinner : false})
   axios({
     method: 'post',
     url: "https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/broadcasts?sid=bbc_marathi_tv&start="
@@ -91,11 +92,14 @@ class Schedule extends React.Component {
    
     })
     .then(function (response) {
+      alert(' in here')
+      this.setState({spinner:true})
+      this.forceUpdate()
 
     })
     .catch(function (error) {
     });
-    this.setState({savePlaylist: "Saved"});
+    
   }
 
   pasteContent(content){
@@ -302,9 +306,8 @@ class Schedule extends React.Component {
     }
 }
     render() { 
-      for(let i = 0; i < videos.length;i++){
-        console.log(videos[i].props.id)
-      }
+alert('render')
+      
      return (
 
         <div>
@@ -332,9 +335,10 @@ class Schedule extends React.Component {
             <tr>
               <th></th>
               <th colSpan="6">
-        
-                <div className="ui right floated small primary labeled icon button" onClick={this.savePlaylist}>
-                    {this.state.savePlaylist}
+                <div class="ui right floated small primary labeled icon button" onClick={this.savePlaylist}>
+                    {this.state.spinner ? <div class="ui right floated small primary labeled loading button"></div> : 'xxx'}
+                  
+                    
                 </div>
                 <div className="ui left floated small primary labeled icon button"  onClick  = { () => {this.pasteContent(this.props.pasted)} }   >
                   Paste  
