@@ -8,7 +8,8 @@ var count = -2;
 var loadedContent = [];
 var scheduleContent = [];
 var test = [];
-var videos = [];  
+var videos = []; 
+var newState = null; 
 var start = moment().utcOffset(0);
 var newStart = moment().utcOffset(0);
 start.set({hour:0,minute:0,second:0,millisecond:0})
@@ -25,7 +26,7 @@ class Schedule extends React.Component {
   };
 
   componentDidMount(){
-
+  
     var count = -2;
     this.savePlaylist = this.savePlaylist.bind(this);
     this.pasteContent = this.pasteContent.bind(this);    
@@ -80,7 +81,8 @@ class Schedule extends React.Component {
            test.push(payLoad);
      }
     
-     this.setState({spinner : false})
+    
+     
   axios({
     method: 'post',
     url: "https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/broadcasts?sid=bbc_marathi_tv&start="
@@ -92,39 +94,40 @@ class Schedule extends React.Component {
    
     })
     .then(function (response) {
+     this.setState({savePlaylist: "Saved Playlist",})
       
-      this.setState({spinner:true})
-      this.forceUpdate()
-
+     
     })
     .catch(function (error) {
+      
+   
     });
     
   }
 
   pasteContent(content){
-      for(let i = 0; i < content.length; i++){
+    for(let i = 0; i < content.length; i++){
 
-        if(content[i].isLive === false && loadedContent.length === 0){
-          content[i].startTime = moment.utc("00:00", "HH:mm:ss").format("HH:mm:ss");
-          content[i].id = count += 1;
-          loadedContent.push(content[i]);
-        }else if (content[i].isLive === true ){
-          
-          content[i].id = count += 1;
-          loadedContent.push(content[i]);
-      }else{
-          
-          content[i].startTime = moment.utc(loadedContent[loadedContent.length - 1].startTime, "HH:mm:ss").add(moment.duration(loadedContent[loadedContent.length - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
-          content[i].id = count += 1;
-          loadedContent.push(content[i])
-        }
+      if(content[i].isLive === false && loadedContent.length === 0){
+        content[i].startTime = moment.utc("00:00", "HH:mm:ss").format("HH:mm:ss");
+        content[i].id = count += 1;
+        loadedContent.push(content[i]);
+      }else if (content[i].isLive === true ){
+        content[i].live = 'live'
+        content[i].id = count += 1;
+        loadedContent.push(content[i]);
+    }else{
         
-       videos.push( <SingleSchedule fetchTime = {this.props.fetchTime} title={loadedContent[loadedContent.length - 1].title} startTime = {loadedContent[loadedContent.length - 1].startTime}
-       duration={loadedContent[loadedContent.length - 1].duration} deleteItem = {this.deleteItem} id = {loadedContent[loadedContent.length - 1].id} />)
+        content[i].startTime = moment.utc(loadedContent[loadedContent.length - 1].startTime, "HH:mm:ss").add(moment.duration(loadedContent[loadedContent.length - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
+        content[i].id = count += 1;
+        loadedContent.push(content[i])
       }
-      this.setState({refresh: 1})
-  }
+      
+     videos.push( <SingleSchedule fetchTime = {this.props.fetchTime} title={loadedContent[loadedContent.length - 1].title} startTime = {loadedContent[loadedContent.length - 1].startTime}
+     duration={loadedContent[loadedContent.length - 1].duration} deleteItem = {this.deleteItem} id = {loadedContent[loadedContent.length - 1].id} live={loadedContent[loadedContent.length - 1].live} />)
+    }
+    this.setState({refresh: 1})
+}
   deleteItem(id){
 
       videos.map((item, idx) => {
@@ -148,7 +151,7 @@ class Schedule extends React.Component {
           loadedContent[i].startTime = moment.utc(loadedContent[i - 1].startTime, "HH:mm:ss").add(moment.duration(loadedContent[i - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
         }
           videos.push( <SingleSchedule fetchTime = {this.props.fetchTime} title={loadedContent[i].title} startTime = {loadedContent[i].startTime}
-            duration={loadedContent[i].duration} deleteItem = {this.deleteItem} id = {loadedContent[i].id} />)
+            duration={loadedContent[i].duration} deleteItem = {this.deleteItem} id = {loadedContent[i].id} live={loadedContent[i].live} />)
         }
         this.setState({refresh: 1})
       } 
@@ -204,8 +207,13 @@ class Schedule extends React.Component {
               //highlight on the actual listing.
               alert('Warning! Programme at ' + loadedContent[loadedContent.length - 1].startTime +  " will be cut short because of the Live Programme")
              
+            }else if(moment(loadedContent[loadedContent.length - 1].startTime, "HH:mm:ss").
+            add(moment.duration(loadedContent[loadedContent.length - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss")
+            < scheduleContent[i].startTime){
+              alert('Warning! You have a gap in the schedule before the start of the LIVE programme')
             }
             scheduleContent[i].id = count += 1;
+            scheduleContent[i].live = 'live'
             loadedContent.push(scheduleContent[i]);
             this.setState({refresh: 1})
        }
@@ -213,12 +221,13 @@ class Schedule extends React.Component {
        else{
          if(scheduleContent[i].isLive === true && videos.length === 0){
           scheduleContent[i].id = count += 1;
+          scheduleContent[i].live = 'live'
           loadedContent.push(scheduleContent[i]);
           this.setState({refresh: 1})
          }else{
          scheduleContent[i].startTime = moment.utc(loadedContent[loadedContent.length - 1].startTime, "HH:mm:ss").add(moment.duration(loadedContent[loadedContent.length - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
-         console.log(scheduleContent)
          scheduleContent[i].id = count += 1;
+         scheduleContent.style = 'live'
          loadedContent.push(scheduleContent[i]);
          this.setState({refresh: 1})
          }
@@ -244,7 +253,7 @@ class Schedule extends React.Component {
                 loadedContent[j].id = count+=1;
                 }
                 else if(loadedContent[j].isLive === true){
-                  
+                  loadedContent[j].live = 'live'
                 }
                 else{
                 loadedContent[j].startTime = moment.utc(loadedContent[j - 1].startTime, "HH:mm:ss").add(moment.duration(loadedContent[j - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
@@ -261,7 +270,7 @@ class Schedule extends React.Component {
               });
     
                 videos.push( <SingleSchedule fetchTime = {this.props.fetchTime} title={loadedContent[j].title} startTime = {loadedContent[j].startTime}
-                duration={loadedContent[j].duration} deleteItem = {this.deleteItem} id = {loadedContent[j].id} />)
+                duration={loadedContent[j].duration} deleteItem = {this.deleteItem} id = {loadedContent[j].id} live = {loadedContent[j].live}/>)
               }
           }else if (loadedContent[this.state.index + 1].isLive === true &&
             moment(currentStartTime, "HH:mm:ss").add(moment.duration(loadedContent[loadedContent.length - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss") 
@@ -300,24 +309,24 @@ class Schedule extends React.Component {
           });
 
             videos.push( <SingleSchedule fetchTime = {this.props.fetchTime} title={loadedContent[j].title} startTime = {loadedContent[j].startTime}
-            duration={loadedContent[j].duration} deleteItem = {this.deleteItem} id = {loadedContent[j].id} />)
+            duration={loadedContent[j].duration} deleteItem = {this.deleteItem} id = {loadedContent[j].id} live = {loadedContent[j].live} />)
           }
         }
          }else{
            
       videos.push(<SingleSchedule fetchTime = {this.props.fetchTime} title={loadedContent[loadedContent.length - 1].title} startTime = {loadedContent[loadedContent.length - 1].startTime}
-      duration={loadedContent[loadedContent.length - 1].duration} deleteItem = {this.deleteItem} id = {loadedContent[loadedContent.length - 1].id} />)
+      duration={loadedContent[loadedContent.length - 1].duration} deleteItem = {this.deleteItem} id = {loadedContent[loadedContent.length - 1].id} live={loadedContent[loadedContent.length - 1].live} />)
        } 
       }
     }
 }
     render() { 
-      
+      alert('bang')
      return (
 
         <div>
             
-          <center><h2>{this.props.text}Schedule</h2></center>
+            <div className = 'dateContainer'><h2>{this.props.text}Schedule</h2></div>
           <table className="ui compact celled definition table">
         <thead>
             <tr>
@@ -340,8 +349,8 @@ class Schedule extends React.Component {
             <tr>
               <th></th>
               <th colSpan="6">
-                <div class="ui right floated small primary labeled icon button" onClick={this.savePlaylist}>
-                    {this.state.spinner ? <div class="ui right floated small primary labeled loading button"></div> : 'xxx'}
+                <div className="ui right floated small primary labeled icon button" onClick={this.savePlaylist}>
+                    {this.state.spinner ? <div class="ui right floated small primary labeled loading button"></div> : 'Save Playlist'}
                   
                     
                 </div>

@@ -40,8 +40,14 @@
 .tooltip:hover .tooltiptext {
   visibility: visible;
 }
-.overwriter{
-  background-color: red !important; 
+.dateContainer{
+ margin: auto;
+ text-align: center;
+ width:50%
+}
+
+.live{
+  background-color: #DAA520;
 }
 
     

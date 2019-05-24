@@ -28,32 +28,25 @@ class Date extends React.Component {
       render() {   
     return(
       <div className ="dateContainer"> 
-      <div className ="dateHeader"> 
+      
    
-      <center>
-      {/* <button><FastRewind onClick= {() => {this.props.previousDay(  this.handleOtherClick(7)  )}  }/></button> */}
-      <button class="ui icon button" onClick= {() => {this.props.previousDay(  this.handleOtherClick(7)  )}  } >
-      <i class="angle double left icon"></i>
+      <button className="ui icon button" onClick= {() => {this.props.previousDay(  this.handleOtherClick(7)  )}  } >
+      <i className="angle double left icon"></i>
       </button>
 
-      
-      {/* <button><ChevronLeftIcon onClick= {() => {this.props.previousDay(  this.handleOtherClick(1)  )}  }/> </button> */}
-      <button class="ui icon button" onClick= {() => {this.props.previousDay(  this.handleOtherClick(1)  )}  } >
-      <i class="left arrow icon"></i>
+      <button className="ui icon button" onClick= {() => {this.props.previousDay(  this.handleOtherClick(1)  )}  } >
+      <i className="left arrow icon"></i>
       
       </button>
        {this.props.scheduleDate} 
-      {/* <button><ChevronRightIcon onClick={() => {this.props.nextDay( this.handleClick(1) )} }  /></button> */}
-      <button class="ui icon button" onClick={() => {this.props.nextDay( this.handleClick(1) )} } >
-      <i class="right arrow icon"></i>
+      <button className="ui icon button" onClick={() => {this.props.nextDay( this.handleClick(1) )} } >
+      <i className="right arrow icon"></i>
      
       </button>
-      {/* <button><FastForward onClick= {() => {this.props.nextDay(  this.handleClick(7)  )}  }/></button> */}
-      <button class="ui icon button" onClick={() => {this.props.nextDay(  this.handleClick(7)  )}  } >
-      <i class="angle double right icon"></i>
+      <button className="ui icon button" onClick={() => {this.props.nextDay(  this.handleClick(7)  )}  } >
+      <i className="angle double right icon"></i>
       </button>
-      </center>
-    </div>
+    
     </div>
     )
   }

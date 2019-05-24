@@ -35,8 +35,9 @@ class SingleSchedule extends React.Component {
         this.props.flag === true ? status = <Arrow/> : status =  null;
   
 return (
-    <Fragment>
-        <tr className = {this.props.border}>
+    <Fragment className = {this.props.live}>
+      
+        <tr className = {this.props.live}>
         <td onClick={() => this.props.fetchTime(this.props.id, status)}> {status}</td>
         <td className="collapsing" className = {this.props.style}>
         <input type="checkbox"/> <label></label>
@@ -46,6 +47,7 @@ return (
         <td className = {this.props.style}>{moment.duration(this.props.duration)._data.minutes}:{this.timeFormat()}</td>
         {additional}
     </tr>
+    
     </Fragment>
 );
 }

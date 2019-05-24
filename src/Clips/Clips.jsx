@@ -131,7 +131,7 @@ export class Clips extends React.Component {
     }
     
   state = {
-      
+    spinner: false,
     rows: [
     ].sort((a, b) => (a.duration < b.duration ? -1 : 1)),
     page: 0,
@@ -178,6 +178,7 @@ export class Clips extends React.Component {
       rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
 
       if(cells.length === 0){
+        this.setState({spinner : true})
         return <Spinner />
       }
 
@@ -200,7 +201,7 @@ export class Clips extends React.Component {
                   <TableRow key={row.id}>
                     <TableCell component="th" scope="row">
                       <div className="tooltip"> {row.title} 
-                      <span className="tooltiptext">PID = {row.pid} - Version = {row.versions}</span>
+                      <span className="tooltiptext">PID = {row.pid}</span>
                       </div>
                       
                     </TableCell>
