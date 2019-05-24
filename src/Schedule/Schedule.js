@@ -92,7 +92,7 @@ class Schedule extends React.Component {
    
     })
     .then(function (response) {
-      alert(' in here')
+      
       this.setState({spinner:true})
       this.forceUpdate()
 
@@ -142,6 +142,8 @@ class Schedule extends React.Component {
         for(let i = idx; i < loadedContent.length; i++){
           if(i === 0){
             loadedContent[i].startTime = moment.utc("00:00", "HH:mm:ss").format("HH:mm:ss");
+        }else if(loadedContent[i].isLive === true){
+          
         }else{
           loadedContent[i].startTime = moment.utc(loadedContent[i - 1].startTime, "HH:mm:ss").add(moment.duration(loadedContent[i - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
         }
@@ -195,13 +197,13 @@ class Schedule extends React.Component {
          this.setState({refresh: 1})
     
 
-       }else if(scheduleContent[i].isLive === true){
+       }else if(scheduleContent[i].isLive === true && videos.length !== 0){
             if(moment(loadedContent[loadedContent.length - 1].startTime, "HH:mm:ss").
             add(moment.duration(loadedContent[loadedContent.length - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss")
             > scheduleContent[i].startTime){
               //highlight on the actual listing.
-              alert('Programme at ' + loadedContent[loadedContent.length - 1].startTime +  " will be cut short")
-              alert('Programme at ' + loadedContent[loadedContent.length - 1].startTime +  " will be cut short")
+              alert('Warning! Programme at ' + loadedContent[loadedContent.length - 1].startTime +  " will be cut short because of the Live Programme")
+             
             }
             scheduleContent[i].id = count += 1;
             loadedContent.push(scheduleContent[i]);
@@ -209,12 +211,17 @@ class Schedule extends React.Component {
        }
        
        else{
-         
+         if(scheduleContent[i].isLive === true && videos.length === 0){
+          scheduleContent[i].id = count += 1;
+          loadedContent.push(scheduleContent[i]);
+          this.setState({refresh: 1})
+         }else{
          scheduleContent[i].startTime = moment.utc(loadedContent[loadedContent.length - 1].startTime, "HH:mm:ss").add(moment.duration(loadedContent[loadedContent.length - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
          console.log(scheduleContent)
          scheduleContent[i].id = count += 1;
          loadedContent.push(scheduleContent[i]);
          this.setState({refresh: 1})
+         }
        }
        
        if(newState !== null){
@@ -225,7 +232,7 @@ class Schedule extends React.Component {
           moment(currentStartTime, "HH:mm:ss").add(moment.duration(loadedContent[loadedContent.length - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss") 
           < loadedContent[this.state.index + 1].startTime)
               {
-                alert('bang')
+                
               loadedContent.pop()
               videos.splice(this.state.index, 0, <SingleSchedule fetchTime = {this.props.fetchTime} title={loadedContent[loadedContent.length - 1].title} startTime = {loadedContent[loadedContent.length - 1].startTime}
               duration={loadedContent[loadedContent.length - 1].duration} deleteItem = {this.deleteItem} id = {loadedContent[loadedContent.length - 1].id}/>)
@@ -260,9 +267,8 @@ class Schedule extends React.Component {
             moment(currentStartTime, "HH:mm:ss").add(moment.duration(loadedContent[loadedContent.length - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss") 
           > loadedContent[this.state.index + 1].startTime)
             {
-              console.log('current start time is ', currentStartTime)
-              console.log('calculation',  moment.utc(currentStartTime, "HH:mm:ss").add(moment.duration(loadedContent[loadedContent.length - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss"))
-              alert("Cannot change live show, remove")
+             
+              alert("Cannot move the live show, please review your changes")
               loadedContent.pop()
               break
           }else{
@@ -306,7 +312,6 @@ class Schedule extends React.Component {
     }
 }
     render() { 
-alert('render')
       
      return (
 
