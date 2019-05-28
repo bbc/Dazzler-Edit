@@ -2,7 +2,6 @@ import React from 'react';
 import SingleSchedule from '../SingleSchedule/SingleSchedule';
 import moment from 'moment'
 import axios from 'axios'
-import Spinner from '../Spinner/Spinner'
 
 var count = -2;
 var loadedContent = [];
@@ -21,7 +20,8 @@ class Schedule extends React.Component {
     text: null,
     refresh: 2,
     data: [],
-    savePlaylist: "Save Playlist",
+    savePlaylist: "ui right floated small primary labeled icon button",
+    status: "Save Playlist",
     index: null
   };
 
@@ -81,7 +81,7 @@ class Schedule extends React.Component {
            test.push(payLoad);
      }
     
-    
+  this.setState({savePlaylist: "ui right floated primary loading button"})
      
   axios({
     method: 'post',
@@ -93,10 +93,9 @@ class Schedule extends React.Component {
     data: test,
    
     })
-    .then(function (response) {
-     this.setState({savePlaylist: "Saved Playlist",})
-      
-     
+    .then(response => {
+     this.setState({savePlaylist: "ui right floated positive button active"})
+     this.setState({status: 'Playlist Saved'})
     })
     .catch(function (error) {
       
@@ -126,7 +125,8 @@ class Schedule extends React.Component {
      videos.push( <SingleSchedule fetchTime = {this.props.fetchTime} title={loadedContent[loadedContent.length - 1].title} startTime = {loadedContent[loadedContent.length - 1].startTime}
      duration={loadedContent[loadedContent.length - 1].duration} deleteItem = {this.deleteItem} id = {loadedContent[loadedContent.length - 1].id} live={loadedContent[loadedContent.length - 1].live} />)
     }
-    this.setState({refresh: 1})
+    this.setState({savePlaylist: "ui right floated small primary labeled icon button"})
+    this.setState({status: "Save Playlist"})
 }
   deleteItem(id){
 
@@ -197,7 +197,8 @@ class Schedule extends React.Component {
          scheduleContent[i].startTime = moment.utc("00:00", "HH:mm:ss").format("HH:mm:ss");
          scheduleContent[i].id = count += 1;
          loadedContent.push(scheduleContent[i]);
-         this.setState({refresh: 1})
+         this.setState({savePlaylist: "ui right floated small primary labeled icon button"})
+         this.setState({status: "Save Playlist"})
     
 
        }else if(scheduleContent[i].isLive === true && videos.length !== 0){
@@ -215,7 +216,8 @@ class Schedule extends React.Component {
             scheduleContent[i].id = count += 1;
             scheduleContent[i].live = 'live'
             loadedContent.push(scheduleContent[i]);
-            this.setState({refresh: 1})
+            this.setState({savePlaylist: "ui right floated small primary labeled icon button"})
+            this.setState({status: "Save Playlist"})
        }
        
        else{
@@ -223,13 +225,15 @@ class Schedule extends React.Component {
           scheduleContent[i].id = count += 1;
           scheduleContent[i].live = 'live'
           loadedContent.push(scheduleContent[i]);
-          this.setState({refresh: 1})
+          this.setState({savePlaylist: "ui right floated small primary labeled icon button"})
+          this.setState({status: "Save Playlist"})
          }else{
          scheduleContent[i].startTime = moment.utc(loadedContent[loadedContent.length - 1].startTime, "HH:mm:ss").add(moment.duration(loadedContent[loadedContent.length - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
          scheduleContent[i].id = count += 1;
          scheduleContent.style = 'live'
          loadedContent.push(scheduleContent[i]);
-         this.setState({refresh: 1})
+         this.setState({savePlaylist: "ui right floated small primary labeled icon button"})
+         this.setState({status: "Save Playlist"})
          }
        }
        
@@ -321,7 +325,6 @@ class Schedule extends React.Component {
     }
 }
     render() { 
-      alert('bang')
      return (
 
         <div>
@@ -349,10 +352,8 @@ class Schedule extends React.Component {
             <tr>
               <th></th>
               <th colSpan="6">
-                <div className="ui right floated small primary labeled icon button" onClick={this.savePlaylist}>
-                    {this.state.spinner ? <div class="ui right floated small primary labeled loading button"></div> : 'Save Playlist'}
-                  
-                    
+                <div className={this.state.savePlaylist} onClick={this.savePlaylist}>
+                  {this.state.status}
                 </div>
                 <div className="ui left floated small primary labeled icon button"  onClick  = { () => {this.pasteContent(this.props.pasted)} }   >
                   Paste  
