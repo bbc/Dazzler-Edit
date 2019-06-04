@@ -34,7 +34,7 @@ class Schedule extends React.Component {
     this.getCrid = this.getCrid.bind(this);  
     for(let i = 0; i < videos.length; i++) {
        videos[i] =  <SingleSchedule fetchTime = {this.props.fetchTime} title={loadedContent[i].title} startTime = {loadedContent[i].startTime}
-        duration={loadedContent[i].duration} deleteItem = {this.deleteItem} id = {loadedContent[i].id} flag = {false} />
+        duration={loadedContent[i].duration} deleteItem = {this.deleteItem} id = {loadedContent[i].id} flag = {false} live={loadedContent[i].live} />
         var newState = null;
         this.setState({index : null})
     }
@@ -51,19 +51,18 @@ class Schedule extends React.Component {
    return idType;
   }
     savePlaylist(){
-      
+      if(videos.length > 0){
       test  = [];
      var end =  moment.utc(loadedContent[loadedContent.length - 1].startTime, "HH:mm:ss").add(moment.duration(loadedContent[loadedContent.length - 1].duration)._milliseconds, 'milliseconds').format()
      
-      for(let i =0; i < loadedContent.length; i++){
-           newStart.set({hour:loadedContent[i].startTime.charAt(0) + loadedContent[i].startTime.charAt(1),
-            minute:loadedContent[i].startTime.charAt(3) + loadedContent[i].startTime.charAt(4),
-            second:loadedContent[i].startTime.charAt(6) + loadedContent[i].startTime.charAt(7)})
+      for(let i = 0; i < loadedContent.length; i++){
+           newStart.set({hour:videos[i].props.startTime.charAt(0) + videos[i].props.startTime.charAt(1),
+            minute:videos[i].props.startTime.charAt(3) + videos[i].props.startTime.charAt(4),
+            second:videos[i].props.startTime.charAt(6) + videos[i].props.startTime.charAt(7)})
             var payLoad = {
               "start": newStart.format(),
-              "duration": moment.duration(loadedContent[i].duration).toIsoString(),
-              "live": loadedContent[i].isLive, 
-              //"entity_type": "clip" (when its an episode it will have episode in there, if clip it will be CLIP)
+              "duration": moment.duration(videos[i].props.duration).toIsoString(),
+              "live": videos[i].props.live === 'live' ? true: false,
               "repeat": false
             }
             if(loadedContent[i].item_type === "clip"){
@@ -97,13 +96,14 @@ class Schedule extends React.Component {
      this.setState({savePlaylist: "ui right floated positive button active"})
      this.setState({status: 'Playlist Saved'})
     })
-    .catch(function (error) {
-      
-   
+    .catch(error => {
+      this.setState({savePlaylist: 'ui right floated small primary labeled icon button'})
+      this.setState({status: "Save Playlist"})
+      alert('Error Saving Playlist')
     });
     
   }
-
+    }
   pasteContent(content){
     for(let i = 0; i < content.length; i++){
 
@@ -125,6 +125,12 @@ class Schedule extends React.Component {
      videos.push( <SingleSchedule fetchTime = {this.props.fetchTime} title={loadedContent[loadedContent.length - 1].title} startTime = {loadedContent[loadedContent.length - 1].startTime}
      duration={loadedContent[loadedContent.length - 1].duration} deleteItem = {this.deleteItem} id = {loadedContent[loadedContent.length - 1].id} live={loadedContent[loadedContent.length - 1].live} />)
     }
+    // for(let i = 0; i< loadedContent.length; i++){
+      
+    //   loadedContent[i].startTime = videos[i].props.startTime
+ 
+    // }
+
     this.setState({savePlaylist: "ui right floated small primary labeled icon button"})
     this.setState({status: "Save Playlist"})
 }
@@ -325,6 +331,7 @@ class Schedule extends React.Component {
     }
 }
     render() { 
+      console.log('videos', videos)
      return (
 
         <div>

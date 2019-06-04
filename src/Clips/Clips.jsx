@@ -177,10 +177,10 @@ export class Clips extends React.Component {
     const emptyRows =
       rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
 
-      if(cells.length === 0){
-        this.setState({spinner : true})
-        return <Spinner />
-      }
+      // if(cells.length === 0){
+      //   this.setState({spinner : true})
+      //   return <Spinner />
+      // }
 
     return (
       
