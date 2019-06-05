@@ -97,6 +97,7 @@ class Schedule extends React.Component {
      this.setState({status: 'Playlist Saved'})
     })
     .catch(error => {
+  
       this.setState({savePlaylist: 'ui right floated small primary labeled icon button'})
       this.setState({status: "Save Playlist"})
       alert('Error Saving Playlist')
