@@ -120,7 +120,7 @@ class Schedule extends React.Component {
   this.setState({savePlaylist: "ui right floated primary loading button"})
   for(let i = 0; i < loadedContent.length; i++){
          
-    test = this.makeScheduleEvent(loadedContent[i])
+    test += this.makeScheduleEvent(loadedContent[i])
   axios({
     method: 'post',
     url: "https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/tva",
