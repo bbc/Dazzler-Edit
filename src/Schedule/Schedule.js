@@ -7,7 +7,7 @@ import xml2js from 'xml2js'
 var count = -2;
 var loadedContent = [];
 var scheduleContent = [];
-var test = [];
+var test;
 var videos = []; 
 var newState = null; 
 var start = moment().utcOffset(0);
@@ -42,6 +42,7 @@ class Schedule extends React.Component {
 
 
     makeScheduleEvent(broadcast){
+     
      console.log('broadcast', broadcast.nCrid)
       start.set({hour:broadcast.startTime.charAt(0) + broadcast.startTime.charAt(1),
         minute:broadcast.startTime.charAt(3) + broadcast.startTime.charAt(4),
@@ -69,7 +70,7 @@ class Schedule extends React.Component {
             </InstanceDescription>
             <PublishedStartTime>${start.format()}</PublishedStartTime>
             <PublishedDuration>${broadcast.duration}</PublishedDuration>
-            <Live value="${false}"/>
+            <Live value="${ broadcast.live === 'live'? true: false}"/>
             <Repeat value="${false}"/>
             <Free value="true"/>
       </ScheduleEvent> ${endXML}`
@@ -91,39 +92,39 @@ class Schedule extends React.Component {
         }
         })
         pids.forEach(async (i1)=>loadedContent.forEach(async (i2, idx)=>{
-          if(i1 === i2.available_versions.version[0].pid || i1 === i2.versionPid){
-            await axios.get(`https://programmes.api.bbc.com/nitro/api/versions?api_key=tT0EI8LEPIQntUM1msXEgYkZECRAkoFC&pid=${i1}`).then((response) => {
-              xml2js.parseString(response.data, function (err, result) {
-                loadedContent[idx].nCrid = result.nitro.results[0].version[0].identifiers[0].identifier[0]._
-                alert(loadedContent[idx].nCrid)
-                // console.log('BOOOOOM', result.nitro.results[0].version[0].identifiers[0].identifier[0]._)
-                // console.log('boooom', i1)
-                // console.log('boom', idx)
-              });  
-      
+          if(i2.available_versions !== undefined && i1 === i2.available_versions.version[0].pid){ 
+            await axios.get(`https://programmes.api.bbc.com/nitro/api/versions?api_key=tT0EI8LEPIQntUM1msXEgYkZECRAkoFC&pid=${i1}`).then(async(response) => {
+              return await response;
+          }).then(async(response)=>{
+            xml2js.parseString(response.data, function (err, result) {
+              loadedContent[idx].nCrid = result.nitro.results[0].version[0].identifiers[0].identifier[0]._
+              // alert(loadedContent[idx].nCrid)
+              // console.log('BOOOOOM', result.nitro.results[0].version[0].identifiers[0].identifier[0]._)
+              // console.log('boooom', i1)
+              // console.log('boom', idx)
+            }); 
             }).catch(e => {
                console.log('error', e);
                alert('error b')
             });
-
+          }else if(i1 === i2.versionPid){
+            loadedContent[idx].nCrid = loadedContent[idx].window_of[0].crid
           }
         }))
   
-          for(let i = 0; i < loadedContent.length; i++){
-            alert('here')
-          test.push(this.makeScheduleEvent(loadedContent[i]));
+         
+          // test.push(;
            console.log('TVA', test)
-     }
+     
     
   this.setState({savePlaylist: "ui right floated primary loading button"})
-  console.log('jb', test)   
+  for(let i = 0; i < loadedContent.length; i++){
+         
+    test = this.makeScheduleEvent(loadedContent[i])
   axios({
     method: 'post',
     url: "https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/tva",
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    data: test[0],
+    data: test,
    
     })
     .then(response => {
@@ -135,7 +136,7 @@ class Schedule extends React.Component {
       this.setState({status: "Save Playlist"})
       alert('Error Saving Playlist')
     });
-    
+  }
   }
   }
   pasteContent(content){
@@ -366,7 +367,7 @@ class Schedule extends React.Component {
       if(loadedContent.length > 0){
       //  console.log('loaded Content', loadedContent[0].identifiers.identifier[0].$)
       // console.log('test start time', loadedContent[0].startTime.replace(/:/g, ','))
-      console.log('test', loadedContent)
+      console.log('testLoadedContent', loadedContent)
       
       }
       
