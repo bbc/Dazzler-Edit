@@ -1,7 +1,7 @@
 
 Name: ws-dazzler-edit
 Version: 0.1.0
-Release: 11%{?dist}
+Release: 13%{?dist}
 Group: Application/Web
 License: Internal BBC use only
 Summary: ws-dazzler-edit
