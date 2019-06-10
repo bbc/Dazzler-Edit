@@ -133,8 +133,6 @@ export class Live extends React.Component {
     data: []
   };
 
-
-  
   componentDidMount = () => {
     cells = [];
     for(let i = 0; i < this.props.live.length; i++){
@@ -204,7 +202,7 @@ export class Live extends React.Component {
                   <TableRow key={row.id}>
                     <TableCell component="th" scope="row">
                       <div className="tooltip"> {row.title} 
-                      <span className="tooltiptext">{row.stream}}</span>
+                      <span className="tooltiptext">{row.stream}</span>
                       </div>
                       
                     </TableCell>

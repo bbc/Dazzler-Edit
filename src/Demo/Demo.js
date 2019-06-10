@@ -146,7 +146,7 @@ class Demo extends React.Component {
     })
       //Clips
     axios.get('https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/clip?language=marathi').then((response) => {
-    
+    console.log('test1', response)
         this.setState({
             items: response.data,
         })

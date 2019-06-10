@@ -2,6 +2,7 @@ import React from 'react';
 import SingleSchedule from '../SingleSchedule/SingleSchedule';
 import moment from 'moment'
 import axios from 'axios'
+import xml2js from 'xml2js'
 
 var count = -2;
 var loadedContent = [];
@@ -10,7 +11,6 @@ var test = [];
 var videos = []; 
 var newState = null; 
 var start = moment().utcOffset(0);
-var newStart = moment().utcOffset(0);
 start.set({hour:0,minute:0,second:0,millisecond:0})
 
 class Schedule extends React.Component {
@@ -31,7 +31,7 @@ class Schedule extends React.Component {
     this.savePlaylist = this.savePlaylist.bind(this);
     this.pasteContent = this.pasteContent.bind(this);    
     this.deleteItem = this.deleteItem.bind(this); 
-    this.getCrid = this.getCrid.bind(this);  
+    this.makeScheduleEvent = this.makeScheduleEvent.bind(this); 
     for(let i = 0; i < videos.length; i++) {
        videos[i] =  <SingleSchedule fetchTime = {this.props.fetchTime} title={loadedContent[i].title} startTime = {loadedContent[i].startTime}
         duration={loadedContent[i].duration} deleteItem = {this.deleteItem} id = {loadedContent[i].id} flag = {false} live={loadedContent[i].live} />
@@ -40,56 +40,90 @@ class Schedule extends React.Component {
     }
   }
 
-  getCrid(item) {
-    var idType;
-    item.identifiers.identifier.forEach(id => {
 
-      if(id.type === 'crid'){
-        idType = id.$
-      } 
-    })
-   return idType;
-  }
+    makeScheduleEvent(broadcast){
+     console.log('broadcast', broadcast.nCrid)
+      start.set({hour:broadcast.startTime.charAt(0) + broadcast.startTime.charAt(1),
+        minute:broadcast.startTime.charAt(3) + broadcast.startTime.charAt(4),
+        second:broadcast.startTime.charAt(6) + broadcast.startTime.charAt(7)})
+        var end =  moment.utc(loadedContent[loadedContent.length - 1].startTime, "HH:mm:ss").add(moment.duration(loadedContent[loadedContent.length - 1].duration)._milliseconds, 'milliseconds').format()
+
+      let imi ="imi:dazzler/"+(Date.parse(start)/1000);
+      console.log('test', imi)
+      let startXML = 
+     `<TVAMain xmlns="urn:tva:metadata:2007" xmlns:mpeg7="urn:tva:mpeg7:2005" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+      xml:lang="en-GB" xsi:schemaLocation="urn:tva:metadata:2007 tva_metadata_3-1_v141.xsd">
+      <ProgramDescription>
+      <ProgramLocationTable>`;
+      var endXML = "</Schedule></ProgramLocationTable></ProgramDescription></TVAMain>";
+      return `${startXML}  
+      <Schedule start="${start.format()}" end="${end}" serviceIDRef="TVMAR01">
+        <ScheduleEvent>
+          <Program crid="${broadcast.nCrid}"/>
+            <InstanceMetadataId>${imi}</InstanceMetadataId>
+            <InstanceDescription>
+              <AVAttributes>
+                <AudioAttributes><MixType href="urn:mpeg:mpeg7:cs:AudioPresentationCS:2001:3"><Name>Stereo</Name></MixType></AudioAttributes>
+                <VideoAttributes><AspectRatio>16:9</AspectRatio><Color type="color"/></VideoAttributes>
+              </AVAttributes>
+            </InstanceDescription>
+            <PublishedStartTime>${start.format()}</PublishedStartTime>
+            <PublishedDuration>${broadcast.duration}</PublishedDuration>
+            <Live value="${false}"/>
+            <Repeat value="${false}"/>
+            <Free value="true"/>
+      </ScheduleEvent> ${endXML}`
+      
+    }
     savePlaylist(){
+      
       if(videos.length > 0){
-      test  = [];
-     var end =  moment.utc(loadedContent[loadedContent.length - 1].startTime, "HH:mm:ss").add(moment.duration(loadedContent[loadedContent.length - 1].duration)._milliseconds, 'milliseconds').format()
-     
-      for(let i = 0; i < loadedContent.length; i++){
-           newStart.set({hour:videos[i].props.startTime.charAt(0) + videos[i].props.startTime.charAt(1),
-            minute:videos[i].props.startTime.charAt(3) + videos[i].props.startTime.charAt(4),
-            second:videos[i].props.startTime.charAt(6) + videos[i].props.startTime.charAt(7)})
-            var payLoad = {
-              "start": newStart.format(),
-              "duration": moment.duration(videos[i].props.duration).toIsoString(),
-              "live": videos[i].props.live === 'live' ? true: false,
-              "repeat": false
-            }
-            if(loadedContent[i].item_type === "clip"){
-              payLoad.broadcast_of = loadedContent[i].versionPid;
-              payLoad.broadcast_of_crid = this.getCrid(loadedContent[i])
-            }
-            if(loadedContent[i].item_type === "window"){
-              loadedContent[i].window_of.forEach(id => {
+        test  = [];
+        let pids = new Set();
+        var end =  moment.utc(loadedContent[loadedContent.length - 1].startTime, "HH:mm:ss").add(moment.duration(loadedContent[loadedContent.length - 1].duration)._milliseconds, 'milliseconds').format()
+       
+        loadedContent.forEach(item => {
+          
+        if(item.available_versions !== undefined){
+        pids.add(item.available_versions.version[0].pid)
+        }else{
+          pids.add(item.versionPid)
+        }
+        })
+        pids.forEach(async (i1)=>loadedContent.forEach(async (i2, idx)=>{
+          if(i1 === i2.available_versions.version[0].pid || i1 === i2.versionPid){
+            await axios.get(`https://programmes.api.bbc.com/nitro/api/versions?api_key=tT0EI8LEPIQntUM1msXEgYkZECRAkoFC&pid=${i1}`).then((response) => {
+              xml2js.parseString(response.data, function (err, result) {
+                loadedContent[idx].nCrid = result.nitro.results[0].version[0].identifiers[0].identifier[0]._
+                alert(loadedContent[idx].nCrid)
+                // console.log('BOOOOOM', result.nitro.results[0].version[0].identifiers[0].identifier[0]._)
+                // console.log('boooom', i1)
+                // console.log('boom', idx)
+              });  
+      
+            }).catch(e => {
+               console.log('error', e);
+               alert('error b')
+            });
 
-                if(id.result_type === 'version'){
-                  payLoad.broadcast_of = id.pid
-                }
-              });
-            }
-           test.push(payLoad);
+          }
+        }))
+  
+          for(let i = 0; i < loadedContent.length; i++){
+            alert('here')
+          test.push(this.makeScheduleEvent(loadedContent[i]));
+           console.log('TVA', test)
      }
     
   this.setState({savePlaylist: "ui right floated primary loading button"})
-     
+  console.log('jb', test)   
   axios({
     method: 'post',
-    url: "https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/broadcasts?sid=bbc_marathi_tv&start="
-    + start.format() + '&end=' + end,
+    url: "https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/tva",
     headers: {
       'Content-Type': 'application/json'
     },
-    data: test,
+    data: test[0],
    
     })
     .then(response => {
@@ -97,15 +131,15 @@ class Schedule extends React.Component {
      this.setState({status: 'Playlist Saved'})
     })
     .catch(error => {
-  
       this.setState({savePlaylist: 'ui right floated small primary labeled icon button'})
       this.setState({status: "Save Playlist"})
       alert('Error Saving Playlist')
     });
     
   }
-    }
+  }
   pasteContent(content){
+    alert(loadedContent.length)
     for(let i = 0; i < content.length; i++){
 
       if(content[i].isLive === false && loadedContent.length === 0){
@@ -126,11 +160,6 @@ class Schedule extends React.Component {
      videos.push( <SingleSchedule fetchTime = {this.props.fetchTime} title={loadedContent[loadedContent.length - 1].title} startTime = {loadedContent[loadedContent.length - 1].startTime}
      duration={loadedContent[loadedContent.length - 1].duration} deleteItem = {this.deleteItem} id = {loadedContent[loadedContent.length - 1].id} live={loadedContent[loadedContent.length - 1].live} />)
     }
-    // for(let i = 0; i< loadedContent.length; i++){
-      
-    //   loadedContent[i].startTime = videos[i].props.startTime
- 
-    // }
 
     this.setState({savePlaylist: "ui right floated small primary labeled icon button"})
     this.setState({status: "Save Playlist"})
@@ -167,6 +196,7 @@ class Schedule extends React.Component {
   componentDidUpdate(prevProps){  
 
     if(prevProps.clipTime !== this.props.clipTime){
+    
     for(let i = 0; i < videos.length; i++) {
       if(videos[i].props.id === this.props.clipTime && videos[i].props.flag !== true && videos[i].props.isLive !== true){
 
@@ -188,6 +218,7 @@ class Schedule extends React.Component {
       }
     }
     }else{
+      
       var newState = null;
     }
     if(prevProps.dataLength !== this.props.dataLength){
@@ -332,7 +363,14 @@ class Schedule extends React.Component {
     }
 }
     render() { 
-      console.log('videos', videos)
+      if(loadedContent.length > 0){
+      //  console.log('loaded Content', loadedContent[0].identifiers.identifier[0].$)
+      // console.log('test start time', loadedContent[0].startTime.replace(/:/g, ','))
+      console.log('test', loadedContent)
+      
+      }
+      
+      
      return (
 
         <div>
