@@ -8,9 +8,12 @@ var count = -2;
 var loadedContent = [];
 var scheduleContent = [];
 var test;
+var startXML;
+var endXML;
 var videos = []; 
 var newState = null; 
 var start = moment().utcOffset(0);
+let newStart =  moment().utcOffset(0);
 start.set({hour:0,minute:0,second:0,millisecond:0})
 
 class Schedule extends React.Component {
@@ -26,7 +29,6 @@ class Schedule extends React.Component {
   };
 
   componentDidMount(){
-  
     var count = -2;
     this.savePlaylist = this.savePlaylist.bind(this);
     this.pasteContent = this.pasteContent.bind(this);    
@@ -39,26 +41,21 @@ class Schedule extends React.Component {
         this.setState({index : null})
     }
   }
-
-
     makeScheduleEvent(broadcast){
-     
-     console.log('broadcast', broadcast.nCrid)
-      start.set({hour:broadcast.startTime.charAt(0) + broadcast.startTime.charAt(1),
+      newStart.set({hour:broadcast.startTime.charAt(0) + broadcast.startTime.charAt(1),
         minute:broadcast.startTime.charAt(3) + broadcast.startTime.charAt(4),
-        second:broadcast.startTime.charAt(6) + broadcast.startTime.charAt(7)})
+        second:broadcast.startTime.charAt(6) + broadcast.startTime.charAt(7)})      
         var end =  moment.utc(loadedContent[loadedContent.length - 1].startTime, "HH:mm:ss").add(moment.duration(loadedContent[loadedContent.length - 1].duration)._milliseconds, 'milliseconds').format()
 
       let imi ="imi:dazzler/"+(Date.parse(start)/1000);
-      console.log('test', imi)
-      let startXML = 
-     `<TVAMain xmlns="urn:tva:metadata:2007" xmlns:mpeg7="urn:tva:mpeg7:2005" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+      startXML = `<TVAMain xmlns="urn:tva:metadata:2007" xmlns:mpeg7="urn:tva:mpeg7:2005" 
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
       xml:lang="en-GB" xsi:schemaLocation="urn:tva:metadata:2007 tva_metadata_3-1_v141.xsd">
       <ProgramDescription>
-      <ProgramLocationTable>`;
-      var endXML = "</Schedule></ProgramLocationTable></ProgramDescription></TVAMain>";
-      return `${startXML}  
-      <Schedule start="${start.format()}" end="${end}" serviceIDRef="TVMAR01">
+      <ProgramLocationTable>
+      <Schedule start="${start.format()}" end="${end}" serviceIDRef="TVMAR01">`
+      endXML = "</Schedule></ProgramLocationTable></ProgramDescription></TVAMain>";
+      return ` 
         <ScheduleEvent>
           <Program crid="${broadcast.nCrid}"/>
             <InstanceMetadataId>${imi}</InstanceMetadataId>
@@ -68,16 +65,20 @@ class Schedule extends React.Component {
                 <VideoAttributes><AspectRatio>16:9</AspectRatio><Color type="color"/></VideoAttributes>
               </AVAttributes>
             </InstanceDescription>
-            <PublishedStartTime>${start.format()}</PublishedStartTime>
+            <PublishedStartTime>${newStart.format()}</PublishedStartTime>
             <PublishedDuration>${broadcast.duration}</PublishedDuration>
             <Live value="${ broadcast.live === 'live'? true: false}"/>
             <Repeat value="${false}"/>
             <Free value="true"/>
-      </ScheduleEvent> ${endXML}`
-      
+      </ScheduleEvent>`
     }
     savePlaylist(){
-      
+        start.set({hour:videos[0].props.startTime.charAt(0) + videos[0].props.startTime.charAt(1),
+        minute:videos[0].props.startTime.charAt(3) + videos[0].props.startTime.charAt(4),
+        second:videos[0].props.startTime.charAt(6) + videos[0].props.startTime.charAt(7)})
+        var end =  moment.utc(loadedContent[loadedContent.length - 1].startTime, "HH:mm:ss").add(moment.
+        duration(loadedContent[loadedContent.length - 1].duration)._milliseconds, 'milliseconds').format()
+
       if(videos.length > 0){
         test  = [];
         let pids = new Set();
@@ -98,33 +99,28 @@ class Schedule extends React.Component {
           }).then(async(response)=>{
             xml2js.parseString(response.data, function (err, result) {
               loadedContent[idx].nCrid = result.nitro.results[0].version[0].identifiers[0].identifier[0]._
-              // alert(loadedContent[idx].nCrid)
-              // console.log('BOOOOOM', result.nitro.results[0].version[0].identifiers[0].identifier[0]._)
-              // console.log('boooom', i1)
-              // console.log('boom', idx)
+
             }); 
             }).catch(e => {
                console.log('error', e);
-               alert('error b')
+              
             });
           }else if(i1 === i2.versionPid){
             loadedContent[idx].nCrid = loadedContent[idx].window_of[0].crid
           }
         }))
-  
-         
-          // test.push(;
-           console.log('TVA', test)
-     
-    
+
   this.setState({savePlaylist: "ui right floated primary loading button"})
   for(let i = 0; i < loadedContent.length; i++){
          
     test += this.makeScheduleEvent(loadedContent[i])
+  }
+
   axios({
     method: 'post',
     url: "https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/tva",
-    data: test,
+    data: startXML + 
+    test + endXML,
    
     })
     .then(response => {
@@ -134,11 +130,11 @@ class Schedule extends React.Component {
     .catch(error => {
       this.setState({savePlaylist: 'ui right floated small primary labeled icon button'})
       this.setState({status: "Save Playlist"})
-      alert('Error Saving Playlist')
+      // alert('Error Saving Playlist')
     });
   }
   }
-  }
+  
   pasteContent(content){
     alert(loadedContent.length)
     for(let i = 0; i < content.length; i++){
@@ -415,4 +411,4 @@ class Schedule extends React.Component {
     }
      
 }
-export default Schedule;      
+export default Schedule;     
