@@ -11,6 +11,7 @@ var test;
 var startXML;
 var endXML;
 var videos = []; 
+var promises = []
 var newState = null; 
 var start = moment().utcOffset(0);
 let newStart =  moment().utcOffset(0);
@@ -32,6 +33,7 @@ class Schedule extends React.Component {
     var count = -2;
     this.savePlaylist = this.savePlaylist.bind(this);
     this.pasteContent = this.pasteContent.bind(this);    
+    this.getCrid = this.getCrid.bind(this);    
     this.deleteItem = this.deleteItem.bind(this); 
     this.makeScheduleEvent = this.makeScheduleEvent.bind(this); 
     for(let i = 0; i < videos.length; i++) {
@@ -46,12 +48,8 @@ class Schedule extends React.Component {
         minute:broadcast.startTime.charAt(3) + broadcast.startTime.charAt(4),
         second:broadcast.startTime.charAt(6) + broadcast.startTime.charAt(7)})      
         var end =  moment.utc(loadedContent[loadedContent.length - 1].startTime, "HH:mm:ss").add(moment.duration(loadedContent[loadedContent.length - 1].duration)._milliseconds, 'milliseconds').format()
-
       let imi ="imi:dazzler/"+(Date.parse(start)/1000);
-      startXML = `<TVAMain xmlns="urn:tva:metadata:2007" xmlns:mpeg7="urn:tva:mpeg7:2005" 
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-      xml:lang="en-GB" xsi:schemaLocation="urn:tva:metadata:2007 tva_metadata_3-1_v141.xsd">
-      <ProgramDescription>
+      startXML = `<TVAMain xmlns="urn:tva:metadata:2007" xmlns:mpeg7="urn:tva:mpeg7:2005"xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"xml:lang="en-GB" xsi:schemaLocation="urn:tva:metadata:2007 tva_metadata_3-1_v141.xsd"><ProgramDescription>
       <ProgramLocationTable>
       <Schedule start="${start.format()}" end="${end}" serviceIDRef="TVMAR01">`
       endXML = "</Schedule></ProgramLocationTable></ProgramDescription></TVAMain>";
@@ -71,6 +69,12 @@ class Schedule extends React.Component {
             <Repeat value="${false}"/>
             <Free value="true"/>
       </ScheduleEvent>`
+    }
+    getCrid = (pid, idx) =>{
+      
+      return new Promise((resolve, reject) => {  
+         resolve(axios.get(`https://programmes.api.bbc.com/nitro/api/versions?api_key=tT0EI8LEPIQntUM1msXEgYkZECRAkoFC&pid=${pid}`))
+     });
     }
     savePlaylist(){
         start.set({hour:videos[0].props.startTime.charAt(0) + videos[0].props.startTime.charAt(1),
@@ -92,31 +96,35 @@ class Schedule extends React.Component {
           pids.add(item.versionPid)
         }
         })
-        pids.forEach(async (i1)=>loadedContent.forEach(async (i2, idx)=>{
-          if(i2.available_versions !== undefined && i1 === i2.available_versions.version[0].pid){ 
-            await axios.get(`https://programmes.api.bbc.com/nitro/api/versions?api_key=tT0EI8LEPIQntUM1msXEgYkZECRAkoFC&pid=${i1}`).then(async(response) => {
-              return await response;
-          }).then(async(response)=>{
-            xml2js.parseString(response.data, function (err, result) {
-              loadedContent[idx].nCrid = result.nitro.results[0].version[0].identifiers[0].identifier[0]._
+        pids.forEach((i1)=>loadedContent.forEach( (i2, idx)=>{
+          if(loadedContent[idx].nCrid === undefined){
+            alert('undefined')
+          if(i2.available_versions !== undefined && i1 === i2.available_versions.version[0].pid){
+            promises.push(this.getCrid(i1, idx).then(response =>{
+              xml2js.parseString(response.data, (err, result)=> {
+                loadedContent[idx].nCrid = result.nitro.results[0].version[0].identifiers[0].identifier[0]._
+              }); 
+            }))
 
-            }); 
-            }).catch(e => {
-               console.log('error', e);
-              
-            });
-          }else if(i1 === i2.versionPid){
+        }else if(i1 === i2.versionPid){
             loadedContent[idx].nCrid = loadedContent[idx].window_of[0].crid
           }
+        }else{
+          alert('ready have it ')
+        }
+        return loadedContent;
         }))
 
   this.setState({savePlaylist: "ui right floated primary loading button"})
-  for(let i = 0; i < loadedContent.length; i++){
-         
+
+  Promise.all(promises).then(results => { 
+    for(let i = 0; i < loadedContent.length; i++){
     test += this.makeScheduleEvent(loadedContent[i])
   }
 
+}).then(result=>{
   axios({
+   
     method: 'post',
     url: "https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/tva",
     data: startXML + 
@@ -130,13 +138,14 @@ class Schedule extends React.Component {
     .catch(error => {
       this.setState({savePlaylist: 'ui right floated small primary labeled icon button'})
       this.setState({status: "Save Playlist"})
-      // alert('Error Saving Playlist')
+      alert('Error Saving Playlist')
+    });
     });
   }
   }
   
   pasteContent(content){
-    alert(loadedContent.length)
+  
     for(let i = 0; i < content.length; i++){
 
       if(content[i].isLive === false && loadedContent.length === 0){
@@ -360,16 +369,7 @@ class Schedule extends React.Component {
     }
 }
     render() { 
-      if(loadedContent.length > 0){
-      //  console.log('loaded Content', loadedContent[0].identifiers.identifier[0].$)
-      // console.log('test start time', loadedContent[0].startTime.replace(/:/g, ','))
-      console.log('testLoadedContent', loadedContent)
-      
-      }
-      
-      
      return (
-
         <div>
             
             <div className = 'dateContainer'><h2>{this.props.text}Schedule</h2></div>
@@ -411,4 +411,4 @@ class Schedule extends React.Component {
     }
      
 }
-export default Schedule;     
+export default Schedule;  
