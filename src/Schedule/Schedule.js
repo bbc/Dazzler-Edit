@@ -33,7 +33,6 @@ class Schedule extends React.Component {
     var count = -2;
     this.savePlaylist = this.savePlaylist.bind(this);
     this.pasteContent = this.pasteContent.bind(this);    
-    this.getCrid = this.getCrid.bind(this);    
     this.deleteItem = this.deleteItem.bind(this); 
     this.makeScheduleEvent = this.makeScheduleEvent.bind(this); 
     for(let i = 0; i < videos.length; i++) {
@@ -44,6 +43,7 @@ class Schedule extends React.Component {
     }
   }
     makeScheduleEvent(broadcast){
+      console.log(broadcast.startTime)
       newStart.set({hour:broadcast.startTime.charAt(0) + broadcast.startTime.charAt(1),
         minute:broadcast.startTime.charAt(3) + broadcast.startTime.charAt(4),
         second:broadcast.startTime.charAt(6) + broadcast.startTime.charAt(7)})      
@@ -70,12 +70,7 @@ class Schedule extends React.Component {
             <Free value="true"/>
       </ScheduleEvent>`
     }
-    getCrid = (pid, idx) =>{
-      
-      return new Promise((resolve, reject) => {  
-         resolve(axios.get(`https://programmes.api.bbc.com/nitro/api/versions?api_key=tT0EI8LEPIQntUM1msXEgYkZECRAkoFC&pid=${pid}`))
-     });
-    }
+
     savePlaylist(){
         start.set({hour:videos[0].props.startTime.charAt(0) + videos[0].props.startTime.charAt(1),
         minute:videos[0].props.startTime.charAt(3) + videos[0].props.startTime.charAt(4),
@@ -85,44 +80,14 @@ class Schedule extends React.Component {
 
       if(videos.length > 0){
         test  = [];
-        let pids = new Set();
         var end =  moment.utc(loadedContent[loadedContent.length - 1].startTime, "HH:mm:ss").add(moment.duration(loadedContent[loadedContent.length - 1].duration)._milliseconds, 'milliseconds').format()
        
-        loadedContent.forEach(item => {
-          
-        if(item.available_versions !== undefined){
-        pids.add(item.available_versions.version[0].pid)
-        }else{
-          pids.add(item.versionPid)
-        }
-        })
-        pids.forEach((i1)=>loadedContent.forEach( (i2, idx)=>{
-          if(loadedContent[idx].nCrid === undefined){
-            alert('undefined')
-          if(i2.available_versions !== undefined && i1 === i2.available_versions.version[0].pid){
-            promises.push(this.getCrid(i1, idx).then(response =>{
-              xml2js.parseString(response.data, (err, result)=> {
-                loadedContent[idx].nCrid = result.nitro.results[0].version[0].identifiers[0].identifier[0]._
-              }); 
-            }))
-
-        }else if(i1 === i2.versionPid){
-            loadedContent[idx].nCrid = loadedContent[idx].window_of[0].crid
-          }
-        }else{
-          alert('ready have it ')
-        }
-        return loadedContent;
-        }))
-
   this.setState({savePlaylist: "ui right floated primary loading button"})
 
-  Promise.all(promises).then(results => { 
     for(let i = 0; i < loadedContent.length; i++){
     test += this.makeScheduleEvent(loadedContent[i])
-  }
+    }
 
-}).then(result=>{
   axios({
    
     method: 'post',
@@ -140,7 +105,7 @@ class Schedule extends React.Component {
       this.setState({status: "Save Playlist"})
       alert('Error Saving Playlist')
     });
-    });
+   
   }
   }
   
@@ -163,9 +128,12 @@ class Schedule extends React.Component {
         loadedContent.push(content[i])
       }
       
+      
      videos.push( <SingleSchedule fetchTime = {this.props.fetchTime} title={loadedContent[loadedContent.length - 1].title} startTime = {loadedContent[loadedContent.length - 1].startTime}
      duration={loadedContent[loadedContent.length - 1].duration} deleteItem = {this.deleteItem} id = {loadedContent[loadedContent.length - 1].id} live={loadedContent[loadedContent.length - 1].live} />)
+      console.log(loadedContent)
     }
+    
 
     this.setState({savePlaylist: "ui right floated small primary labeled icon button"})
     this.setState({status: "Save Playlist"})
@@ -355,7 +323,7 @@ class Schedule extends React.Component {
                 }
               }
           });
-
+            
             videos.push( <SingleSchedule fetchTime = {this.props.fetchTime} title={loadedContent[j].title} startTime = {loadedContent[j].startTime}
             duration={loadedContent[j].duration} deleteItem = {this.deleteItem} id = {loadedContent[j].id} live = {loadedContent[j].live} />)
           }

@@ -37,11 +37,15 @@ import Date from '../Date/Date';
 import Schedule from '../Schedule/Schedule';
 import PreviousSchedule from '../PreviousSchedule/PreviousSchedule';
 import NextSchedule from '../NextSchedule/NextSchedule';
+import xml2js from 'xml2js'
+import { promises } from 'fs';
+
 const drawerWidth = 240;
 var menuText = "Schedule";
 var text = "Today's ";
 var s = [];
 var time = -2;
+var promise = [];
 var n = [];
 var copiedContent = [];
 var icons = [<MailIcon />, <Movie />,  <Payment />, <Picture />, <Lock />, <Opacity />]
@@ -137,9 +141,8 @@ class Demo extends React.Component {
     this.nextDay = this.nextDay.bind(this);
     this.copyContent = this.copyContent.bind(this);
     this.clearContent = this.clearContent.bind(this);
+    this.fetchCrid = this.fetchCrid.bind(this);
    
-
-
     this.setState({
       display: <Schedule fetchTime = {this.fetchTime} clipTime = {time} data={n} dataLength = {n.length} pasted ={copiedContent} data={s} deleteItem={this.deleteItem} text="Today's " loadPlaylist = {this.loadPlaylist}/>
 
@@ -150,6 +153,7 @@ class Demo extends React.Component {
         this.setState({
             items: response.data,
         })
+      this.fetchCrid()
         
     }).catch(e => {
        console.log(e);
@@ -177,32 +181,43 @@ class Demo extends React.Component {
     //get request for webcasts 
     axios.get('https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/webcast?brand=w13xttvl&start=' 
     + begin.format() + '&end=' + end.format()).then((response) => {
+      console.log('webcast Response', response.data)
+      response.data.forEach(item =>{
+      item.nCrid = item.window_of[0].crid
       
-   
-            for(let i =0; i < response.data.length; i++){
-
+      })
+    
+      for(let i =0; i < response.data.length; i++){
         if(!moment().isAfter(response.data[i].scheduled_time.start)){
-          
           this.setState({
             live:  [...this.state.live, response.data[i]]
-            
         })
-        
       }else if(moment().isAfter(response.data[i].scheduled_time.start)){
        
           this.setState({
             episodes:  [...this.state.episodes, response.data[i]]
         })
-      
         }
      
     }
-       
     }).catch(e => {
        console.log(e);
     }); 
   }
-  
+
+  fetchCrid=()=>{
+   
+    var localData = this.state.items
+    localData.forEach(item=>{
+     axios.get(`https://programmes.api.bbc.com/nitro/api/versions?api_key=tT0EI8LEPIQntUM1msXEgYkZECRAkoFC&pid=${item.available_versions.version[0].pid}`)
+      .then(response=>{
+        xml2js.parseString(response.data, (err, result)=> {
+          item.nCrid = result.nitro.results[0].version[0].identifiers[0].identifier[0]._
+        }); 
+      })
+    })
+    this.setState({items: localData})
+  }
    handleDrawerOpen = () => {
     this.setState({ open: true });
 
@@ -370,6 +385,7 @@ clearContent(){
   }
   
   render() {
+  
     const { items, data, count } = this.state;
     const { classes, theme } = this.props;
     const { open } = this.state;
