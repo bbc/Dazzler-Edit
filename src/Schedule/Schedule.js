@@ -13,6 +13,7 @@ var endXML;
 var videos = []; 
 var promises = []
 var newState = null; 
+var currentTime = moment()._d.toString().slice(16, 24)
 var start = moment().utcOffset(0);
 let newStart =  moment().utcOffset(0);
 start.set({hour:0,minute:0,second:0,millisecond:0})
@@ -30,6 +31,7 @@ class Schedule extends React.Component {
   };
 
   componentDidMount(){
+    console.log('current time is', )
     var count = -2;
     this.savePlaylist = this.savePlaylist.bind(this);
     this.pasteContent = this.pasteContent.bind(this);    
@@ -115,7 +117,7 @@ class Schedule extends React.Component {
     for(let i = 0; i < content.length; i++){
 
       if(content[i].isLive === false && loadedContent.length === 0){
-        content[i].startTime = moment.utc("00:00", "HH:mm:ss").format("HH:mm:ss");
+        content[i].startTime = moment.utc(currentTime, "HH:mm:ss").format("HH:mm:ss");
         content[i].id = count += 1;
         loadedContent.push(content[i]);
       }else if (content[i].isLive === true ){
@@ -155,7 +157,7 @@ class Schedule extends React.Component {
         loadedContent.splice(idx, 1)
         for(let i = idx; i < loadedContent.length; i++){
           if(i === 0){
-            loadedContent[i].startTime = moment.utc("00:00", "HH:mm:ss").format("HH:mm:ss");
+            loadedContent[i].startTime = moment.utc(currentTime, "HH:mm:ss").format("HH:mm:ss");
         }else if(loadedContent[i].isLive === true){
           
         }else{
@@ -207,7 +209,7 @@ class Schedule extends React.Component {
       for(let i = prevProps.dataLength; i < this.props.dataLength; i++){
         
        if(scheduleContent[i].isLive === false && videos.length === 0){
-         scheduleContent[i].startTime = moment.utc("00:00", "HH:mm:ss").format("HH:mm:ss");
+         scheduleContent[i].startTime = moment.utc(currentTime, "HH:mm:ss").format("HH:mm:ss");
          scheduleContent[i].id = count += 1;
          loadedContent.push(scheduleContent[i]);
          this.setState({savePlaylist: "ui right floated small primary labeled icon button"})
@@ -266,7 +268,7 @@ class Schedule extends React.Component {
               videos.splice(this.state.index, videos.length)
               for(let j = this.state.index; j < loadedContent.length; j++){
                 if(j == 0){
-                loadedContent[j].startTime = moment.utc("00:00", "HH:mm:ss").format("HH:mm:ss");
+                loadedContent[j].startTime = moment.utc(currentTime, "HH:mm:ss").format("HH:mm:ss");
                 loadedContent[j].id = count+=1;
                 }
                 else if(loadedContent[j].isLive === true){
@@ -305,7 +307,7 @@ class Schedule extends React.Component {
           videos.splice(this.state.index, videos.length)
           for(let j = this.state.index; j < loadedContent.length; j++){
             if(j == 0){
-            loadedContent[j].startTime = moment.utc("00:00", "HH:mm:ss").format("HH:mm:ss");
+            loadedContent[j].startTime = moment.utc(currentTime, "HH:mm:ss").format("HH:mm:ss");
             loadedContent[j].id = count+=1;
             }
             else if(loadedContent[j].isLive === true){
