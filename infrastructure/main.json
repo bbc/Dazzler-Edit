@@ -41,6 +41,11 @@
             "Key": "BBCComponent",
             "Value": "ws-dazzler-edit",
             "PropagateAtLaunch": true
+          },
+          {
+            "Key": "BBCProject",
+            "PropagateAtLaunch": true,
+            "Value": "ws-dazzler"
           }
         ],
         "LaunchConfigurationName": {
@@ -120,8 +125,8 @@
     },
     "LoadBalancerSecurityGroup": {
       "Type": "AWS::EC2::SecurityGroup",
-      "GroupDescription": "An ELB group allowing access only to from the corresponding component",
       "Properties": {
+        "GroupDescription": "An ELB group allowing access only to from the corresponding component",
         "SecurityGroupIngress": [
           {
             "ToPort": "443",
