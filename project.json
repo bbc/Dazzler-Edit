@@ -1,0 +1,6 @@
+{
+    "name" : "dazzler-edit",
+    "packaging" : {
+        "type" : "spec"
+    }
+}

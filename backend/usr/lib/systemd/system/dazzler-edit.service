@@ -1,0 +1,19 @@
+# Full docs: https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/7/html/System_Administrators_Guide/chap-Managing_Services_with_systemd.html
+
+# https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/7/html/System_Administrators_Guide/sect-Managing_Services_with_systemd-Unit_Files.html#tabl-Managing_Services_with_systemd-Unit_Sec_Options
+[Unit]
+Description=A BBC node application to edit schedules
+Documentation=<url where the API docs are>
+
+# https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/7/html/System_Administrators_Guide/sect-Managing_Services_with_systemd-Unit_Files.html#tabl-Managing_Services_with_systemd-Service_Sec_Options
+[Service]
+ExecStart=/usr/bin/node /usr/lib/dazzler-edit/index.js
+User=dazzler-edit
+Group=dazzler-edit
+KillMode=process # https://www.freedesktop.org/software/systemd/man/systemd.kill.html
+Restart=on-failure # https://www.freedesktop.org/software/systemd/man/systemd.service.html#Restart=
+Environment=NODE_ENV=production
+
+# https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/7/html/System_Administrators_Guide/sect-Managing_Services_with_systemd-Unit_Files.html#tabl-Managing_Services_with_systemd-Install_Sec_Options
+[Install]
+WantedBy=multi-user.target

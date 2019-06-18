@@ -1,12 +1,12 @@
 
 Name: ws-dazzler-edit
 Version: 0.1.0
-Release: 13%{?dist}
+Release: 14%{?dist}
 Group: Application/Web
 License: Internal BBC use only
 Summary: ws-dazzler-edit
-Source0: bake-scripts.tar.gz
-Source1: build.tar.gz
+Source0: git@github.com:bbc/Dazzler-Edit.git
+BuildRequires: npm
 Requires: nginx, cloud-httpd24-ssl-services-devs-staff
 BuildRoot: %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 BuildArch: noarch
@@ -14,16 +14,19 @@ BuildArch: noarch
 
 
 %description
-ws-dazzler-edit built by the Spectacle
+Dazzler Edit a schedule editor for Web TV
 
 %prep
-%setup -T -c spectacle
+echo %{SOURCES0}
+rm -rf %{_builddir}/Dazzler-Edit
+git clone git@github.com:bbc/Dazzler-Edit.git
 
 %build
-mkdir -p %{_builddir}/bake-scripts
-tar -C %{_builddir}/bake-scripts -xzf %{SOURCE0}
-mkdir -p %{_builddir}/build
-tar -C %{_builddir}/build -xzf %{SOURCE1}
+cd Dazzler-Edit
+npm i
+npm run build
+tar -C build -czf %{_topdir}/SOURCES/build.tar.gza *
+tar -C bake-scripts -czf %{_topdir}/SOURCES/bake-scripts.tar.gza *
 
 %install
 mkdir -p %{buildroot}/var/www
