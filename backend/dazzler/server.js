@@ -1,12 +1,16 @@
 'use strict';
 
 // https://github.com/bbc/sample-cloud-apps/nodejs-helloworld/src/helloworld/server.js
-var express = require('express');
-var fs = require('fs');
-var Big = require('big-integer');
-var https = require('https');
-var bodyParser = require('body-parser')
-var app = express();
+const auth = require('./auth');
+const express = require('express');
+const fs = require('fs');
+const parseString = require('xml2js').parseString;
+const querystring = require('querystring');
+const Big = require('big-integer');
+const http = require('http');
+const https = require('https');
+const bodyParser = require('body-parser')
+const app = express();
 
 //app.use(bodyParser.raw({ type: '*/*' }));
 app.use(bodyParser.text({ type: '*/*' }));
@@ -19,35 +23,28 @@ app.get('/status', function (req, res) {
 });
 
 app.get('/user', function (req, res) {
-    var subject = req.header('sslclientcertsubject');
-    if(subject != null) {
-        var subject = req.header('sslclientcertsubject');
-        var fields = subject.split(',');
-        var data = {};
-        for(var i=0; i<fields.length; i++) {
-          console.log(fields[i]);
-          var [ key, val ] = fields[i].split('=');
-          data[key] = val;
+    if(req.header.hasOwnProperty('sslclientcertsubject')) {
+	const subject = parseSSLsubject(req);
+	let r = { email: subject.emailAddress, auth: auth(subject.emailAddress)};
+        if(subject.hasOwnProperty('CN')) {
+            r.name = subject.CN;
         }
-        if(data.hasOwnProperty('CN')) {
-          res.json({name: data.CN, email: data.emailAddress});
-        }
-        else {
-              res.json({name: "", email: ""});
-        }
+        res.json(r);
     }
     else {
-        res.json({name: "", email: ""});
+        res.json({auth: false});
     }
 });
 
 app.get('/schedule', function (req, res) {
   SpwRequest(req.query.sid, req.query.date).then(
       r => {
-        res.type('application/xml');
-        res.send(r);
+        res.json(r);
         },
-      err => res.status(404).send('Not found') // TODO use proper error message
+      err => {
+		console.log(err);
+		res.status(404).send('Not found'); // TODO use proper error message
+      }
     );
 });
 
@@ -122,60 +119,103 @@ app.get('/special', function (req, res) {
 });
 
 app.get('/placings', function (req, res) {
-  nitroRequest('schedules', { version: req.query.version}).then(
+  nitroRequest('schedule', { pid: req.query.version }).then(
     r => res.json(r.nitro.results.items),
     err => res.status(404).send('Not found') // TODO use proper error message
   );
 });
 
+app.get('/version', function (req, res) {
+  nitroRequest('versions', { pid: req.query.version }).then(
+    r => res.json(r.nitro.results.items),
+    err => res.status(404).send('Not found') // TODO use proper error message
+  );
+});
+
+/*
+  ENV=live
+  KEY=/home/developer/t/Dazzler-Edit/backend/dazzler.key
+  CERT=/home/developer/t/Dazzler-Edit/backend/dazzler.pem
+  PASSPHRASE=dazzler
+  KEY=/etc/pki/tls/private/client.key
+  CERT=/etc/pki/tls/certs/client.crt
+  PASSPHRASE=client
+ */
+
 app.post('/tva', function (req, res) {
-    console.log('add_tva');
-    console.log(req.body);
-        if(req.body.includes('serviceIDRef="TVMAR01')) {
-            console.log('its marathi');
-        }
-  var post_data = req.body;
+  if(req.body.includes('serviceIDRef="TVMAR01')) {
+    if(req.header.hasOwnProperty('sslclientcertsubject')) {
+	const subject = parseSSLsubject(req);
+	if(auth(subject.emailAddress)) {
+	    postTVA(data, res);
+	}
+        else {
+	    res.status(403).send('unauthorised1');
+	}
+    }
+    else {
+	res.status(403).send('unauthorised2');
+    }
+  }
+  else {
+      res.status(403).send('unauthorised3');
+  }
+});
+
+function postTVA(data, res) {
   var options = {
-    hostname: 'api.live.bbc.co.uk',
+    hostname: 'api.'+process.env.ENV+'.bbc.co.uk',
     path: '/pips/import/tva/',
     method: 'POST',
+    key: fs.readFileSync(process.env.KEY),
+    cert: fs.readFileSync(process.env.CERT),
+    passphrase: process.env.PASSPHRASE,
     headers: {
-        'Content-Type': 'text/xml',
-        'Content-Length': Buffer.byteLength(post_data)
-    },
-    key: fs.readFileSync('/etc/pki/tls/private/client.key'),
-    cert: fs.readFileSync('/etc/pki/tls/certs/client.crt'),
-    passphrase: 'client'
+        'Content-Type': 'application/xml',
+        'Content-Length': Buffer.byteLength(data)
+    }
   };
   options.agent = new https.Agent(options);
-  console.log(options);
-  var post_req = https.request(options, function(post_res) {
+  var req = https.request(options, function(post_res) {
+      var body = '';
       post_res.setEncoding('utf8');
-      post_res.on('data', function (chunk) {
-          console.log('Response: ' + chunk);
-      });
-      post_res.on('end', function() {
-         res.send(Buffer.concat(body).toString());
+      post_res.on('data', (chunk) => {body+=chunk;});
+      post_res.on('end', () => {
+	try {
+	  parseString(
+	    body,
+	    function(err, result) {
+	      if(err) {
+		res.status(404).send(err);
+	      }
+	      else {
+		res.json(result);
+	      }
+	    }
+	  );
+	}
+	catch (e){
+	  res.status(404).send(e);
+	}
       });
   });
   // post the data
-  post_req.write(post_data);
-  post_req.end();
-});
+  req.write(data);
+  req.end();
+}
 
 // https://programmes.api.bbc.com/schedule?api_key=mUvZU43V0uGr7ItNBGnxYXgZLFVgx8Zo&sid=bbc_marathi_tv&date=2019-06-20
 
 function SpwRequest(sid, date) {
-    console.log('schedule', sid, date);
     
     return new Promise((resolve, reject) => {
 
         var options = {
             host: 'programmes.api.bbc.com',
             path: `/schedule?api_key=${process.env.SPW_KEY}&sid=${sid}&date=${date}`,
-	    key: fs.readFileSync('/etc/pki/tls/private/client.key'),
-	    cert: fs.readFileSync('/etc/pki/tls/certs/client.crt'),
-	    passphrase: 'client',
+	    key: fs.readFileSync(process.env.KEY),
+	    cert: fs.readFileSync(process.env.CERT),
+	    passphrase: process.env.PASSPHRASE,
             headers: {
                 accept: 'application/xml'
             }
@@ -183,35 +223,36 @@ function SpwRequest(sid, date) {
         var request = https.get(options, (response) => {
             
             if (response.statusCode < 200 || response.statusCode > 299) {
+                console.log('Invalid status code: ' + response.statusCode);
                 reject(new Error('Invalid status code: ' + response.statusCode));
+		return;
             }
             
             var body = [];
             response.on('data', (chunk) => {body.push(chunk);});
             response.on('end', () => {
-                try {
-                    parseString(Buffer.concat(body).toString(), function (err, result) {
-                      console.log(err);
-                      console.log(result);
-                      if(err) {
-                        reject(err);
-                      }
-                      else {
-                        resolve(result);
-                      }
-                    }); 
-                }
-                catch (e){
-                    reject(new Error(e));
-                }
+  		try {
+                  parseString(
+		    Buffer.concat(body).toString(), 
+		    function(err, result) {
+		      if(err) {
+			reject(err);
+		      }
+		      else {
+			resolve(result);
+		      }
+                    }
+		  );
+		}
+		catch (e){
+		  reject(new Error(e));
+		}
             });
             response.on('error', (err) => reject(new Error(err)));
-            
         });
         request.on('error', (err) => reject(new Error(err)));
     });
 }
-
 
 function nitroRequest(feed, query) {
     
@@ -225,7 +266,6 @@ function nitroRequest(feed, query) {
             }
         };
     
-        console.log(options.path);
         var request = http.get(options, (response) => {
             
             if (response.statusCode < 200 || response.statusCode > 299) {
@@ -270,6 +310,18 @@ function add_crids_to_webcast(items) {
         }
     }
     return items;
+}
+
+function parseSSLsubject(req) {
+    var subject = req.header('sslclientcertsubject');
+    var fields = subject.split(',');
+    var data = {};
+    for(var i=0; i<fields.length; i++) {
+        console.log(fields[i]);
+        var [ key, val ] = fields[i].split('=');
+        data[key] = val;
+    }
+    return data;
 }
 
 // We do the "listen" call in index.js - making this module easier to test
