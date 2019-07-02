@@ -1,7 +1,7 @@
 'use strict';
 
-var dazzler = require("./dazzler-edit/server");
+var dazzler = require("./dazzler/server");
 
 dazzler.app.listen(8080, function () {
-    console.log('Example app listening on port 8080!');
+    console.log('dazzler listening on port 8080!');
 });
