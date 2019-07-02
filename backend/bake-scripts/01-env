@@ -7,9 +7,11 @@ if __name__ == "__main__" and os.path.exists("/etc/profile.d/cosmos_enviroment.s
     config_file = sys.argv[1]
     config = json.load(open(config_file))
  
-    environment = config.get("environment")
- 
     target = open("/etc/profile.d/cosmos_enviroment.sh", 'w')
-    target.write("export cosmos_env=" + environment + "\n")
+    for key, value in config["configuration"].items():
+        target.write("export %s=%s\n" % (key, pipes.quote(value)))
+    for key, value in config["secure_configuration"].items():
+        target.write("export %s=%s\n" % (key, pipes.quote(value)))
+    target.write("export cosmos_env=%s\n" % config["environment"]);
     target.close
     os.chmod("/etc/profile.d/cosmos_enviroment.sh", 0554)
