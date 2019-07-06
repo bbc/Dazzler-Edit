@@ -12,10 +12,20 @@ const https = require("https");
 const bodyParser = require("body-parser");
 const app = express();
 
+const config = {
+  bbc_marathi_tv: {
+    specials_collection: "p0715nv4",
+    live_brand: "w13xttvl",
+    clip_language: "marathi",
+    webcast_channels: ["world_service_stream_05","world_service_stream_06","world_service_stream_07","world_service_stream_08"]
+  }
+};
+
 //app.use(bodyParser.raw({ type: '*/*' }));
 app.use(bodyParser.text({ type: "*/*" }));
 
-app.use(express.static("/usr/lib/dazzler/edit"));
+//app.use(express.static("/usr/lib/dazzler/edit"));
+app.use(express.static("/Users/cablej01/shared/Dazzler-Edit/frontend/build"));
 
 // /status is used by ELB health checkers to assert that the service is running OK
 app.get("/status", function(req, res) {
@@ -53,15 +63,16 @@ app.get("/schedule", function(req, res) {
 
 app.get("/webcast", function(req, res) {
   let q = {
-    descendants_of: req.query.brand,
-    sid: [
-      "world_service_stream_05",
-      "world_service_stream_06",
-      "world_service_stream_07",
-      "world_service_stream_08"
-    ],
     start_from: req.query.start
+    // what about an end parameter? (is page_size enough?)
   };
+  if(req.query.hasOwnProperty('brand')) {
+    q.descendants_of =  req.query.brand;
+  }
+  if(req.query.hasOwnProperty('sid')) {
+    q.descendants_of =  config[req.query.sid].live_brand;
+    q.sid = config[req.query.sid].webcast_channels;
+  }
   if (req.query.hasOwnProperty("page")) {
     q.page = req.query.page;
   }
@@ -76,11 +87,17 @@ app.get("/webcast", function(req, res) {
 
 app.get("/clip", function(req, res) {
   let q = {
-    mixin: ["images", "available_versions"],
-    entity_type: "clip"
+    mixin: ['images','available_versions'],
+    entity_type: 'clip'
   };
-  if (req.query.hasOwnProperty("language")) {
-    q.tag_name = req.query.language;
+  if(req.query.hasOwnProperty('language')) {
+    q.tag_name= req.query.language;
+  }
+  if(req.query.hasOwnProperty('sid')) {
+    q.tag_name= config[req.query.sid].clip_language;
+  }
+  if(req.query.hasOwnProperty('collection')) {
+    q.group= config[req.query.sid].specials_collection;
   }
   if (req.query.hasOwnProperty("page")) {
     q.page = req.query.page;
@@ -117,9 +134,14 @@ app.get("/episode", function(req, res) {
 app.get("/special", function(req, res) {
   let q = {
     mixin: ["images", "available_versions"],
-    entity_type: "clip",
-    group: process.env.SPECIALS_COLLECTION
+    entity_type: "clip"
   };
+  if (req.query.hasOwnProperty("sid")) {
+    q.group= config[req.query.sid].specials_collection;
+  }
+  else {
+    q.group= config['bbc_marathi_tv'].specials_collection;
+  }
   nitroRequest("programmes", q).then(
     r => res.json(r.nitro.results.items),
     err => res.status(404).send("Not found") // TODO use proper error message
