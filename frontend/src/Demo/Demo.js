@@ -201,7 +201,7 @@ class Demo extends React.Component {
     axios
       .get(
         "/webcast" +
-          "?sid=" this.state.sid +
+          "?sid=" + this.state.sid +
           "&start=" + begin.format() +
           "&end=" + end.format()
       )
