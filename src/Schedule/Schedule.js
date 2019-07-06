@@ -131,7 +131,7 @@ class Schedule extends React.Component {
 
       axios({
         method: "post",
-        url: "https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/tva",
+        url: "/tva",
         data: startXML + test + endXML
       })
         .then(response => {

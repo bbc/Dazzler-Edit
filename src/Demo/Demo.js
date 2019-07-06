@@ -325,6 +325,7 @@ class Demo extends React.Component {
         scheduleDate: CDate,
         display: (
           <PreviousSchedule
+            sid={this.state.sid}
             scheduleDate={moment(CDate)
               .utcOffset(0)
               .format()}
@@ -360,9 +361,8 @@ class Demo extends React.Component {
         scheduleDate: CDate,
         display: (
           <NextSchedule
-            scheduleDate={moment(CDate)
-              .utcOffset(0)
-              .format()}
+            sid={this.state.sid}
+            scheduleDate={moment(CDate) .utcOffset(0) .format()}
             text={text}
           />
         )

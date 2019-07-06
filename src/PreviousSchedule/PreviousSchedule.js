@@ -24,19 +24,13 @@ class PreviousSchedule extends React.Component {
       .format();
     axios
       .get(
-        "https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/broadcast?sid=bbc_marathi_tv&start=" +
-          this.props.scheduleDate +
-          "&end=" +
-          end
+        "/broadcast?sid=" + this.props.sid +
+          &start=" + this.props.scheduleDate +
+          "&end=" + end
       )
       .then(response => {
         returnedData = response.data;
-        console.log(
-          "https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/broadcast?sid=bbc_marathi_tv&start=" +
-            this.props.scheduleDate +
-            "&end=" +
-            end
-        );
+        console.log( `/broadcast?sid=${this.props.sid}&start=${this.props.scheduleDate}&end=${end}`);
         console.log(returnedData);
         for (let i = 0; i < returnedData.length; i++) {
           videos.push(
@@ -74,10 +68,9 @@ class PreviousSchedule extends React.Component {
         .format();
       axios
         .get(
-          "https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/broadcast?sid=bbc_marathi_tv&start=" +
-            this.props.scheduleDate +
-            "&end=" +
-            end
+          "/broadcast?sid=" + this.props.sid +
+            &start=" + this.props.scheduleDate +
+            "&end=" + end
         )
         .then(response => {
           returnedData = response.data;
