@@ -145,7 +145,7 @@ class Demo extends React.Component {
 
     })
       //Clips
-    axios.get('https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/clip?language=marathi').then((response) => {
+    axios.get('/clip?language=marathi').then((response) => {
     console.log('test1', response)
         this.setState({
             items: response.data,
@@ -154,7 +154,7 @@ class Demo extends React.Component {
     }).catch(e => {
        console.log(e);
     });
-    axios.get('https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/placings?version=p078fmvz').then((response) => {
+    axios.get('/placings?version=p078fmvz').then((response) => {
     
       this.setState({
         specials: response.data
@@ -164,7 +164,7 @@ class Demo extends React.Component {
     });
 
     //get request for specials
-    axios.get('https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/special').then((response) => {
+    axios.get('/special').then((response) => {
      
       this.setState({
         specials: response.data
@@ -175,7 +175,7 @@ class Demo extends React.Component {
     });
 
     //get request for webcasts 
-    axios.get('https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/webcast?brand=w13xttvl&start=' 
+    axios.get('/webcast?brand=w13xttvl&start=' 
     + begin.format() + '&end=' + end.format()).then((response) => {
       
    

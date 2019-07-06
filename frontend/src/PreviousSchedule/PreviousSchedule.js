@@ -17,10 +17,10 @@ class PreviousSchedule extends React.Component {
       componentDidMount(){
         prev = moment(this.props.scheduleDate).isBefore(current.format()) ? 1 : null;
         var end = moment(this.props.scheduleDate).set({hour:23,minute:59,second:59,millisecond:59}).utcOffset(0).format();
-        axios.get('https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/broadcast?sid=bbc_marathi_tv&start=' +
+        axios.get('/broadcast?sid=bbc_marathi_tv&start=' +
         this.props.scheduleDate + "&end=" + end).then((response) => {
           returnedData = response.data
-          console.log('https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/broadcast?sid=bbc_marathi_tv&start=' +
+          console.log('/broadcast?sid=bbc_marathi_tv&start=' +
           this.props.scheduleDate + "&end=" + end)
           console.log(returnedData)
           for(let i =0; i < returnedData.length; i++){
@@ -49,7 +49,7 @@ class PreviousSchedule extends React.Component {
         
         //alert('not the same')
         var end = moment(this.props.scheduleDate).set({hour:23,minute:59,second:59,millisecond:59}).utcOffset(0).format();
-        axios.get('https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/broadcast?sid=bbc_marathi_tv&start=' +
+        axios.get('/broadcast?sid=bbc_marathi_tv&start=' +
         this.props.scheduleDate + "&end=" + end).then((response) => {
           returnedData = response.data
 

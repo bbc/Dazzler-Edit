@@ -92,15 +92,9 @@ class Schedule extends React.Component {
         })
         pids.forEach(async (i1)=>loadedContent.forEach(async (i2, idx)=>{
           if(i1 === i2.available_versions.version[0].pid || i1 === i2.versionPid){
-            await axios.get(`https://programmes.api.bbc.com/nitro/api/versions?api_key=tT0EI8LEPIQntUM1msXEgYkZECRAkoFC&pid=${i1}`).then((response) => {
-              xml2js.parseString(response.data, function (err, result) {
-                loadedContent[idx].nCrid = result.nitro.results[0].version[0].identifiers[0].identifier[0]._
+            await axios.get(`/version_crid?pid=${i1}`).then((response) => {
+                loadedContent[idx].nCrid = response.data.crid;
                 alert(loadedContent[idx].nCrid)
-                // console.log('BOOOOOM', result.nitro.results[0].version[0].identifiers[0].identifier[0]._)
-                // console.log('boooom', i1)
-                // console.log('boom', idx)
-              });  
-      
             }).catch(e => {
                console.log('error', e);
                alert('error b')
@@ -119,7 +113,7 @@ class Schedule extends React.Component {
   console.log('jb', test)   
   axios({
     method: 'post',
-    url: "https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/tva",
+    url: "/tva",
     headers: {
       'Content-Type': 'application/json'
     },
