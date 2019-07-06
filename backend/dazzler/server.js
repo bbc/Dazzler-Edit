@@ -23,7 +23,7 @@ app.get('/status', function (req, res) {
 });
 
 app.get('/user', function (req, res) {
-    if(req.header.hasOwnProperty('sslclientcertsubject')) {
+    if(req.header('sslclientcertsubject')) {
 	const subject = parseSSLsubject(req);
 	let r = { email: subject.emailAddress, auth: auth(subject.emailAddress)};
         if(subject.hasOwnProperty('CN')) {
@@ -39,8 +39,13 @@ app.get('/user', function (req, res) {
 app.get('/schedule', function (req, res) {
   SpwRequest(req.query.sid, req.query.date).then(
       r => {
-        res.json(r);
-        },
+        if(r) {
+          res.json(r);
+        }
+        else {
+                res.status(404).send('Not found'); // TODO use proper error message
+        }
+      },
       err => {
 		console.log(err);
 		res.status(404).send('Not found'); // TODO use proper error message
@@ -110,7 +115,7 @@ app.get('/special', function (req, res) {
   let q = {
     mixin: ['images','available_versions'],
     entity_type: 'clip',
-    group: process.env.SPECIALS
+    group: process.env.SPECIALS_COLLECTION
   };
   nitroRequest('programmes', q).then(
     r => res.json(r.nitro.results.items),
@@ -119,7 +124,7 @@ app.get('/special', function (req, res) {
 });
 
 app.get('/placings', function (req, res) {
-  nitroRequest('schedule', { pid: req.query.version }).then(
+  nitroRequest('schedules', { version: req.query.version }).then(
     r => res.json(r.nitro.results.items),
     err => res.status(404).send('Not found') // TODO use proper error message
   );
@@ -220,8 +225,14 @@ function SpwRequest(sid, date) {
                 accept: 'application/xml'
             }
         };
+
         var request = https.get(options, (response) => {
             
+            if (response.statusCode == 404) {
+                resolve(null);
+                return;
+            }
+
             if (response.statusCode < 200 || response.statusCode > 299) {
                 console.log('Invalid status code: ' + response.statusCode);
                 reject(new Error('Invalid status code: ' + response.statusCode));

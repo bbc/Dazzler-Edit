@@ -13,5 +13,10 @@ if __name__ == "__main__" and os.path.exists("/etc/profile.d/cosmos_enviroment.s
     for key, value in config["secure_configuration"].items():
         target.write("export %s=%s\n" % (key, value))
     target.write("export cosmos_env=%s\n" % config["environment"]);
+
+    target.write("export KEY=/etc/pki/tls/private/client.key");
+    target.write("export CERT=/etc/pki/tls/private/client_crt_key.pem");
+    target.write("export PASSPHRASE=client");
+
     target.close
     os.chmod("/etc/profile.d/cosmos_enviroment.sh", 0554)
