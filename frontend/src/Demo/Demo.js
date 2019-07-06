@@ -133,7 +133,8 @@ class Demo extends React.Component {
     scheduleDate: moment()
       .add(0, "d")
       .format("LL"),
-    display: ""
+    display: "",
+    sid: "bbc_marathi_tv"
   };
 
   componentDidMount() {
