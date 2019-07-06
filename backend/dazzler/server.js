@@ -24,8 +24,7 @@ const config = {
 //app.use(bodyParser.raw({ type: '*/*' }));
 app.use(bodyParser.text({ type: "*/*" }));
 
-//app.use(express.static("/usr/lib/dazzler/edit"));
-app.use(express.static("/Users/cablej01/shared/Dazzler-Edit/frontend/build"));
+app.use(express.static("/usr/lib/dazzler/edit"));
 
 // /status is used by ELB health checkers to assert that the service is running OK
 app.get("/status", function(req, res) {
@@ -67,13 +66,6 @@ app.get("/broadcast", function(req, res) {
     start_from: req.query.start,
     start_to: req.query.end
   };
-  if(req.query.hasOwnProperty('brand')) {
-    q.descendants_of =  req.query.brand;
-  }
-  if(req.query.hasOwnProperty('sid')) {
-    q.descendants_of =  config[req.query.sid].live_brand;
-    q.sid = config[req.query.sid].webcast_channels;
-  }
   if (req.query.hasOwnProperty("page")) {
     q.page = req.query.page;
   }
@@ -211,18 +203,18 @@ app.get("/version_crid", function(req, res) {
 
 app.post("/tva", function(req, res) {
   if (req.body.includes('serviceIDRef="TVMAR01')) {
-    if (req.header.hasOwnProperty("sslclientcertsubject")) {
+    if (req.header("sslclientcertsubject")) {
       const subject = parseSSLsubject(req);
       if (auth(subject.emailAddress)) {
         postTVA(data, res);
       } else {
-        res.status(403).send("unauthorised1");
+        res.status(403).send(subject.emailAddress +" is not authorised to save schedules");
       }
     } else {
-      res.status(403).send("unauthorised2");
+      res.status(403).send("missing authentification header");
     }
   } else {
-    res.status(403).send("unauthorised3");
+    res.status(403).send("Marathi only please");
   }
 });
 
