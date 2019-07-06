@@ -130,9 +130,22 @@ app.get('/placings', function (req, res) {
   );
 });
 
-app.get('/version', function (req, res) {
-  nitroRequest('versions', { pid: req.query.version }).then(
-    r => res.json(r.nitro.results.items),
+app.get('/version_crid', function (req, res) {
+  nitroRequest('versions', { pid: req.query.pid }).then(
+    r => {
+      const items = r.nitro.results.items;
+      if(items.length>0) {
+         const ids = items[0].identifiers.identifier;
+         for(let i=0; i<ids.length; i++) {
+           if(ids[i].type == 'crid') {
+              res.json({pid: req.query.pid, crid: ids[i].$ });
+           }
+         }
+      }
+      else {
+         res.status(404).send('Not found');
+      }
+    },
     err => res.status(404).send('Not found') // TODO use proper error message
   );
 });
