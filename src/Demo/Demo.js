@@ -137,7 +137,8 @@ class Demo extends React.Component {
     scheduleDate: moment()
       .add(0, "d")
       .format("LL"),
-    display: ""
+    display: "",
+    sid: "bbc_marathi_tv"
   };
 
   componentDidMount() {
@@ -168,7 +169,7 @@ class Demo extends React.Component {
     //Clips
     axios
       .get(
-        "/clip?language=marathi"
+        "/clip?sid=" + this.state.sid
       )
       .then(response => {
         console.log("test1", response);
@@ -196,7 +197,7 @@ class Demo extends React.Component {
     //get request for specials
     axios
       .get(
-        "/special"
+        "/special?sid=" + this.state.sid
       )
       .then(response => {
         this.setState({
@@ -210,10 +211,10 @@ class Demo extends React.Component {
     //get request for webcasts
     axios
       .get(
-        "/webcast?brand=w13xttvl&start=" +
-          begin.format() +
-          "&end=" +
-          end.format()
+        "/webcast" +
+          "?sid=" + this.state.sid +
+          "&start=" + begin.format() +
+          "&end=" + end.format()
       )
       .then(response => {
         console.log("webcast Response", response.data);
