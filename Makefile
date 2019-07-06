@@ -19,14 +19,14 @@ npm-install:
 	# Avoid installing the devDependencies with --production
 	npm --production --prefix backend install --no-bin-links
 	# we need the dev dependencies so we can run the react build script
-	npm --prefix frontend install
-	cd frontend && npm run-script build
+	npm install
+	npm run-script build
 
 
 prepare: npm-install
 	# Bundle the source code into a single .tar.gz file, used in
 	# combination with the .spec file to create the RPM(s)
-	cp -a frontend/build/ backend/edit
+	cp -a build backend/edit
 	mkdir -p RPMS SRPMS SOURCES
 	tar --exclude=".svn" --exclude="*.sw?" --exclude="*.pyc" -czf SOURCES/src.tar.gz backend/
 
