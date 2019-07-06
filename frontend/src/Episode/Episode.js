@@ -13,17 +13,16 @@ import FirstPageIcon from "@material-ui/icons/FirstPage";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import LastPageIcon from "@material-ui/icons/LastPage";
-import moment from 'moment';
+import moment from "moment";
 
-
- const actionsStyles = theme => ({
+const actionsStyles = theme => ({
   root: {
     flexShrink: 0,
     color: theme.palette.text.secondary,
     marginLeft: theme.spacing.unit * 2.5
   }
 });
- class TablePaginationActions extends React.Component {
+class TablePaginationActions extends React.Component {
   handleFirstPageButtonClick = event => {
     this.props.onChangePage(event, 0);
   };
@@ -79,8 +78,7 @@ import moment from 'moment';
         </IconButton>
         <IconButton
           onClick={this.handleLastPageButtonClick}
-          disabled={page >= 
-            Math.ceil(count / rowsPerPage) - 1}
+          disabled={page >= Math.ceil(count / rowsPerPage) - 1}
           aria-label="Last Page"
         >
           {theme.direction === "rtl" ? <FirstPageIcon /> : <LastPageIcon />}
@@ -103,8 +101,6 @@ export const TablePaginationActionsWrapped = withStyles(actionsStyles, {
   withTheme: true
 })(TablePaginationActions);
 
-
-
 export const styles = theme => ({
   root: {
     width: "100%",
@@ -120,47 +116,51 @@ export const styles = theme => ({
 var cells = [];
 var isEpisode = false;
 export class Episode extends React.Component {
-  
-    constructor(props){
-        super(props)
-    }
-    
+  constructor(props) {
+    super(props);
+  }
+
   state = {
-      
-    rows: [
-    ].sort((a, b) => (a < b ? -1 : 1)),
+    rows: [].sort((a, b) => (a < b ? -1 : 1)),
     page: 0,
     rowsPerPage: 6,
     data: []
   };
 
- 
-
-  
   componentDidMount = () => {
-    
     cells = [];
-    for(let i = 0; i < this.props.episodes.length; i++){
+    for (let i = 0; i < this.props.episodes.length; i++) {
+      var durationTime =
+        moment(this.props.episodes[i].scheduled_time.end) -
+        moment(this.props.episodes[i].scheduled_time.start);
 
-      var durationTime = moment(this.props.episodes[i].scheduled_time.end) - moment(this.props.episodes[i].scheduled_time.start);
-      
-      
-      this.props.episodes[i].title = "Episode" + [i+ 1];
-      this.props.episodes[i].duration = moment.duration(durationTime, "milliseconds")
+      this.props.episodes[i].title = "Episode" + [i + 1];
+      this.props.episodes[i].duration = moment.duration(
+        durationTime,
+        "milliseconds"
+      );
 
-     cells.push({       id: this.props.episodes[i].pid, 
-                        title: "Programme" + [i + 1],
-                        Info: "Broadcast at " + moment(this.props.episodes[i].scheduled_time.start).format("HH:mm"),
-                        pid: this.props.episodes[i].pid,
-                        add: <button className="ui compact icon button" onClick  = { () => {this.props.handleClick(this.props.episodes[i], isEpisode)} }><i className="plus icon"></i></button>})
-                        
-
-                        
+      cells.push({
+        id: this.props.episodes[i].pid,
+        title: "Programme" + [i + 1],
+        Info:
+          "Broadcast at " +
+          moment(this.props.episodes[i].scheduled_time.start).format("HH:mm"),
+        pid: this.props.episodes[i].pid,
+        add: (
+          <button
+            className="ui compact icon button"
+            onClick={() => {
+              this.props.handleClick(this.props.episodes[i], isEpisode);
+            }}
+          >
+            <i className="plus icon"></i>
+          </button>
+        )
+      });
     }
-    this.setState({rows: cells});
-    
-}
-
+    this.setState({ rows: cells });
+  };
 
   handleChangePage = (event, page) => {
     this.setState({ page });
@@ -173,64 +173,61 @@ export class Episode extends React.Component {
   render() {
     const { classes } = this.props;
     const { rows, rowsPerPage, page } = this.state;
-    
+
     const emptyRows =
       rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
 
-      if(this.props.episodes.length === 0){
-         return <h1>No Episodes</h1>
-      }
+    if (this.props.episodes.length === 0) {
+      return <h1>No Episodes</h1>;
+    }
     return (
-        <div>
-          
-      <Paper className={classes.root}>
-        <div className={classes.tableWrapper}>
-          <Table className={classes.table}>
-          
-            <TableBody>
-            <th>Title</th>
-            <th>Info</th>
-            <th>Add</th>
-            
-        
-              {rows
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map(row => (
-                  <TableRow key={row.id}>
-                    <TableCell component="th" scope="row">
-                      {row.title}
-                    </TableCell>
-                    <TableCell align="right">{row.Info}</TableCell>
-                    <TableCell align="right">{row.add}</TableCell>
+      <div>
+        <Paper className={classes.root}>
+          <div className={classes.tableWrapper}>
+            <Table className={classes.table}>
+              <TableBody>
+                <th>Title</th>
+                <th>Info</th>
+                <th>Add</th>
+
+                {rows
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map(row => (
+                    <TableRow key={row.id}>
+                      <TableCell component="th" scope="row">
+                        {row.title}
+                      </TableCell>
+                      <TableCell align="right">{row.Info}</TableCell>
+                      <TableCell align="right">{row.add}</TableCell>
+                    </TableRow>
+                  ))}
+
+                {emptyRows > 0 && (
+                  <TableRow style={{ height: 48 * emptyRows }}>
+                    <TableCell colSpan={6} />
                   </TableRow>
-                ))}
-            
-              {emptyRows > 0 && (
-                <TableRow style={{ height: 48 * emptyRows }}>
-                  <TableCell colSpan={6} />
+                )}
+              </TableBody>
+              <TableFooter>
+                <TableRow>
+                  <TablePagination
+                    rowsPerPageOptions={[5, 10, 25]}
+                    colSpan={3}
+                    count={rows.length}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    SelectProps={{
+                      native: true
+                    }}
+                    onChangePage={this.handleChangePage}
+                    onChangeRowsPerPage={this.handleChangeRowsPerPage}
+                    ActionsComponent={TablePaginationActionsWrapped}
+                  />
                 </TableRow>
-              )}
-            </TableBody>
-            <TableFooter>
-              <TableRow>
-                <TablePagination
-                  rowsPerPageOptions={[5, 10, 25]}
-                  colSpan={3}
-                  count={rows.length}
-                  rowsPerPage={rowsPerPage}
-                  page={page}
-                  SelectProps={{
-                    native: true
-                  }}
-                  onChangePage={this.handleChangePage}
-                  onChangeRowsPerPage={this.handleChangeRowsPerPage}
-                  ActionsComponent={TablePaginationActionsWrapped}
-                />
-              </TableRow>
-            </TableFooter>  
-          </Table>
-        </div>
-      </Paper>
+              </TableFooter>
+            </Table>
+          </div>
+        </Paper>
       </div>
     );
   }
@@ -240,5 +237,4 @@ Episode.propTypes = {
   classes: PropTypes.object.isRequired
 };
 
-export default withStyles (styles)(Episode)
-
+export default withStyles(styles)(Episode);
