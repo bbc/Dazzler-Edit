@@ -7,10 +7,14 @@ import xml2js from 'xml2js'
 var count = -2;
 var loadedContent = [];
 var scheduleContent = [];
-var test = [];
+var test;
+var startXML;
+var endXML;
 var videos = []; 
+var promises = []
 var newState = null; 
 var start = moment().utcOffset(0);
+let newStart =  moment().utcOffset(0);
 start.set({hour:0,minute:0,second:0,millisecond:0})
 
 class Schedule extends React.Component {
@@ -26,7 +30,6 @@ class Schedule extends React.Component {
   };
 
   componentDidMount(){
-  
     var count = -2;
     this.savePlaylist = this.savePlaylist.bind(this);
     this.pasteContent = this.pasteContent.bind(this);    
@@ -39,25 +42,18 @@ class Schedule extends React.Component {
         this.setState({index : null})
     }
   }
-
-
-    makeScheduleEvent(broadcast){
-     console.log('broadcast', broadcast.nCrid)
-      start.set({hour:broadcast.startTime.charAt(0) + broadcast.startTime.charAt(1),
-        minute:broadcast.startTime.charAt(3) + broadcast.startTime.charAt(4),
-        second:broadcast.startTime.charAt(6) + broadcast.startTime.charAt(7)})
-        var end =  moment.utc(loadedContent[loadedContent.length - 1].startTime, "HH:mm:ss").add(moment.duration(loadedContent[loadedContent.length - 1].duration)._milliseconds, 'milliseconds').format()
-
+    makeScheduleEvent(broadcast, vids){
+      
+      newStart.set({hour:vids.startTime.charAt(0) + vids.startTime.charAt(1),
+      minute:vids.startTime.charAt(3) + vids.startTime.charAt(4),
+      second:vids.startTime.charAt(6) + vids.startTime.charAt(7)}) 
+      var end =  moment.utc(loadedContent[loadedContent.length - 1].startTime, "HH:mm:ss").add(moment.duration(loadedContent[loadedContent.length - 1].duration)._milliseconds, 'milliseconds').format()
       let imi ="imi:dazzler/"+(Date.parse(start)/1000);
-      console.log('test', imi)
-      let startXML = 
-     `<TVAMain xmlns="urn:tva:metadata:2007" xmlns:mpeg7="urn:tva:mpeg7:2005" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-      xml:lang="en-GB" xsi:schemaLocation="urn:tva:metadata:2007 tva_metadata_3-1_v141.xsd">
-      <ProgramDescription>
-      <ProgramLocationTable>`;
-      var endXML = "</Schedule></ProgramLocationTable></ProgramDescription></TVAMain>";
-      return `${startXML}  
-      <Schedule start="${start.format()}" end="${end}" serviceIDRef="TVMAR01">
+      startXML = `<TVAMain xmlns="urn:tva:metadata:2007" xmlns:mpeg7="urn:tva:mpeg7:2005"xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"xml:lang="en-GB" xsi:schemaLocation="urn:tva:metadata:2007 tva_metadata_3-1_v141.xsd"><ProgramDescription>
+      <ProgramLocationTable>
+      <Schedule start="${start.format()}" end="${end}" serviceIDRef="TVMAR01">`
+      endXML = "</Schedule></ProgramLocationTable></ProgramDescription></TVAMain>";
+      return ` 
         <ScheduleEvent>
           <Program crid="${broadcast.nCrid}"/>
             <InstanceMetadataId>${imi}</InstanceMetadataId>
@@ -67,63 +63,38 @@ class Schedule extends React.Component {
                 <VideoAttributes><AspectRatio>16:9</AspectRatio><Color type="color"/></VideoAttributes>
               </AVAttributes>
             </InstanceDescription>
-            <PublishedStartTime>${start.format()}</PublishedStartTime>
+            <PublishedStartTime>${newStart.format()}</PublishedStartTime>
             <PublishedDuration>${broadcast.duration}</PublishedDuration>
-            <Live value="${false}"/>
+            <Live value="${ broadcast.live === 'live'? true: false}"/>
             <Repeat value="${false}"/>
             <Free value="true"/>
-      </ScheduleEvent> ${endXML}`
-      
+      </ScheduleEvent>`
     }
+
     savePlaylist(){
       
+        start.set({hour:videos[0].props.startTime.charAt(0) + videos[0].props.startTime.charAt(1),
+        minute:videos[0].props.startTime.charAt(3) + videos[0].props.startTime.charAt(4),
+        second:videos[0].props.startTime.charAt(6) + videos[0].props.startTime.charAt(7)})
+        var end =  moment.utc(loadedContent[loadedContent.length - 1].startTime, "HH:mm:ss").add(moment.
+        duration(loadedContent[loadedContent.length - 1].duration)._milliseconds, 'milliseconds').format()
+
       if(videos.length > 0){
         test  = [];
-        let pids = new Set();
         var end =  moment.utc(loadedContent[loadedContent.length - 1].startTime, "HH:mm:ss").add(moment.duration(loadedContent[loadedContent.length - 1].duration)._milliseconds, 'milliseconds').format()
        
-        loadedContent.forEach(item => {
-          
-        if(item.available_versions !== undefined){
-        pids.add(item.available_versions.version[0].pid)
-        }else{
-          pids.add(item.versionPid)
-        }
-        })
-        pids.forEach(async (i1)=>loadedContent.forEach(async (i2, idx)=>{
-          if(i1 === i2.available_versions.version[0].pid || i1 === i2.versionPid){
-            await axios.get(`https://programmes.api.bbc.com/nitro/api/versions?api_key=tT0EI8LEPIQntUM1msXEgYkZECRAkoFC&pid=${i1}`).then((response) => {
-              xml2js.parseString(response.data, function (err, result) {
-                loadedContent[idx].nCrid = result.nitro.results[0].version[0].identifiers[0].identifier[0]._
-                alert(loadedContent[idx].nCrid)
-                // console.log('BOOOOOM', result.nitro.results[0].version[0].identifiers[0].identifier[0]._)
-                // console.log('boooom', i1)
-                // console.log('boom', idx)
-              });  
-      
-            }).catch(e => {
-               console.log('error', e);
-               alert('error b')
-            });
-
-          }
-        }))
-  
-          for(let i = 0; i < loadedContent.length; i++){
-            alert('here')
-          test.push(this.makeScheduleEvent(loadedContent[i]));
-           console.log('TVA', test)
-     }
-    
   this.setState({savePlaylist: "ui right floated primary loading button"})
-  console.log('jb', test)   
+
+    for(let i = 0; i < loadedContent.length; i++){
+    test += this.makeScheduleEvent(loadedContent[i], videos[i].props)
+    }
+
   axios({
+   
     method: 'post',
     url: "https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/tva",
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    data: test[0],
+    data: startXML + 
+    test + endXML,
    
     })
     .then(response => {
@@ -135,11 +106,12 @@ class Schedule extends React.Component {
       this.setState({status: "Save Playlist"})
       alert('Error Saving Playlist')
     });
-    
+   
   }
   }
+  
   pasteContent(content){
-    alert(loadedContent.length)
+  
     for(let i = 0; i < content.length; i++){
 
       if(content[i].isLive === false && loadedContent.length === 0){
@@ -157,9 +129,12 @@ class Schedule extends React.Component {
         loadedContent.push(content[i])
       }
       
+      
      videos.push( <SingleSchedule fetchTime = {this.props.fetchTime} title={loadedContent[loadedContent.length - 1].title} startTime = {loadedContent[loadedContent.length - 1].startTime}
      duration={loadedContent[loadedContent.length - 1].duration} deleteItem = {this.deleteItem} id = {loadedContent[loadedContent.length - 1].id} live={loadedContent[loadedContent.length - 1].live} />)
+      
     }
+    console.log('1', loadedContent)
 
     this.setState({savePlaylist: "ui right floated small primary labeled icon button"})
     this.setState({status: "Save Playlist"})
@@ -349,7 +324,7 @@ class Schedule extends React.Component {
                 }
               }
           });
-
+            
             videos.push( <SingleSchedule fetchTime = {this.props.fetchTime} title={loadedContent[j].title} startTime = {loadedContent[j].startTime}
             duration={loadedContent[j].duration} deleteItem = {this.deleteItem} id = {loadedContent[j].id} live = {loadedContent[j].live} />)
           }
@@ -363,16 +338,7 @@ class Schedule extends React.Component {
     }
 }
     render() { 
-      if(loadedContent.length > 0){
-      //  console.log('loaded Content', loadedContent[0].identifiers.identifier[0].$)
-      // console.log('test start time', loadedContent[0].startTime.replace(/:/g, ','))
-      console.log('test', loadedContent)
-      
-      }
-      
-      
      return (
-
         <div>
             
             <div className = 'dateContainer'><h2>{this.props.text}Schedule</h2></div>
@@ -414,4 +380,4 @@ class Schedule extends React.Component {
     }
      
 }
-export default Schedule;      
+export default Schedule;  
