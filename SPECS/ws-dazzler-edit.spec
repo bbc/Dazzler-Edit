@@ -1,7 +1,7 @@
 
 Name: dazzler-edit
 Version: 0.1.1%{?buildnum:.%{buildnum}}
-Release: 7%{?dist}
+Release: 8%{?dist}
 Group: System Environment/Daemons
 License: Internal BBC use only
 Summary: A dazzler-edit application
