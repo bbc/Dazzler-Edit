@@ -146,6 +146,8 @@ class Demo extends React.Component {
     this.clearContent = this.clearContent.bind(this);
 
     this.setState({
+      serviceName: "Marathi",
+      sid: "bbc_marathi_tv",
       display: (
         <Schedule
           fetchTime={this.fetchTime}
@@ -162,7 +164,7 @@ class Demo extends React.Component {
     });
     //Clips
     axios
-      .get("/clip?language=marathi")
+      .get("/clip?sid=" + this.state.sid )
       .then(response => {
         console.log("test1", response);
         this.setState({
@@ -173,10 +175,10 @@ class Demo extends React.Component {
         console.log(e);
       });
     axios
-      .get("/placings?version=p078fmvz")
+      .get("/placings?version=p078fmvz") // don't know what this is doing
       .then(response => {
         this.setState({
-          specials: response.data
+          placings: response.data
         });
       })
       .catch(e => {
@@ -198,10 +200,10 @@ class Demo extends React.Component {
     //get request for webcasts
     axios
       .get(
-        "/webcast?brand=w13xttvl&start=" +
-          begin.format() +
-          "&end=" +
-          end.format()
+        "/webcast" +
+          "?sid=" this.state.sid +
+          "&start=" + begin.format() +
+          "&end=" + end.format()
       )
       .then(response => {
         for (let i = 0; i < response.data.length; i++) {
@@ -537,7 +539,7 @@ class Demo extends React.Component {
               <MenuIcon />
             </IconButton>
             <Typography variant="h6" color="inherit" noWrap>
-              <center>Marathi</center>
+              <center>{this.state.serviceName}</center>
             </Typography>
           </Toolbar>
         </AppBar>
