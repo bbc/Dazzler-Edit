@@ -61,6 +61,31 @@ app.get("/schedule", function(req, res) {
   );
 });
 
+app.get("/broadcast", function(req, res) {
+  let q = {
+    sid: req.query.sid,
+    start_from: req.query.start,
+    start_to: req.query.end
+  };
+  if(req.query.hasOwnProperty('brand')) {
+    q.descendants_of =  req.query.brand;
+  }
+  if(req.query.hasOwnProperty('sid')) {
+    q.descendants_of =  config[req.query.sid].live_brand;
+    q.sid = config[req.query.sid].webcast_channels;
+  }
+  if (req.query.hasOwnProperty("page")) {
+    q.page = req.query.page;
+  }
+  if (req.query.hasOwnProperty("page_size")) {
+    q.page_size = req.query.page_size;
+  }
+  nitroRequest("schedules", q).then(
+    r => res.json(r.nitro.results.items),
+    err => res.status(404).send("Not found") // TODO use proper error message
+  );
+});
+
 app.get("/webcast", function(req, res) {
   let q = {
     start_from: req.query.start
