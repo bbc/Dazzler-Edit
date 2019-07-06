@@ -206,7 +206,7 @@ app.post("/tva", function(req, res) {
     if (req.header("sslclientcertsubject")) {
       const subject = parseSSLsubject(req);
       if (auth(subject.emailAddress)) {
-        postTVA(data, res);
+        postTVA(req.body, res);
       } else {
         res.status(403).send(subject.emailAddress +" is not authorised to save schedules");
       }
@@ -220,7 +220,7 @@ app.post("/tva", function(req, res) {
 
 function postTVA(data, res) {
   var options = {
-    hostname: "api." + process.env.ENV + ".bbc.co.uk",
+    hostname: "api.live.bbc.co.uk",
     path: "/pips/import/tva/",
     method: "POST",
     key: fs.readFileSync(process.env.KEY),
