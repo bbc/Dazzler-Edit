@@ -1,7 +1,7 @@
 const fs = require('fs');
 
 function auth(email) {
-  const auth = fs.readFileSync('auth.txt');
+  const auth = fs.readFileSync('/usr/lib/dazzler/auth.txt');
   return auth.includes(','+email+',');;
 }
 

@@ -13,6 +13,7 @@ Group=dazzler
 KillMode=process # https://www.freedesktop.org/software/systemd/man/systemd.kill.html
 Restart=on-failure # https://www.freedesktop.org/software/systemd/man/systemd.service.html#Restart=
 Environment=NODE_ENV=production
+EnvironmentFile=/usr/lib/dazzler/env
 
 # https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/7/html/System_Administrators_Guide/sect-Managing_Services_with_systemd-Unit_Files.html#tabl-Managing_Services_with_systemd-Install_Sec_Options
 [Install]

@@ -3,20 +3,21 @@ import sys
 import json
 import os
  
-if __name__ == "__main__" and os.path.exists("/etc/profile.d/cosmos_enviroment.sh") == False:
+FILE = "/usr/lib/dazzler/env"
+
+if __name__ == "__main__" and os.path.exists(FILE) == False:
     config_file = sys.argv[1]
     config = json.load(open(config_file))
  
-    target = open("/etc/profile.d/cosmos_enviroment.sh", 'w')
+    target = open(FILE, 'w')
     for key, value in config["configuration"].items():
-        target.write("export %s=%s\n" % (key, value))
+        target.write("%s=%s\n" % (key, value))
     for key, value in config["secure_configuration"].items():
-        target.write("export %s=%s\n" % (key, value))
-    target.write("export cosmos_env=%s\n" % config["environment"]);
+        target.write("%s=%s\n" % (key, value))
+    target.write("cosmos_env=%s\n" % config["environment"]);
 
-    target.write("export KEY=/etc/pki/tls/private/client.key\n");
-    target.write("export CERT=/etc/pki/tls/private/client_crt_key.pem\n");
-    target.write("export PASSPHRASE=client");
+    target.write("KEY=/etc/pki/tls/private/client.key\n");
+    target.write("CERT=/etc/pki/tls/private/client_crt_key.pem\n");
+    target.write("PASSPHRASE=client\n");
 
     target.close
-    os.chmod("/etc/profile.d/cosmos_enviroment.sh", 0554)
