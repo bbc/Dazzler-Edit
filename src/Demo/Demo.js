@@ -168,7 +168,7 @@ class Demo extends React.Component {
     //Clips
     axios
       .get(
-        "https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/clip?language=marathi"
+        "/clip?language=marathi"
       )
       .then(response => {
         console.log("test1", response);
@@ -182,7 +182,7 @@ class Demo extends React.Component {
       });
     axios
       .get(
-        "https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/placings?version=p078fmvz"
+        "/placings?version=p078fmvz"
       )
       .then(response => {
         this.setState({
@@ -196,7 +196,7 @@ class Demo extends React.Component {
     //get request for specials
     axios
       .get(
-        "https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/special"
+        "/special"
       )
       .then(response => {
         this.setState({
@@ -210,7 +210,7 @@ class Demo extends React.Component {
     //get request for webcasts
     axios
       .get(
-        "https://iqvp3l4nzg.execute-api.eu-west-1.amazonaws.com/live/webcast?brand=w13xttvl&start=" +
+        "/webcast?brand=w13xttvl&start=" +
           begin.format() +
           "&end=" +
           end.format()
@@ -243,12 +243,10 @@ class Demo extends React.Component {
     localData.forEach(item => {
       axios
         .get(
-          `https://programmes.api.bbc.com/nitro/api/versions?api_key=tT0EI8LEPIQntUM1msXEgYkZECRAkoFC&pid=${item.available_versions.version[0].pid}`
+          `/version_crid?pid=${item.available_versions.version[0].pid}`
         )
         .then(response => {
-          xml2js.parseString(response.data, (err, result) => {
-            item.nCrid =
-              result.nitro.results[0].version[0].identifiers[0].identifier[0]._;
+            item.nCrid = result.crid;
           });
         });
     });
