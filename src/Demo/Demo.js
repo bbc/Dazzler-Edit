@@ -247,12 +247,12 @@ class Demo extends React.Component {
           `/version_crid?pid=${item.available_versions.version[0].pid}`
         )
         .then(response => {
-            item.nCrid = result.crid;
+            item.nCrid = response.crid;
           });
         });
-    });
     this.setState({ items: localData });
   };
+
   handleDrawerOpen = () => {
     this.setState({ open: true });
   };

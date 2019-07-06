@@ -24,7 +24,7 @@ class NextSchedule extends React.Component {
     axios
       .get(
         "/broadcast?sid=" + this.props.sid +
-          &start=" + this.props.scheduleDate +
+          "&start=" + this.props.scheduleDate +
           "&end=" + end
       )
       .then(response => {
