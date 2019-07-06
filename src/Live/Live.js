@@ -13,16 +13,16 @@ import FirstPageIcon from "@material-ui/icons/FirstPage";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import LastPageIcon from "@material-ui/icons/LastPage";
-import moment from 'moment';
+import moment from "moment";
 
- const actionsStyles = theme => ({
+const actionsStyles = theme => ({
   root: {
     flexShrink: 0,
     color: theme.palette.text.secondary,
     marginLeft: theme.spacing.unit * 2.5
   }
 });
- class TablePaginationActions extends React.Component {
+class TablePaginationActions extends React.Component {
   handleFirstPageButtonClick = event => {
     this.props.onChangePage(event, 0);
   };
@@ -78,8 +78,7 @@ import moment from 'moment';
         </IconButton>
         <IconButton
           onClick={this.handleLastPageButtonClick}
-          disabled={page >= 
-            Math.ceil(count / rowsPerPage) - 1}
+          disabled={page >= Math.ceil(count / rowsPerPage) - 1}
           aria-label="Last Page"
         >
           {theme.direction === "rtl" ? <FirstPageIcon /> : <LastPageIcon />}
@@ -102,8 +101,6 @@ export const TablePaginationActionsWrapped = withStyles(actionsStyles, {
   withTheme: true
 })(TablePaginationActions);
 
-
-
 export const styles = theme => ({
   root: {
     width: "100%",
@@ -119,15 +116,12 @@ export const styles = theme => ({
 var cells = [];
 var isLive = true;
 export class Live extends React.Component {
-  
-    constructor(props){
-        super(props)
-    }
-    
+  constructor(props) {
+    super(props);
+  }
+
   state = {
-      
-    rows: [
-    ].sort((a, b) => (a < b ? -1 : 1)),
+    rows: [].sort((a, b) => (a < b ? -1 : 1)),
     page: 0,
     rowsPerPage: 6,
     data: []
@@ -135,34 +129,44 @@ export class Live extends React.Component {
 
   componentDidMount = () => {
     cells = [];
-    for(let i = 0; i < this.props.live.length; i++){
-      var durationTime = moment(this.props.live[i].scheduled_time.end) - moment(this.props.live[i].scheduled_time.start);
-      
+    for (let i = 0; i < this.props.live.length; i++) {
+      var durationTime =
+        moment(this.props.live[i].scheduled_time.end) -
+        moment(this.props.live[i].scheduled_time.start);
 
-      
       this.props.live[i].isLive = true;
-      this.props.live[i].startTime = moment(this.props.live[i].scheduled_time.start).format("HH:mm:ss");
-      console.log('start time' ,moment(this.props.live[i].startTime));
-      this.props.live[i].title = "Live Programme " + [i+ 1];
-      this.props.live[i].duration = moment.duration(durationTime, "milliseconds")
-     
-     
-     cells.push({       id: this.props.live[i].pid, 
-                        title: "Live Programme " + [i+ 1],
-                        info: moment(this.props.live[i].scheduled_time.start).format("HH:mm"),
-                        pid: this.props.live[i].pid,
-                        stream: this.props.live[i].service.sid.replace(/_/g, " "),
-                        add: <button className="ui compact icon button" onClick  = { () => {this.props.handleClick(this.props.live[i], isLive)} }><i className="plus icon"></i></button>})
-                        
+      this.props.live[i].startTime = moment(
+        this.props.live[i].scheduled_time.start
+      ).format("HH:mm:ss");
+      console.log("start time", moment(this.props.live[i].startTime));
+      this.props.live[i].title = "Live Programme " + [i + 1];
+      this.props.live[i].duration = moment.duration(
+        durationTime,
+        "milliseconds"
+      );
 
-     
+      cells.push({
+        id: this.props.live[i].pid,
+        title: "Live Programme " + [i + 1],
+        info: moment(this.props.live[i].scheduled_time.start).format("HH:mm"),
+        pid: this.props.live[i].pid,
+        stream: this.props.live[i].service.sid.replace(/_/g, " "),
+        add: (
+          <button
+            className="ui compact icon button"
+            onClick={() => {
+              this.props.handleClick(this.props.live[i], isLive);
+            }}
+          >
+            <i className="plus icon"></i>
+          </button>
+        )
+      });
     }
-    
-    this.setState({rows: cells});
-    console.log(this.props.items);
-    
-}
 
+    this.setState({ rows: cells });
+    console.log(this.props.items);
+  };
 
   handleChangePage = (event, page) => {
     this.setState({ page });
@@ -175,69 +179,67 @@ export class Live extends React.Component {
   render() {
     const { classes } = this.props;
     const { rows, rowsPerPage, page } = this.state;
-    
+
     const emptyRows =
       rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
 
-      if(this.props.live.length === 0){
-          return <h1> No Live Content</h1>
-      }
+    if (this.props.live.length === 0) {
+      return <h1> No Live Content</h1>;
+    }
 
     return (
-        <div>
-          
-      <Paper className={classes.root}>
-        <div className={classes.tableWrapper}>
-          <Table className={classes.table}>
-          
-            <TableBody>
-            <th>Title</th>
-            <th>Start Time</th>
-            <th>Add</th>
-            
-        
-              {rows
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map(row => (
-                  <TableRow key={row.id}>
-                    <TableCell component="th" scope="row">
-                      <div className="tooltip"> {row.title} 
-                      <span className="tooltiptext">{row.stream}</span>
-                      </div>
-                      
-                    </TableCell>
-                    <TableCell align="right">{row.info}</TableCell>
+      <div>
+        <Paper className={classes.root}>
+          <div className={classes.tableWrapper}>
+            <Table className={classes.table}>
+              <TableBody>
+                <th>Title</th>
+                <th>Start Time</th>
+                <th>Add</th>
 
-                    <TableCell align="right">{row.add}</TableCell>
+                {rows
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map(row => (
+                    <TableRow key={row.id}>
+                      <TableCell component="th" scope="row">
+                        <div className="tooltip">
+                          {" "}
+                          {row.title}
+                          <span className="tooltiptext">{row.stream}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell align="right">{row.info}</TableCell>
+
+                      <TableCell align="right">{row.add}</TableCell>
+                    </TableRow>
+                  ))}
+
+                {emptyRows > 0 && (
+                  <TableRow style={{ height: 48 * emptyRows }}>
+                    <TableCell colSpan={6} />
                   </TableRow>
-                ))}
-            
-              {emptyRows > 0 && (
-                <TableRow style={{ height: 48 * emptyRows }}>
-                  <TableCell colSpan={6} />
+                )}
+              </TableBody>
+              <TableFooter>
+                <TableRow>
+                  <TablePagination
+                    rowsPerPageOptions={[5, 10, 25]}
+                    colSpan={3}
+                    count={rows.length}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    SelectProps={{
+                      native: true
+                    }}
+                    onChangePage={this.handleChangePage}
+                    onChangeRowsPerPage={this.handleChangeRowsPerPage}
+                    ActionsComponent={TablePaginationActionsWrapped}
+                  />
                 </TableRow>
-              )}
-            </TableBody>
-            <TableFooter>
-              <TableRow>
-                <TablePagination
-                  rowsPerPageOptions={[5, 10, 25]}
-                  colSpan={3}
-                  count={rows.length}
-                  rowsPerPage={rowsPerPage}
-                  page={page}
-                  SelectProps={{
-                    native: true
-                  }}
-                  onChangePage={this.handleChangePage}
-                  onChangeRowsPerPage={this.handleChangeRowsPerPage}
-                  ActionsComponent={TablePaginationActionsWrapped}
-                />
-              </TableRow>
-            </TableFooter>
-          </Table>
-        </div>
-      </Paper>
+              </TableFooter>
+            </Table>
+          </div>
+        </Paper>
       </div>
     );
   }
@@ -247,5 +249,4 @@ Live.propTypes = {
   classes: PropTypes.object.isRequired
 };
 
-export default withStyles (styles)(Live)
-
+export default withStyles(styles)(Live);
