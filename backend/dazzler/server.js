@@ -14,6 +14,7 @@ const app = express();
 
 const config = {
   bbc_marathi_tv: {
+    mid: "bbc_marathi_tv",
     specials_collection: "p0715nv4",
     live_brand: "w13xttvl",
     clip_language: "marathi",
@@ -131,8 +132,12 @@ app.get("/clip", function(req, res) {
 app.get("/episode", function(req, res) {
   let q = {
     mixin: ["images", "available_versions"],
-    entity_type: "episode"
+    entity_type: "episode",
+    availability: "available"
   };
+  if (req.query.hasOwnProperty("sid")) {
+    q.master_brand = config[req.query.sid].master_brand;
+  }
   if (req.query.hasOwnProperty("pid")) {
     q.pid = req.query.pid;
   }
@@ -363,6 +368,20 @@ function add_crids_to_webcast(items) {
     for (let i = 0; i < items.length; i++) {
       const pid = items[i].window_of[0].pid;
       items[i].window_of[0].crid = pid2crid(pid);
+    }
+  }
+  return items;
+}
+
+function add_crids_to_episodes(items) {
+  if (items != null) {
+    for (let i = 0; i < items.length; i++) {
+      for(let j=0; j < items[i].available_versions.length; j++) {
+        for(let k=0; k < items[i].available_versions[j].length; k++) {
+          const pid = items[i].available_versions[j].version[k].pid;
+          items[i].available_versions[j].version[k].crid = pid2crid(pid);    
+        }  
+      }
     }
   }
   return items;

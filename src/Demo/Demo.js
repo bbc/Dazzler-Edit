@@ -309,7 +309,7 @@ class Demo extends React.Component {
           clipTime={time}
           schStart={id}
           data={scheduleItems}
-          dataLength={n.length}
+          dataLength={scheduleItems.length}
           pasted={copiedContent}
           deleteItem={this.deleteItem}
           text={text}
@@ -332,7 +332,7 @@ class Demo extends React.Component {
             fetchTime={this.fetchTime}
             clipTime={time}
             data={scheduleItems}
-            dataLength={n.length}
+            dataLength={scheduleItems.length}
             pasted={copiedContent}
             deleteItem={this.deleteItem}
             text={text}
@@ -524,7 +524,7 @@ class Demo extends React.Component {
       return this.setState({
         display: (
           <Scratchpad
-            data={s}
+            data={scratchPadItems}
             deleteItem={this.deleteItem}
             clearContent={this.clearContent}
             copyContent={this.copyContent}

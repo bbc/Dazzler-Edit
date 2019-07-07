@@ -9,7 +9,6 @@ var scheduleContent = [];
 const tvaStart = "<TVAMain xmlns=\"urn:tva:metadata:2007\" xmlns:mpeg7=\"urn:tva:mpeg7:2005\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xml:lang=\"en-GB\" xsi:schemaLocation=\"urn:tva:metadata:2007 tva_metadata_3-1_v141.xsd\"><ProgramDescription>";
 const tvaEnd = "</ProgramDescription></TVAMain>";
 var videos = [];
-var newState = null;
 
 class Schedule extends React.Component {
   state = {
@@ -24,7 +23,6 @@ class Schedule extends React.Component {
   };
 
   componentDidMount() {
-    var count = -2;
     this.savePlaylist = this.savePlaylist.bind(this);
     this.pasteContent = this.pasteContent.bind(this);
     this.deleteItem = this.deleteItem.bind(this);
@@ -42,7 +40,6 @@ class Schedule extends React.Component {
           live={loadedContent[i].live}
         />
       );
-      var newState = null;
       this.setState({ index: null });
     }
   }
@@ -95,7 +92,7 @@ class Schedule extends React.Component {
       events += this.makeScheduleEvent(loadedContent[i]);
     }
   
-    const scheduleStart = `<ProgramLocationTable><Schedule start="${start.format()}" end="${end.format()}" serviceIDRef="${serviceIDRef}">`;
+    const scheduleStart = `<ProgramLocationTable><Schedule start="${start.format()}" end="${end.format()}" serviceIDRef="${this.state.serviceIDRef}">`;
     const scheduleEnd = "</Schedule></ProgramLocationTable>";
 
     axios({
@@ -103,21 +100,19 @@ class Schedule extends React.Component {
       url: "/tva",
       data: tvaStart + scheduleStart + events + scheduleEnd + tvaEnd
     })
-      .then(response => {
-        this.setState({
-          savePlaylist: "ui right floated positive button active"
-        });
-        this.setState({ status: "Playlist Saved" });
-      })
-      .catch(error => {
-        this.setState({
-          savePlaylist: "ui right floated small primary labeled icon button"
-        });
-        this.setState({ status: "Save Playlist" });
-        alert("Error Saving Playlist");
+    .then(response => {
+      this.setState({
+        savePlaylist: "ui right floated positive button active"
       });
-    }
-
+      this.setState({ status: "Playlist Saved" });
+    })
+    .catch(error => {
+      this.setState({
+        savePlaylist: "ui right floated small primary labeled icon button"
+      });
+      this.setState({ status: "Save Playlist" });
+      alert("Error Saving Playlist");
+    });
   }
 
   pasteContent(content) {
@@ -266,8 +261,6 @@ class Schedule extends React.Component {
           );
         }
       }
-    } else {
-      var newState = null;
     }
     if (prevProps.dataLength !== this.props.dataLength) {
       // why is dataLength different to data.length??
