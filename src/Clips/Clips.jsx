@@ -104,12 +104,6 @@ export const TablePaginationActionsWrapped = withStyles(actionsStyles, {
   withTheme: true
 })(TablePaginationActions);
 
-let counter = 0;
-function createData(name, calories, fat, test) {
-  counter += 1;
-  return { id: counter, name, calories, fat };
-}
-
 export const styles = theme => ({
   root: {
     width: "100%",
@@ -122,14 +116,11 @@ export const styles = theme => ({
     overflowX: "hidden"
   }
 });
+
 var cells = [];
-var idType
+
 export class Clips extends React.Component {
   
-    constructor(props){
-        super(props)
-    }
-    
   state = {
     spinner: false,
     rows: [
@@ -138,6 +129,7 @@ export class Clips extends React.Component {
     rowsPerPage: 6,
     data: []
   };
+
   componentDidMount = () => {
     
     for(let i = 0; i < this.props.items.length; i++){
@@ -146,21 +138,19 @@ export class Clips extends React.Component {
         var timeDiff = Math.abs(date2.getTime() - date1.getTime());
       
         var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24) - 1); 
-     cells.push({       id: this.props.items[i].pid, 
-                        title: this.props.items[i].title,
-                        duration: moment.duration(this.props.items[i].available_versions.version[0].duration)._data.minutes + " minutes " + 
-                        moment.duration(this.props.items[i].available_versions.version[0].duration)._data.seconds + "seconds",
-                        from: diffDays + " days ago",
-                        pid: this.props.items[i].pid,
-                        versions: this.props.items[i].available_versions.version.length,
-                        add: <button className="ui compact icon button" onClick  = { () => {this.props.handleClick(this.props.items[i])} }><i className="plus icon"></i></button>})
 
-     
+        cells.push({
+          id: this.props.items[i].pid, 
+          title: this.props.items[i].title,
+          duration: moment.duration(this.props.items[i].available_versions.version[0].duration)._data.minutes + " minutes " + 
+          moment.duration(this.props.items[i].available_versions.version[0].duration)._data.seconds + "seconds",
+          from: diffDays + " days ago",
+          pid: this.props.items[i].pid,
+          versions: this.props.items[i].available_versions.version.length,
+          add: <button className="ui compact icon button" onClick  = { () => {this.props.handleClick(this.props.items[i])} }><i className="plus icon"></i></button>})
     }
-    this.setState({rows: cells});
-    
-}
-
+    this.setState({rows: cells});    
+  }
 
   handleChangePage = (event, page) => {
     this.setState({ page });
@@ -173,7 +163,7 @@ export class Clips extends React.Component {
   render() {
     const { classes } = this.props;
     const { rows, rowsPerPage, page } = this.state;
-    {console.log(rows)};
+    console.log(rows);
     const emptyRows =
       rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
 

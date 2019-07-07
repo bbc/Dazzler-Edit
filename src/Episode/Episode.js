@@ -13,7 +13,6 @@ import FirstPageIcon from "@material-ui/icons/FirstPage";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import LastPageIcon from "@material-ui/icons/LastPage";
-import moment from "moment";
 
 const actionsStyles = theme => ({
   root: {
@@ -113,12 +112,11 @@ export const styles = theme => ({
     overflowX: "hidden"
   }
 });
+
+
 var cells = [];
 var isEpisode = false;
 export class Episode extends React.Component {
-  constructor(props) {
-    super(props);
-  }
 
   state = {
     rows: [].sort((a, b) => (a < b ? -1 : 1)),
@@ -129,12 +127,18 @@ export class Episode extends React.Component {
 
   componentDidMount = () => {
     cells = [];
+    console.log(this.props);
+    console.log(this.props.episodes.length);
     for (let i = 0; i < this.props.episodes.length; i++) {
       const episode = this.props.episodes[i];
+      console.log(JSON.stringify(episode));
+
       // TODO - pick a version
-      const version = episode.available_versions[0].version[0];
-      // TODO set the nCrid
-      this.props.episodes[i].version_pid = version.pid;
+      const version = episode.available_versions.version[0];
+
+      console.log(JSON.stringify(version));
+
+      this.props.episodes[i].nCrid = version.crid;
 
       cells.push({
         id: episode.pid,
@@ -166,8 +170,10 @@ export class Episode extends React.Component {
   };
 
   render() {
+
     const { classes } = this.props;
     const { rows, rowsPerPage, page } = this.state;
+    console.log(rows);
 
     const emptyRows =
       rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
@@ -185,7 +191,6 @@ export class Episode extends React.Component {
                 <th>Release Date</th>
                 <th>Duration</th>
                 <th>Add</th>
-
                 {rows
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map(row => (

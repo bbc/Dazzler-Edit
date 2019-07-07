@@ -123,7 +123,6 @@ app.get("/clip", function(req, res) {
   if (req.query.hasOwnProperty("page_size")) {
     q.page_size = req.query.page_size;
   }
-  console.log(JSON.stringify(q));
   nitroRequest("programmes", q).then(
     r => res.json(r.nitro.results.items),
     err => res.status(404).send("Not found") // TODO use proper error message
@@ -393,7 +392,6 @@ function parseSSLsubject(req) {
   var fields = subject.split(",");
   var data = {};
   for (var i = 0; i < fields.length; i++) {
-    console.log(fields[i]);
     var [key, val] = fields[i].split("=");
     data[key] = val;
   }
