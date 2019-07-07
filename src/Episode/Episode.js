@@ -130,28 +130,23 @@ export class Episode extends React.Component {
   componentDidMount = () => {
     cells = [];
     for (let i = 0; i < this.props.episodes.length; i++) {
-      var durationTime =
-        moment(this.props.episodes[i].scheduled_time.end) -
-        moment(this.props.episodes[i].scheduled_time.start);
-
-      this.props.episodes[i].title = "Episode" + [i + 1];
-      this.props.episodes[i].duration = moment.duration(
-        durationTime,
-        "milliseconds"
-      );
+      const episode = this.props.episodes[i];
+      // TODO - pick a version
+      const version = episode.available_versions[0].version[0];
+      // TODO set the nCrid
+      this.props.episodes[i].version_pid = version.pid;
 
       cells.push({
-        id: this.props.episodes[i].pid,
-        title: "Programme" + [i + 1],
-        Info:
-          "Broadcast at " +
-          moment(this.props.episodes[i].scheduled_time.start).format("HH:mm"),
-        pid: this.props.episodes[i].pid,
+        id: episode.pid,
+        title: episode.presentation_title,
+        duration: version.duration,
+        releaseDate: episode.release_date,
+        pid: episode.pid,
         add: (
           <button
             className="ui compact icon button"
             onClick={() => {
-              this.props.handleClick(this.props.episodes[i], isEpisode);
+              this.props.handleClick(episode, isEpisode);
             }}
           >
             <i className="plus icon"></i>
@@ -187,7 +182,8 @@ export class Episode extends React.Component {
             <Table className={classes.table}>
               <TableBody>
                 <th>Title</th>
-                <th>Info</th>
+                <th>Release Date</th>
+                <th>Duration</th>
                 <th>Add</th>
 
                 {rows
@@ -197,7 +193,8 @@ export class Episode extends React.Component {
                       <TableCell component="th" scope="row">
                         {row.title}
                       </TableCell>
-                      <TableCell align="right">{row.Info}</TableCell>
+                      <TableCell align="right">{row.releaseDate}</TableCell>
+                      <TableCell align="right">{row.duration}</TableCell>
                       <TableCell align="right">{row.add}</TableCell>
                     </TableRow>
                   ))}

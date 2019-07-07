@@ -2,25 +2,20 @@ import React from "react";
 import SingleSchedule from "../SingleSchedule/SingleSchedule";
 import moment from "moment";
 import axios from "axios";
-import xml2js from "xml2js";
 
 var count = -2;
 var loadedContent = [];
 var scheduleContent = [];
-var test;
-var startXML;
-var endXML;
+const tvaStart = "<TVAMain xmlns=\"urn:tva:metadata:2007\" xmlns:mpeg7=\"urn:tva:mpeg7:2005\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xml:lang=\"en-GB\" xsi:schemaLocation=\"urn:tva:metadata:2007 tva_metadata_3-1_v141.xsd\"><ProgramDescription>";
+const tvaEnd = "</ProgramDescription></TVAMain>";
 var videos = [];
-var promises = [];
 var newState = null;
-var start = moment().utcOffset(0);
-let newStart = moment().utcOffset(0);
-start.set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
 
 class Schedule extends React.Component {
   state = {
     spinner: false,
     text: null,
+    serviceIDRef: null,
     refresh: 2,
     data: [],
     savePlaylist: "ui right floated small primary labeled icon button",
@@ -51,26 +46,13 @@ class Schedule extends React.Component {
       this.setState({ index: null });
     }
   }
-  makeScheduleEvent(broadcast, vids) {
-    newStart.set({
-      hour: vids.startTime.charAt(0) + vids.startTime.charAt(1),
-      minute: vids.startTime.charAt(3) + vids.startTime.charAt(4),
-      second: vids.startTime.charAt(6) + vids.startTime.charAt(7)
-    });
-    var end = moment
-      .utc(loadedContent[loadedContent.length - 1].startTime, "HH:mm:ss")
-      .add(
-        moment.duration(loadedContent[loadedContent.length - 1].duration)
-          ._milliseconds,
-        "milliseconds"
-      )
-      .format();
-    let imi = "imi:dazzler/" + Date.parse(start) / 1000;
-    startXML = `<TVAMain xmlns="urn:tva:metadata:2007" xmlns:mpeg7="urn:tva:mpeg7:2005"xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"xml:lang="en-GB" xsi:schemaLocation="urn:tva:metadata:2007 tva_metadata_3-1_v141.xsd"><ProgramDescription>
-      <ProgramLocationTable>
-      <Schedule start="${start.format()}" end="${end}" serviceIDRef="TVMAR01">`;
-    endXML =
-      "</Schedule></ProgramLocationTable></ProgramDescription></TVAMain>";
+
+  makeScheduleEvent(broadcast) {
+
+    const startDateTime = moment.utc(broadcast.startTime, "HH:mm:ss")
+
+    let imi = `imi:dazzler:${this.state.serviceIDRef}/{startDateTime.unix()}`;
+
     return ` 
         <ScheduleEvent>
           <Program crid="${broadcast.nCrid}"/>
@@ -81,7 +63,7 @@ class Schedule extends React.Component {
                 <VideoAttributes><AspectRatio>16:9</AspectRatio><Color type="color"/></VideoAttributes>
               </AVAttributes>
             </InstanceDescription>
-            <PublishedStartTime>${newStart.format()}</PublishedStartTime>
+            <PublishedStartTime>${startDateTime.format()}</PublishedStartTime>
             <PublishedDuration>${broadcast.duration}</PublishedDuration>
             <Live value="${broadcast.live === "live" ? true : false}"/>
             <Repeat value="${false}"/>
@@ -90,64 +72,52 @@ class Schedule extends React.Component {
   }
 
   savePlaylist() {
-    start.set({
-      hour:
-        videos[0].props.startTime.charAt(0) +
-        videos[0].props.startTime.charAt(1),
-      minute:
-        videos[0].props.startTime.charAt(3) +
-        videos[0].props.startTime.charAt(4),
-      second:
-        videos[0].props.startTime.charAt(6) +
-        videos[0].props.startTime.charAt(7)
-    });
-    var end = moment
-      .utc(loadedContent[loadedContent.length - 1].startTime, "HH:mm:ss")
-      .add(
-        moment.duration(loadedContent[loadedContent.length - 1].duration)
-          ._milliseconds,
-        "milliseconds"
-      )
-      .format();
 
-    if (videos.length > 0) {
-      test = [];
-      var end = moment
-        .utc(loadedContent[loadedContent.length - 1].startTime, "HH:mm:ss")
-        .add(
-          moment.duration(loadedContent[loadedContent.length - 1].duration)
-            ._milliseconds,
-          "milliseconds"
-        )
-        .format();
-
-      this.setState({
-        savePlaylist: "ui right floated primary loading button"
-      });
-
-      for (let i = 0; i < loadedContent.length; i++) {
-        test += this.makeScheduleEvent(loadedContent[i], videos[i].props);
-      }
-
-      axios({
-        method: "post",
-        url: "/tva",
-        data: startXML + test + endXML
-      })
-        .then(response => {
-          this.setState({
-            savePlaylist: "ui right floated positive button active"
-          });
-          this.setState({ status: "Playlist Saved" });
-        })
-        .catch(error => {
-          this.setState({
-            savePlaylist: "ui right floated small primary labeled icon button"
-          });
-          this.setState({ status: "Save Playlist" });
-          alert("Error Saving Playlist");
-        });
+    if(loadedContent.length == 0) {
+      console.log('nothing to save - button should be disabled');
+      return;
     }
+
+    this.setState({
+      savePlaylist: "ui right floated primary loading button"
+    });
+
+    const first = loadedContent[0];
+    const last = loadedContent[loadedContent.length - 1];
+
+    const start = moment.utc(first.startTime, "HH:mm:ss")
+    const end = moment
+      .utc(last.startTime, "HH:mm:ss")
+      .add(moment.duration(last.duration));
+  
+    let events = "";
+    for (let i = 0; i < loadedContent.length; i++) {
+      events += this.makeScheduleEvent(loadedContent[i]);
+    }
+  
+    const scheduleStart = `<ProgramLocationTable><Schedule start="${start.format()}" end="${end.format()}" serviceIDRef="${serviceIDRef}">`;
+    const scheduleEnd = "</Schedule></ProgramLocationTable>";
+
+    axios({
+      method: "post",
+      url: "/tva",
+      data: tvaStart + scheduleStart + events + scheduleEnd + tvaEnd
+    })
+      .then(response => {
+        this.setState({
+          savePlaylist: "ui right floated positive button active"
+        });
+        this.setState({ status: "Playlist Saved" });
+      })
+      .catch(error => {
+        this.setState({
+          savePlaylist: "ui right floated small primary labeled icon button"
+        });
+        this.setState({ status: "Save Playlist" });
+        alert("Error Saving Playlist");
+      });
+    }
+
   }
 
   pasteContent(content) {
@@ -301,8 +271,11 @@ class Schedule extends React.Component {
     }
     if (prevProps.dataLength !== this.props.dataLength) {
       // why is dataLength different to data.length??
+      // TODO was it because you were passing the schedule and the scratchpad?? Julian
 
       scheduleContent = this.props.data;
+
+      this.setState({ serviceIDRef: this.props.serviceIDRef });
 
       // this.props.data.length === ? scheduleContent = loadedContent : scheduleContent = this.props.data
 

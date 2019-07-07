@@ -37,16 +37,13 @@ import Date from "../Date/Date";
 import Schedule from "../Schedule/Schedule";
 import PreviousSchedule from "../PreviousSchedule/PreviousSchedule";
 import NextSchedule from "../NextSchedule/NextSchedule";
-import xml2js from "xml2js";
-import { promises } from "fs";
 
 const drawerWidth = 240;
 var menuText = "Schedule";
 var text = "Today's ";
-var s = [];
 var time = -2;
-var promise = [];
-var n = [];
+var scheduleItems = [];
+var scratchPadItems = [];
 var copiedContent = [];
 var icons = [
   <MailIcon />,
@@ -57,13 +54,6 @@ var icons = [
   <Opacity />
 ];
 var viewIcons = [<InboxIcon />, <Assignment />];
-var begin = moment().utcOffset(0);
-var end = moment().utcOffset(0);
-begin.set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
-begin.toISOString();
-
-end.set({ hour: 23, minute: 59, second: 5, millisecond: 9 });
-end.toISOString();
 var count = -1;
 
 const styles = theme => ({
@@ -138,7 +128,8 @@ class Demo extends React.Component {
       .add(0, "d")
       .format("LL"),
     display: "",
-    sid: "bbc_marathi_tv"
+    user: null,
+    service: { sid: "bbc_marathi_tv", name: "Marathi", serviceIDRef: "TVMAR01" }
   };
 
   componentDidMount() {
@@ -154,22 +145,23 @@ class Demo extends React.Component {
     this.setState({
       display: (
         <Schedule
+          serviceIDRef={this.state.serviceIDRef}
           fetchTime={this.fetchTime}
           clipTime={time}
-          data={n}
-          dataLength={n.length}
+          data={scheduleItems}
+          dataLength={scheduleItems.length}
           pasted={copiedContent}
-          data={s}
           deleteItem={this.deleteItem}
           text="Today's "
           loadPlaylist={this.loadPlaylist}
         />
       )
     });
-    //Clips
+
+    // Clips
     axios
       .get(
-        "/clip?sid=" + this.state.sid
+        "/clip?sid=" + this.state.service.sid
       )
       .then(response => {
         console.log("test1", response);
@@ -181,6 +173,24 @@ class Demo extends React.Component {
       .catch(e => {
         console.log(e);
       });
+
+    // Episodes
+    axios
+      .get(
+        "/episodes?sid=" + this.state.service.sid
+      )
+      .then(response => {
+        console.log("episodes", response);
+        // TODO promote version crid to nCrid field
+        this.setState({
+          episodes: response.data
+        });
+      })
+      .catch(e => {
+        console.log(e);
+      });
+
+    /* TODO what did we need placings for?
     axios
       .get(
         "/placings?version=p078fmvz"
@@ -193,11 +203,27 @@ class Demo extends React.Component {
       .catch(e => {
         console.log(e);
       });
+      */
+
+    // get user
+    axios
+      .get(
+        "/user"
+      )
+      .then(response => {
+        console.log('user', JSON.stringify(response.data));
+        this.setState({
+          user: response.data
+        });
+      })
+      .catch(e => {
+        console.log(e);
+      });
 
     //get request for specials
     axios
       .get(
-        "/special?sid=" + this.state.sid
+        "/special?sid=" + this.state.service.sid
       )
       .then(response => {
         this.setState({
@@ -212,9 +238,9 @@ class Demo extends React.Component {
     axios
       .get(
         "/webcast" +
-          "?sid=" + this.state.sid +
-          "&start=" + begin.format() +
-          "&end=" + end.format()
+          "?sid=" + this.state.service.sid +
+          "&start=" + moment.add(5, 'minutes').format() +
+          "&end=" + moment.add(1, 'days').format()
       )
       .then(response => {
         console.log("webcast Response", response.data);
@@ -223,15 +249,9 @@ class Demo extends React.Component {
         });
 
         for (let i = 0; i < response.data.length; i++) {
-          if (!moment().isAfter(response.data[i].scheduled_time.start)) {
-            this.setState({
-              live: [...this.state.live, response.data[i]]
-            });
-          } else if (moment().isAfter(response.data[i].scheduled_time.start)) {
-            this.setState({
-              episodes: [...this.state.episodes, response.data[i]]
-            });
-          }
+          this.setState({
+            live: [...this.state.live, response.data[i]]
+          });
         }
       })
       .catch(e => {
@@ -268,11 +288,11 @@ class Demo extends React.Component {
     }
   }
   clearContent() {
-    s = [];
+    scratchPadItems = [];
     this.setState({
       display: (
         <Scratchpad
-          data={s}
+          data={scratchPadItems}
           deleteItem={this.deleteItem}
           copyContent={this.copyContent}
           clearContent={this.clearContent}
@@ -284,13 +304,13 @@ class Demo extends React.Component {
     this.setState({
       display: (
         <Schedule
+          serviceIDRef={this.state.serviceIDRef}
           fetchTime={this.fetchTime}
           clipTime={time}
           schStart={id}
-          data={n}
+          data={scheduleItems}
           dataLength={n.length}
           pasted={copiedContent}
-          data={s}
           deleteItem={this.deleteItem}
           text={text}
           loadPlaylist={this.loadPlaylist}
@@ -308,12 +328,12 @@ class Demo extends React.Component {
         scheduleDate: CDate,
         display: (
           <Schedule
+            serviceIDRef={this.state.serviceIDRef}
             fetchTime={this.fetchTime}
             clipTime={time}
-            data={n}
+            data={scheduleItems}
             dataLength={n.length}
             pasted={copiedContent}
-            data={s}
             deleteItem={this.deleteItem}
             text={text}
             loadPlaylist={this.loadPlaylist}
@@ -325,7 +345,7 @@ class Demo extends React.Component {
         scheduleDate: CDate,
         display: (
           <PreviousSchedule
-            sid={this.state.sid}
+            sid={this.state.service.sid}
             scheduleDate={moment(CDate)
               .utcOffset(0)
               .format()}
@@ -344,12 +364,12 @@ class Demo extends React.Component {
         scheduleDate: CDate,
         display: (
           <Schedule
+            serviceIDRef={this.state.serviceIDRef}
             fetchTime={this.fetchTime}
             clipTime={time}
-            data={n}
-            dataLength={n.length}
+            data={scheduleItems}
+            dataLength={scheduleItems.length}
             pasted={copiedContent}
-            data={s}
             deleteItem={this.deleteItem}
             text={text}
             loadPlaylist={this.loadPlaylist}
@@ -361,8 +381,8 @@ class Demo extends React.Component {
         scheduleDate: CDate,
         display: (
           <NextSchedule
-            sid={this.state.sid}
-            scheduleDate={moment(CDate) .utcOffset(0) .format()}
+            sid={this.state.service.sid}
+            scheduleDate={moment(CDate).utcOffset(0).format()}
             text={text}
           />
         )
@@ -401,11 +421,11 @@ class Demo extends React.Component {
       newItem2.isLive = false;
     }
     if (menuText === "Scratchpad") {
-      s.push(newItem2);
+      scratchPadItems.push(newItem2);
       this.setState({
         display: (
           <Scratchpad
-            data={s}
+            data={scratchPadItems}
             deleteItem={this.deleteItem}
             copyContent={this.copyContent}
             clearContent={this.clearContent}
@@ -413,14 +433,15 @@ class Demo extends React.Component {
         )
       });
     } else {
-      n.push(newItem2);
+      scheduleItems.push(newItem2);
       this.setState({
         display: (
           <Schedule
+            serviceIDRef={this.state.serviceIDRef}
             fetchTime={this.fetchTime}
             clipTime={time}
-            data={n}
-            dataLength={n.length}
+            data={scheduleItems}
+            dataLength={scheduleItems.length}
             pasted={copiedContent}
             text="Today's "
             deleteItem={this.deleteItem}
@@ -443,7 +464,7 @@ class Demo extends React.Component {
 
     if (text === "Live") {
       this.setState({ isPaneOpen: true });
-      this.setState({ title: "Live" });
+      this.setState({ title: "Upcoming Live Broadcasts" });
       this.setState({
         panelShow: (
           <Live live={this.state.live} handleClick={this.handleClick} />
@@ -456,7 +477,7 @@ class Demo extends React.Component {
 
     if (text === "Episodes") {
       this.setState({ isPaneOpen: true });
-      this.setState({ title: "Episodes" });
+      this.setState({ title: "Recent Episodes" });
       this.setState({
         panelShow: (
           <Episode
@@ -486,10 +507,11 @@ class Demo extends React.Component {
       return this.setState({
         display: (
           <Schedule
+            serviceIDRef={this.state.serviceIDRef}
             fetchTime={this.fetchTime}
             clipTime={time}
-            data={n}
-            dataLength={n.length}
+            data={scheduleItems}
+            dataLength={scheduleItems.length}
             pasted={copiedContent}
             text="Today's "
             deleteItem={this.deleteItem}
@@ -516,10 +538,11 @@ class Demo extends React.Component {
     this.setState({
       display: (
         <Schedule
+          serviceIDRef={this.state.serviceIDRef}
           fetchTime={this.fetchTime}
           clipTime={time}
-          data={n}
-          dataLength={n.length}
+          data={scheduleItems}
+          dataLength={scheduleItems.length}
           pasted={copiedContent}
           text="Today's "
           deleteItem={this.deleteItem}
@@ -529,7 +552,6 @@ class Demo extends React.Component {
   }
 
   render() {
-    const { items, data, count } = this.state;
     const { classes, theme } = this.props;
     const { open } = this.state;
 
@@ -569,7 +591,7 @@ class Demo extends React.Component {
               <MenuIcon />
             </IconButton>
             <Typography variant="h6" color="inherit" noWrap>
-              <center>Marathi</center>
+              <center>{this.state.service.name}</center>
             </Typography>
           </Toolbar>
         </AppBar>
