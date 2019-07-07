@@ -25,8 +25,7 @@ const config = {
 //app.use(bodyParser.raw({ type: '*/*' }));
 app.use(bodyParser.text({ type: "*/*" }));
 
-//app.use(express.static("/usr/lib/dazzler/edit"));
-app.use(express.static("/Users/cablej01/shared/Dazzler-Edit/build"));
+app.use(express.static(__dirname+"/../edit"));
 
 // /status is used by ELB health checkers to assert that the service is running OK
 app.get("/status", function(req, res) {
@@ -332,7 +331,6 @@ function nitroRequest(feed, query) {
         accept: "application/json"
       }
     };
-console.log(options.path);
     var request = http.get(options, response => {
       if (response.statusCode < 200 || response.statusCode > 299) {
         reject(new Error("Invalid status code: " + response.statusCode));

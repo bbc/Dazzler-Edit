@@ -239,8 +239,8 @@ class Demo extends React.Component {
       .get(
         "/webcast" +
           "?sid=" + this.state.service.sid +
-          "&start=" + moment.add(5, 'minutes').format() +
-          "&end=" + moment.add(1, 'days').format()
+          "&start=" + moment().add(5, 'minutes').format() +
+          "&end=" + moment().add(1, 'days').format()
       )
       .then(response => {
         console.log("webcast Response", response.data);
