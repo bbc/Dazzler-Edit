@@ -403,6 +403,9 @@ class Demo extends React.Component {
       newItem2.nCrid = item.available_versions.version[0].crid;
       newItem2.id = count;
       newItem2.isLive = false;
+      if(newItem2.title == null) {
+        newItem2.title = newItem2.presentation_title;
+      }
       break;
       case "clip":
       newItem2.duration = item.available_versions.version[0].duration;
