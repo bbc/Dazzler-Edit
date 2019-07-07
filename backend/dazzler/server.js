@@ -25,7 +25,8 @@ const config = {
 //app.use(bodyParser.raw({ type: '*/*' }));
 app.use(bodyParser.text({ type: "*/*" }));
 
-app.use(express.static("/usr/lib/dazzler/edit"));
+//app.use(express.static("/usr/lib/dazzler/edit"));
+app.use(express.static("/Users/cablej01/shared/Dazzler-Edit/build"));
 
 // /status is used by ELB health checkers to assert that the service is running OK
 app.get("/status", function(req, res) {
@@ -123,6 +124,7 @@ app.get("/clip", function(req, res) {
   if (req.query.hasOwnProperty("page_size")) {
     q.page_size = req.query.page_size;
   }
+  console.log(JSON.stringify(q));
   nitroRequest("programmes", q).then(
     r => res.json(r.nitro.results.items),
     err => res.status(404).send("Not found") // TODO use proper error message
@@ -136,7 +138,7 @@ app.get("/episode", function(req, res) {
     availability: "available"
   };
   if (req.query.hasOwnProperty("sid")) {
-    q.master_brand = config[req.query.sid].master_brand;
+    q.master_brand = config[req.query.sid].mid;
   }
   if (req.query.hasOwnProperty("pid")) {
     q.pid = req.query.pid;
@@ -148,7 +150,10 @@ app.get("/episode", function(req, res) {
     q.page_size = req.query.page_size;
   }
   nitroRequest("programmes", q).then(
-    r => res.json(r.nitro.results.items),
+    r => {
+      add_crids_to_episodes(r.nitro.results.items);
+      res.json(r.nitro.results.items);
+    },
     err => res.status(404).send("Not found") // TODO use proper error message
   );
 });
@@ -327,7 +332,7 @@ function nitroRequest(feed, query) {
         accept: "application/json"
       }
     };
-
+console.log(options.path);
     var request = http.get(options, response => {
       if (response.statusCode < 200 || response.statusCode > 299) {
         reject(new Error("Invalid status code: " + response.statusCode));
@@ -376,11 +381,9 @@ function add_crids_to_webcast(items) {
 function add_crids_to_episodes(items) {
   if (items != null) {
     for (let i = 0; i < items.length; i++) {
-      for(let j=0; j < items[i].available_versions.length; j++) {
-        for(let k=0; k < items[i].available_versions[j].length; k++) {
-          const pid = items[i].available_versions[j].version[k].pid;
-          items[i].available_versions[j].version[k].crid = pid2crid(pid);    
-        }  
+      for(let j=0; j < items[i].available_versions.version.length; j++) {
+        let version = items[i].available_versions.version[j];
+        version.crid = pid2crid(version.pid);
       }
     }
   }

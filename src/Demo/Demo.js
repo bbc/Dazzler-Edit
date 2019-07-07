@@ -177,7 +177,7 @@ class Demo extends React.Component {
     // Episodes
     axios
       .get(
-        "/episodes?sid=" + this.state.service.sid
+        "/episode?sid=" + this.state.service.sid
       )
       .then(response => {
         console.log("episodes", response);
