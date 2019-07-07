@@ -131,15 +131,9 @@ export class Episode extends React.Component {
     console.log(this.props.episodes.length);
     for (let i = 0; i < this.props.episodes.length; i++) {
       const episode = this.props.episodes[i];
-      console.log(JSON.stringify(episode));
-
       // TODO - pick a version
       const version = episode.available_versions.version[0];
-
-      console.log(JSON.stringify(version));
-
       this.props.episodes[i].nCrid = version.crid;
-
       cells.push({
         id: episode.pid,
         title: episode.presentation_title,

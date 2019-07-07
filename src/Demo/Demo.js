@@ -396,30 +396,32 @@ class Demo extends React.Component {
       ...item
     };
 
-    if (isLive) {
-      if (newItem2.startTime === undefined) {
-        newItem2.versionPid = item.pid;
-        newItem2.isLive = false;
-        newItem2.id = count;
-      } else {
-        newItem2.versionPid = item.pid;
-        newItem2.isLive = true;
-        newItem2.id = count;
-      }
-    } else {
-      if (item.available_versions !== undefined) {
-        newItem2.duration = item.available_versions.version[0].duration;
-        newItem2.versionPid = item.available_versions.version[0].pid;
-        newItem2.id = count;
-      } else {
-        newItem2.duration =
-          moment(item.scheduled_time.end) - moment(item.scheduled_time.start);
-        newItem2.versionPid = item.pid;
-        newItem2.id = count;
-      }
-
+    switch(item.item_type) {
+      case "episode":
+      newItem2.duration = item.available_versions.version[0].duration;
+      newItem2.versionPid = item.available_versions.version[0].pid;
+      newItem2.nCrid = item.available_versions.version[0].crid;
+      newItem2.id = count;
       newItem2.isLive = false;
+      break;
+      case "clip":
+      newItem2.duration = item.available_versions.version[0].duration;
+      newItem2.versionPid = item.available_versions.version[0].pid;
+      newItem2.nCrid = item.nCrid;
+      newItem2.isLive = false;
+      newItem2.id = count;
+      break;
+      case "webcast":
+      newItem2.versionPid = item.pid;
+      newItem2.isLive = true;
+      newItem2.id = count;
+      break;
+      default:
+        console.log(item.item_type, isLive);
     }
+
+    console.log(JSON.stringify(newItem2));
+      
     if (menuText === "Scratchpad") {
       scratchPadItems.push(newItem2);
       this.setState({

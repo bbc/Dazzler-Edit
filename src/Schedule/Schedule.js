@@ -244,7 +244,7 @@ class Schedule extends React.Component {
                 border="border_bottom"
               />
             );
-            var newState = i;
+            newState = i;
             this.setState({ index: i });
           }
         } else {
@@ -360,16 +360,21 @@ class Schedule extends React.Component {
         }
 
         if (newState !== null) {
+          console.log('get start', this.state.index, loadedContent.length);
+          if(loadedContent.length > 0) {
+            console.log(JSON.stringify(loadedContent[0]));
+          }
+          if(this.state.index == null) {
+            this.setState({ index: 0 });
+          }
           var currentStartTime = moment(
             loadedContent[this.state.index].startTime,
             "HH:mm:ss"
           )
-            .add(
-              moment.duration(loadedContent[this.state.index].duration)
-                ._milliseconds,
-              "milliseconds"
-            )
-            .format("HH:mm:ss");
+          .add(
+            moment.duration(loadedContent[this.state.index].duration)                
+          )
+          .format("HH:mm:ss");
           //  var newTime = (moment.duration(loadedContent[loadedContent.length - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
 
           if (
