@@ -30,8 +30,6 @@ class PreviousSchedule extends React.Component {
       )
       .then(response => {
         returnedData = response.data;
-        console.log( `/broadcast?sid=${this.props.sid}&start=${this.props.scheduleDate}&end=${end}`);
-        console.log(returnedData);
         for (let i = 0; i < returnedData.length; i++) {
           videos.push(
             <SingleSchedule

@@ -6,8 +6,8 @@ import axios from "axios";
 var count = -2;
 var loadedContent = [];
 var scheduleContent = [];
-const tvaStart = "<TVAMain xmlns=\"urn:tva:metadata:2007\" xmlns:mpeg7=\"urn:tva:mpeg7:2005\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xml:lang=\"en-GB\" xsi:schemaLocation=\"urn:tva:metadata:2007 tva_metadata_3-1_v141.xsd\"><ProgramDescription>";
-const tvaEnd = "</ProgramDescription></TVAMain>";
+const tvaStart = "<TVAMain xmlns=\"urn:tva:metadata:2007\" xmlns:mpeg7=\"urn:tva:mpeg7:2005\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xml:lang=\"en-GB\" xsi:schemaLocation=\"urn:tva:metadata:2007 tva_metadata_3-1_v141.xsd\">\n  <ProgramDescription>\n";
+const tvaEnd = "  </ProgramDescription>\n</TVAMain>";
 var videos = [];
 
 class Schedule extends React.Component {
@@ -40,17 +40,16 @@ class Schedule extends React.Component {
           live={loadedContent[i].live}
         />
       );
-      this.setState({ index: null });
+      this.setState({ index: null, serviceIDRef: this.props.serviceIDRef });
     }
   }
 
-  makeScheduleEvent(broadcast) {
+  makeScheduleEvent(serviceIDRef, broadcast) {
 
     const startDateTime = moment.utc(broadcast.startTime, "HH:mm:ss")
 
-    let imi = `imi:dazzler:${this.state.serviceIDRef}/{startDateTime.unix()}`;
+    let imi = "imi:dazzler:"+serviceIDRef+"/"+startDateTime.unix();
 
-    console.log(JSON.stringify(broadcast));
     // TODO put capture channel into the broadcast somewhere
 
     return ` 
@@ -68,7 +67,8 @@ class Schedule extends React.Component {
             <Live value="${broadcast.live === "live" ? true : false}"/>
             <Repeat value="${false}"/>
             <Free value="true"/>
-      </ScheduleEvent>`;
+        </ScheduleEvent>
+      `;
   }
 
   savePlaylist() {
@@ -90,18 +90,20 @@ class Schedule extends React.Component {
       .utc(last.startTime, "HH:mm:ss")
       .add(moment.duration(last.duration));
   
-    let events = "";
+    let tva = tvaStart + 
+    "    <ProgramLocationTable>\n" +
+    `      <Schedule start="${start.format()}" end="${end.format()}" serviceIDRef="${this.props.serviceIDRef}">`;
     for (let i = 0; i < loadedContent.length; i++) {
-      events += this.makeScheduleEvent(loadedContent[i]);
+      tva += this.makeScheduleEvent(this.props.serviceIDRef, loadedContent[i]);
     }
-  
-    const scheduleStart = `<ProgramLocationTable><Schedule start="${start.format()}" end="${end.format()}" serviceIDRef="${this.state.serviceIDRef}">`;
-    const scheduleEnd = "</Schedule></ProgramLocationTable>";
+    tva += "\n      </Schedule>\n    </ProgramLocationTable>\n" +
+      tvaEnd;
+    console.log(tva);
 
     axios({
       method: "post",
       url: "/api/v1/tva",
-      data: tvaStart + scheduleStart + events + scheduleEnd + tvaEnd
+      data: tva
     })
     .then(response => {
       this.setState({

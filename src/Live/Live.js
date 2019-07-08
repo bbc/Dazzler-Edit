@@ -165,7 +165,6 @@ export class Live extends React.Component {
     }
 
     this.setState({ rows: cells });
-    console.log(this.props.items);
   };
 
   handleChangePage = (event, page) => {

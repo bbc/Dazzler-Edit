@@ -144,7 +144,7 @@ class Demo extends React.Component {
     this.setState({
       display: (
         <Schedule
-          serviceIDRef={this.state.serviceIDRef}
+          serviceIDRef={this.state.service.serviceIDRef}
           fetchTime={this.fetchTime}
           clipTime={time}
           data={scheduleItems}
@@ -282,7 +282,7 @@ class Demo extends React.Component {
     this.setState({
       display: (
         <Schedule
-          serviceIDRef={this.state.serviceIDRef}
+          serviceIDRef={this.state.service.serviceIDRef}
           fetchTime={this.fetchTime}
           clipTime={time}
           schStart={id}
@@ -306,7 +306,7 @@ class Demo extends React.Component {
         scheduleDate: CDate,
         display: (
           <Schedule
-            serviceIDRef={this.state.serviceIDRef}
+            serviceIDRef={this.state.service.serviceIDRef}
             fetchTime={this.fetchTime}
             clipTime={time}
             data={scheduleItems}
@@ -342,7 +342,7 @@ class Demo extends React.Component {
         scheduleDate: CDate,
         display: (
           <Schedule
-            serviceIDRef={this.state.serviceIDRef}
+            serviceIDRef={this.state.service.serviceIDRef}
             fetchTime={this.fetchTime}
             clipTime={time}
             data={scheduleItems}
@@ -438,7 +438,7 @@ class Demo extends React.Component {
       this.setState({
         display: (
           <Schedule
-            serviceIDRef={this.state.serviceIDRef}
+            serviceIDRef={this.state.service.serviceIDRef}
             fetchTime={this.fetchTime}
             clipTime={time}
             data={scheduleItems}
@@ -508,7 +508,7 @@ class Demo extends React.Component {
       return this.setState({
         display: (
           <Schedule
-            serviceIDRef={this.state.serviceIDRef}
+            serviceIDRef={this.state.service.serviceIDRef}
             fetchTime={this.fetchTime}
             clipTime={time}
             data={scheduleItems}
@@ -539,7 +539,7 @@ class Demo extends React.Component {
     this.setState({
       display: (
         <Schedule
-          serviceIDRef={this.state.serviceIDRef}
+          serviceIDRef={this.state.service.serviceIDRef}
           fetchTime={this.fetchTime}
           clipTime={time}
           data={scheduleItems}

@@ -127,8 +127,6 @@ export class Episode extends React.Component {
 
   componentDidMount = () => {
     cells = [];
-    console.log(this.props);
-    console.log(this.props.episodes.length);
     for (let i = 0; i < this.props.episodes.length; i++) {
       const episode = this.props.episodes[i];
       const version = 0 // TODO - pick a version
@@ -165,7 +163,6 @@ export class Episode extends React.Component {
 
     const { classes } = this.props;
     const { rows, rowsPerPage, page } = this.state;
-    console.log(rows);
 
     const emptyRows =
       rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
