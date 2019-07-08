@@ -196,19 +196,22 @@ app.get("/api/v1/placings", function(req, res) {
   );
 });
 
-app.post("api/v1/tva", function(req, res) {
+app.post("/api/v1/tva", function(req, res) {
   if (req.body.includes('serviceIDRef="TVMAR01')) {
     if (req.header("sslclientcertsubject")) {
       const subject = parseSSLsubject(req);
       if (auth(subject.emailAddress)) {
         postTVA(req.body, res);
       } else {
+        console.log(subject.emailAddress +" is not authorised to save schedules");
         res.status(403).send(subject.emailAddress +" is not authorised to save schedules");
       }
     } else {
+      console.log("missing authentification header");
       res.status(403).send("missing authentification header");
     }
   } else {
+    console.log("Marathi only please");
     res.status(403).send("Marathi only please");
   }
 });
@@ -226,6 +229,7 @@ function postTVA(data, res) {
       "Content-Length": Buffer.byteLength(data)
     }
   };
+  console.log(options);
   options.agent = new https.Agent(options);
   var req = https.request(options, function(post_res) {
     var body = "";
