@@ -180,7 +180,6 @@ class Demo extends React.Component {
       )
       .then(response => {
         console.log("episodes", response);
-        // TODO promote version crid to nCrid field
         this.setState({
           episodes: response.data
         });
@@ -242,11 +241,6 @@ class Demo extends React.Component {
           "&end=" + moment().add(1, 'days').format()
       )
       .then(response => {
-        console.log("webcast Response", response.data);
-        response.data.forEach(item => {
-          item.nCrid = item.window_of[0].crid;
-        });
-
         for (let i = 0; i < response.data.length; i++) {
           this.setState({
             live: [...this.state.live, response.data[i]]
@@ -383,26 +377,44 @@ class Demo extends React.Component {
 
     switch(item.item_type) {
       case "episode":
-      newItem2.duration = item.available_versions.version[0].duration;
-      newItem2.versionPid = item.available_versions.version[0].pid;
-      newItem2.nCrid = item.available_versions.version[0].crid;
-      newItem2.id = count;
-      newItem2.isLive = false;
-      if(newItem2.title == null) {
-        newItem2.title = newItem2.presentation_title;
+      {
+        const version = 0; // TODO pick a version
+        newItem2.duration = item.available_versions.version[version].duration;
+        newItem2.versionPid = item.available_versions.version[version].pid;
+        newItem2.versionCrid = item.available_versions.version[version].crid;
+        newItem2.id = count;
+        newItem2.isLive = false;
+        if(newItem2.title == null) {
+          newItem2.title = newItem2.presentation_title;
+        }
       }
       break;
       case "clip":
-      newItem2.duration = item.available_versions.version[0].duration;
-      newItem2.versionPid = item.available_versions.version[0].pid;
-      newItem2.nCrid = item.nCrid;
-      newItem2.isLive = false;
-      newItem2.id = count;
-      break;
+      {
+        const version = 0; // TODO pick a version
+        newItem2.duration = item.available_versions.version[version].duration;
+        newItem2.versionPid = item.available_versions.version[version].pid;
+        newItem2.versionCrid = item.available_versions.version[version].crid;
+        newItem2.isLive = false;
+        newItem2.id = count;
+      }
+      break;      
       case "webcast":
-      newItem2.versionPid = item.pid;
-      newItem2.isLive = true;
-      newItem2.id = count;
+        for(let i = 0; i < item.window_of.length; i++ ) {
+          switch(item.window_of[i].result_type) {
+            case "version":
+              newItem2.versionPid = item.window_of[i].pid;
+              newItem2.versionCrid = item.window_of[i].crid;
+              break;
+            case "episode":
+              // do we want anything from the episode level?
+            break;
+            default: // DO Nothing
+          }
+        }
+        newItem2.captureChannel = item.service.sid; // TODO make use of this
+        newItem2.isLive = true;
+        newItem2.id = count;
       break;
       default:
         console.log(item.item_type, isLive);

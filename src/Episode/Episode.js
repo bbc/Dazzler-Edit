@@ -131,13 +131,11 @@ export class Episode extends React.Component {
     console.log(this.props.episodes.length);
     for (let i = 0; i < this.props.episodes.length; i++) {
       const episode = this.props.episodes[i];
-      // TODO - pick a version
-      const version = episode.available_versions.version[0];
-      this.props.episodes[i].nCrid = version.crid;
+      const version = 0 // TODO - pick a version
       cells.push({
         id: episode.pid,
         title: episode.presentation_title,
-        duration: version.duration,
+        duration: episode.available_versions.version[version].duration,
         releaseDate: episode.release_date,
         pid: episode.pid,
         add: (

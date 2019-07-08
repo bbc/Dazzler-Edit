@@ -50,9 +50,12 @@ class Schedule extends React.Component {
 
     let imi = `imi:dazzler:${this.state.serviceIDRef}/{startDateTime.unix()}`;
 
+    console.log(JSON.stringify(broadcast));
+    // TODO put capture channel into the broadcast somewhere
+
     return ` 
         <ScheduleEvent>
-          <Program crid="${broadcast.nCrid}"/>
+          <Program crid="${broadcast.versionCrid}"/>
             <InstanceMetadataId>${imi}</InstanceMetadataId>
             <InstanceDescription>
               <AVAttributes>
