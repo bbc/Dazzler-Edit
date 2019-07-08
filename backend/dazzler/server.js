@@ -31,7 +31,7 @@ app.get("/status", function(req, res) {
   res.send("OK");
 });
 
-app.get("/api/vi/user", function(req, res) {
+app.get("/api/v1/user", function(req, res) {
   if (req.header("sslclientcertsubject")) {
     const subject = parseSSLsubject(req);
     let r = { email: subject.emailAddress, auth: auth(subject.emailAddress) };
@@ -44,7 +44,7 @@ app.get("/api/vi/user", function(req, res) {
   }
 });
 
-app.get("/api/vi/schedule", function(req, res) {
+app.get("/api/v1/schedule", function(req, res) {
   SpwRequest(req.query.sid, req.query.date).then(
     r => {
       if (r) {
@@ -60,7 +60,7 @@ app.get("/api/vi/schedule", function(req, res) {
   );
 });
 
-app.get("/api/vi/broadcast", function(req, res) {
+app.get("/api/v1/broadcast", function(req, res) {
   let q = {
     sid: req.query.sid,
     start_from: req.query.start,
@@ -78,7 +78,7 @@ app.get("/api/vi/broadcast", function(req, res) {
   );
 });
 
-app.get("/api/vi/webcast", function(req, res) {
+app.get("/api/v1/webcast", function(req, res) {
   let q = {
     start_from: req.query.start
     // what about an end parameter? (is page_size enough?)
@@ -102,7 +102,7 @@ app.get("/api/vi/webcast", function(req, res) {
   );
 });
 
-app.get("/api/vi/clip", function(req, res) {
+app.get("/api/v1/clip", function(req, res) {
   let q = {
     mixin: ['images','available_versions'],
     entity_type: 'clip'
@@ -159,7 +159,7 @@ app.get("/api/vi/clip", function(req, res) {
   );
 });
 
-app.get("/api/vi/episode", function(req, res) {
+app.get("/api/v1/episode", function(req, res) {
   let q = {
     mixin: ["images", "available_versions"],
     entity_type: "episode",
@@ -186,7 +186,7 @@ app.get("/api/vi/episode", function(req, res) {
   );
 });
 
-app.get("/api/vi/special", function(req, res) {
+app.get("/api/v1/special", function(req, res) {
   let q = {
     mixin: ["images", "available_versions"],
     entity_type: "clip"
@@ -203,7 +203,7 @@ app.get("/api/vi/special", function(req, res) {
   );
 });
 
-app.get("/api/vi/placings", function(req, res) {
+app.get("/api/v1/placings", function(req, res) {
   nitroRequest("schedules", { version: req.query.version }).then(
     r => res.json(r.nitro.results.items),
     err => res.status(404).send("Not found") // TODO use proper error message
