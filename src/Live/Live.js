@@ -138,8 +138,8 @@ export class Live extends React.Component {
       this.props.live[i].startTime = moment(
         this.props.live[i].scheduled_time.start
       ).format("HH:mm:ss");
-      console.log("start time", moment(this.props.live[i].startTime));
-      this.props.live[i].title = "Live Programme " + [i + 1];
+        
+      this.props.live[i].title = "Live programme at "+this.props.live[i].scheduled_time.start;
       this.props.live[i].duration = moment.duration(
         durationTime,
         "milliseconds"
@@ -147,8 +147,8 @@ export class Live extends React.Component {
 
       cells.push({
         id: this.props.live[i].pid,
-        title: "Live Programme " + [i + 1],
-        info: moment(this.props.live[i].scheduled_time.start).format("HH:mm"),
+        title: this.props.live[i].title,
+        info: this.props.live[i].startTime,
         pid: this.props.live[i].pid,
         stream: this.props.live[i].service.sid.replace(/_/g, " "),
         add: (

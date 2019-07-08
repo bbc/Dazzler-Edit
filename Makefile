@@ -22,6 +22,9 @@ npm-install:
 	npm install
 	npm run-script build
 
+backend/edit: build
+	npm run-script build
+	cp -a build backend/edit
 
 prepare: npm-install
 	# Bundle the source code into a single .tar.gz file, used in

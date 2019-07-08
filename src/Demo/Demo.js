@@ -140,7 +140,6 @@ class Demo extends React.Component {
     this.nextDay = this.nextDay.bind(this);
     this.copyContent = this.copyContent.bind(this);
     this.clearContent = this.clearContent.bind(this);
-    this.fetchCrid = this.fetchCrid.bind(this);
 
     this.setState({
       display: (
@@ -164,7 +163,6 @@ class Demo extends React.Component {
         "/api/v1/clip?sid=" + this.state.service.sid
       )
       .then(response => {
-        console.log("test1", response);
         this.setState({
           items: response.data
         });
@@ -179,7 +177,6 @@ class Demo extends React.Component {
         "/api/v1/episode?sid=" + this.state.service.sid
       )
       .then(response => {
-        console.log("episodes", response);
         this.setState({
           episodes: response.data
         });
@@ -233,12 +230,14 @@ class Demo extends React.Component {
       });
 
     //get request for webcasts
+    const day = moment().millisecond(0).second(0).add(5, 'minutes').utc(); // TODO DAZZLER-68
+    const days = 5; // to allow us to edit future schedules
     axios
       .get(
         "/api/v1/webcast" +
           "?sid=" + this.state.service.sid +
-          "&start=" + moment().add(5, 'minutes').format() +
-          "&end=" + moment().add(1, 'days').format()
+          "&start=" + day.format() +
+          "&end=" + day.add(days, 'days').utc().format()
       )
       .then(response => {
         for (let i = 0; i < response.data.length; i++) {
