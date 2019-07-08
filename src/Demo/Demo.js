@@ -398,7 +398,7 @@ class Demo extends React.Component {
         newItem2.id = count;
       }
       break;      
-      case "webcast":
+      case "window":
         for(let i = 0; i < item.window_of.length; i++ ) {
           switch(item.window_of[i].result_type) {
             case "version":
@@ -418,8 +418,6 @@ class Demo extends React.Component {
       default:
         console.log(item.item_type, isLive);
     }
-
-    console.log(JSON.stringify(newItem2));
       
     if (menuText === "Scratchpad") {
       scratchPadItems.push(newItem2);
