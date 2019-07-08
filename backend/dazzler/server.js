@@ -80,8 +80,8 @@ app.get("/api/v1/broadcast", function(req, res) {
 
 app.get("/api/v1/webcast", function(req, res) {
   let q = {
-    start_from: req.query.start
-    // what about an end parameter? (is page_size enough?)
+    start_from: req.query.start,
+    start_to: req.query.end
   };
   if(req.query.hasOwnProperty('brand')) {
     q.descendants_of =  req.query.brand;
