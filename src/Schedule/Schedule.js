@@ -97,7 +97,7 @@ class Schedule extends React.Component {
 
     axios({
       method: "post",
-      url: "/tva",
+      url: "/api/v1/tva",
       data: tvaStart + scheduleStart + events + scheduleEnd + tvaEnd
     })
     .then(response => {
@@ -114,46 +114,45 @@ class Schedule extends React.Component {
       alert("Error Saving Playlist");
     });
   }
+  addItem(item) {
+    if (item.isLive) {
+      item.live = "live";
+    }
+    else {
+      if(loadedContent.length === 0) {
+        item.startTime = moment
+        .utc("00:00", "HH:mm:ss")
+        .format("HH:mm:ss");
+      }
+      else {
+        item.startTime = moment
+        .utc(loadedContent[loadedContent.length - 1].startTime, "HH:mm:ss")
+        .add(
+          moment.duration(loadedContent[loadedContent.length - 1].duration)
+        )
+        .format("HH:mm:ss");
+      }
+    }
+    item.id = count += 1;
+    loadedContent.push(item);
 
+    videos.push(
+      <SingleSchedule
+        fetchTime={this.props.fetchTime}
+        title={item.title}
+        startTime={item.startTime}
+        duration={item.duration}
+        deleteItem={this.deleteItem}
+        id={item.id}
+        live={item.live}
+      />
+    );
+
+  }
   pasteContent(content) {
     for (let i = 0; i < content.length; i++) {
-      if (content[i].isLive === false && loadedContent.length === 0) {
-        content[i].startTime = moment
-          .utc("00:00", "HH:mm:ss")
-          .format("HH:mm:ss");
-        content[i].id = count += 1;
-        loadedContent.push(content[i]);
-      } else if (content[i].isLive === true) {
-        content[i].live = "live";
-        content[i].id = count += 1;
-        loadedContent.push(content[i]);
-      } else {
-        content[i].startTime = moment
-          .utc(loadedContent[loadedContent.length - 1].startTime, "HH:mm:ss")
-          .add(
-            moment.duration(loadedContent[loadedContent.length - 1].duration)
-              ._milliseconds,
-            "milliseconds"
-          )
-          .format("HH:mm:ss");
-        content[i].id = count += 1;
-        loadedContent.push(content[i]);
-      }
-
-      videos.push(
-        <SingleSchedule
-          fetchTime={this.props.fetchTime}
-          title={loadedContent[loadedContent.length - 1].title}
-          startTime={loadedContent[loadedContent.length - 1].startTime}
-          duration={loadedContent[loadedContent.length - 1].duration}
-          deleteItem={this.deleteItem}
-          id={loadedContent[loadedContent.length - 1].id}
-          live={loadedContent[loadedContent.length - 1].live}
-        />
-      );
+      this.addItem(content[i]);
     }
-    console.log("1", loadedContent);
-
     this.setState({
       savePlaylist: "ui right floated small primary labeled icon button"
     });
@@ -264,7 +263,7 @@ class Schedule extends React.Component {
     }
     if (prevProps.dataLength !== this.props.dataLength) {
       // why is dataLength different to data.length??
-      // TODO was it because you were passing the schedule and the scratchpad?? Julian
+      // TODO was it because you were both passing the schedule and the scratchpad?? Julian
 
       scheduleContent = this.props.data;
 
@@ -273,100 +272,30 @@ class Schedule extends React.Component {
       // this.props.data.length === ? scheduleContent = loadedContent : scheduleContent = this.props.data
 
       for (let i = prevProps.dataLength; i < this.props.dataLength; i++) {
-        if (scheduleContent[i].isLive === false && videos.length === 0) {
-          scheduleContent[i].startTime = moment
-            .utc("00:00", "HH:mm:ss")
-            .format("HH:mm:ss");
-          scheduleContent[i].id = count += 1;
-          loadedContent.push(scheduleContent[i]);
-          this.setState({
-            savePlaylist: "ui right floated small primary labeled icon button"
-          });
-          this.setState({ status: "Save Playlist" });
-        } else if (scheduleContent[i].isLive === true && videos.length !== 0) {
-          if (
-            moment(
-              loadedContent[loadedContent.length - 1].startTime,
-              "HH:mm:ss"
-            )
-              .add(
-                moment.duration(
-                  loadedContent[loadedContent.length - 1].duration
-                )._milliseconds,
-                "milliseconds"
-              )
-              .format("HH:mm:ss") > scheduleContent[i].startTime
-          ) {
-            //highlight on the actual listing.
-            alert(
-              "Warning! Programme at " +
-                loadedContent[loadedContent.length - 1].startTime +
-                " will be cut short because of the Live Programme"
-            );
-          } else if (
-            moment(
-              loadedContent[loadedContent.length - 1].startTime,
-              "HH:mm:ss"
-            )
-              .add(
-                moment.duration(
-                  loadedContent[loadedContent.length - 1].duration
-                )._milliseconds,
-                "milliseconds"
-              )
-              .format("HH:mm:ss") < scheduleContent[i].startTime
-          ) {
-            alert(
-              "Warning! You have a gap in the schedule before the start of the LIVE programme"
-            );
+
+        this.addItem(scheduleContent[i]);
+        /*
+            if ( lastEndTime > item.startTime ) {
+              //highlight on the actual listing.
+              alert(
+                "Warning! Programme at " +
+                  loadedContent[loadedContent.length - 1].startTime +
+                  " will be cut short because of the Live Programme"
+              );
+            } else if (lastEndTime < item.startTime) {
+              alert(
+                "Warning! You have a gap in the schedule before the start of the LIVE programme"
+              );
+            }          
           }
-          scheduleContent[i].id = count += 1;
-          scheduleContent[i].live = "live";
-          loadedContent.push(scheduleContent[i]);
-          this.setState({
-            savePlaylist: "ui right floated small primary labeled icon button"
-          });
-          this.setState({ status: "Save Playlist" });
-        } else {
-          if (scheduleContent[i].isLive === true && videos.length === 0) {
-            scheduleContent[i].id = count += 1;
-            scheduleContent[i].live = "live";
-            loadedContent.push(scheduleContent[i]);
-            this.setState({
-              savePlaylist: "ui right floated small primary labeled icon button"
-            });
-            this.setState({ status: "Save Playlist" });
-          } else {
-            scheduleContent[i].startTime = moment
-              .utc(
-                loadedContent[loadedContent.length - 1].startTime,
-                "HH:mm:ss"
-              )
-              .add(
-                moment.duration(
-                  loadedContent[loadedContent.length - 1].duration
-                )._milliseconds,
-                "milliseconds"
-              )
-              .format("HH:mm:ss");
-            scheduleContent[i].id = count += 1;
-            scheduleContent.style = "live";
-            loadedContent.push(scheduleContent[i]);
-            this.setState({
-              savePlaylist: "ui right floated small primary labeled icon button"
-            });
-            this.setState({ status: "Save Playlist" });
+          else {
+            item.startTime = lastEndTime;
           }
         }
+        */
 
+    
         if (newState !== null) {
-          console.log('get start', this.state.index, loadedContent.length);
-          if(loadedContent.length > 0) {
-            console.log(JSON.stringify(loadedContent[0]));
-          }
-          if(this.state.index == null) {
-            this.setState({ index: 0 });
-          }
           var currentStartTime = moment(
             loadedContent[this.state.index].startTime,
             "HH:mm:ss"
@@ -383,8 +312,7 @@ class Schedule extends React.Component {
               .add(
                 moment.duration(
                   loadedContent[loadedContent.length - 1].duration
-                )._milliseconds,
-                "milliseconds"
+                )
               )
               .format("HH:mm:ss") <
               loadedContent[this.state.index + 1].startTime
@@ -533,6 +461,10 @@ class Schedule extends React.Component {
           );
         }
       }
+      this.setState({
+        savePlaylist: "ui right floated small primary labeled icon button"
+      });
+      this.setState({ status: "Save Playlist" });
     }
   }
   render() {

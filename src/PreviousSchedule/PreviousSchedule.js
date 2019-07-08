@@ -24,7 +24,7 @@ class PreviousSchedule extends React.Component {
       .format();
     axios
       .get(
-        "/broadcast?sid=" + this.props.sid +
+        "/api/v1/broadcast?sid=" + this.props.sid +
           "&start=" + this.props.scheduleDate +
           "&end=" + end
       )
@@ -68,7 +68,7 @@ class PreviousSchedule extends React.Component {
         .format();
       axios
         .get(
-          "/broadcast?sid=" + this.props.sid +
+          "/api/v1/broadcast?sid=" + this.props.sid +
             "&start=" + this.props.scheduleDate +
             "&end=" + end
         )

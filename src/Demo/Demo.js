@@ -161,14 +161,13 @@ class Demo extends React.Component {
     // Clips
     axios
       .get(
-        "/clip?sid=" + this.state.service.sid
+        "/api/v1/clip?sid=" + this.state.service.sid
       )
       .then(response => {
         console.log("test1", response);
         this.setState({
           items: response.data
         });
-        this.fetchCrid();
       })
       .catch(e => {
         console.log(e);
@@ -177,7 +176,7 @@ class Demo extends React.Component {
     // Episodes
     axios
       .get(
-        "/episode?sid=" + this.state.service.sid
+        "/api/v1/episode?sid=" + this.state.service.sid
       )
       .then(response => {
         console.log("episodes", response);
@@ -193,7 +192,7 @@ class Demo extends React.Component {
     /* TODO what did we need placings for?
     axios
       .get(
-        "/placings?version=p078fmvz"
+        "/api/v1/placings?version=p078fmvz"
       )
       .then(response => {
         this.setState({
@@ -208,7 +207,7 @@ class Demo extends React.Component {
     // get user
     axios
       .get(
-        "/user"
+        "/api/v1/user"
       )
       .then(response => {
         console.log('user', JSON.stringify(response.data));
@@ -223,7 +222,7 @@ class Demo extends React.Component {
     //get request for specials
     axios
       .get(
-        "/special?sid=" + this.state.service.sid
+        "/api/v1/special?sid=" + this.state.service.sid
       )
       .then(response => {
         this.setState({
@@ -237,7 +236,7 @@ class Demo extends React.Component {
     //get request for webcasts
     axios
       .get(
-        "/webcast" +
+        "/api/v1/webcast" +
           "?sid=" + this.state.service.sid +
           "&start=" + moment().add(5, 'minutes').format() +
           "&end=" + moment().add(1, 'days').format()
@@ -258,20 +257,6 @@ class Demo extends React.Component {
         console.log(e);
       });
   }
-
-  fetchCrid = () => {
-    var localData = this.state.items;
-    localData.forEach(item => {
-      axios
-        .get(
-          `/version_crid?pid=${item.available_versions.version[0].pid}`
-        )
-        .then(response => {
-            item.nCrid = response.crid;
-          });
-        });
-    this.setState({ items: localData });
-  };
 
   handleDrawerOpen = () => {
     this.setState({ open: true });
