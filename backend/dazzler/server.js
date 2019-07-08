@@ -1,4 +1,3 @@
-"use strict";
 
 // https://github.com/bbc/sample-cloud-apps/nodejs-helloworld/src/helloworld/server.js
 const auth = require("./auth");
@@ -32,7 +31,7 @@ app.get("/status", function(req, res) {
   res.send("OK");
 });
 
-app.get("/user", function(req, res) {
+app.get("/api/vi/user", function(req, res) {
   if (req.header("sslclientcertsubject")) {
     const subject = parseSSLsubject(req);
     let r = { email: subject.emailAddress, auth: auth(subject.emailAddress) };
@@ -45,7 +44,7 @@ app.get("/user", function(req, res) {
   }
 });
 
-app.get("/schedule", function(req, res) {
+app.get("/api/vi/schedule", function(req, res) {
   SpwRequest(req.query.sid, req.query.date).then(
     r => {
       if (r) {
@@ -61,7 +60,7 @@ app.get("/schedule", function(req, res) {
   );
 });
 
-app.get("/broadcast", function(req, res) {
+app.get("/api/vi/broadcast", function(req, res) {
   let q = {
     sid: req.query.sid,
     start_from: req.query.start,
@@ -79,7 +78,7 @@ app.get("/broadcast", function(req, res) {
   );
 });
 
-app.get("/webcast", function(req, res) {
+app.get("/api/vi/webcast", function(req, res) {
   let q = {
     start_from: req.query.start
     // what about an end parameter? (is page_size enough?)
@@ -103,7 +102,7 @@ app.get("/webcast", function(req, res) {
   );
 });
 
-app.get("/clip", function(req, res) {
+app.get("/api/vi/clip", function(req, res) {
   let q = {
     mixin: ['images','available_versions'],
     entity_type: 'clip'
@@ -124,12 +123,43 @@ app.get("/clip", function(req, res) {
     q.page_size = req.query.page_size;
   }
   nitroRequest("programmes", q).then(
-    r => res.json(r.nitro.results.items),
+    r => {
+      let pids = [];
+      let clips = r.nitro.results.items;
+      for(let i=0; i<clips.length; i++) {
+        const version = clips[i].available_versions.version;
+        for(let j=0; j<version.length; j++) {
+          pids.push(version[j].pid);
+        }
+      }
+      nitroRequest("versions", { pid: pids }).then(
+        r => {
+          const items = r.nitro.results.items;
+          let map = new Map();
+          for (let i = 0; i < items.length; i++) {
+            const ids = items[i].identifiers.identifier;
+            for (let j = 0; j < ids.length; j++) {
+              if (ids[j].type === "crid") {
+                map.set(items[i].pid, ids[j].$);
+              }
+            }
+          }
+          for(let i=0; i<clips.length; i++) {
+            const version = clips[i].available_versions.version;
+            for(let j=0; j<version.length; j++) {
+              version[j].crid = map.get(version[j].pid);
+            }
+          }
+          res.json(clips);
+        },
+        err => res.status(404).send("Not found") // TODO use proper error message
+      );
+    },
     err => res.status(404).send("Not found") // TODO use proper error message
   );
 });
 
-app.get("/episode", function(req, res) {
+app.get("/api/vi/episode", function(req, res) {
   let q = {
     mixin: ["images", "available_versions"],
     entity_type: "episode",
@@ -156,7 +186,7 @@ app.get("/episode", function(req, res) {
   );
 });
 
-app.get("/special", function(req, res) {
+app.get("/api/vi/special", function(req, res) {
   let q = {
     mixin: ["images", "available_versions"],
     entity_type: "clip"
@@ -173,43 +203,14 @@ app.get("/special", function(req, res) {
   );
 });
 
-app.get("/placings", function(req, res) {
+app.get("/api/vi/placings", function(req, res) {
   nitroRequest("schedules", { version: req.query.version }).then(
     r => res.json(r.nitro.results.items),
     err => res.status(404).send("Not found") // TODO use proper error message
   );
 });
 
-app.get("/version_crid", function(req, res) {
-  nitroRequest("versions", { pid: req.query.pid }).then(
-    r => {
-      const items = r.nitro.results.items;
-      if (items.length > 0) {
-        const ids = items[0].identifiers.identifier;
-        for (let i = 0; i < ids.length; i++) {
-          if (ids[i].type == "crid") {
-            res.json({ pid: req.query.pid, crid: ids[i].$ });
-          }
-        }
-      } else {
-        res.status(404).send("Not found");
-      }
-    },
-    err => res.status(404).send("Not found") // TODO use proper error message
-  );
-});
-
-/*
-  ENV=live
-  KEY=/home/developer/t/Dazzler-Edit/backend/dazzler.key
-  CERT=/home/developer/t/Dazzler-Edit/backend/dazzler.pem
-  PASSPHRASE=dazzler
-  KEY=/etc/pki/tls/private/client.key
-  CERT=/etc/pki/tls/certs/client.crt
-  PASSPHRASE=client
- */
-
-app.post("/tva", function(req, res) {
+app.post("api/v1/tva", function(req, res) {
   if (req.body.includes('serviceIDRef="TVMAR01')) {
     if (req.header("sslclientcertsubject")) {
       const subject = parseSSLsubject(req);
