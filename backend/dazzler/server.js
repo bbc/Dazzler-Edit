@@ -102,26 +102,29 @@ app.get("/api/v1/webcast", function(req, res) {
   );
 });
 
+app.get("/api/v1/special", function(req, res) {
+  let q = {
+    group: config[req.query.sid].specials_collection
+  };
+  clip(q, req, res);
+});
+
 app.get("/api/v1/clip", function(req, res) {
   let q = {
-    mixin: ['images','available_versions'],
-    entity_type: 'clip'
+    tag_name: config[req.query.sid].clip_language
   };
-  if(req.query.hasOwnProperty('language')) {
-    q.tag_name= req.query.language;
-  }
-  if(req.query.hasOwnProperty('sid')) {
-    q.tag_name= config[req.query.sid].clip_language;
-  }
-  if(req.query.hasOwnProperty('collection')) {
-    q.group= config[req.query.sid].specials_collection;
-  }
+  clip(q, req, res);
+});
+
+function clip(q, query, res) {
   if (req.query.hasOwnProperty("page")) {
-    q.page = req.query.page;
+    q.page = query.page;
   }
   if (req.query.hasOwnProperty("page_size")) {
-    q.page_size = req.query.page_size;
+    q.page_size = query.page_size;
   }
+  q.mixin = ["images", "available_versions"];
+  q.entity_type = "clip";
   nitroRequest("programmes", q).then(
     r => {
       let pids = [];
@@ -182,23 +185,6 @@ app.get("/api/v1/episode", function(req, res) {
       add_crids_to_episodes(r.nitro.results.items);
       res.json(r.nitro.results.items);
     },
-    err => res.status(404).send("Not found") // TODO use proper error message
-  );
-});
-
-app.get("/api/v1/special", function(req, res) {
-  let q = {
-    mixin: ["images", "available_versions"],
-    entity_type: "clip"
-  };
-  if (req.query.hasOwnProperty("sid")) {
-    q.group= config[req.query.sid].specials_collection;
-  }
-  else {
-    q.group= config['bbc_marathi_tv'].specials_collection;
-  }
-  nitroRequest("programmes", q).then(
-    r => res.json(r.nitro.results.items),
     err => res.status(404).send("Not found") // TODO use proper error message
   );
 });
