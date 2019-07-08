@@ -117,10 +117,10 @@ app.get("/api/v1/clip", function(req, res) {
 });
 
 function clip(q, query, res) {
-  if (req.query.hasOwnProperty("page")) {
+  if (query.hasOwnProperty("page")) {
     q.page = query.page;
   }
-  if (req.query.hasOwnProperty("page_size")) {
+  if (query.hasOwnProperty("page_size")) {
     q.page_size = query.page_size;
   }
   q.mixin = ["images", "available_versions"];
@@ -160,7 +160,7 @@ function clip(q, query, res) {
     },
     err => res.status(404).send("Not found") // TODO use proper error message
   );
-});
+}
 
 app.get("/api/v1/episode", function(req, res) {
   let q = {
