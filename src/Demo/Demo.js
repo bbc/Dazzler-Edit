@@ -114,25 +114,9 @@ const styles = theme => ({
 });
 
 class Demo extends React.Component {
-  state = {
-    open: false,
-    Title: "",
-    isPaneOpen: false,
-    panelShow: null,
-    count: 0,
-    items: [],
-    specials: [],
-    episodes: [],
-    live: [],
-    scheduleDate: moment()
-      .add(0, "d")
-      .format("LL"),
-    display: "",
-    user: null,
-    service: { sid: "bbc_marathi_tv", name: "Marathi", serviceIDRef: "TVMAR01" }
-  };
 
-  componentDidMount() {
+  constructor(props) {
+    super(props);
     this.handleClick = this.handleClick.bind(this);
     this.fetchTime = this.fetchTime.bind(this);
     this.deleteItem = this.deleteItem.bind(this);
@@ -140,6 +124,27 @@ class Demo extends React.Component {
     this.nextDay = this.nextDay.bind(this);
     this.copyContent = this.copyContent.bind(this);
     this.clearContent = this.clearContent.bind(this);
+    this.state = {
+      open: false,
+      Title: "",
+      isPaneOpen: false,
+      panelShow: null,
+      count: 0,
+      clips: [],
+      specials: [],
+      episodes: [],
+      live: [],
+      schedules: {}, // state store for loaded and/or edited schedules
+      scheduleDate: moment()
+        .add(0, "d")
+        .format("LL"),
+      display: "",
+      user: null,
+      service: { sid: "bbc_marathi_tv", name: "Marathi", serviceIDRef: "TVMAR01" }
+    };
+  }
+
+  componentDidMount() {
 
     this.setState({
       display: (
@@ -157,20 +162,6 @@ class Demo extends React.Component {
       )
     });
 
-    // Clips
-    axios
-      .get(
-        "/api/v1/clip?sid=" + this.state.service.sid
-      )
-      .then(response => {
-        this.setState({
-          items: response.data
-        });
-      })
-      .catch(e => {
-        console.log(e);
-      });
-
     // Episodes
     axios
       .get(
@@ -178,7 +169,7 @@ class Demo extends React.Component {
       )
       .then(response => {
         this.setState({
-          episodes: response.data
+          episodes: response.data.items
         });
       })
       .catch(e => {
@@ -222,7 +213,7 @@ class Demo extends React.Component {
       )
       .then(response => {
         this.setState({
-          specials: response.data
+          specials: response.data.items
         });
       })
       .catch(e => {
@@ -240,9 +231,10 @@ class Demo extends React.Component {
           "&end=" + day.add(days, 'days').utc().format()
       )
       .then(response => {
-        for (let i = 0; i < response.data.length; i++) {
+        const items = response.data.items;
+        for (let i = 0; i < items.length; i++) {
           this.setState({
-            live: [...this.state.live, response.data[i]]
+            live: [...this.state.live, items[i]]
           });
         }
       })
@@ -456,7 +448,7 @@ class Demo extends React.Component {
       this.setState({ title: "Available Clips" });
       this.setState({
         panelShow: (
-          <Clips items={this.state.items} handleClick={this.handleClick} />
+          <Clips sid={this.state.service.sid} handleClick={this.handleClick} />
         )
       });
     }
