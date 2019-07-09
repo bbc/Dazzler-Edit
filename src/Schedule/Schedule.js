@@ -2,46 +2,84 @@ import React from "react";
 import SingleSchedule from "../SingleSchedule/SingleSchedule";
 import moment from "moment";
 import axios from "axios";
+import { isTaggedTemplateExpression } from "typescript";
 
 var count = -2;
-var loadedContent = [];
-var scheduleContent = [];
 const tvaStart = "<TVAMain xmlns=\"urn:tva:metadata:2007\" xmlns:mpeg7=\"urn:tva:mpeg7:2005\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xml:lang=\"en-GB\" xsi:schemaLocation=\"urn:tva:metadata:2007 tva_metadata_3-1_v141.xsd\">\n  <ProgramDescription>\n";
 const tvaEnd = "  </ProgramDescription>\n</TVAMain>";
-var videos = [];
 
 class Schedule extends React.Component {
-  state = {
-    spinner: false,
-    text: null,
-    serviceIDRef: null,
-    refresh: 2,
-    data: [],
-    savePlaylist: "ui right floated small primary labeled icon button",
-    status: "Save Playlist",
-    index: null
-  };
 
-  componentDidMount() {
+  constructor(props) {
+    super(props);
+
     this.savePlaylist = this.savePlaylist.bind(this);
     this.pasteContent = this.pasteContent.bind(this);
     this.deleteItem = this.deleteItem.bind(this);
     this.makeScheduleEvent = this.makeScheduleEvent.bind(this);
-    for (let i = 0; i < videos.length; i++) {
-      videos[i] = (
-        <SingleSchedule
-          fetchTime={this.props.fetchTime}
-          title={loadedContent[i].title}
-          startTime={loadedContent[i].startTime}
-          duration={loadedContent[i].duration}
-          deleteItem={this.deleteItem}
-          id={loadedContent[i].id}
-          flag={false}
-          live={loadedContent[i].live}
-        />
-      );
-      this.setState({ index: null, serviceIDRef: this.props.serviceIDRef });
+
+    this.state = {
+      spinner: false,
+      text: null,
+      serviceIDRef: null,
+      refresh: 2,
+      data: [],
+      savePlaylist: "ui right floated small primary labeled icon button",
+      status: "Save Playlist",
+      index: null,
+      preRenderedItem: []
+    };
+  }
+
+  savePlaylist() {
+
+    const data = this.state.data;
+
+    if(data.length === 0) {
+      console.log('nothing to save - button should be disabled');
+      return;
     }
+
+    this.setState({
+      savePlaylist: "ui right floated primary loading button"
+    });
+
+    const first = data[0];
+    const last = data[data.length - 1];
+
+    const start = moment.utc(first.startTime, "HH:mm:ss")
+    const end = moment
+      .utc(last.startTime, "HH:mm:ss")
+      .add(moment.duration(last.duration));
+  
+    let tva = tvaStart + 
+    "    <ProgramLocationTable>\n" +
+    `      <Schedule start="${start.format()}" end="${end.format()}" serviceIDRef="${this.props.serviceIDRef}">`;
+    for (let i = 0; i < data.length; i++) {
+      tva += this.makeScheduleEvent(this.props.serviceIDRef, data[i]);
+    }
+    tva += "\n      </Schedule>\n    </ProgramLocationTable>\n" +
+      tvaEnd;
+    console.log(tva);
+
+    axios({
+      method: "post",
+      url: "/api/v1/tva",
+      data: tva
+    })
+    .then(response => {
+      this.setState({
+        savePlaylist: "ui right floated positive button active"
+      });
+      this.setState({ status: "Playlist Saved" });
+    })
+    .catch(error => {
+      this.setState({
+        savePlaylist: "ui right floated small primary labeled icon button"
+      });
+      this.setState({ status: "Save Playlist" });
+      alert("Error Saving Playlist");
+    });
   }
 
   makeScheduleEvent(serviceIDRef, broadcast) {
@@ -71,220 +109,153 @@ class Schedule extends React.Component {
       `;
   }
 
-  savePlaylist() {
-
-    if(loadedContent.length == 0) {
-      console.log('nothing to save - button should be disabled');
-      return;
-    }
-
-    this.setState({
-      savePlaylist: "ui right floated primary loading button"
-    });
-
-    const first = loadedContent[0];
-    const last = loadedContent[loadedContent.length - 1];
-
-    const start = moment.utc(first.startTime, "HH:mm:ss")
-    const end = moment
-      .utc(last.startTime, "HH:mm:ss")
-      .add(moment.duration(last.duration));
-  
-    let tva = tvaStart + 
-    "    <ProgramLocationTable>\n" +
-    `      <Schedule start="${start.format()}" end="${end.format()}" serviceIDRef="${this.props.serviceIDRef}">`;
-    for (let i = 0; i < loadedContent.length; i++) {
-      tva += this.makeScheduleEvent(this.props.serviceIDRef, loadedContent[i]);
-    }
-    tva += "\n      </Schedule>\n    </ProgramLocationTable>\n" +
-      tvaEnd;
-    console.log(tva);
-
-    axios({
-      method: "post",
-      url: "/api/v1/tva",
-      data: tva
-    })
-    .then(response => {
-      this.setState({
-        savePlaylist: "ui right floated positive button active"
-      });
-      this.setState({ status: "Playlist Saved" });
-    })
-    .catch(error => {
-      this.setState({
-        savePlaylist: "ui right floated small primary labeled icon button"
-      });
-      this.setState({ status: "Save Playlist" });
-      alert("Error Saving Playlist");
-    });
-  }
-  addItem(item) {
+  addItemPosition(item) {
     if (item.isLive) {
       item.live = "live";
     }
     else {
-      if(loadedContent.length === 0) {
+      if(this.state.data.length === 0) {
         item.startTime = moment
         .utc("00:00", "HH:mm:ss")
         .format("HH:mm:ss");
       }
       else {
+        const lastItem = this.state.data[this.state.data.length-1];
         item.startTime = moment
-        .utc(loadedContent[loadedContent.length - 1].startTime, "HH:mm:ss")
+        .utc(lastItem.startTime, "HH:mm:ss")
         .add(
-          moment.duration(loadedContent[loadedContent.length - 1].duration)
+          moment.duration(lastItem.duration)
         )
         .format("HH:mm:ss");
       }
     }
     item.id = count += 1;
-    loadedContent.push(item);
-
-    videos.push(
-      <SingleSchedule
-        fetchTime={this.props.fetchTime}
-        title={item.title}
-        startTime={item.startTime}
-        duration={item.duration}
-        deleteItem={this.deleteItem}
-        id={item.id}
-        live={item.live}
-      />
-    );
-
   }
+
   pasteContent(content) {
+    let items = [];
     for (let i = 0; i < content.length; i++) {
-      this.addItem(content[i]);
-    }
-    this.setState({
-      savePlaylist: "ui right floated small primary labeled icon button"
-    });
+      this.addItemPosition(content[i]);
+
+      items.push(
+        <SingleSchedule
+          fetchTime={this.props.fetchTime}
+          title={content[i].title}
+          startTime={content[i].startTime}
+          duration={content[i].duration}
+          deleteItem={this.deleteItem}
+          id={content[i].id}
+          live={content[i].live}
+        />
+      );
+      }
+    this.setState({ serviceIDRef: this.props.serviceIDRef });
     this.setState({ status: "Save Playlist" });
+    this.setState({ data: this.state.data.concat(content) })
+    this.setState({ preRenderedItem: this.state.preRenderedItem.concat(items) })
   }
-  deleteItem(id) {
-    videos.map((item, idx) => {
-      if (item.props.startTime === id) {
-        videos[idx] = (
-          <SingleSchedule
-            fetchTime={this.props.fetchTime}
-            deleteItem={this.deleteItem}
-            style="blankScheduleItem"
-            duration={loadedContent[idx].duration}
-            id={loadedContent[idx].id}
-          />
-        );
-        this.forceUpdate();
-        return;
-      }
-    });
-    videos.map((item, idx) => {
-      if (item.props.id === id) {
-        videos.splice(idx, videos.length);
-        loadedContent.splice(idx, 1);
-        for (let i = idx; i < loadedContent.length; i++) {
-          if (i === 0) {
-            loadedContent[i].startTime = moment
-              .utc("00:00", "HH:mm:ss")
-              .format("HH:mm:ss");
-          } else if (loadedContent[i].isLive === true) {
-          } else {
-            loadedContent[i].startTime = moment
-              .utc(loadedContent[i - 1].startTime, "HH:mm:ss")
-              .add(
-                moment.duration(loadedContent[i - 1].duration)._milliseconds,
-                "milliseconds"
-              )
-              .format("HH:mm:ss");
-          }
-          videos.push(
-            <SingleSchedule
-              fetchTime={this.props.fetchTime}
-              title={loadedContent[i].title}
-              startTime={loadedContent[i].startTime}
-              duration={loadedContent[i].duration}
-              deleteItem={this.deleteItem}
-              id={loadedContent[i].id}
-              live={loadedContent[i].live}
-            />
-          );
-        }
-        this.setState({ refresh: 1 });
-      }
-    });
+
+  componentDidMount() {
+    let items = [];
+    for (let i = 0; i < this.props.data.length; i++) {
+      items.push(
+        <SingleSchedule
+          fetchTime={this.props.fetchTime}
+          title={this.props.data[i].title}
+          startTime={this.props.data[i].startTime}
+          duration={this.props.data[i].duration}
+          deleteItem={this.deleteItem}
+          id={this.props.data[i].id}
+          flag={false}
+          live={this.props.data[i].live}
+        />
+      );
+    }
+    this.setState({ index: null});
+    this.setState({ serviceIDRef: this.props.serviceIDRef });
+    this.setState({ data: this.state.data.concat(this.props.data) })
+    this.setState({ preRenderedItem: this.state.preRenderedItem.concat(items) })
   }
+
   componentDidUpdate(prevProps) {
+    let items = [];
     if (prevProps.clipTime !== this.props.clipTime) {
-      for (let i = 0; i < videos.length; i++) {
+      for (let i = 0; i < this.props.data.length; i++) {
         if (
-          videos[i].props.id === this.props.clipTime &&
-          videos[i].props.flag !== true &&
-          videos[i].props.isLive !== true
+          this.props.data[i].id === this.props.clipTime &&
+          this.props.data[i].flag !== true &&
+          this.props.data[i].isLive !== true
         ) {
-          if (videos[i].props.style === "blankScheduleItem") {
-            videos[i] = (
+          if (this.props.data[i].style === "blankScheduleItem") {
+            items.push(
               <SingleSchedule
                 flag={true}
                 fetchTime={this.props.fetchTime}
                 deleteItem={this.deleteItem}
                 style="blankScheduleItem"
-                duration={loadedContent[i].duration}
-                id={loadedContent[i].id}
+                duration={this.props.data[i].duration}
+                id={this.props.data[i].id}
               />
             );
-            var newState = i;
             this.setState({ index: i });
           } else {
-            videos[i] = (
+            items.push(
               <SingleSchedule
                 fetchTime={this.props.fetchTime}
-                title={loadedContent[i].title}
-                startTime={loadedContent[i].startTime}
-                duration={loadedContent[i].duration}
+                title={this.props.data[i].title}
+                startTime={this.props.data[i].startTime}
+                duration={this.props.data[i].duration}
                 deleteItem={this.deleteItem}
-                id={loadedContent[i].id}
+                id={this.props.data[i].id}
                 flag={true}
                 border="border_bottom"
               />
             );
-            newState = i;
             this.setState({ index: i });
           }
         } else {
-          videos[i] = (
+          items.push(
             <SingleSchedule
               fetchTime={this.props.fetchTime}
-              title={loadedContent[i].title}
-              startTime={loadedContent[i].startTime}
-              duration={loadedContent[i].duration}
+              title={this.props.data[i].title}
+              startTime={this.props.data[i].startTime}
+              duration={this.props.data[i].duration}
               deleteItem={this.deleteItem}
-              id={loadedContent[i].id}
+              id={this.props.data[i].id}
               flag={false}
             />
           );
         }
       }
     }
-    if (prevProps.dataLength !== this.props.dataLength) {
-      // why is dataLength different to data.length??
-      // TODO was it because you were both passing the schedule and the scratchpad?? Julian
+    if (prevProps.data.length !== this.props.data.length) {
 
-      scheduleContent = this.props.data;
+      // this.props.data.length === ? scheduleContent = newData : scheduleContent = this.props.data
 
-      this.setState({ serviceIDRef: this.props.serviceIDRef });
+      let newData = [];
 
-      // this.props.data.length === ? scheduleContent = loadedContent : scheduleContent = this.props.data
+      for (let i = prevProps.data.length; i < this.props.data.length; i++) {
 
-      for (let i = prevProps.dataLength; i < this.props.dataLength; i++) {
+        this.addItemPosition(this.props.data[i]);
+        newData.push(this.props.data[i]);
 
-        this.addItem(scheduleContent[i]);
-        /*
+        items.push(
+          <SingleSchedule
+            fetchTime={this.props.fetchTime}
+            title={this.props.data.title}
+            startTime={this.props.data.startTime}
+            duration={this.props.data.duration}
+            deleteItem={this.deleteItem}
+            id={this.props.data.id}
+            live={this.props.data.live}
+          />
+        );
+            /*
             if ( lastEndTime > item.startTime ) {
               //highlight on the actual listing.
               alert(
                 "Warning! Programme at " +
-                  loadedContent[loadedContent.length - 1].startTime +
+                  newData[newData.length - 1].startTime +
                   " will be cut short because of the Live Programme"
               );
             } else if (lastEndTime < item.startTime) {
@@ -300,168 +271,165 @@ class Schedule extends React.Component {
         */
 
     
-        if (newState !== null) {
+        if (false !== null) { // TODO
           var currentStartTime = moment(
-            loadedContent[this.state.index].startTime,
+            newData[this.state.index].startTime,
             "HH:mm:ss"
           )
           .add(
-            moment.duration(loadedContent[this.state.index].duration)                
+            moment.duration(newData[this.state.index].duration)                
           )
           .format("HH:mm:ss");
-          //  var newTime = (moment.duration(loadedContent[loadedContent.length - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
+          //  var newTime = (moment.duration(newData[newData.length - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
 
           if (
-            loadedContent[this.state.index + 1].isLive === true &&
+            newData[this.state.index + 1].isLive === true &&
             moment(currentStartTime, "HH:mm:ss")
               .add(
                 moment.duration(
-                  loadedContent[loadedContent.length - 1].duration
+                  newData[newData.length - 1].duration
                 )
               )
               .format("HH:mm:ss") <
-              loadedContent[this.state.index + 1].startTime
+              newData[this.state.index + 1].startTime
           ) {
-            loadedContent.pop();
-            videos.splice(
+            newData.pop();
+            items.splice(
               this.state.index,
               0,
               <SingleSchedule
                 fetchTime={this.props.fetchTime}
-                title={loadedContent[loadedContent.length - 1].title}
-                startTime={loadedContent[loadedContent.length - 1].startTime}
-                duration={loadedContent[loadedContent.length - 1].duration}
+                title={newData[newData.length - 1].title}
+                startTime={newData[newData.length - 1].startTime}
+                duration={newData[newData.length - 1].duration}
                 deleteItem={this.deleteItem}
-                id={loadedContent[loadedContent.length - 1].id}
+                id={newData[newData.length - 1].id}
               />
             );
-            loadedContent.splice(this.state.index, 0, scheduleContent[i]);
-            videos.splice(this.state.index, videos.length);
-            for (let j = this.state.index; j < loadedContent.length; j++) {
-              if (j == 0) {
-                loadedContent[j].startTime = moment
+            newData.splice(this.state.index, 0, this.props.data[i]);
+            items.splice(this.state.index, items.length);
+            for (let j = this.state.index; j < newData.length; j++) {
+              if (j === 0) {
+                newData[j].startTime = moment
                   .utc("00:00", "HH:mm:ss")
                   .format("HH:mm:ss");
-                loadedContent[j].id = count += 1;
-              } else if (loadedContent[j].isLive === true) {
-                loadedContent[j].live = "live";
+                newData[j].id = count += 1;
+              } else if (newData[j].isLive === true) {
+                newData[j].live = "live";
               } else {
-                loadedContent[j].startTime = moment
-                  .utc(loadedContent[j - 1].startTime, "HH:mm:ss")
+                newData[j].startTime = moment
+                  .utc(newData[j - 1].startTime, "HH:mm:ss")
                   .add(
-                    moment.duration(loadedContent[j - 1].duration)
-                      ._milliseconds,
-                    "milliseconds"
+                    moment.duration(newData[j - 1].duration)
                   )
                   .format("HH:mm:ss");
-                loadedContent[j].id = count += 1;
+                newData[j].id = count += 1;
               }
               this.props.data.map((item, idx) => {
-                if (item.title === loadedContent[j].title) {
+                if (item.title === newData[j].title) {
                   if (item.available_versions !== undefined) {
-                    loadedContent[j].duration =
+                    newData[j].duration =
                       item.available_versions.version[0].duration;
                   } else {
-                    loadedContent[j].duration = item.duration;
+                    newData[j].duration = item.duration;
                   }
                 }
               });
 
-              videos.push(
+              items.push(
                 <SingleSchedule
                   fetchTime={this.props.fetchTime}
-                  title={loadedContent[j].title}
-                  startTime={loadedContent[j].startTime}
-                  duration={loadedContent[j].duration}
+                  title={newData[j].title}
+                  startTime={newData[j].startTime}
+                  duration={newData[j].duration}
                   deleteItem={this.deleteItem}
-                  id={loadedContent[j].id}
-                  live={loadedContent[j].live}
+                  id={newData[j].id}
+                  live={newData[j].live}
                 />
               );
             }
           } else if (
-            loadedContent[this.state.index + 1].isLive === true &&
+            newData[this.state.index + 1].isLive === true &&
             moment(currentStartTime, "HH:mm:ss")
               .add(
                 moment.duration(
-                  loadedContent[loadedContent.length - 1].duration
+                  newData[newData.length - 1].duration
                 )._milliseconds,
                 "milliseconds"
               )
               .format("HH:mm:ss") >
-              loadedContent[this.state.index + 1].startTime
+              newData[this.state.index + 1].startTime
           ) {
             alert("Cannot move the live show, please review your changes");
-            loadedContent.pop();
+            newData.pop();
             break;
           } else {
-            loadedContent.pop();
-            videos.splice(
+            newData.pop();
+            items.splice(
               this.state.index,
               0,
               <SingleSchedule
                 fetchTime={this.props.fetchTime}
-                title={loadedContent[loadedContent.length - 1].title}
-                startTime={loadedContent[loadedContent.length - 1].startTime}
-                duration={loadedContent[loadedContent.length - 1].duration}
+                title={newData[newData.length - 1].title}
+                startTime={newData[newData.length - 1].startTime}
+                duration={newData[newData.length - 1].duration}
                 deleteItem={this.deleteItem}
-                id={loadedContent[loadedContent.length - 1].id}
+                id={newData[newData.length - 1].id}
               />
             );
-            loadedContent.splice(this.state.index, 0, scheduleContent[i]);
-            videos.splice(this.state.index, videos.length);
-            for (let j = this.state.index; j < loadedContent.length; j++) {
-              if (j == 0) {
-                loadedContent[j].startTime = moment
+            newData.splice(this.state.index, 0, this.props.data[i]);
+            items.splice(this.state.index, items.length);
+            for (let j = this.state.index; j < newData.length; j++) {
+              if (j === 0) {
+                newData[j].startTime = moment
                   .utc("00:00", "HH:mm:ss")
                   .format("HH:mm:ss");
-                loadedContent[j].id = count += 1;
-              } else if (loadedContent[j].isLive === true) {
+                newData[j].id = count += 1;
+              } else if (newData[j].isLive === true) {
+                // DO nothing ???
               } else {
-                loadedContent[j].startTime = moment
-                  .utc(loadedContent[j - 1].startTime, "HH:mm:ss")
+                newData[j].startTime = moment
+                  .utc(newData[j - 1].startTime, "HH:mm:ss")
                   .add(
-                    moment.duration(loadedContent[j - 1].duration)
-                      ._milliseconds,
-                    "milliseconds"
+                    moment.duration(newData[j - 1].duration)                     
                   )
                   .format("HH:mm:ss");
-                loadedContent[j].id = count += 1;
+                newData[j].id = count += 1;
               }
               this.props.data.map((item, idx) => {
-                if (item.title === loadedContent[j].title) {
+                if (item.title === newData[j].title) {
                   if (item.available_versions !== undefined) {
-                    loadedContent[j].duration =
+                    newData[j].duration =
                       item.available_versions.version[0].duration;
                   } else {
-                    loadedContent[j].duration = item.duration;
+                    newData[j].duration = item.duration;
                   }
                 }
               });
 
-              videos.push(
+              items.push(
                 <SingleSchedule
                   fetchTime={this.props.fetchTime}
-                  title={loadedContent[j].title}
-                  startTime={loadedContent[j].startTime}
-                  duration={loadedContent[j].duration}
+                  title={newData[j].title}
+                  startTime={newData[j].startTime}
+                  duration={newData[j].duration}
                   deleteItem={this.deleteItem}
-                  id={loadedContent[j].id}
-                  live={loadedContent[j].live}
+                  id={newData[j].id}
+                  live={newData[j].live}
                 />
               );
             }
           }
         } else {
-          videos.push(
+          items.push(
             <SingleSchedule
               fetchTime={this.props.fetchTime}
-              title={loadedContent[loadedContent.length - 1].title}
-              startTime={loadedContent[loadedContent.length - 1].startTime}
-              duration={loadedContent[loadedContent.length - 1].duration}
+              title={newData[newData.length - 1].title}
+              startTime={newData[newData.length - 1].startTime}
+              duration={newData[newData.length - 1].duration}
               deleteItem={this.deleteItem}
-              id={loadedContent[loadedContent.length - 1].id}
-              live={loadedContent[loadedContent.length - 1].live}
+              id={newData[newData.length - 1].id}
+              live={newData[newData.length - 1].live}
             />
           );
         }
@@ -470,8 +438,18 @@ class Schedule extends React.Component {
         savePlaylist: "ui right floated small primary labeled icon button"
       });
       this.setState({ status: "Save Playlist" });
-    }
+      this.setState({ serviceIDRef: this.props.serviceIDRef });
+      this.setState({ data: this.state.data.concat(this.props.data) })
+      this.setState({ preRenderedItem: this.state.preRenderedItem.concat(items) })
+      }
   }
+
+  deleteItem(id) {
+    // TODO - 
+    // 1) remove one item
+    // 2) recalculate all start times
+  }
+
   render() {
     return (
       <div>
@@ -490,7 +468,7 @@ class Schedule extends React.Component {
             </tr>
           </thead>
 
-          <tbody>{videos}</tbody>
+          <tbody>{this.state.preRenderedItem}</tbody>
           <tfoot className="full-width">
             <tr>
               <th></th>

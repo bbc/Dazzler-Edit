@@ -114,25 +114,9 @@ const styles = theme => ({
 });
 
 class Demo extends React.Component {
-  state = {
-    open: false,
-    Title: "",
-    isPaneOpen: false,
-    panelShow: null,
-    count: 0,
-    items: [],
-    specials: [],
-    episodes: [],
-    live: [],
-    scheduleDate: moment()
-      .add(0, "d")
-      .format("LL"),
-    display: "",
-    user: null,
-    service: { sid: "bbc_marathi_tv", name: "Marathi", serviceIDRef: "TVMAR01" }
-  };
 
-  componentDidMount() {
+  constructor(props) {
+    super(props);
     this.handleClick = this.handleClick.bind(this);
     this.fetchTime = this.fetchTime.bind(this);
     this.deleteItem = this.deleteItem.bind(this);
@@ -140,6 +124,27 @@ class Demo extends React.Component {
     this.nextDay = this.nextDay.bind(this);
     this.copyContent = this.copyContent.bind(this);
     this.clearContent = this.clearContent.bind(this);
+    this.state = {
+      open: false,
+      Title: "",
+      isPaneOpen: false,
+      panelShow: null,
+      count: 0,
+      clips: [],
+      specials: [],
+      episodes: [],
+      live: [],
+      schedules: {}, // state store for loaded and/or edited schedules
+      scheduleDate: moment()
+        .add(0, "d")
+        .format("LL"),
+      display: "",
+      user: null,
+      service: { sid: "bbc_marathi_tv", name: "Marathi", serviceIDRef: "TVMAR01" }
+    };
+  }
+
+  componentDidMount() {
 
     this.setState({
       display: (
@@ -156,20 +161,6 @@ class Demo extends React.Component {
         />
       )
     });
-
-    // Clips
-    axios
-      .get(
-        "/api/v1/clip?sid=" + this.state.service.sid
-      )
-      .then(response => {
-        this.setState({
-          items: response.data
-        });
-      })
-      .catch(e => {
-        console.log(e);
-      });
 
     // Episodes
     axios
@@ -456,7 +447,7 @@ class Demo extends React.Component {
       this.setState({ title: "Available Clips" });
       this.setState({
         panelShow: (
-          <Clips items={this.state.items} handleClick={this.handleClick} />
+          <Clips sid={this.state.service.sid} items={this.state.clips} handleClick={this.handleClick} />
         )
       });
     }

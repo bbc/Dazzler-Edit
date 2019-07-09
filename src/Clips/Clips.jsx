@@ -15,6 +15,7 @@ import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import LastPageIcon from "@material-ui/icons/LastPage";
 import moment from 'moment';
 import Spinner from "../Spinner/Spinner";
+import axios from "axios";
 
 
  const actionsStyles = theme => ({
@@ -117,39 +118,57 @@ export const styles = theme => ({
   }
 });
 
-var cells = [];
-
 export class Clips extends React.Component {
+  constructor(props) {
+    super(props);
   
-  state = {
-    spinner: false,
-    rows: [
-    ].sort((a, b) => (a.duration < b.duration ? -1 : 1)),
-    page: 0,
-    rowsPerPage: 6,
-    data: []
-  };
+    this.state = {
+      spinner: false,
+      rows: [
+      ].sort((a, b) => (a.duration < b.duration ? -1 : 1)),
+      page: 0,
+      rowsPerPage: 6,
+      data: [],
+      sid: ""
+    };
+  }
 
   componentDidMount = () => {
-    
-    for(let i = 0; i < this.props.items.length; i++){
-        var date1 = new Date();
-        var date2 = new Date(this.props.items[i].updated_time.split('T')[0]);
-        var timeDiff = Math.abs(date2.getTime() - date1.getTime());
-      
-        var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24) - 1); 
 
-        cells.push({
-          id: this.props.items[i].pid, 
-          title: this.props.items[i].title,
-          duration: moment.duration(this.props.items[i].available_versions.version[0].duration)._data.minutes + " minutes " + 
-          moment.duration(this.props.items[i].available_versions.version[0].duration)._data.seconds + "seconds",
-          from: diffDays + " days ago",
-          pid: this.props.items[i].pid,
-          versions: this.props.items[i].available_versions.version.length,
-          add: <button className="ui compact icon button" onClick  = { () => {this.props.handleClick(this.props.items[i])} }><i className="plus icon"></i></button>})
-    }
-    this.setState({rows: cells});    
+    this.setState({ sid: this.props.sid });
+
+    axios
+    .get(
+      "/api/v1/clip?sid=" + this.props.sid
+    )
+    .then(response => {
+      const items = response.data;
+
+      let cells = [];
+  
+      for(let i = 0; i < items.length; i++){
+          var date1 = new Date();
+          var date2 = new Date(items[i].updated_time.split('T')[0]);
+          var timeDiff = Math.abs(date2.getTime() - date1.getTime());
+        
+          var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24) - 1); 
+  
+          cells.push({
+            id: items[i].pid, 
+            title: items[i].title,
+            duration: moment.duration(items[i].available_versions.version[0].duration)._data.minutes + " minutes " + 
+            moment.duration(items[i].available_versions.version[0].duration)._data.seconds + "seconds",
+            from: diffDays + " days ago",
+            pid: items[i].pid,
+            versions: items[i].available_versions.version.length,
+            add: <button className="ui compact icon button" onClick  = { () => {this.props.handleClick(this.props.items[i])} }><i className="plus icon"></i></button>})
+      }
+      this.setState({rows: cells});    
+      })
+    .catch(e => {
+      console.log(e);
+    });
+
   }
 
   handleChangePage = (event, page) => {
