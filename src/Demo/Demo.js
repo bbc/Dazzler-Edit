@@ -213,7 +213,7 @@ class Demo extends React.Component {
       )
       .then(response => {
         this.setState({
-          specials: response.data
+          specials: response.data.items
         });
       })
       .catch(e => {
@@ -447,7 +447,7 @@ class Demo extends React.Component {
       this.setState({ title: "Available Clips" });
       this.setState({
         panelShow: (
-          <Clips sid={this.state.service.sid} items={this.state.clips} handleClick={this.handleClick} />
+          <Clips sid={this.state.service.sid} handleClick={this.handleClick} />
         )
       });
     }
