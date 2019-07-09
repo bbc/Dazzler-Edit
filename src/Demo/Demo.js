@@ -169,7 +169,7 @@ class Demo extends React.Component {
       )
       .then(response => {
         this.setState({
-          episodes: response.data
+          episodes: response.data.items
         });
       })
       .catch(e => {
@@ -231,9 +231,10 @@ class Demo extends React.Component {
           "&end=" + day.add(days, 'days').utc().format()
       )
       .then(response => {
-        for (let i = 0; i < response.data.length; i++) {
+        const items = response.data.items;
+        for (let i = 0; i < items.length; i++) {
           this.setState({
-            live: [...this.state.live, response.data[i]]
+            live: [...this.state.live, items[i]]
           });
         }
       })
