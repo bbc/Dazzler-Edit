@@ -73,7 +73,7 @@ app.get("/api/v1/broadcast", function(req, res) {
     q.page_size = req.query.page_size;
   }
   nitroRequest("schedules", q).then(
-    r => res.json(r.nitro.results.items),
+    r => res.json(r.nitro.results),
     err => res.status(404).send("Not found") // TODO use proper error message
   );
 });
@@ -97,7 +97,7 @@ app.get("/api/v1/webcast", function(req, res) {
     q.page_size = req.query.page_size;
   }
   nitroRequest("schedules", q).then(
-    r => res.json(add_crids_to_webcast(r.nitro.results.items)),
+    r => res.json(add_crids_to_webcast(r.nitro.results)),
     err => res.status(404).send("Not found") // TODO use proper error message
   );
 });
@@ -183,15 +183,8 @@ app.get("/api/v1/episode", function(req, res) {
   nitroRequest("programmes", q).then(
     r => {
       add_crids_to_episodes(r.nitro.results.items);
-      res.json(r.nitro.results.items);
+      res.json(r.nitro.results);
     },
-    err => res.status(404).send("Not found") // TODO use proper error message
-  );
-});
-
-app.get("/api/v1/placings", function(req, res) {
-  nitroRequest("schedules", { version: req.query.version }).then(
-    r => res.json(r.nitro.results.items),
     err => res.status(404).send("Not found") // TODO use proper error message
   );
 });
