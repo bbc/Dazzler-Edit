@@ -15,6 +15,7 @@ import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import LastPageIcon from "@material-ui/icons/LastPage";
 import moment from 'moment';
 import Spinner from "../Spinner/Spinner";
+import axios from "axios";
 
 
  const actionsStyles = theme => ({
@@ -117,42 +118,53 @@ export const styles = theme => ({
   }
 });
 
-var cells = [];
-
 export class Clips extends React.Component {
+  constructor(props) {
+    super(props);
   
-  state = {
-    spinner: false,
-    rows: [
-    ].sort((a, b) => (a.duration < b.duration ? -1 : 1)),
-    page: 0,
-    rowsPerPage: 6,
-    data: []
-  };
+    this.state = {
+      spinner: false,
+      totalRows: 0,
+      rows: [],
+      page: 0,
+      previousPage: -1,
+      rowsPerPage: 5,
+      data: [],
+      sid: ""
+    };
+  }
 
   componentDidMount = () => {
-    
-    for(let i = 0; i < this.props.items.length; i++){
-        var date1 = new Date();
-        var date2 = new Date(this.props.items[i].updated_time.split('T')[0]);
-        var timeDiff = Math.abs(date2.getTime() - date1.getTime());
-      
-        var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24) - 1); 
 
-        cells.push({
-          id: this.props.items[i].pid, 
-          title: this.props.items[i].title,
-          duration: moment.duration(this.props.items[i].available_versions.version[0].duration)._data.minutes + " minutes " + 
-          moment.duration(this.props.items[i].available_versions.version[0].duration)._data.seconds + "seconds",
-          from: diffDays + " days ago",
-          pid: this.props.items[i].pid,
-          versions: this.props.items[i].available_versions.version.length,
-          add: <button className="ui compact icon button" onClick  = { () => {this.props.handleClick(this.props.items[i])} }><i className="plus icon"></i></button>})
+    this.setState({ sid: this.props.sid });
+  }
+
+  componentDidUpdate(prevProps) {
+    console.log("Clips update", this.state.page);
+    if(this.state.page !== this.state.previousPage) {
+      console.log("have page %d want page %d", this.props.page, prevProps.page);
+      axios
+      .get(
+        "/api/v1/clip" +
+        "?sid=" + this.props.sid + 
+        "&page=" + (this.state.page+1) + // nitro is 1 based
+        "&page_size=" + this.state.rowsPerPage
+      )
+      .then(response => {
+        console.log(response);
+        this.setState({previousPage: response.data.page - 1});    
+        this.setState({page: response.data.page - 1});    
+        this.setState({rows: response.data.items});    
+        this.setState({totalRows: response.data.total});    
+        })
+      .catch(e => {
+        console.log(e);
+      });
     }
-    this.setState({rows: cells});    
   }
 
   handleChangePage = (event, page) => {
+    console.log("Clips handleChangePage", this.state.page, page);
     this.setState({ page });
   };
 
@@ -160,15 +172,23 @@ export class Clips extends React.Component {
     this.setState({ page: 0, rowsPerPage: event.target.value });
   };
 
+  formattedDuration(clip) {
+    return moment.duration(clip.available_versions.version[0].duration).humanize();
+  }
+
+  addButton(clip) {
+    return <button className="ui compact icon button" onClick  = { () => {this.props.handleClick(clip)} }><i className="plus icon"></i></button>
+  }
+
   render() {
     const { classes } = this.props;
-    const { rows, rowsPerPage, page } = this.state;
+    const { rows, rowsPerPage, page, totalRows } = this.state;
     const emptyRows =
       rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
 
-      // if(cells.length === 0){
-      //   this.setState({spinner : true})
-      //   return <Spinner />
+       //if(rows.length === 0){
+       //  this.setState({spinner : true})
+       //  return <Spinner />
       // }
 
     return (
@@ -183,20 +203,17 @@ export class Clips extends React.Component {
             <th>Duration</th>
             <th>Add</th>
 
-        
-              {rows
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map(row => (
-                  <TableRow key={row.id}>
+              {rows.map(row => (
+                  <TableRow key={row.pid}>
                     <TableCell component="th" scope="row">
                       <div className="tooltip"> {row.title} 
                       <span className="tooltiptext">PID = {row.pid}</span>
                       </div>
                       
                     </TableCell>
-                    <TableCell align="right">{row.duration}</TableCell>
+                    <TableCell align="right">{this.formattedDuration(row)}</TableCell>
 
-                    <TableCell align="right">{row.add}</TableCell>
+                    <TableCell align="right">{this.addButton(row)}</TableCell>
                   </TableRow>
                 ))}
             
@@ -212,7 +229,7 @@ export class Clips extends React.Component {
                 <TablePagination
                   rowsPerPageOptions={[5, 10, 25]}
                   colSpan={3}
-                  count={rows.length}
+                  count={totalRows}
                   rowsPerPage={rowsPerPage}
                   page={page}
                   SelectProps={{

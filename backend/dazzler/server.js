@@ -73,7 +73,7 @@ app.get("/api/v1/broadcast", function(req, res) {
     q.page_size = req.query.page_size;
   }
   nitroRequest("schedules", q).then(
-    r => res.json(r.nitro.results.items),
+    r => res.json(r.nitro.results),
     err => res.status(404).send("Not found") // TODO use proper error message
   );
 });
@@ -97,7 +97,7 @@ app.get("/api/v1/webcast", function(req, res) {
     q.page_size = req.query.page_size;
   }
   nitroRequest("schedules", q).then(
-    r => res.json(add_crids_to_webcast(r.nitro.results.items)),
+    r => res.json(add_crids_to_webcast(r.nitro.results)),
     err => res.status(404).send("Not found") // TODO use proper error message
   );
 });
@@ -106,14 +106,14 @@ app.get("/api/v1/special", function(req, res) {
   let q = {
     group: config[req.query.sid].specials_collection
   };
-  clip(q, req, res);
+  clip(q, req.query, res);
 });
 
 app.get("/api/v1/clip", function(req, res) {
   let q = {
     tag_name: config[req.query.sid].clip_language
   };
-  clip(q, req, res);
+  clip(q, req.query, res);
 });
 
 function clip(q, query, res) {
@@ -128,9 +128,9 @@ function clip(q, query, res) {
   nitroRequest("programmes", q).then(
     r => {
       let pids = [];
-      let clips = r.nitro.results.items;
-      for(let i=0; i<clips.length; i++) {
-        const version = clips[i].available_versions.version;
+      let clips = r.nitro.results;
+      for(let i=0; i<clips.items.length; i++) {
+        const version = clips.items[i].available_versions.version;
         for(let j=0; j<version.length; j++) {
           pids.push(version[j].pid);
         }
@@ -147,8 +147,8 @@ function clip(q, query, res) {
               }
             }
           }
-          for(let i=0; i<clips.length; i++) {
-            const version = clips[i].available_versions.version;
+          for(let i=0; i<clips.items.length; i++) {
+            const version = clips.items[i].available_versions.version;
             for(let j=0; j<version.length; j++) {
               version[j].crid = map.get(version[j].pid);
             }
@@ -183,15 +183,8 @@ app.get("/api/v1/episode", function(req, res) {
   nitroRequest("programmes", q).then(
     r => {
       add_crids_to_episodes(r.nitro.results.items);
-      res.json(r.nitro.results.items);
+      res.json(r.nitro.results);
     },
-    err => res.status(404).send("Not found") // TODO use proper error message
-  );
-});
-
-app.get("/api/v1/placings", function(req, res) {
-  nitroRequest("schedules", { version: req.query.version }).then(
-    r => res.json(r.nitro.results.items),
     err => res.status(404).send("Not found") // TODO use proper error message
   );
 });

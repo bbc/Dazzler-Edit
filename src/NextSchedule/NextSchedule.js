@@ -28,7 +28,7 @@ class NextSchedule extends React.Component {
           "&end=" + end
       )
       .then(response => {
-        returnedData = response.data;
+        returnedData = response.data.items;
         for (let i = 0; i < returnedData.length; i++) {
           videos.push(
             <SingleSchedule
@@ -70,7 +70,7 @@ class NextSchedule extends React.Component {
             "&end=" + end
         )
         .then(response => {
-          returnedData = response.data;
+          returnedData = response.data.items;
           for (let i = 0; i < returnedData.length; i++) {
             videos.push(
               <SingleSchedule
