@@ -13,19 +13,19 @@ import FirstPageIcon from "@material-ui/icons/FirstPage";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import LastPageIcon from "@material-ui/icons/LastPage";
-import Schedule from '../Schedule/Schedule';
-import moment from 'moment';
-import Demo from '../Demo/Demo';
-import App from '../App/App';
+import Schedule from "../Schedule/Schedule";
+import moment from "moment";
+import Demo from "../Demo/Demo";
+import App from "../App/App";
 
- const actionsStyles = theme => ({
+const actionsStyles = theme => ({
   root: {
     flexShrink: 0,
     color: theme.palette.text.secondary,
     marginLeft: theme.spacing.unit * 2.5
   }
 });
- class TablePaginationActions extends React.Component {
+class TablePaginationActions extends React.Component {
   handleFirstPageButtonClick = event => {
     this.props.onChangePage(event, 0);
   };
@@ -81,8 +81,7 @@ import App from '../App/App';
         </IconButton>
         <IconButton
           onClick={this.handleLastPageButtonClick}
-          disabled={page >= 
-            Math.ceil(count / rowsPerPage) - 1}
+          disabled={page >= Math.ceil(count / rowsPerPage) - 1}
           aria-label="Last Page"
         >
           {theme.direction === "rtl" ? <FirstPageIcon /> : <LastPageIcon />}
@@ -105,8 +104,6 @@ export const TablePaginationActionsWrapped = withStyles(actionsStyles, {
   withTheme: true
 })(TablePaginationActions);
 
-
-
 export const styles = theme => ({
   root: {
     width: "100%",
@@ -121,47 +118,55 @@ export const styles = theme => ({
 });
 var cells = [];
 export class Specials extends React.Component {
-  
-    constructor(props){
-        super(props)
-    }
-    
+  constructor(props) {
+    super(props);
+  }
+
   state = {
-      
-    rows: [
-    ].sort((a, b) => (a < b ? -1 : 1)),
+    rows: [].sort((a, b) => (a < b ? -1 : 1)),
     page: 0,
     rowsPerPage: 6,
     data: []
   };
 
-
-  
   componentDidMount = () => {
     cells = [];
-    for(let i = 0; i < this.props.specials.length; i++){
-        var date1 = new Date();
-        var date2 = new Date(this.props.specials[i].updated_time.split('T')[0]);
-        var timeDiff = Math.abs(date2.getTime() - date1.getTime());
-      
-        var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24) - 1); 
+    for (let i = 0; i < this.props.specials.length; i++) {
+      var date1 = new Date();
+      var date2 = new Date(this.props.specials[i].updated_time.split("T")[0]);
+      var timeDiff = Math.abs(date2.getTime() - date1.getTime());
 
-     cells.push({       id: this.props.specials[i].pid, 
-                        title: this.props.specials[i].title,
-                        duration: moment.duration(this.props.specials[i].available_versions.version[0].duration)._data.minutes + " minutes " + 
-                        moment.duration(this.props.specials[i].available_versions.version[0].duration)._data.seconds + "seconds",
-                        from: diffDays + " days ago",
-                        pid: this.props.specials[i].pid,
-                        versions: this.props.specials[i].available_versions.version.length,
-                        add: <button className="ui compact icon button" onClick  = { () => {this.props.handleClick(this.props.specials[i])} }><i className="plus icon"></i></button>})
-                        
+      var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24) - 1);
 
-     
+      cells.push({
+        id: this.props.specials[i].pid,
+        title: this.props.specials[i].title,
+        duration:
+          moment.duration(
+            this.props.specials[i].available_versions.version[0].duration
+          )._data.minutes +
+          " minutes " +
+          moment.duration(
+            this.props.specials[i].available_versions.version[0].duration
+          )._data.seconds +
+          "seconds",
+        from: diffDays + " days ago",
+        pid: this.props.specials[i].pid,
+        versions: this.props.specials[i].available_versions.version.length,
+        add: (
+          <button
+            className="ui compact icon button"
+            onClick={() => {
+              this.props.handleClick(this.props.specials[i]);
+            }}
+          >
+            <i className="plus icon"></i>
+          </button>
+        )
+      });
     }
-    this.setState({rows: cells});
-    
-}
-
+    this.setState({ rows: cells });
+  };
 
   handleChangePage = (event, page) => {
     this.setState({ page });
@@ -174,63 +179,65 @@ export class Specials extends React.Component {
   render() {
     const { classes } = this.props;
     const { rows, rowsPerPage, page } = this.state;
-    
+
     const emptyRows =
       rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
 
     return (
-        <div>
-          
-      <Paper className={classes.root}>
-        <div className={classes.tableWrapper}>
-          <Table className={classes.table}>
-          
-            <TableBody>
-            <th>Title</th>
-            <th>Duration</th>
-            <th>Add</th>
-        
-              {rows
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map(row => (
-                  <TableRow key={row.id}>
-                    <TableCell component="th" scope="row">
-                      <div className="tooltip"> {row.title} 
-                      <span className="tooltiptext">pid = {row.pid}       version = {row.versions}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell align="right">{row.duration}</TableCell>
+      <div>
+        <Paper className={classes.root}>
+          <div className={classes.tableWrapper}>
+            <Table className={classes.table}>
+              <TableBody>
+                <th>Title</th>
+                <th>Duration</th>
+                <th>Add</th>
 
-                    <TableCell align="right">{row.add}</TableCell>
+                {rows
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map(row => (
+                    <TableRow key={row.id}>
+                      <TableCell component="th" scope="row">
+                        <div className="tooltip">
+                          {" "}
+                          {row.title}
+                          <span className="tooltiptext">
+                            pid = {row.pid} version = {row.versions}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell align="right">{row.duration}</TableCell>
+
+                      <TableCell align="right">{row.add}</TableCell>
+                    </TableRow>
+                  ))}
+
+                {emptyRows > 0 && (
+                  <TableRow style={{ height: 48 * emptyRows }}>
+                    <TableCell colSpan={6} />
                   </TableRow>
-                ))}
-            
-              {emptyRows > 0 && (
-                <TableRow style={{ height: 48 * emptyRows }}>
-                  <TableCell colSpan={6} />
+                )}
+              </TableBody>
+              <TableFooter>
+                <TableRow>
+                  <TablePagination
+                    rowsPerPageOptions={[5, 10, 25]}
+                    colSpan={3}
+                    count={rows.length}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    SelectProps={{
+                      native: true
+                    }}
+                    onChangePage={this.handleChangePage}
+                    onChangeRowsPerPage={this.handleChangeRowsPerPage}
+                    ActionsComponent={TablePaginationActionsWrapped}
+                  />
                 </TableRow>
-              )}
-            </TableBody>
-            <TableFooter>
-              <TableRow>
-                <TablePagination
-                  rowsPerPageOptions={[5, 10, 25]}
-                  colSpan={3}
-                  count={rows.length}
-                  rowsPerPage={rowsPerPage}
-                  page={page}
-                  SelectProps={{
-                    native: true
-                  }}
-                  onChangePage={this.handleChangePage}
-                  onChangeRowsPerPage={this.handleChangeRowsPerPage}
-                  ActionsComponent={TablePaginationActionsWrapped}
-                />
-              </TableRow>
-            </TableFooter>
-          </Table>
-        </div>
-      </Paper>
+              </TableFooter>
+            </Table>
+          </div>
+        </Paper>
       </div>
     );
   }
@@ -240,5 +247,4 @@ Specials.propTypes = {
   classes: PropTypes.object.isRequired
 };
 
-export default withStyles (styles)(Specials)
-
+export default withStyles(styles)(Specials);

@@ -1,18 +1,13 @@
-import React from 'react';
+import React from "react";
 class Button extends React.Component {
- 
- 
-
-    state = {
-      disabled: false
-    };
- 
+  state = {
+    disabled: false
+  };
 
   handleClick = () => {
-    this.setState({disabled : !this.state.disabled});
+    this.setState({ disabled: !this.state.disabled });
+  };
 
-  }
-  
   render() {
     return (
       <div>
