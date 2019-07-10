@@ -1,67 +1,52 @@
 
-Name: ws-dazzler-edit
-Version: 0.1.0
-Release: 13%{?dist}
-Group: Application/Web
+Name: dazzler-edit
+Version: 0.1.1%{?buildnum:.%{buildnum}}
+Release: 12%{?dist}
+Group: System Environment/Daemons
 License: Internal BBC use only
-Summary: ws-dazzler-edit
-Source0: bake-scripts.tar.gz
-Source1: build.tar.gz
-Requires: nginx, cloud-httpd24-ssl-services-devs-staff
+Summary: A dazzler-edit application
+Source0: src.tar.gz
+
+
+Requires: nodejs
+
+Requires: cloud-httpd24-ssl-services-devs-staff
 BuildRoot: %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
-BuildArch: noarch
+BuildArch: x86_64
 
-
+BuildRequires: npm
+BuildRequires: systemd
 
 %description
-ws-dazzler-edit built by the Spectacle
+A dazzler edit application
 
 %prep
-%setup -T -c spectacle
+%setup -q -n backend/
 
 %build
-mkdir -p %{_builddir}/bake-scripts
-tar -C %{_builddir}/bake-scripts -xzf %{SOURCE0}
-mkdir -p %{_builddir}/build
-tar -C %{_builddir}/build -xzf %{SOURCE1}
+npm rebuild
 
 %install
-mkdir -p %{buildroot}/var/www
-cp -R --preserve=timestamps %{_builddir}/build %{buildroot}/var/www/dazzler
-mkdir -p %{buildroot}/etc/bake-scripts
-cp -R --preserve=timestamps %{_builddir}/bake-scripts %{buildroot}/etc
-echo ===============
-ls -l %{buildroot}/etc/bake-scripts
-echo ===============
+mkdir -p %{buildroot}/usr/lib/systemd/system/
+mkdir -p %{buildroot}%{_sysconfdir}/bake-scripts/dazzler
+mkdir -p %{buildroot}/usr/lib/dazzler
+cp %{_builddir}/backend/index.js %{buildroot}/usr/lib/dazzler
+cp %{_builddir}/backend/auth.txt %{buildroot}/usr/lib/dazzler
+cp -R %{_builddir}/backend/dazzler/ %{buildroot}/usr/lib/dazzler/
+cp -R %{_builddir}/backend/edit/ %{buildroot}/usr/lib/dazzler/
+cp -R %{_builddir}/backend/node_modules %{buildroot}/usr/lib/dazzler
+cp -R %{_builddir}/backend/usr/lib/systemd/system/dazzler-edit.service %{buildroot}/usr/lib/systemd/system/
+cp -R %{_builddir}/backend/bake-scripts %{buildroot}%{_sysconfdir}/bake-scripts/dazzler
 
 %pre
-
-getent group nginx >/dev/null || groupadd -r nginx
-getent passwd nginx >/dev/null || \
-    useradd -r -g nginx -G nginx -d / -s /sbin/nologin \
-    -c "nginx service" nginx
-
-
-getent group nginx >/dev/null || groupadd -r nginx
-getent passwd nginx >/dev/null || \
-    useradd -r -g nginx -G nginx -d / -s /sbin/nologin \
-    -c "nginx service" nginx
-
-
-%preun
-
-
-%post
-
-
-%postun
-
-
-%clean
-rm -rf %{buildroot}
+getent group dazzler >/dev/null || groupadd -r dazzler
+getent passwd dazzler >/dev/null || \
+        useradd -r -g dazzler -G dazzler -d / -s /sbin/nologin \
+        -c "dazzler node.js service" dazzler
 
 %files
 %defattr(644, root, root, 755)
-/var/www/dazzler
-%defattr(755, root, root, 755)
-/etc/bake-scripts
+/usr/lib/dazzler
+/usr/lib/systemd/system/dazzler-edit.service
+%defattr(-, root, root, 755)
+/etc/bake-scripts/dazzler

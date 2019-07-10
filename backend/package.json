@@ -1,0 +1,23 @@
+{
+  "name": "dazzler-edit",
+  "description": "A node js app to edit schedules",
+  "version": "0.0.1",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "NODE_ENV=test node_modules/mocha/bin/mocha 'test/*.js'"
+  },
+  "dependencies": {
+    "big-integer": "^1.6.44",
+    "body-parser": "^1.19.0",
+    "express": "*",
+    "querystring": "^0.2.0",
+    "serve-static": "^1.14.1",
+    "xml2js": "^0.4.19"
+  },
+  "devDependencies": {
+    "mocha": "^6.1.4",
+    "supertest": "^4.0.2"
+  }
+}
