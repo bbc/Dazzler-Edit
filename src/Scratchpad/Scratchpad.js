@@ -12,12 +12,15 @@ const columns = [
   { key: "Delete", name: "Delete" }
 ];
 class Scratchpad extends React.Component {
-  state = {
-    data: [],
-    status: "",
-    current: "",
-    refresh: 0
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      data: [],
+      status: "",
+      current: "",
+      refresh: 0
+    };
+  }
 
   componentDidMount() {
     this.setState({ data: this.props.data });
@@ -35,7 +38,7 @@ class Scratchpad extends React.Component {
   render() {
     rows = [];
     duration = 0;
-    copiedContent = this.props.data;
+    copiedContent = this.state.data;
     if (copiedContent.length > 0) {
       length = copiedContent.length;
       copiedContent.map((item, idx) => {

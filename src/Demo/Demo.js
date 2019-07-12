@@ -145,7 +145,9 @@ class Demo extends React.Component {
   }
 
   componentDidMount() {
-
+console.log('DidMount',time);
+console.log(scheduleItems);
+console.log(copiedContent);
     this.setState({
       display: (
         <Schedule
@@ -153,7 +155,6 @@ class Demo extends React.Component {
           fetchTime={this.fetchTime}
           clipTime={time}
           data={scheduleItems}
-          dataLength={scheduleItems.length}
           pasted={copiedContent}
           deleteItem={this.deleteItem}
           text="Today's "
@@ -175,21 +176,6 @@ class Demo extends React.Component {
       .catch(e => {
         console.log(e);
       });
-
-    /* TODO what did we need placings for?
-    axios
-      .get(
-        "/api/v1/placings?version=p078fmvz"
-      )
-      .then(response => {
-        this.setState({
-          specials: response.data
-        });
-      })
-      .catch(e => {
-        console.log(e);
-      });
-      */
 
     // get user
     axios
@@ -279,7 +265,6 @@ class Demo extends React.Component {
           clipTime={time}
           schStart={id}
           data={scheduleItems}
-          dataLength={scheduleItems.length}
           pasted={copiedContent}
           deleteItem={this.deleteItem}
           text={text}
@@ -291,7 +276,10 @@ class Demo extends React.Component {
 
   previousDay = CDate => {
     text = moment(CDate).isAfter(moment()) ? "Future " : "Previous ";
-
+    console.log('previousDay',time);
+    console.log(scheduleItems);
+    console.log(copiedContent);
+    
     if (moment(CDate).format("LL") === moment().format("LL")) {
       text = "Today's ";
       this.setState({
@@ -302,7 +290,6 @@ class Demo extends React.Component {
             fetchTime={this.fetchTime}
             clipTime={time}
             data={scheduleItems}
-            dataLength={scheduleItems.length}
             pasted={copiedContent}
             deleteItem={this.deleteItem}
             text={text}
@@ -327,6 +314,9 @@ class Demo extends React.Component {
   };
   nextDay = CDate => {
     text = moment(CDate).isBefore(moment()) ? "Previous " : "Future ";
+    console.log('nextDay',time);
+    console.log(scheduleItems);
+    console.log(copiedContent);
 
     if (moment(CDate).format("LL") === moment().format("LL")) {
       text = "Today's ";
@@ -338,7 +328,6 @@ class Demo extends React.Component {
             fetchTime={this.fetchTime}
             clipTime={time}
             data={scheduleItems}
-            dataLength={scheduleItems.length}
             pasted={copiedContent}
             deleteItem={this.deleteItem}
             text={text}
@@ -432,7 +421,6 @@ class Demo extends React.Component {
             fetchTime={this.fetchTime}
             clipTime={time}
             data={scheduleItems}
-            dataLength={scheduleItems.length}
             pasted={copiedContent}
             text="Today's "
             deleteItem={this.deleteItem}
@@ -502,7 +490,6 @@ class Demo extends React.Component {
             fetchTime={this.fetchTime}
             clipTime={time}
             data={scheduleItems}
-            dataLength={scheduleItems.length}
             pasted={copiedContent}
             text="Today's "
             deleteItem={this.deleteItem}
@@ -533,7 +520,6 @@ class Demo extends React.Component {
           fetchTime={this.fetchTime}
           clipTime={time}
           data={scheduleItems}
-          dataLength={scheduleItems.length}
           pasted={copiedContent}
           text="Today's "
           deleteItem={this.deleteItem}
