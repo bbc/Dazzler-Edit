@@ -1,7 +1,7 @@
 .PHONY: all clean npm-install prepare local release
 
 # PLEASE CHANGE THE FOLLOWING
-COMPONENT="cosmos-component-name-goes-here"
+COMPONENT="ws-dazzler-edit"
 
 all: local
 
