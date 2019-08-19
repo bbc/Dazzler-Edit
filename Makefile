@@ -16,6 +16,10 @@ clean:
 	rm -rf frontend/node_modules backend/node_modules backend/edit RPMS SRPMS SOURCES
 
 npm-install:
+	npm -v
+	node -v
+	sudo swapon -s
+	free
 	# Avoid installing the devDependencies with --production
 	npm --production --prefix backend install --no-bin-links
 	# we need the dev dependencies so we can run the react build script
