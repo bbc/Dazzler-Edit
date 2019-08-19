@@ -18,7 +18,6 @@ clean:
 npm-install:
 	npm -v
 	node -v
-	sudo swapon -s
 	free
 	# Avoid installing the devDependencies with --production
 	npm --production --prefix backend install --no-bin-links
