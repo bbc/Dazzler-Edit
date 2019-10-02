@@ -9,6 +9,7 @@ const Big = require("big-integer");
 const http = require("http");
 const https = require("https");
 const bodyParser = require("body-parser");
+const configuration = require('../../config/env.json');
 const app = express();
 
 const config = {
@@ -20,6 +21,8 @@ const config = {
     webcast_channels: ["world_service_stream_05","world_service_stream_06","world_service_stream_07","world_service_stream_08"]
   }
 };
+
+process.env = configuration
 
 //app.use(bodyParser.raw({ type: '*/*' }));
 app.use(bodyParser.text({ type: "*/*" }));
@@ -117,6 +120,7 @@ app.get("/api/v1/clip", function(req, res) {
 });
 
 function clip(q, query, res) {
+  console.log("IN CLIP")
   if (query.hasOwnProperty("page")) {
     q.page = query.page;
   }
@@ -249,8 +253,6 @@ function postTVA(data, res) {
   req.end();
 }
 
-// https://programmes.api.bbc.com/schedule?api_key=mUvZU43V0uGr7ItNBGnxYXgZLFVgx8Zo&sid=bbc_marathi_tv&date=2019-06-20
-
 function SpwRequest(sid, date) {
   return new Promise((resolve, reject) => {
     var options = {
@@ -300,11 +302,15 @@ function SpwRequest(sid, date) {
 }
 
 function nitroRequest(feed, query) {
+  console.log("IN NITRO REQUEST")
   return new Promise((resolve, reject) => {
     var options = {
-      host: "programmes.api.bbc.com",
+      /* if environment exists (env.json), use host and port with the values in env.json,
+       else do nothing..so in cosmos environment it doesn't pull it in. */
+      host: process.env.HOST,
+      port:process.env.PORT,
       path:
-        "/nitro/api/" +
+      "http://programmes.api.bbc.com" + "/nitro/api/" +
         feed +
         "?api_key=" +
         process.env.NITRO_KEY +
@@ -314,25 +320,33 @@ function nitroRequest(feed, query) {
         accept: "application/json"
       }
     };
+    
     var request = http.get(options, response => {
+      console.log("RESPONSE STATUS CODE IS", response.statusCode)
+      console.log("RESPONSE IS", response)
       if (response.statusCode < 200 || response.statusCode > 299) {
         reject(new Error("Invalid status code: " + response.statusCode));
+        console.log("ERROR")
       }
 
       var data = "";
       response.on("data", chunk => {
         data += chunk;
       });
+      console.log("DATA IS", data)
       response.on("end", () => {
         try {
           resolve(JSON.parse(data));
         } catch (e) {
           reject(new Error(e));
+          console.log("ERROR", e)
         }
       });
-      response.on("error", err => reject(new Error(err)));
+      response.on("error", err => console.log(err));
+      console.log("RESPONSE IS", response)
+      console.log("RESPONSE STATUS CODE IS", response.statusCode)
     });
-    request.on("error", err => reject(new Error(err)));
+    request.on("error", err => console.log("1", err));
   });
 }
 

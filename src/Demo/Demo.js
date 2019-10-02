@@ -166,7 +166,7 @@ console.log(copiedContent);
     // Episodes
     axios
       .get(
-        "/api/v1/episode?sid=" + this.state.service.sid
+        "http://localhost:8080/api/v1/episode?sid=" + this.state.service.sid
       )
       .then(response => {
         this.setState({
@@ -180,10 +180,11 @@ console.log(copiedContent);
     // get user
     axios
       .get(
-        "/api/v1/user"
+        "http://localhost:8080/api/v1/user"
       )
       .then(response => {
         console.log('user', JSON.stringify(response.data));
+        console.log("RESPONSE", response)
         this.setState({
           user: response.data
         });
@@ -195,7 +196,7 @@ console.log(copiedContent);
     //get request for specials
     axios
       .get(
-        "/api/v1/special?sid=" + this.state.service.sid
+        "http://localhost:8080/api/v1/special?sid=" + this.state.service.sid
       )
       .then(response => {
         this.setState({
@@ -211,7 +212,7 @@ console.log(copiedContent);
     const days = 5; // to allow us to edit future schedules
     axios
       .get(
-        "/api/v1/webcast" +
+        "http://localhost:8080/api/v1/webcast" +
           "?sid=" + this.state.service.sid +
           "&start=" + day.format() +
           "&end=" + day.add(days, 'days').utc().format()
