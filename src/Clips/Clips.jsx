@@ -145,6 +145,7 @@ export class Clips extends React.Component {
       console.log("have page %d want page %d", this.props.page, prevProps.page);
       axios
       .get(
+        "http://localhost:8080"+
         "/api/v1/clip" +
         "?sid=" + this.props.sid + 
         "&page=" + (this.state.page+1) + // nitro is 1 based
