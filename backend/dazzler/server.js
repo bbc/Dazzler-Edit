@@ -120,7 +120,6 @@ app.get("/api/v1/clip", function(req, res) {
 });
 
 function clip(q, query, res) {
-  console.log("IN CLIP")
   if (query.hasOwnProperty("page")) {
     q.page = query.page;
   }
@@ -302,15 +301,11 @@ function SpwRequest(sid, date) {
 }
 
 function nitroRequest(feed, query) {
-  console.log("IN NITRO REQUEST")
   return new Promise((resolve, reject) => {
     var options = {
-      /* if environment exists (env.json), use host and port with the values in env.json,
-       else do nothing..so in cosmos environment it doesn't pull it in. */
-      host: process.env.HOST,
-      port:process.env.PORT,
+      host: "programmes.api.bbc.com",
       path:
-      "http://programmes.api.bbc.com" + "/nitro/api/" +
+        "/nitro/api/" +
         feed +
         "?api_key=" +
         process.env.NITRO_KEY +
@@ -322,29 +317,22 @@ function nitroRequest(feed, query) {
     };
     
     var request = http.get(options, response => {
-      console.log("RESPONSE STATUS CODE IS", response.statusCode)
-      console.log("RESPONSE IS", response)
       if (response.statusCode < 200 || response.statusCode > 299) {
         reject(new Error("Invalid status code: " + response.statusCode));
-        console.log("ERROR")
       }
 
       var data = "";
       response.on("data", chunk => {
         data += chunk;
       });
-      console.log("DATA IS", data)
       response.on("end", () => {
         try {
           resolve(JSON.parse(data));
         } catch (e) {
           reject(new Error(e));
-          console.log("ERROR", e)
         }
       });
       response.on("error", err => console.log(err));
-      console.log("RESPONSE IS", response)
-      console.log("RESPONSE STATUS CODE IS", response.statusCode)
     });
     request.on("error", err => console.log("1", err));
   });

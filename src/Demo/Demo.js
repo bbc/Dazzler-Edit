@@ -155,6 +155,7 @@ console.log(copiedContent);
           fetchTime={this.fetchTime}
           clipTime={time}
           data={scheduleItems}
+          length={scheduleItems.length}
           pasted={copiedContent}
           deleteItem={this.deleteItem}
           text="Today's "
@@ -266,6 +267,7 @@ console.log(copiedContent);
           clipTime={time}
           schStart={id}
           data={scheduleItems}
+          length={scheduleItems.length}
           pasted={copiedContent}
           deleteItem={this.deleteItem}
           text={text}
@@ -292,6 +294,7 @@ console.log(copiedContent);
             clipTime={time}
             data={scheduleItems}
             pasted={copiedContent}
+            length={scheduleItems.length}
             deleteItem={this.deleteItem}
             text={text}
             loadPlaylist={this.loadPlaylist}
@@ -329,6 +332,7 @@ console.log(copiedContent);
             fetchTime={this.fetchTime}
             clipTime={time}
             data={scheduleItems}
+            length={scheduleItems.length}
             pasted={copiedContent}
             deleteItem={this.deleteItem}
             text={text}
@@ -355,6 +359,7 @@ console.log(copiedContent);
     const newItem2 = {
       ...item
     };
+    console.log("NEW ITEM ", newItem2)
 
     switch(item.item_type) {
       case "episode":
@@ -378,6 +383,7 @@ console.log(copiedContent);
         newItem2.versionCrid = item.available_versions.version[version].crid;
         newItem2.isLive = false;
         newItem2.id = count;
+        alert("in clip")
       }
       break;      
       case "window":
@@ -415,6 +421,7 @@ console.log(copiedContent);
       });
     } else {
       scheduleItems.push(newItem2);
+      console.log("in schedule")
       this.setState({
         display: (
           <Schedule
@@ -422,6 +429,7 @@ console.log(copiedContent);
             fetchTime={this.fetchTime}
             clipTime={time}
             data={scheduleItems}
+            length={scheduleItems.length}
             pasted={copiedContent}
             text="Today's "
             deleteItem={this.deleteItem}
@@ -432,86 +440,84 @@ console.log(copiedContent);
   };
 
   iHandleClick = text => {
-    if (text === "Clips") {
-      this.setState({ isPaneOpen: true });
-      this.setState({ title: "Available Clips" });
-      this.setState({
-        panelShow: (
-          <Clips sid={this.state.service.sid} handleClick={this.handleClick} />
-        )
-      });
-    }
+    switch(text) {
 
-    if (text === "Live") {
-      this.setState({ isPaneOpen: true });
-      this.setState({ title: "Upcoming Live Broadcasts" });
-      this.setState({
-        panelShow: (
-          <Live live={this.state.live} handleClick={this.handleClick} />
-        )
-      });
+      case "Clips": 
+        this.setState({ isPaneOpen: true });
+        this.setState({ title: "Available Clips" });
+        this.setState({
+          panelShow: (
+            <Clips sid={this.state.service.sid} handleClick={this.handleClick} />
+          )
+        });
+      break;
+      case "Live":
+          this.setState({ isPaneOpen: true });
+          this.setState({ title: "Upcoming Live Broadcasts" });
+          this.setState({
+            panelShow: (
+              <Live live={this.state.live} handleClick={this.handleClick} />
+            )
+          });
+      case "a":
+          return this.setState({ show: <Date /> });
+      case "Episodes":
+          this.setState({ isPaneOpen: true });
+          this.setState({ title: "Recent Episodes" });
+          this.setState({
+            panelShow: (
+              <Episode
+                episodes={this.state.episodes}
+                handleClick={this.handleClick}
+              />
+            )
+          });
+          break;
+      case "Specials":
+          this.setState({ isPaneOpen: true });
+          this.setState({ title: "Specials" });
+          this.setState({
+            panelShow: (
+              <Specials
+                specials={this.state.specials}
+                handleClick={this.handleClick}
+              />
+            )
+          });
+          break;
+      case "Extra":
+          return this.setState({ show: <Date /> });
+      case "Schedule":
+          menuText = text;
+          return this.setState({
+            display: (
+              <Schedule
+                serviceIDRef={this.state.service.serviceIDRef}
+                fetchTime={this.fetchTime}
+                clipTime={time}
+                data={scheduleItems}
+                length={scheduleItems.length}
+                pasted={copiedContent}
+                text="Today's "
+                deleteItem={this.deleteItem}
+              />
+            )
+          });;
+      case "Scratchpad":        
+        menuText = text;
+        return this.setState({
+          display: (
+            <Scratchpad
+              data={scratchPadItems}
+              deleteItem={this.deleteItem}
+              clearContent={this.clearContent}
+              copyContent={this.copyContent}
+            />
+          )
+        });
+      }
     }
-    if (text === "a") {
-      return this.setState({ show: <Date /> });
-    }
-
-    if (text === "Episodes") {
-      this.setState({ isPaneOpen: true });
-      this.setState({ title: "Recent Episodes" });
-      this.setState({
-        panelShow: (
-          <Episode
-            episodes={this.state.episodes}
-            handleClick={this.handleClick}
-          />
-        )
-      });
-    }
-    if (text === "Specials") {
-      this.setState({ isPaneOpen: true });
-      this.setState({ title: "Specials" });
-      this.setState({
-        panelShow: (
-          <Specials
-            specials={this.state.specials}
-            handleClick={this.handleClick}
-          />
-        )
-      });
-    }
-    if (text === "Extra") {
-      return this.setState({ show: <Date /> });
-    }
-    if (text === "Schedule") {
-      menuText = text;
-      return this.setState({
-        display: (
-          <Schedule
-            serviceIDRef={this.state.service.serviceIDRef}
-            fetchTime={this.fetchTime}
-            clipTime={time}
-            data={scheduleItems}
-            pasted={copiedContent}
-            text="Today's "
-            deleteItem={this.deleteItem}
-          />
-        )
-      });
-    }
-    if (text === "Scratchpad") {
-      menuText = text;
-      return this.setState({
-        display: (
-          <Scratchpad
-            data={scratchPadItems}
-            deleteItem={this.deleteItem}
-            clearContent={this.clearContent}
-            copyContent={this.copyContent}
-          />
-        )
-      });
-    }
-  };
+    
   fetchTime(clipTime) {
     var time = clipTime;
     this.setState({
@@ -520,6 +526,7 @@ console.log(copiedContent);
           serviceIDRef={this.state.service.serviceIDRef}
           fetchTime={this.fetchTime}
           clipTime={time}
+          length = {scheduleItems.length}
           data={scheduleItems}
           pasted={copiedContent}
           text="Today's "

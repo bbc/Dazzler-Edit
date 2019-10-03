@@ -12,7 +12,6 @@ class Schedule extends React.Component {
 
   constructor(props) {
     super(props);
-
     this.savePlaylist = this.savePlaylist.bind(this);
     this.pasteContent = this.pasteContent.bind(this);
     this.deleteItem = this.deleteItem.bind(this);
@@ -29,6 +28,28 @@ class Schedule extends React.Component {
       index: null,
       preRenderedItem: []
     };
+  }
+  componentDidMount() {
+    let items = [];
+    for (let i = 0; i < this.props.data.length; i++) {
+      
+      items.push(
+        <SingleSchedule
+          fetchTime={this.props.fetchTime}
+          title={this.props.data[i].title}
+          startTime={this.props.data[i].startTime}
+          duration={this.props.data[i].duration}
+          deleteItem={this.deleteItem}
+          id={this.props.data[i].id}
+          flag={false}
+          live={this.props.data[i].live}
+        />
+      );
+    }
+    this.setState({ index: null});
+    this.setState({ serviceIDRef: this.props.serviceIDRef });
+    this.setState({ data: this.state.data.concat(this.props.data) })
+    this.setState({ preRenderedItem: items })
   }
 
   savePlaylist() {
@@ -115,6 +136,7 @@ class Schedule extends React.Component {
     }
     else {
       if(this.state.data.length === 0) {
+        alert("its zero still")
         item.startTime = moment
         .utc("00:00", "HH:mm:ss")
         .format("HH:mm:ss");
@@ -152,32 +174,13 @@ class Schedule extends React.Component {
     this.setState({ serviceIDRef: this.props.serviceIDRef });
     this.setState({ status: "Save Playlist" });
     this.setState({ data: this.state.data.concat(content) })
-    this.setState({ preRenderedItem: this.state.preRenderedItem.concat(items) })
+    this.setState({ preRenderedItem: items })
   }
 
-  componentDidMount() {
-    let items = [];
-    for (let i = 0; i < this.props.data.length; i++) {
-      items.push(
-        <SingleSchedule
-          fetchTime={this.props.fetchTime}
-          title={this.props.data[i].title}
-          startTime={this.props.data[i].startTime}
-          duration={this.props.data[i].duration}
-          deleteItem={this.deleteItem}
-          id={this.props.data[i].id}
-          flag={false}
-          live={this.props.data[i].live}
-        />
-      );
-    }
-    this.setState({ index: null});
-    this.setState({ serviceIDRef: this.props.serviceIDRef });
-    this.setState({ data: this.state.data.concat(this.props.data) })
-    this.setState({ preRenderedItem: this.state.preRenderedItem.concat(items) })
-  }
+
 
   componentDidUpdate(prevProps) {
+
     let items = [];
     if (prevProps.clipTime !== this.props.clipTime) {
       for (let i = 0; i < this.props.data.length; i++) {
@@ -228,28 +231,33 @@ class Schedule extends React.Component {
         }
       }
     }
-    if (prevProps.data.length !== this.props.data.length) {
-
+    if (prevProps.length !== this.props.length) {
+      alert("SOMETHING ADDED BRO")
+      this.setState({ data: this.state.data.concat(this.props.data) })
       // this.props.data.length === ? scheduleContent = newData : scheduleContent = this.props.data
 
       let newData = [];
 
-      for (let i = prevProps.data.length; i < this.props.data.length; i++) {
-
+      for (let i = prevProps.length; i < this.props.length; i++) {
         this.addItemPosition(this.props.data[i]);
         newData.push(this.props.data[i]);
 
         items.push(
           <SingleSchedule
             fetchTime={this.props.fetchTime}
-            title={this.props.data.title}
-            startTime={this.props.data.startTime}
-            duration={this.props.data.duration}
+            title={this.props.data[i].title}
+            startTime={this.props.data[i].startTime}
+            duration={this.props.data[i].duration}
             deleteItem={this.deleteItem}
-            id={this.props.data.id}
-            live={this.props.data.live}
+            id={this.props.data[i].id}
+            live={this.props.data[i].live}
           />
         );
+      }
+      this.setState({ preRenderedItem: this.state.preRenderedItem.concat(items) })
+      
+
+    }
             /*
             if ( lastEndTime > item.startTime ) {
               //highlight on the actual listing.
@@ -271,178 +279,178 @@ class Schedule extends React.Component {
         */
 
     
-        if (false !== null) { // TODO
-          var currentStartTime = moment(
-            newData[this.state.index].startTime,
-            "HH:mm:ss"
-          )
-          .add(
-            moment.duration(newData[this.state.index].duration)                
-          )
-          .format("HH:mm:ss");
-          //  var newTime = (moment.duration(newData[newData.length - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
+      //   if (false !== null) { // TODO
+      //     var currentStartTime = moment(
+      //       newData[this.state.index].startTime,
+      //       "HH:mm:ss"
+      //     )
+      //     .add(
+      //       moment.duration(newData[this.state.index].duration)                
+      //     )
+      //     .format("HH:mm:ss");
+      //     //  var newTime = (moment.duration(newData[newData.length - 1].duration)._milliseconds, 'milliseconds').format("HH:mm:ss");
 
-          if (
-            newData[this.state.index + 1].isLive === true &&
-            moment(currentStartTime, "HH:mm:ss")
-              .add(
-                moment.duration(
-                  newData[newData.length - 1].duration
-                )
-              )
-              .format("HH:mm:ss") <
-              newData[this.state.index + 1].startTime
-          ) {
-            newData.pop();
-            items.splice(
-              this.state.index,
-              0,
-              <SingleSchedule
-                fetchTime={this.props.fetchTime}
-                title={newData[newData.length - 1].title}
-                startTime={newData[newData.length - 1].startTime}
-                duration={newData[newData.length - 1].duration}
-                deleteItem={this.deleteItem}
-                id={newData[newData.length - 1].id}
-              />
-            );
-            newData.splice(this.state.index, 0, this.props.data[i]);
-            items.splice(this.state.index, items.length);
-            for (let j = this.state.index; j < newData.length; j++) {
-              if (j === 0) {
-                newData[j].startTime = moment
-                  .utc("00:00", "HH:mm:ss")
-                  .format("HH:mm:ss");
-                newData[j].id = count += 1;
-              } else if (newData[j].isLive === true) {
-                newData[j].live = "live";
-              } else {
-                newData[j].startTime = moment
-                  .utc(newData[j - 1].startTime, "HH:mm:ss")
-                  .add(
-                    moment.duration(newData[j - 1].duration)
-                  )
-                  .format("HH:mm:ss");
-                newData[j].id = count += 1;
-              }
-              this.props.data.map((item, idx) => {
-                if (item.title === newData[j].title) {
-                  if (item.available_versions !== undefined) {
-                    newData[j].duration =
-                      item.available_versions.version[0].duration;
-                  } else {
-                    newData[j].duration = item.duration;
-                  }
-                }
-              });
+      //     if (
+      //       newData[this.state.index + 1].isLive === true &&
+      //       moment(currentStartTime, "HH:mm:ss")
+      //         .add(
+      //           moment.duration(
+      //             newData[newData.length - 1].duration
+      //           )
+      //         )
+      //         .format("HH:mm:ss") <
+      //         newData[this.state.index + 1].startTime
+      //     ) {
+      //       newData.pop();
+      //       items.splice(
+      //         this.state.index,
+      //         0,
+      //         <SingleSchedule
+      //           fetchTime={this.props.fetchTime}
+      //           title={newData[newData.length - 1].title}
+      //           startTime={newData[newData.length - 1].startTime}
+      //           duration={newData[newData.length - 1].duration}
+      //           deleteItem={this.deleteItem}
+      //           id={newData[newData.length - 1].id}
+      //         />
+      //       );
+      //       newData.splice(this.state.index, 0, this.props.data[i]);
+      //       items.splice(this.state.index, items.length);
+      //       for (let j = this.state.index; j < newData.length; j++) {
+      //         if (j === 0) {
+      //           newData[j].startTime = moment
+      //             .utc("00:00", "HH:mm:ss")
+      //             .format("HH:mm:ss");
+      //           newData[j].id = count += 1;
+      //         } else if (newData[j].isLive === true) {
+      //           newData[j].live = "live";
+      //         } else {
+      //           newData[j].startTime = moment
+      //             .utc(newData[j - 1].startTime, "HH:mm:ss")
+      //             .add(
+      //               moment.duration(newData[j - 1].duration)
+      //             )
+      //             .format("HH:mm:ss");
+      //           newData[j].id = count += 1;
+      //         }
+      //         this.props.data.map((item, idx) => {
+      //           if (item.title === newData[j].title) {
+      //             if (item.available_versions !== undefined) {
+      //               newData[j].duration =
+      //                 item.available_versions.version[0].duration;
+      //             } else {
+      //               newData[j].duration = item.duration;
+      //             }
+      //           }
+      //         });
 
-              items.push(
-                <SingleSchedule
-                  fetchTime={this.props.fetchTime}
-                  title={newData[j].title}
-                  startTime={newData[j].startTime}
-                  duration={newData[j].duration}
-                  deleteItem={this.deleteItem}
-                  id={newData[j].id}
-                  live={newData[j].live}
-                />
-              );
-            }
-          } else if (
-            newData[this.state.index + 1].isLive === true &&
-            moment(currentStartTime, "HH:mm:ss")
-              .add(
-                moment.duration(
-                  newData[newData.length - 1].duration
-                )._milliseconds,
-                "milliseconds"
-              )
-              .format("HH:mm:ss") >
-              newData[this.state.index + 1].startTime
-          ) {
-            alert("Cannot move the live show, please review your changes");
-            newData.pop();
-            break;
-          } else {
-            newData.pop();
-            items.splice(
-              this.state.index,
-              0,
-              <SingleSchedule
-                fetchTime={this.props.fetchTime}
-                title={newData[newData.length - 1].title}
-                startTime={newData[newData.length - 1].startTime}
-                duration={newData[newData.length - 1].duration}
-                deleteItem={this.deleteItem}
-                id={newData[newData.length - 1].id}
-              />
-            );
-            newData.splice(this.state.index, 0, this.props.data[i]);
-            items.splice(this.state.index, items.length);
-            for (let j = this.state.index; j < newData.length; j++) {
-              if (j === 0) {
-                newData[j].startTime = moment
-                  .utc("00:00", "HH:mm:ss")
-                  .format("HH:mm:ss");
-                newData[j].id = count += 1;
-              } else if (newData[j].isLive === true) {
-                // DO nothing ???
-              } else {
-                newData[j].startTime = moment
-                  .utc(newData[j - 1].startTime, "HH:mm:ss")
-                  .add(
-                    moment.duration(newData[j - 1].duration)                     
-                  )
-                  .format("HH:mm:ss");
-                newData[j].id = count += 1;
-              }
-              this.props.data.map((item, idx) => {
-                if (item.title === newData[j].title) {
-                  if (item.available_versions !== undefined) {
-                    newData[j].duration =
-                      item.available_versions.version[0].duration;
-                  } else {
-                    newData[j].duration = item.duration;
-                  }
-                }
-              });
+      //         items.push(
+      //           <SingleSchedule
+      //             fetchTime={this.props.fetchTime}
+      //             title={newData[j].title}
+      //             startTime={newData[j].startTime}
+      //             duration={newData[j].duration}
+      //             deleteItem={this.deleteItem}
+      //             id={newData[j].id}
+      //             live={newData[j].live}
+      //           />
+      //         );
+      //       }
+      //     } else if (
+      //       newData[this.state.index + 1].isLive === true &&
+      //       moment(currentStartTime, "HH:mm:ss")
+      //         .add(
+      //           moment.duration(
+      //             newData[newData.length - 1].duration
+      //           )._milliseconds,
+      //           "milliseconds"
+      //         )
+      //         .format("HH:mm:ss") >
+      //         newData[this.state.index + 1].startTime
+      //     ) {
+      //       alert("Cannot move the live show, please review your changes");
+      //       newData.pop();
+      //       break;
+      //     } else {
+      //       newData.pop();
+      //       items.splice(
+      //         this.state.index,
+      //         0,
+      //         <SingleSchedule
+      //           fetchTime={this.props.fetchTime}
+      //           title={newData[newData.length - 1].title}
+      //           startTime={newData[newData.length - 1].startTime}
+      //           duration={newData[newData.length - 1].duration}
+      //           deleteItem={this.deleteItem}
+      //           id={newData[newData.length - 1].id}
+      //         />
+      //       );
+      //       newData.splice(this.state.index, 0, this.props.data[i]);
+      //       items.splice(this.state.index, items.length);
+      //       for (let j = this.state.index; j < newData.length; j++) {
+      //         if (j === 0) {
+      //           newData[j].startTime = moment
+      //             .utc("00:00", "HH:mm:ss")
+      //             .format("HH:mm:ss");
+      //           newData[j].id = count += 1;
+      //         } else if (newData[j].isLive === true) {
+      //           // DO nothing ???
+      //         } else {
+      //           newData[j].startTime = moment
+      //             .utc(newData[j - 1].startTime, "HH:mm:ss")
+      //             .add(
+      //               moment.duration(newData[j - 1].duration)                     
+      //             )
+      //             .format("HH:mm:ss");
+      //           newData[j].id = count += 1;
+      //         }
+      //         this.props.data.map((item, idx) => {
+      //           if (item.title === newData[j].title) {
+      //             if (item.available_versions !== undefined) {
+      //               newData[j].duration =
+      //                 item.available_versions.version[0].duration;
+      //             } else {
+      //               newData[j].duration = item.duration;
+      //             }
+      //           }
+      //         });
 
-              items.push(
-                <SingleSchedule
-                  fetchTime={this.props.fetchTime}
-                  title={newData[j].title}
-                  startTime={newData[j].startTime}
-                  duration={newData[j].duration}
-                  deleteItem={this.deleteItem}
-                  id={newData[j].id}
-                  live={newData[j].live}
-                />
-              );
-            }
-          }
-        } else {
-          items.push(
-            <SingleSchedule
-              fetchTime={this.props.fetchTime}
-              title={newData[newData.length - 1].title}
-              startTime={newData[newData.length - 1].startTime}
-              duration={newData[newData.length - 1].duration}
-              deleteItem={this.deleteItem}
-              id={newData[newData.length - 1].id}
-              live={newData[newData.length - 1].live}
-            />
-          );
-        }
+      //         items.push(
+      //           <SingleSchedule
+      //             fetchTime={this.props.fetchTime}
+      //             title={newData[j].title}
+      //             startTime={newData[j].startTime}
+      //             duration={newData[j].duration}
+      //             deleteItem={this.deleteItem}
+      //             id={newData[j].id}
+      //             live={newData[j].live}
+      //           />
+      //         );
+      //       }
+      //     }
+      //   } else {
+      //     items.push(
+      //       <SingleSchedule
+      //         fetchTime={this.props.fetchTime}
+      //         title={newData[newData.length - 1].title}
+      //         startTime={newData[newData.length - 1].startTime}
+      //         duration={newData[newData.length - 1].duration}
+      //         deleteItem={this.deleteItem}
+      //         id={newData[newData.length - 1].id}
+      //         live={newData[newData.length - 1].live}
+      //       />
+      //     );
+      //   }
+      // }
+      // this.setState({
+      //   savePlaylist: "ui right floated small primary labeled icon button"
+      // });
+      // this.setState({ status: "Save Playlist" });
+      // this.setState({ serviceIDRef: this.props.serviceIDRef });
+      // this.setState({ data: this.state.data.concat(this.props.data) })
+      // this.setState({ preRenderedItem: this.state.preRenderedItem.concat(items) })
+      // }
       }
-      this.setState({
-        savePlaylist: "ui right floated small primary labeled icon button"
-      });
-      this.setState({ status: "Save Playlist" });
-      this.setState({ serviceIDRef: this.props.serviceIDRef });
-      this.setState({ data: this.state.data.concat(this.props.data) })
-      this.setState({ preRenderedItem: this.state.preRenderedItem.concat(items) })
-      }
-  }
 
   deleteItem(id) {
     // TODO - 
