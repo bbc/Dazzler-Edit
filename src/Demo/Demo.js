@@ -383,7 +383,6 @@ console.log(copiedContent);
         newItem2.versionCrid = item.available_versions.version[version].crid;
         newItem2.isLive = false;
         newItem2.id = count;
-        alert("in clip")
       }
       break;      
       case "window":

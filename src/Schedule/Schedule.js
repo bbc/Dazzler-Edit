@@ -8,6 +8,7 @@ var count = -2;
 const tvaStart = "<TVAMain xmlns=\"urn:tva:metadata:2007\" xmlns:mpeg7=\"urn:tva:mpeg7:2005\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xml:lang=\"en-GB\" xsi:schemaLocation=\"urn:tva:metadata:2007 tva_metadata_3-1_v141.xsd\">\n  <ProgramDescription>\n";
 const tvaEnd = "  </ProgramDescription>\n</TVAMain>";
 
+
 class Schedule extends React.Component {
 
   constructor(props) {
@@ -136,7 +137,6 @@ class Schedule extends React.Component {
     }
     else {
       if(this.state.data.length === 0) {
-        alert("its zero still")
         item.startTime = moment
         .utc("00:00", "HH:mm:ss")
         .format("HH:mm:ss");
@@ -176,6 +176,7 @@ class Schedule extends React.Component {
     this.setState({ data: this.state.data.concat(content) })
     this.setState({ preRenderedItem: items })
   }
+
 
 
 
@@ -231,17 +232,26 @@ class Schedule extends React.Component {
         }
       }
     }
-    if (prevProps.length !== this.props.length) {
-      alert("SOMETHING ADDED BRO")
+    if (prevProps.length != this.props.length) {
+
+
       this.setState({ data: this.state.data.concat(this.props.data) })
       // this.props.data.length === ? scheduleContent = newData : scheduleContent = this.props.data
 
       let newData = [];
+      let lastEndTime = '';
 
       for (let i = prevProps.length; i < this.props.length; i++) {
         this.addItemPosition(this.props.data[i]);
         newData.push(this.props.data[i]);
-
+        //setting the end time
+        i > 1 ? lastEndTime = moment
+        .utc(this.props.data[i - 1].startTime, "HH:mm:ss")
+        .add(
+          moment.duration(this.props.data[i - 1].duration)
+        )
+        .format("HH:mm:ss"): lastEndTime = '';
+        
         items.push(
           <SingleSchedule
             fetchTime={this.props.fetchTime}
@@ -253,31 +263,45 @@ class Schedule extends React.Component {
             live={this.props.data[i].live}
           />
         );
+                    
+          // if ( lastEndTime > this.props.data[i].startTime ) {
+          //     //highlight on the actual listing.
+          //     alert(
+          //       "Warning! Programme at " +
+          //         newData[newData.length - 1].startTime +
+          //         " will be cut short because of the Live Programme"
+          //     );
+          //   } else if (lastEndTime < this.props.data[i].startTime) {
+          //     alert(
+          //       "Warning! You have a gap in the schedule before the start of the LIVE programme"
+          //     );
+          //   }          
+          
+          // else {
+          //   this.props.data[i].startTime = lastEndTime;
+          // }
+
+
+
       }
+     
       this.setState({ preRenderedItem: this.state.preRenderedItem.concat(items) })
-      
-
+      this.setState({ data: this.state.data.concat(this.props.data) })
+      console.log("LAST END TIME IS ", lastEndTime)
     }
-            /*
-            if ( lastEndTime > item.startTime ) {
-              //highlight on the actual listing.
-              alert(
-                "Warning! Programme at " +
-                  newData[newData.length - 1].startTime +
-                  " will be cut short because of the Live Programme"
-              );
-            } else if (lastEndTime < item.startTime) {
-              alert(
-                "Warning! You have a gap in the schedule before the start of the LIVE programme"
-              );
-            }          
-          }
-          else {
-            item.startTime = lastEndTime;
-          }
-        }
-        */
+    //   let lastEndTime = moment
+    //   .utc(lastItem.startTime, "HH:mm:ss")
+    //   .add(
+    //     moment.duration(lastItem.duration)
+    //   )
+    //   .format("HH:mm:ss");
+    // }
+    
+            
 
+        
+        
+      // }
     
       //   if (false !== null) { // TODO
       //     var currentStartTime = moment(
@@ -450,7 +474,7 @@ class Schedule extends React.Component {
       // this.setState({ data: this.state.data.concat(this.props.data) })
       // this.setState({ preRenderedItem: this.state.preRenderedItem.concat(items) })
       // }
-      }
+    }
 
   deleteItem(id) {
     // TODO - 
