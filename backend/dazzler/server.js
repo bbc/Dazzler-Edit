@@ -303,9 +303,12 @@ function SpwRequest(sid, date) {
 function nitroRequest(feed, query) {
   return new Promise((resolve, reject) => {
     var options = {
-      host: "programmes.api.bbc.com",
+      /* if environment exists (env.json), use host and port with the values in env.json,
+       else do nothing..so in cosmos environment it doesn't pull it in. */
+      host: process.env.HOST,
+      port:process.env.PORT,
       path:
-        "/nitro/api/" +
+      "http://programmes.api.bbc.com" + "/nitro/api/" +
         feed +
         "?api_key=" +
         process.env.NITRO_KEY +
