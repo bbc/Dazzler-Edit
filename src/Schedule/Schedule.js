@@ -264,22 +264,22 @@ class Schedule extends React.Component {
           />
         );
                     
-          // if ( lastEndTime > this.props.data[i].startTime ) {
-          //     //highlight on the actual listing.
-          //     alert(
-          //       "Warning! Programme at " +
-          //         newData[newData.length - 1].startTime +
-          //         " will be cut short because of the Live Programme"
-          //     );
-          //   } else if (lastEndTime < this.props.data[i].startTime) {
-          //     alert(
-          //       "Warning! You have a gap in the schedule before the start of the LIVE programme"
-          //     );
-          //   }          
+          if ( lastEndTime > this.props.data[i].startTime ) {
+              //highlight on the actual listing.
+              alert(
+                "Warning! Programme at " +
+                  newData[newData.length - 1].startTime +
+                  " will be cut short because of the Live Programme"
+              );
+            } else if (lastEndTime < this.props.data[i].startTime) {
+              alert(
+                "Warning! You have a gap in the schedule before the start of the LIVE programme"
+              );
+            }          
           
-          // else {
-          //   this.props.data[i].startTime = lastEndTime;
-          // }
+          else {
+            this.props.data[i].startTime = lastEndTime;
+          }
 
 
 
