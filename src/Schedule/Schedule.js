@@ -16,7 +16,6 @@ class Schedule extends React.Component {
     super(props);
     this.savePlaylist = this.savePlaylist.bind(this);
     this.pasteContent = this.pasteContent.bind(this);
-    this.deleteItem = this.deleteItem.bind(this);
     this.makeScheduleEvent = this.makeScheduleEvent.bind(this);
     this.addScheduleItem = this.addScheduleItem.bind(this);
     this.deleteScheduleItems = this.deleteScheduleItems.bind(this);
@@ -180,6 +179,7 @@ class Schedule extends React.Component {
   }
 
   addScheduleItem(prevPropsLength){
+    console.log(3)
     let items = []
     this.setState({ data: this.state.data.concat(this.props.data) })
     // this.props.data.length === ? scheduleContent = newData : scheduleContent = this.props.data
@@ -230,33 +230,32 @@ class Schedule extends React.Component {
   deleteScheduleItems(){
     this.props.data.map((item, index) => {
       if (item.startTime == this.props.deleteId){
-          // this.props.data.splice(index, 1)
-          console.log("deletedID is " + this.props.deleteId)
-          console.log("deletedID for this.props.data " + this.props.data[index].startTime)
-          // console.log("deletedID for items " + items[index].startTime)
-          console.log("items is ", items)
-          console.log("deletedID for this.state.data " + this.state.data[index].startTime)
+           this.props.data.splice(index, 1);
+           this.setState({data: this.state.data.splice(index, 1)})
+           this.setState({ preRenderedItem: this.state.preRenderedItem.filter(item => item.props.startTime != this.props.deleteId) });
+    
           }
       })
-      }
+
+ 
+   }
 
 
   
 
 
   componentDidUpdate(prevProps) {
-    let items = [];
-    switch(true) {
 
+    switch(true) {
       case prevProps.length < this.props.length:
           this.addScheduleItem(prevProps.length)
           break;
     
       case prevProps.deleteId !== this.props.deleteId:
           this.deleteScheduleItems()
-        break
+          break;
     }
-
+  }
     // if (prevProps.clipTime !== this.props.clipTime) {
     //   for (let i = 0; i < this.props.data.length; i++) {
     //     if (
@@ -491,13 +490,9 @@ class Schedule extends React.Component {
       // this.setState({ data: this.state.data.concat(this.props.data) })
       // this.setState({ preRenderedItem: this.state.preRenderedItem.concat(items) })
       // }
-    }
+    
 
-  deleteItem(id) {
-    // TODO - 
-    // 1) remove one item
-    // 2) recalculate all start times
-  }
+
 
   render() {
     return (
