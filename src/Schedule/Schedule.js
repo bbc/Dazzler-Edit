@@ -19,6 +19,7 @@ class Schedule extends React.Component {
     this.makeScheduleEvent = this.makeScheduleEvent.bind(this);
     this.addScheduleItem = this.addScheduleItem.bind(this);
     this.deleteScheduleItems = this.deleteScheduleItems.bind(this);
+    this.addItemPosition = this.addItemPosition.bind(this);
 
     this.state = {
       spinner: false,
@@ -50,7 +51,6 @@ class Schedule extends React.Component {
     }
     this.setState({ index: null});
     this.setState({ serviceIDRef: this.props.serviceIDRef });
-    this.setState({ data: this.state.data.concat(this.props.data) })
     this.setState({ preRenderedItem: items })
   }
 
@@ -132,7 +132,8 @@ class Schedule extends React.Component {
       `;
   }
 
-  addItemPosition(item) {
+  addItemPosition = item => {
+    console.log("item is", item)
     if (item.isLive) {
       item.live = "live";
     }
@@ -221,11 +222,30 @@ class Schedule extends React.Component {
     this.setState({ preRenderedItem: this.state.preRenderedItem.concat(items) })
   }
   deleteScheduleItems(){
+    let items = []
     this.props.data.map((item, index) => {
       if (item.startTime == this.props.deleteId){
            this.setState({ preRenderedItem: this.state.preRenderedItem.filter(item => item.props.startTime != this.props.deleteId) });
-          }
-      })
+           this.props.data.splice(index, 1);
+            for (let i = index; i < this.props.data.length - 1; i++){
+              this.addItemPosition(this.props.data[i])
+              items.push(
+                <SingleSchedule
+                  fetchTime={this.props.fetchTime}
+                  title={this.props.data[i].title}
+                  startTime={this.props.data[i].startTime}
+                  duration={this.props.data[i].duration}
+                  deleteItem={this.props.deleteItem}
+                  id={this.props.data[i].id}
+                  live={this.props.data[i].live}
+                />
+              );
+              
+ }
+
+      }
+    })
+    this.setState({ preRenderedItem: this.state.preRenderedItem.concat(items) })
    }
 
 
@@ -240,6 +260,7 @@ class Schedule extends React.Component {
           break;
     
       case prevProps.deleteId !== this.props.deleteId:
+     
           this.deleteScheduleItems()
           break;
     }
