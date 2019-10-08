@@ -179,17 +179,11 @@ class Schedule extends React.Component {
   }
 
   addScheduleItem(prevPropsLength){
-    console.log(3)
     let items = []
     this.setState({ data: this.state.data.concat(this.props.data) })
-    // this.props.data.length === ? scheduleContent = newData : scheduleContent = this.props.data
-
-    let newData = [];
     let lastEndTime = '';
-
     for (let i = prevPropsLength; i < this.props.length; i++) {
       this.addItemPosition(this.props.data[i]);
-      newData.push(this.props.data[i]);
       //setting the end time
       i >= 1 ? lastEndTime = moment
       .utc(this.props.data[i - 1].startTime, "HH:mm:ss")
@@ -197,7 +191,6 @@ class Schedule extends React.Component {
         moment.duration(this.props.data[i - 1].duration)
       )
       .format("HH:mm:ss"): lastEndTime = false;
-      
       items.push(
         <SingleSchedule
           fetchTime={this.props.fetchTime}
@@ -210,14 +203,15 @@ class Schedule extends React.Component {
         />
       );
         if ( lastEndTime > this.props.data[i].startTime ) {
-
+          var programme = this.state.preRenderedItem[this.state.preRenderedItem.length - 1].props
             //highlight on the actual listing.
             alert(
-              "Warning! Programme at " +
-                newData[newData.length - 1].startTime +
+              "Warning! Programme " + programme.title + " at " +
+              programme.startTime +
                 " will be cut short because of the Live Programme"
             );
-          } else if (lastEndTime < this.props.data[i].startTime) {
+        }
+        else if (lastEndTime < this.props.data[i].startTime) {
             alert(
               "Warning! You have a gap in the schedule before the start of the LIVE programme"
             );
@@ -225,19 +219,13 @@ class Schedule extends React.Component {
     }
    
     this.setState({ preRenderedItem: this.state.preRenderedItem.concat(items) })
-    this.setState({ data: this.state.data.concat(this.props.data) })
   }
   deleteScheduleItems(){
     this.props.data.map((item, index) => {
       if (item.startTime == this.props.deleteId){
-           this.props.data.splice(index, 1);
-           this.setState({data: this.state.data.splice(index, 1)})
            this.setState({ preRenderedItem: this.state.preRenderedItem.filter(item => item.props.startTime != this.props.deleteId) });
-    
           }
       })
-
- 
    }
 
 
