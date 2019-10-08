@@ -7,6 +7,7 @@ import { isTaggedTemplateExpression } from "typescript";
 var count = -2;
 const tvaStart = "<TVAMain xmlns=\"urn:tva:metadata:2007\" xmlns:mpeg7=\"urn:tva:mpeg7:2005\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xml:lang=\"en-GB\" xsi:schemaLocation=\"urn:tva:metadata:2007 tva_metadata_3-1_v141.xsd\">\n  <ProgramDescription>\n";
 const tvaEnd = "  </ProgramDescription>\n</TVAMain>";
+var items = [];
 
 
 class Schedule extends React.Component {
@@ -17,6 +18,8 @@ class Schedule extends React.Component {
     this.pasteContent = this.pasteContent.bind(this);
     this.deleteItem = this.deleteItem.bind(this);
     this.makeScheduleEvent = this.makeScheduleEvent.bind(this);
+    this.addScheduleItem = this.addScheduleItem.bind(this);
+    this.deleteScheduleItems = this.deleteScheduleItems.bind(this);
 
     this.state = {
       spinner: false,
@@ -31,7 +34,6 @@ class Schedule extends React.Component {
     };
   }
   componentDidMount() {
-    let items = [];
     for (let i = 0; i < this.props.data.length; i++) {
       
       items.push(
@@ -177,127 +179,142 @@ class Schedule extends React.Component {
     this.setState({ preRenderedItem: items })
   }
 
+  addScheduleItem(prevPropsLength){
+    let items = []
+    this.setState({ data: this.state.data.concat(this.props.data) })
+    // this.props.data.length === ? scheduleContent = newData : scheduleContent = this.props.data
 
+    let newData = [];
+    let lastEndTime = '';
+
+    for (let i = prevPropsLength; i < this.props.length; i++) {
+      this.addItemPosition(this.props.data[i]);
+      newData.push(this.props.data[i]);
+      //setting the end time
+      i >= 1 ? lastEndTime = moment
+      .utc(this.props.data[i - 1].startTime, "HH:mm:ss")
+      .add(
+        moment.duration(this.props.data[i - 1].duration)
+      )
+      .format("HH:mm:ss"): lastEndTime = false;
+      
+      items.push(
+        <SingleSchedule
+          fetchTime={this.props.fetchTime}
+          title={this.props.data[i].title}
+          startTime={this.props.data[i].startTime}
+          duration={this.props.data[i].duration}
+          deleteItem={this.props.deleteItem}
+          id={this.props.data[i].id}
+          live={this.props.data[i].live}
+        />
+      );
+        if ( lastEndTime > this.props.data[i].startTime ) {
+
+            //highlight on the actual listing.
+            alert(
+              "Warning! Programme at " +
+                newData[newData.length - 1].startTime +
+                " will be cut short because of the Live Programme"
+            );
+          } else if (lastEndTime < this.props.data[i].startTime) {
+            alert(
+              "Warning! You have a gap in the schedule before the start of the LIVE programme"
+            );
+          }          
+    }
+   
+    this.setState({ preRenderedItem: this.state.preRenderedItem.concat(items) })
+    this.setState({ data: this.state.data.concat(this.props.data) })
+  }
+  deleteScheduleItems(){
+    this.props.data.map((item, index) => {
+      if (item.startTime == this.props.deleteId){
+          // this.props.data.splice(index, 1)
+          console.log("deletedID is " + this.props.deleteId)
+          console.log("deletedID for this.props.data " + this.props.data[index].startTime)
+          // console.log("deletedID for items " + items[index].startTime)
+          console.log("items is ", items)
+          console.log("deletedID for this.state.data " + this.state.data[index].startTime)
+          }
+      })
+      }
+
+
+  
 
 
   componentDidUpdate(prevProps) {
-
     let items = [];
-    if (prevProps.clipTime !== this.props.clipTime) {
-      for (let i = 0; i < this.props.data.length; i++) {
-        if (
-          this.props.data[i].id === this.props.clipTime &&
-          this.props.data[i].flag !== true &&
-          this.props.data[i].isLive !== true
-        ) {
-          if (this.props.data[i].style === "blankScheduleItem") {
-            items.push(
-              <SingleSchedule
-                flag={true}
-                fetchTime={this.props.fetchTime}
-                deleteItem={this.deleteItem}
-                style="blankScheduleItem"
-                duration={this.props.data[i].duration}
-                id={this.props.data[i].id}
-              />
-            );
-            this.setState({ index: i });
-          } else {
-            items.push(
-              <SingleSchedule
-                fetchTime={this.props.fetchTime}
-                title={this.props.data[i].title}
-                startTime={this.props.data[i].startTime}
-                duration={this.props.data[i].duration}
-                deleteItem={this.deleteItem}
-                id={this.props.data[i].id}
-                flag={true}
-                border="border_bottom"
-              />
-            );
-            this.setState({ index: i });
-          }
-        } else {
-          items.push(
-            <SingleSchedule
-              fetchTime={this.props.fetchTime}
-              title={this.props.data[i].title}
-              startTime={this.props.data[i].startTime}
-              duration={this.props.data[i].duration}
-              deleteItem={this.deleteItem}
-              id={this.props.data[i].id}
-              flag={false}
-            />
-          );
-        }
-      }
-    }
-    if (prevProps.length != this.props.length) {
+    switch(true) {
 
-
-      this.setState({ data: this.state.data.concat(this.props.data) })
-      // this.props.data.length === ? scheduleContent = newData : scheduleContent = this.props.data
-
-      let newData = [];
-      let lastEndTime = '';
-
-      for (let i = prevProps.length; i < this.props.length; i++) {
-        this.addItemPosition(this.props.data[i]);
-        newData.push(this.props.data[i]);
-        //setting the end time
-        i > 1 ? lastEndTime = moment
-        .utc(this.props.data[i - 1].startTime, "HH:mm:ss")
-        .add(
-          moment.duration(this.props.data[i - 1].duration)
-        )
-        .format("HH:mm:ss"): lastEndTime = '';
-        
-        items.push(
-          <SingleSchedule
-            fetchTime={this.props.fetchTime}
-            title={this.props.data[i].title}
-            startTime={this.props.data[i].startTime}
-            duration={this.props.data[i].duration}
-            deleteItem={this.deleteItem}
-            id={this.props.data[i].id}
-            live={this.props.data[i].live}
-          />
-        );
-                    
-          if ( lastEndTime > this.props.data[i].startTime ) {
-              //highlight on the actual listing.
-              alert(
-                "Warning! Programme at " +
-                  newData[newData.length - 1].startTime +
-                  " will be cut short because of the Live Programme"
-              );
-            } else if (lastEndTime < this.props.data[i].startTime) {
-              alert(
-                "Warning! You have a gap in the schedule before the start of the LIVE programme"
-              );
-            }          
-          
-          else {
-            this.props.data[i].startTime = lastEndTime;
-          }
-
-
-
-      }
-     
-      this.setState({ preRenderedItem: this.state.preRenderedItem.concat(items) })
-      this.setState({ data: this.state.data.concat(this.props.data) })
-      console.log("LAST END TIME IS ", lastEndTime)
-    }
-    //   let lastEndTime = moment
-    //   .utc(lastItem.startTime, "HH:mm:ss")
-    //   .add(
-    //     moment.duration(lastItem.duration)
-    //   )
-    //   .format("HH:mm:ss");
-    // }
+      case prevProps.length < this.props.length:
+          this.addScheduleItem(prevProps.length)
+          break;
     
-            
+      case prevProps.deleteId !== this.props.deleteId:
+          this.deleteScheduleItems()
+        break
+    }
+
+    // if (prevProps.clipTime !== this.props.clipTime) {
+    //   for (let i = 0; i < this.props.data.length; i++) {
+    //     if (
+    //       this.props.data[i].id === this.props.clipTime &&
+    //       this.props.data[i].flag !== true &&
+    //       this.props.data[i].isLive !== true
+    //     ) {
+    //       if (this.props.data[i].style === "blankScheduleItem") {
+    //         items.push(
+    //           <SingleSchedule
+    //             flag={true}
+    //             fetchTime={this.props.fetchTime}
+    //             deleteItem={this.deleteItem}
+    //             style="blankScheduleItem"
+    //             duration={this.props.data[i].duration}
+    //             id={this.props.data[i].id}
+    //           />
+    //         );
+    //         this.setState({ index: i });
+    //       } else {
+    //         items.push(
+    //           <SingleSchedule
+    //             fetchTime={this.props.fetchTime}
+    //             title={this.props.data[i].title}
+    //             startTime={this.props.data[i].startTime}
+    //             duration={this.props.data[i].duration}
+    //             deleteItem={this.deleteItem}
+    //             id={this.props.data[i].id}
+    //             flag={true}
+    //             border="border_bottom"
+    //           />
+    //         );
+    //         this.setState({ index: i });
+    //       }
+    //     } else {
+    //       items.push(
+    //         <SingleSchedule
+    //           fetchTime={this.props.fetchTime}
+    //           title={this.props.data[i].title}
+    //           startTime={this.props.data[i].startTime}
+    //           duration={this.props.data[i].duration}
+    //           deleteItem={this.deleteItem}
+    //           id={this.props.data[i].id}
+    //           flag={false}
+    //         />
+    //       );
+    //     }
+    //   }
+    // }
+    // if (prevProps.length < this.props.length) {
+    //     this.addScheduleItem(prevProps.length)
+    // }else if (prevProps.length > this.props.length){
+    //       this.props.data.map((item, index) => {
+    //         if(item.startTime == item.clipTime){
+    //           alert(this.props.clipTime);
+    //         }
+    //       });
+    // }
 
         
         

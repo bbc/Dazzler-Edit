@@ -265,7 +265,7 @@ console.log(copiedContent);
           serviceIDRef={this.state.service.serviceIDRef}
           fetchTime={this.fetchTime}
           clipTime={time}
-          schStart={id}
+          deleteId={id}
           data={scheduleItems}
           length={scheduleItems.length}
           pasted={copiedContent}
