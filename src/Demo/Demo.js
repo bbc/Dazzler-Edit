@@ -213,10 +213,10 @@ console.log(copiedContent);
     const days = 5; // to allow us to edit future schedules
     axios
       .get(
-        "http://localhost:8080/api/v1/webcast" +
-          "?sid=" + this.state.service.sid +
-          "&start=" + day.format() +
-          "&end=" + day.add(days, 'days').utc().format()
+        "http://localhost:8080/api/v1/webcast?sid=bbc_marathi_tv&start=2019-10-09T13:41:00Z&end=2019-10-13T13:41:00Z"
+          // "?sid=" + this.state.service.sid +
+          // "&start=" + day.format() +
+          // "&end=" + day.add(days, 'days').utc().format()
       )
       .then(response => {
         const items = response.data.items;
