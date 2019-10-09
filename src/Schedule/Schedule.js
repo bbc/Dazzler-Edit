@@ -7,7 +7,7 @@ import { isTaggedTemplateExpression } from "typescript";
 var count = -2;
 const tvaStart = "<TVAMain xmlns=\"urn:tva:metadata:2007\" xmlns:mpeg7=\"urn:tva:mpeg7:2005\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xml:lang=\"en-GB\" xsi:schemaLocation=\"urn:tva:metadata:2007 tva_metadata_3-1_v141.xsd\">\n  <ProgramDescription>\n";
 const tvaEnd = "  </ProgramDescription>\n</TVAMain>";
-var items = [];
+
 
 
 class Schedule extends React.Component {
@@ -34,8 +34,10 @@ class Schedule extends React.Component {
     };
   }
   componentDidMount() {
+   
+    let items = [];
     for (let i = 0; i < this.props.data.length; i++) {
-      
+    
       items.push(
         <SingleSchedule
           fetchTime={this.props.fetchTime}
@@ -138,7 +140,7 @@ class Schedule extends React.Component {
       item.live = "live";
     }
     else {
-      if(this.state.data.length === 0) {
+      if(this.state.preRenderedItem.length === 0) {
         item.startTime = moment
         .utc("00:00", "HH:mm:ss")
         .format("HH:mm:ss");
@@ -192,6 +194,7 @@ class Schedule extends React.Component {
         moment.duration(this.props.data[i - 1].duration)
       )
       .format("HH:mm:ss"): lastEndTime = false;
+      this.setState({data : this.state.data.concat(this.props.data[i])})
       items.push(
         <SingleSchedule
           fetchTime={this.props.fetchTime}
@@ -203,7 +206,7 @@ class Schedule extends React.Component {
           live={this.props.data[i].live}
         />
       );
-        if ( lastEndTime > this.props.data[i].startTime ) {
+        if ( lastEndTime > this.props.data[i].startTime && this.state.preRenderedItem.length != 0) {
           var programme = this.state.preRenderedItem[this.state.preRenderedItem.length - 1].props
             //highlight on the actual listing.
             alert(
@@ -220,32 +223,26 @@ class Schedule extends React.Component {
     }
    
     this.setState({ preRenderedItem: this.state.preRenderedItem.concat(items) })
-  }
-  deleteScheduleItems(){
-    let items = []
-    this.props.data.map((item, index) => {
-      if (item.startTime == this.props.deleteId){
-           this.setState({ preRenderedItem: this.state.preRenderedItem.filter(item => item.props.startTime != this.props.deleteId) });
-           this.props.data.splice(index, 1);
-            for (let i = index; i < this.props.data.length - 1; i++){
-              this.addItemPosition(this.props.data[i])
-              items.push(
-                <SingleSchedule
-                  fetchTime={this.props.fetchTime}
-                  title={this.props.data[i].title}
-                  startTime={this.props.data[i].startTime}
-                  duration={this.props.data[i].duration}
-                  deleteItem={this.props.deleteItem}
-                  id={this.props.data[i].id}
-                  live={this.props.data[i].live}
-                />
-              );
-              
- }
 
-      }
-    })
-    this.setState({ preRenderedItem: this.state.preRenderedItem.concat(items) })
+  }
+   deleteScheduleItems(){
+    var myData = this.state.data;
+    let items = []
+    this.setState({preRenderedItem : []})
+
+      myData.map((item, index) => {
+        if(item.startTime == this.props.deleteId){
+            myData.splice(index, 1);
+              for(let i = index; i < myData.length; i++){
+                this.addItemPosition(myData[i]);
+              }
+            }
+    });
+      myData.map(item =>{
+        console.log(item.startTime);
+      })
+    //  this.setState({ preRenderedItem: myData});
+
    }
 
 
@@ -260,8 +257,7 @@ class Schedule extends React.Component {
           break;
     
       case prevProps.deleteId !== this.props.deleteId:
-     
-          this.deleteScheduleItems()
+          this.deleteScheduleItems();
           break;
     }
   }
@@ -504,6 +500,9 @@ class Schedule extends React.Component {
 
 
   render() {
+    console.log(this.state.preRenderedItem)
+    console.log(this.props.data)
+    console.log(this.state.data)
     return (
       <div>
         <div className="dateContainer">

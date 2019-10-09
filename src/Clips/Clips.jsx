@@ -152,7 +152,7 @@ export class Clips extends React.Component {
         "&page_size=" + this.state.rowsPerPage
       )
       .then(response => {
-        console.log(response);
+        console.log("CLIP", response);
         this.setState({previousPage: response.data.page - 1});    
         this.setState({page: response.data.page - 1});    
         this.setState({rows: response.data.items});    
