@@ -220,6 +220,7 @@ console.log(copiedContent);
       )
       .then(response => {
         const items = response.data.items;
+        console.log("LIVE RESPONSE", response)
         for (let i = 0; i < items.length; i++) {
           this.setState({
             live: [...this.state.live, items[i]]
