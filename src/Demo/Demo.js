@@ -154,7 +154,6 @@ console.log(copiedContent);
           serviceIDRef={this.state.service.serviceIDRef}
           fetchTime={this.fetchTime}
           clipTime={time}
-          data={scheduleItems}
           length={scheduleItems.length}
           pasted={copiedContent}
           deleteItem={this.deleteItem}
@@ -267,10 +266,10 @@ console.log(copiedContent);
           fetchTime={this.fetchTime}
           clipTime={time}
           deleteId={id}
-          data={scheduleItems}
           length={scheduleItems.length}
           pasted={copiedContent}
           deleteItem={this.deleteItem}
+          added={false}
           text={text}
           loadPlaylist={this.loadPlaylist}
         />
@@ -293,7 +292,7 @@ console.log(copiedContent);
             serviceIDRef={this.state.service.serviceIDRef}
             fetchTime={this.fetchTime}
             clipTime={time}
-            data={scheduleItems}
+
             pasted={copiedContent}
             length={scheduleItems.length}
             deleteItem={this.deleteItem}
@@ -332,7 +331,7 @@ console.log(copiedContent);
             serviceIDRef={this.state.service.serviceIDRef}
             fetchTime={this.fetchTime}
             clipTime={time}
-            data={scheduleItems}
+
             length={scheduleItems.length}
             pasted={copiedContent}
             deleteItem={this.deleteItem}
@@ -420,18 +419,18 @@ console.log(copiedContent);
         )
       });
     } else {
-      scheduleItems.push(newItem2);
-      console.log("in schedule")
+
       this.setState({
         display: (
           <Schedule
             serviceIDRef={this.state.service.serviceIDRef}
             fetchTime={this.fetchTime}
             clipTime={time}
-            data={scheduleItems}
+            item={newItem2}
             length={scheduleItems.length}
             pasted={copiedContent}
             text="Today's "
+            added={true}
             deleteItem={this.deleteItem}
           />
         )
@@ -495,7 +494,7 @@ console.log(copiedContent);
                 serviceIDRef={this.state.service.serviceIDRef}
                 fetchTime={this.fetchTime}
                 clipTime={time}
-                data={scheduleItems}
+    
                 length={scheduleItems.length}
                 pasted={copiedContent}
                 text="Today's "
@@ -527,7 +526,6 @@ console.log(copiedContent);
           fetchTime={this.fetchTime}
           clipTime={time}
           length = {scheduleItems.length}
-          data={scheduleItems}
           pasted={copiedContent}
           text="Today's "
           deleteItem={this.deleteItem}
