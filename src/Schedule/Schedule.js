@@ -59,7 +59,7 @@ class Schedule extends React.Component {
   }
 
   savePlaylist() {
-    const data = this.state.data;
+    const data = scheduleItems;
     if (data.length === 0) {
       console.log("nothing to save - button should be disabled");
       return;
@@ -77,12 +77,11 @@ class Schedule extends React.Component {
       .utc(last.startTime, "HH:mm:ss")
       .add(moment.duration(last.duration));
 
-    let tva =
-      tvaStart +
-      "    <ProgramLocationTable>\n" +
-      `      <Schedule start="${start.format()}" end="${end.format()}" serviceIDRef="${
-        this.props.serviceIDRef
-      }">`;
+    let tva =tvaStart +
+        "    <ProgramLocationTable>\n" +
+        `      <Schedule start="${start.format()}" end="${end.format()}" serviceIDRef="${
+          this.props.serviceIDRef
+        }">`;
     for (let i = 0; i < data.length; i++) {
       tva += this.makeScheduleEvent(this.props.serviceIDRef, data[i]);
     }
@@ -91,7 +90,7 @@ class Schedule extends React.Component {
 
     axios({
       method: "post",
-      url: "/api/v1/tva",
+      url: "http://localhost:8080" + "/api/v1/tva",
       data: tva
     })
       .then(response => {
@@ -502,6 +501,9 @@ class Schedule extends React.Component {
 
   render() {
     // console.log(this.state.data);
+
+    console.log(this.state.preRenderedItem)
+    console.log(scheduleItems)
     return (
       <div>
         <div className="dateContainer">
