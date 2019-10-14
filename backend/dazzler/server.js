@@ -305,17 +305,18 @@ function nitroRequest(feed, query) {
     var options = {
       /* if environment exists (env.json), use host and port with the values in env.json,
        else do nothing..so in cosmos environment it doesn't pull it in. */
-       host: "programmes.api.bbc.com",
-       path:
-         "/nitro/api/" +
-         feed +
-         "?api_key=" +
-         process.env.NITRO_KEY +
-         "&" +
-         querystring.stringify(query),
-       headers: {
-         accept: "application/json"
-       }
+      host: process.env.HOST,
+      port:process.env.PORT,
+      path:
+      "http://programmes.api.bbc.com" + "/nitro/api/" +
+        feed +
+        "?api_key=" +
+        process.env.NITRO_KEY +
+        "&" +
+        querystring.stringify(query),
+      headers: {
+        accept: "application/json"
+      }
     };
     
     var request = http.get(options, response => {

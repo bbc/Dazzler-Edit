@@ -29,7 +29,7 @@ class SingleSchedule extends React.Component {
             </td>;
         }else{
             additional = 
-            <td><button className="mini ui button" onClick={() => this.props.deleteItem(this.props.startTime)}>Delete</button> 
+            <td><button className="mini ui button" onClick={() => this.props.deleteItem(this.props.id)}>Delete</button> 
             </td>;
         }
         this.props.flag === true ? status = <Arrow/> : status =  null;

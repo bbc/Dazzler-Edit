@@ -33,8 +33,29 @@ class Schedule extends React.Component {
     };
   }
   componentDidMount() {
+    let items = [];
     this.setState({ index: null });
     this.setState({ serviceIDRef: this.props.serviceIDRef });
+    if (localStorage.getItem("data") != null) {
+      JSON.parse(localStorage.getItem("data")).map((item, index) => {
+        items.push(
+          <SingleSchedule
+            fetchTime={this.props.fetchTime}
+            title={item.props.title}
+            startTime={item.props.startTime}
+            duration={item.props.duration}
+            deleteItem={this.props.deleteItem}
+            id={item.props.id}
+            live={item.props.live}
+          />
+        );
+      });
+      scheduleItems = JSON.parse(localStorage.getItem("scheduleItems"));
+      this.setState({
+        preRenderedItem: this.state.preRenderedItem.concat(items)
+      });
+    }
+    console.log(JSON.parse(localStorage.getItem("data")));
   }
 
   savePlaylist() {
@@ -118,7 +139,7 @@ class Schedule extends React.Component {
     if (item.isLive) {
       item.live = "live";
     } else {
-      if (scheduleItems.length === 0) {
+      if (scheduleItems.length === 0 || scheduleItems[0] == item) {
         item.startTime = moment.utc("00:00", "HH:mm:ss").format("HH:mm:ss");
       } else {
         if (recalculate != undefined || null) {
@@ -155,7 +176,7 @@ class Schedule extends React.Component {
           title={content[i].title}
           startTime={content[i].startTime}
           duration={content[i].duration}
-          deleteItem={this.deleteItem}
+          deleteItem={this.props.deleteItem}
           id={content[i].id}
           live={content[i].live}
         />
@@ -194,6 +215,7 @@ class Schedule extends React.Component {
     this.setState({
       preRenderedItem: this.state.preRenderedItem.concat(items)
     });
+    console.log(JSON.parse(localStorage.getItem("data")));
   }
 
   deleteScheduleItems() {
@@ -204,7 +226,7 @@ class Schedule extends React.Component {
     for (var index = 0; index < scheduleItems.length; index++) {
       var item = scheduleItems[index];
 
-      if (item.startTime == this.props.deleteId && !deleted) {
+      if (item.id == this.props.deleteId && !deleted) {
         deleted = true;
         scheduleItems.splice(index, 1);
         myPreRenderedItems.splice(index, myPreRenderedItems.length);
@@ -223,6 +245,7 @@ class Schedule extends React.Component {
           );
         }
         this.setState({ preRenderedItem: myPreRenderedItems.concat(items) });
+
         break;
       }
     }
@@ -233,12 +256,15 @@ class Schedule extends React.Component {
       case prevProps.item != this.props.item && this.props.added:
         console.log("added mode");
         this.addScheduleItem();
+        console.log(JSON.parse(localStorage.getItem("data")));
         break;
 
       case prevProps.deleteId != this.props.deleteId && !this.props.added:
         this.deleteScheduleItems();
         break;
     }
+    localStorage.setItem("data", JSON.stringify(this.state.preRenderedItem));
+    localStorage.setItem("scheduleItems", JSON.stringify(scheduleItems));
   }
 
   // if (prevProps.clipTime !== this.props.clipTime) {
@@ -475,8 +501,7 @@ class Schedule extends React.Component {
   // }
 
   render() {
-    console.log(this.state.preRenderedItem);
-    console.log(this.state.data);
+    // console.log(this.state.data);
     return (
       <div>
         <div className="dateContainer">
