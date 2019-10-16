@@ -367,7 +367,7 @@ console.log(copiedContent);
         newItem2.duration = item.available_versions.version[version].duration;
         newItem2.versionPid = item.available_versions.version[version].pid;
         newItem2.versionCrid = item.available_versions.version[version].crid;
-        newItem2.id = count;
+        // newItem2.id = count;
         newItem2.isLive = false;
         if(newItem2.title == null) {
           newItem2.title = newItem2.presentation_title;
@@ -381,7 +381,7 @@ console.log(copiedContent);
         newItem2.versionPid = item.available_versions.version[version].pid;
         newItem2.versionCrid = item.available_versions.version[version].crid;
         newItem2.isLive = false;
-        newItem2.id = count;
+        // newItem2.id = count;
       }
       break;      
       case "window":
@@ -399,7 +399,7 @@ console.log(copiedContent);
         }
         newItem2.captureChannel = item.service.sid; // TODO make use of this
         newItem2.isLive = true;
-        newItem2.id = count;
+        // newItem2.id = count;
       break;
       default:
         console.log(item.item_type, isLive);

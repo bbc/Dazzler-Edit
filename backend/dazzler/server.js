@@ -193,19 +193,22 @@ app.get("/api/v1/episode", function(req, res) {
 });
 
 app.post("/api/v1/tva", function(req, res) {
+  
+  // console.log(req)
   if (req.body.includes('serviceIDRef="TVMAR01')) {
-    if (req.header("sslclientcertsubject")) {
-      const subject = parseSSLsubject(req);
-      if (auth(subject.emailAddress)) {
-        postTVA(req.body, res);
-      } else {
-        console.log(subject.emailAddress +" is not authorised to save schedules");
-        res.status(403).send(subject.emailAddress +" is not authorised to save schedules");
-      }
-    } else {
-      console.log("missing authentification header");
-      res.status(403).send("missing authentification header");
-    }
+    postTVA(req.body, res);
+    // if (req.header("sslclientcertsubject")) {
+    //   const subject = parseSSLsubject(req);
+    //   if (auth(subject.emailAddress)) {
+    //     postTVA(req.body, res);
+    //   } else {
+    //     console.log(subject.emailAddress +" is not authorised to save schedules");
+    //     res.status(403).send(subject.emailAddress +" is not authorised to save schedules");
+    //   }
+    // } else {
+    //   console.log("missing authentification header");
+    //   res.status(403).send("missing authentification header");
+    // }
   } else {
     console.log("Marathi only please");
     res.status(403).send("Marathi only please");
@@ -214,8 +217,10 @@ app.post("/api/v1/tva", function(req, res) {
 
 function postTVA(data, res) {
   var options = {
-    hostname: "api.live.bbc.co.uk",
-    path: "/pips/import/tva/",
+    host: process.env.HOST,
+    port:process.env.PORT,
+    // hostname: "api.live.bbc.co.uk",
+    path: "https://api.live.bbc.co.uk" + "/pips/import/tva/",
     method: "POST",
     key: fs.readFileSync(process.env.KEY),
     cert: fs.readFileSync(process.env.CERT),
@@ -308,7 +313,7 @@ function nitroRequest(feed, query) {
       host: process.env.HOST,
       port:process.env.PORT,
       path:
-      "http://programmes.api.bbc.com" + "/nitro/api/" +
+      "http://programmes.api.bbc.com/nitro/api/" +
         feed +
         "?api_key=" +
         process.env.NITRO_KEY +
