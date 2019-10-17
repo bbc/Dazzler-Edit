@@ -14,8 +14,9 @@ const app = express();
 const config = {
   bbc_marathi_tv: {
     mid: "bbc_marathi_tv",
-    specials_collection: "p0715nv4",
-    live_brand: "w13xttvl",
+    loop_collection: process.env.LOOP_PID,
+    specials_collection: process.env.SPECIALS_PID,
+    live_brand: process.env.LIVE_BRAND_PID,
     clip_language: "marathi",
     webcast_channels: ["world_service_stream_05","world_service_stream_06","world_service_stream_07","world_service_stream_08"]
   }
@@ -100,6 +101,17 @@ app.get("/api/v1/webcast", function(req, res) {
     r => res.json(add_crids_to_webcast(r.nitro.results)),
     err => res.status(404).send("Not found") // TODO use proper error message
   );
+});
+
+// http://programmes.api.bbc.com/nitro/api/programmes?api_key=XXX&page_size=100&sort=group_position&sort_direction=ascending&group=p0510sbc
+
+app.get("/api/v1/loop", function(req, res) {
+  let q = {
+    group: config[req.query.sid].loop_collection
+    sort: 'group_position',
+    sort_direction: 'ascending'
+  };
+  clip(q, req.query, res);
 });
 
 app.get("/api/v1/special", function(req, res) {
