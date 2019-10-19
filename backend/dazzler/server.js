@@ -193,19 +193,22 @@ app.get("/api/v1/episode", function(req, res) {
 });
 
 app.post("/api/v1/tva", function(req, res) {
+  
+  // console.log(req)
   if (req.body.includes('serviceIDRef="TVMAR01')) {
-    if (req.header("sslclientcertsubject")) {
-      const subject = parseSSLsubject(req);
-      if (auth(subject.emailAddress)) {
-        postTVA(req.body, res);
-      } else {
-        console.log(subject.emailAddress +" is not authorised to save schedules");
-        res.status(403).send(subject.emailAddress +" is not authorised to save schedules");
-      }
-    } else {
-      console.log("missing authentification header");
-      res.status(403).send("missing authentification header");
-    }
+    postTVA(req.body, res);
+    // if (req.header("sslclientcertsubject")) {
+    //   const subject = parseSSLsubject(req);
+    //   if (auth(subject.emailAddress)) {
+    //     postTVA(req.body, res);
+    //   } else {
+    //     console.log(subject.emailAddress +" is not authorised to save schedules");
+    //     res.status(403).send(subject.emailAddress +" is not authorised to save schedules");
+    //   }
+    // } else {
+    //   console.log("missing authentification header");
+    //   res.status(403).send("missing authentification header");
+    // }
   } else {
     console.log("Marathi only please");
     res.status(403).send("Marathi only please");
@@ -214,8 +217,8 @@ app.post("/api/v1/tva", function(req, res) {
 
 function postTVA(data, res) {
   var options = {
-    hostname: "api.live.bbc.co.uk",
     path: "/pips/import/tva/",
+    host: "api.live.bbc.co.uk",
     method: "POST",
     key: fs.readFileSync(process.env.KEY),
     cert: fs.readFileSync(process.env.CERT),
@@ -225,6 +228,12 @@ function postTVA(data, res) {
       "Content-Length": Buffer.byteLength(data)
     }
   };
+  // if(process.env.HOST){
+  //   options.path = "https://" + options.host + options.path;
+  //   options.host = process.env.HOST;
+  //   options.port = process.env.PORT;
+  
+  // }
   console.log(options);
   options.agent = new https.Agent(options);
   var req = https.request(options, function(post_res) {
@@ -305,18 +314,24 @@ function nitroRequest(feed, query) {
     var options = {
       /* if environment exists (env.json), use host and port with the values in env.json,
        else do nothing..so in cosmos environment it doesn't pull it in. */
-       host: "programmes.api.bbc.com",
-       path:
-         "/nitro/api/" +
-         feed +
-         "?api_key=" +
-         process.env.NITRO_KEY +
-         "&" +
-         querystring.stringify(query),
-       headers: {
-         accept: "application/json"
-       }
+      host:"programmes.api.bbc.com",
+      path: "/nitro/api/" +
+        feed +
+        "?api_key=" +
+        process.env.NITRO_KEY +
+        "&" +
+        querystring.stringify(query),
+      headers: {
+        accept: "application/json"
+      }
     };
+
+    // if(process.env.HOST){
+    //   options.path = "http://" + options.host + options.path;
+    //   options.host = process.env.HOST;
+    //   options.port = process.env.PORT;
+
+    // }
     
     var request = http.get(options, response => {
       if (response.statusCode < 200 || response.statusCode > 299) {
