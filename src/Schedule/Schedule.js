@@ -11,7 +11,6 @@ const tvaStart =
   '<TVAMain xmlns="urn:tva:metadata:2007" xmlns:mpeg7="urn:tva:mpeg7:2005" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xml:lang="en-GB" xsi:schemaLocation="urn:tva:metadata:2007 tva_metadata_3-1_v141.xsd">\n  <ProgramDescription>\n';
 const tvaEnd = "  </ProgramDescription>\n</TVAMain>";
 var scheduleItems = [[]];
-var nextScheduleItems = [];
 var text = '';
 var myPreRenderedItems = [[]];
 
@@ -47,23 +46,37 @@ class Schedule extends React.Component {
    
     let items = [];
     this.setState({ serviceIDRef: this.props.serviceIDRef });
-    // if (sessionStorage.getItem("data") != null) {
-    //   JSON.parse(sessionStorage.getItem("data")).map((item, index) => {
-    //     return items.push(
-    //       <SingleSchedule
-    //         fetchTime={this.props.fetchTime}
-    //         title={item.props.title}
-    //         startTime={item.props.startTime}
-    //         duration={item.props.duration}
-    //         deleteItem={this.props.deleteItem}
-    //         id={item.props.id}
-    //         live={item.props.live}
-    //       />
-    //     );
-    //   });
-    //   scheduleItems = JSON.parse(sessionStorage.getItem("scheduleItems"));
+    // if (sessionStorage.getItem("data") != null && myPreRenderedItems == null) {
+    //   var item = JSON.parse(sessionStorage.getItem("data"));
+    //   console.log(item)
+    //   var scheduleData = JSON.parse(sessionStorage.getItem("data"));
+
+    //   for(let i = 0; i < item.length; i++){
+    //      for(let j = 0; j < item[i].length; j++){
+    //       items.push(
+    //         <SingleSchedule
+    //           fetchTime={this.props.fetchTime}
+    //           title={item[i][j].props.title}
+    //           startTime={item[i][j].props.startTime}
+    //           duration={item[i][j].props.duration}
+    //           deleteItem={this.props.deleteItem}
+    //           id={item[i][j].props.id}
+    //           live={item[i][j].props.live}
+    //         />
+    //       )
+         
+    //     }
+    //     myPreRenderedItems[i] = myPreRenderedItems.concat(items)
+    //   }
+
+    //   for(let i = 0; i < scheduleData.length; i++){
+    //     for(let j = 0; j < scheduleData[i].length; j++){
+    //       scheduleItems[i].push(scheduleData[j])
+    //    }
+    //  }
+
     //   this.setState({
-    //     preRenderedItem: this.state.preRenderedItem[0].concat(items)
+    //     preRenderedItem: myPreRenderedItems
     //   });
     // }
 
@@ -167,18 +180,18 @@ class Schedule extends React.Component {
   }
  
   pasteContent() {
+
     let scratchpadItems = JSON.parse(JSON.stringify(this.props.pasted));
-    // // var scratchpadItems = this.props.pasted.slice()
-    // let b = JSON.parse(JSON.stringify(a));
     let items = [];
     for (let i = 0; i < scratchpadItems.length; i++) {
       this.addItemPosition(scratchpadItems[i]);
-      scheduleItems.push(scratchpadItems[i])
+      scheduleItems[dateIndex].push(scratchpadItems[i])
       items.push(
         <SingleSchedule
           fetchTime={this.props.fetchTime}
           title={scratchpadItems[i].title}
-          startTime={scratchpadItems[i].startTime}
+          key={i}
+          startTime={moment(scratchpadItems[i].startTime).format("HH:mm:ss")}
           duration={scratchpadItems[i].duration}
           deleteItem={this.props.deleteItem}
           id={scratchpadItems[i].id}
@@ -186,9 +199,14 @@ class Schedule extends React.Component {
         />
       );
     }
+    alert(5)
     this.setState({ serviceIDRef: this.props.serviceIDRef });
     this.setState({ status: "Save Playlist" });
-    this.setState({ preRenderedItem: this.state.preRenderedItem.concat(items) });
+    alert(6)
+    myPreRenderedItems[dateIndex] = myPreRenderedItems[dateIndex].concat(items)
+  this.setState({
+    preRenderedItem: myPreRenderedItems
+  });
   }
   
   addItemPosition(item, recalculate) {
@@ -210,12 +228,13 @@ class Schedule extends React.Component {
         // item.id = 0;
         
       } else {
+       
         if (recalculate !== undefined) {
            recalculate =
-            scheduleItems[recalculate - 1] === undefined
-              ? scheduleItems.length - 1
+            scheduleItems[dateIndex][recalculate - 1] === undefined
+              ? scheduleItems[dateIndex].length - 1
               : recalculate - 1;
-          const lastItem = scheduleItems[recalculate];
+          const lastItem = scheduleItems[dateIndex][recalculate];
           item.startTime = moment(lastItem.startTime)
             .add(moment.duration(lastItem.duration));
 
@@ -270,19 +289,6 @@ class Schedule extends React.Component {
       preRenderedItem: myPreRenderedItems
     });
 
-      // nextScheduleItems = nextScheduleItems.concat([
-      //   {
-      //     "id": updateItem.id,
-      //     "startTime": updateItem.startTime,
-      //     "duration": updateItem.duration,
-      //     "title": updateItem.title,
-
-      //   }]
-      // )
-     
-      // this.props.nextSchedule(moment()
-      // .add(1, "d")
-      // .format("LL"), nextScheduleItems);
     }else{
       
     scheduleItems[dateIndex].push(updateItem);
@@ -309,33 +315,31 @@ class Schedule extends React.Component {
   }
   deleteScheduleItems() {
 
-    var myPreRenderedItems = this.state.preRenderedItem;
+    // var myPreRenderedItems = this.state.preRenderedItem;
     let items = [];
 
 
-    for (var index = 0; index < scheduleItems.length; index++) {
-      if (this.state.preRenderedItem[index].props.id === this.props.deleteId) {
-  
-        scheduleItems.splice(index, 1);
-        myPreRenderedItems.splice(index, myPreRenderedItems.length);
-        for (let i = index; i < scheduleItems.length; i++) {
-          console.log(scheduleItems)
-          console.log(scheduleItems[i])
-          console.log(i)
-          this.addItemPosition(scheduleItems[i], i);
+    for (var index = 0; index < scheduleItems[dateIndex].length; index++) {
+      if (this.state.preRenderedItem[dateIndex][index].props.id === this.props.deleteId) {
+        
+        scheduleItems[dateIndex].splice(index, 1);
+        myPreRenderedItems[dateIndex].splice(index, myPreRenderedItems[dateIndex].length);
+        for (let i = index; i < scheduleItems[dateIndex].length; i++) {
+          this.addItemPosition(scheduleItems[dateIndex][i], i);
           items.push(
             <SingleSchedule
               fetchTime={this.props.fetchTime}
-              title={scheduleItems[i].title}
-              startTime={scheduleItems[i].startTime}
-              duration={scheduleItems[i].duration}
+              title={scheduleItems[dateIndex][i].title}
+              startTime={moment(scheduleItems[dateIndex][i].startTime).format("HH:mm:ss")}
+              duration={scheduleItems[dateIndex][i].duration}
               deleteItem={this.props.deleteItem}
-              id={scheduleItems[i].id}
-              live={scheduleItems[i].live}
+              id={scheduleItems[dateIndex][i].id}
+              live={scheduleItems[dateIndex][i].live}
             />
           );
         } 
-        this.setState({ preRenderedItem: myPreRenderedItems.concat(items) });
+        myPreRenderedItems[dateIndex] = myPreRenderedItems[dateIndex].concat(items)
+        this.setState({ preRenderedItem: myPreRenderedItems});
 
         break;
       }
