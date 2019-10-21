@@ -16,8 +16,9 @@ import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
-import InboxIcon from "@material-ui/icons/LiveTv";
+import LiveTv from "@material-ui/icons/LiveTv";
 import MailIcon from "@material-ui/icons/Schedule";
+import LoopIcon from '@material-ui/icons/Loop';
 import Payment from "@material-ui/icons/VideoLibrary";
 import Lock from "@material-ui/icons/Star";
 import Assignment from "@material-ui/icons/Assignment";
@@ -37,6 +38,7 @@ import Date from "../Date/Date";
 import Schedule from "../Schedule/Schedule";
 import PreviousSchedule from "../PreviousSchedule/PreviousSchedule";
 import NextSchedule from "../NextSchedule/NextSchedule";
+import Loop from "../Loop/Loop";
 
 const drawerWidth = 240;
 var menuText = "Schedule";
@@ -44,6 +46,7 @@ var text = "Today's ";
 var time = -2;
 var scheduleItems = [];
 var scratchPadItems = [];
+var loopItems = [];
 var copiedContent = [];
 var icons = [
   <MailIcon />,
@@ -53,7 +56,7 @@ var icons = [
   <Lock />,
   <Opacity />
 ];
-var viewIcons = [<InboxIcon />, <Assignment />];
+var viewIcons = [<LiveTv />, <Assignment />, <LoopIcon/>];
 var count = -1;
 
 const styles = theme => ({
@@ -120,10 +123,9 @@ class Demo extends React.Component {
     this.handleClick = this.handleClick.bind(this);
     this.fetchTime = this.fetchTime.bind(this);
     this.deleteItem = this.deleteItem.bind(this);
-    this.previousDay = this.previousDay.bind(this);
-    this.nextDay = this.nextDay.bind(this);
     this.copyContent = this.copyContent.bind(this);
     this.clearContent = this.clearContent.bind(this);
+
     this.state = {
       open: false,
       Title: "",
@@ -159,6 +161,8 @@ console.log(copiedContent);
           deleteItem={this.deleteItem}
           text="Today's "
           loadPlaylist={this.loadPlaylist}
+          nextSchedule={this.nextDay}
+          scheduleDate={this.state.scheduleDate}
         />
       )
     });
@@ -239,6 +243,7 @@ console.log(copiedContent);
     this.setState({ open: false });
   };
 
+
   copyContent(rows) {
     copiedContent = [];
     if (rows.length > 0) {
@@ -272,94 +277,19 @@ console.log(copiedContent);
           added={false}
           text={text}
           loadPlaylist={this.loadPlaylist}
+          nextSchedule={this.nextDay}
+          scheduleDate={this.state.scheduleDate}
         />
       )
     });
   }
 
-  previousDay = CDate => {
-    text = moment(CDate).isAfter(moment()) ? "Future " : "Previous ";
-    console.log('previousDay',time);
-    console.log(scheduleItems);
-    console.log(copiedContent);
-    
-    if (moment(CDate).format("LL") === moment().format("LL")) {
-      text = "Today's ";
-      this.setState({
-        scheduleDate: CDate,
-        display: (
-          <Schedule
-            serviceIDRef={this.state.service.serviceIDRef}
-            fetchTime={this.fetchTime}
-            clipTime={time}
-            pasted={copiedContent}
-            length={scheduleItems.length}
-            deleteItem={this.deleteItem}
-            text={text}
-            loadPlaylist={this.loadPlaylist}
-          />
-        )
-      });
-    } else {
-      this.setState({
-        scheduleDate: CDate,
-        display: (
-          <PreviousSchedule
-            sid={this.state.service.sid}
-            scheduleDate={moment(CDate)
-              .utcOffset(0)
-              .format()}
-            text={text}
-          />
-        )
-      });
-    }
-  };
-  nextDay = CDate => {
-    text = moment(CDate).isBefore(moment()) ? "Previous " : "Future ";
-    console.log('nextDay',time);
-    console.log(scheduleItems);
-    console.log(copiedContent);
-
-    if (moment(CDate).format("LL") === moment().format("LL")) {
-      text = "Today's ";
-      this.setState({
-        scheduleDate: CDate,
-        display: (
-          <Schedule
-            serviceIDRef={this.state.service.serviceIDRef}
-            fetchTime={this.fetchTime}
-            clipTime={time}
-
-            length={scheduleItems.length}
-            pasted={copiedContent}
-            deleteItem={this.deleteItem}
-            text={text}
-            loadPlaylist={this.loadPlaylist}
-          />
-        )
-      });
-    } else {
-      this.setState({
-        scheduleDate: CDate,
-        display: (
-          <NextSchedule
-            sid={this.state.service.sid}
-            scheduleDate={moment(CDate).utcOffset(0).format()}
-            text={text}
-          />
-        )
-      });
-    }
-  };
   handleClick = (item, isLive) => {
     count++;
 
     const newItem2 = {
       ...item
     };
-    console.log("NEW ITEM ", newItem2)
-
     switch(item.item_type) {
       case "episode":
       {
@@ -417,8 +347,8 @@ console.log(copiedContent);
           />
         )
       });
-    } else {
-
+    } else if (menuText === "Schedule") {
+      scheduleItems.push(newItem2);
       this.setState({
         display: (
           <Schedule
@@ -431,6 +361,21 @@ console.log(copiedContent);
             text="Today's "
             added={true}
             deleteItem={this.deleteItem}
+            nextSchedule={this.nextDay}
+            scheduleDate={this.state.scheduleDate}
+          />
+        )
+      });
+    }
+    else {
+      loopItems.push(newItem2);
+      this.setState({
+        display: (
+          <Loop
+            data={loopItems}
+            deleteItem={this.deleteItem}
+            copyContent={this.copyContent}
+            clearContent={this.clearContent}
           />
         )
       });
@@ -493,11 +438,12 @@ console.log(copiedContent);
                 serviceIDRef={this.state.service.serviceIDRef}
                 fetchTime={this.fetchTime}
                 clipTime={time}
-    
+                nextSchedule={this.nextDay}
                 length={scheduleItems.length}
                 pasted={copiedContent}
                 text="Today's "
                 deleteItem={this.deleteItem}
+                scheduleDate={this.state.scheduleDate}
               />
             )
           });;
@@ -513,6 +459,18 @@ console.log(copiedContent);
             />
           )
         });
+      case "Loop":        
+        menuText = text;
+        return this.setState({
+          display: (
+            <Loop
+            data={loopItems}
+            deleteItem={this.deleteItem}
+            clearContent={this.clearContent}
+            copyContent={this.copyContent}
+          />
+          )
+        });
       }
     }
     
@@ -520,6 +478,7 @@ console.log(copiedContent);
     var time = clipTime;
     this.setState({
       display: (
+        
         <Schedule
           serviceIDRef={this.state.service.serviceIDRef}
           fetchTime={this.fetchTime}
@@ -528,6 +487,8 @@ console.log(copiedContent);
           pasted={copiedContent}
           text="Today's "
           deleteItem={this.deleteItem}
+          nextSchedule={this.nextDay}
+          scheduleDate={this.state.scheduleDate}
         />
       )
     });
@@ -601,7 +562,7 @@ console.log(copiedContent);
           </center>
           <Divider />
           <List>
-            {["Schedule", "Scratchpad"].map((text, index) => (
+            {["Schedule", "Scratchpad", "Loop"].map((text, index) => (
               <ListItem
                 button
                 key={text}
@@ -648,11 +609,11 @@ console.log(copiedContent);
         >
           <div className={classes.drawerHeader} />
           <Typography paragraph>
-            <Date
+            {/* <Date
               nextDay={this.nextDay}
               previousDay={this.previousDay}
               scheduleDate={this.state.scheduleDate}
-            />
+            /> */}
             {this.state.display}
           </Typography>
         </main>
