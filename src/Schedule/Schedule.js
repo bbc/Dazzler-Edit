@@ -43,42 +43,38 @@ class Schedule extends React.Component {
     };
   }
   componentDidMount() {
-   
+
+    var myPreRenderedItems = [[]];
     let items = [];
     this.setState({ serviceIDRef: this.props.serviceIDRef });
-    // if (sessionStorage.getItem("data") != null && myPreRenderedItems == null) {
-    //   var item = JSON.parse(sessionStorage.getItem("data"));
-    //   console.log(item)
-    //   var scheduleData = JSON.parse(sessionStorage.getItem("data"));
+    if (sessionStorage.getItem("data") != null) {
+      var data = JSON.parse(sessionStorage.getItem("data"));
+      // var scheduleData = JSON.parse(sessionStorage.getItem("data"));
 
-    //   for(let i = 0; i < item.length; i++){
-    //      for(let j = 0; j < item[i].length; j++){
-    //       items.push(
-    //         <SingleSchedule
-    //           fetchTime={this.props.fetchTime}
-    //           title={item[i][j].props.title}
-    //           startTime={item[i][j].props.startTime}
-    //           duration={item[i][j].props.duration}
-    //           deleteItem={this.props.deleteItem}
-    //           id={item[i][j].props.id}
-    //           live={item[i][j].props.live}
-    //         />
-    //       )
-         
-    //     }
-    //     myPreRenderedItems[i] = myPreRenderedItems.concat(items)
-    //   }
+      data.map((item, index)=>{
+        item.map(unit => {
+          items.push(<SingleSchedule
+          fetchTime={this.props.fetchTime}
+          title={unit.props.title}
+          startTime={unit.props.startTime}
+          duration={unit.props.duration}
+          deleteItem={this.props.deleteItem}
+          id={unit.props.id}
+          live={unit.props.live}
+        />
+          )
+        })
+        myPreRenderedItems[index] = myPreRenderedItems.concat(items)
+      })
+  
+      scheduleItems = JSON.parse(sessionStorage.getItem("scheduleItems"));
 
-    //   for(let i = 0; i < scheduleData.length; i++){
-    //     for(let j = 0; j < scheduleData[i].length; j++){
-    //       scheduleItems[i].push(scheduleData[j])
-    //    }
-    //  }
 
-    //   this.setState({
-    //     preRenderedItem: myPreRenderedItems
-    //   });
-    // }
+      this.setState({
+        preRenderedItem: myPreRenderedItems
+      });
+     
+    }
 
   }
 
@@ -184,8 +180,10 @@ class Schedule extends React.Component {
     let scratchpadItems = JSON.parse(JSON.stringify(this.props.pasted));
     let items = [];
     for (let i = 0; i < scratchpadItems.length; i++) {
+      
       this.addItemPosition(scratchpadItems[i]);
       scheduleItems[dateIndex].push(scratchpadItems[i])
+      this.addItemPosition(scratchpadItems[i]);
       items.push(
         <SingleSchedule
           fetchTime={this.props.fetchTime}
@@ -199,10 +197,10 @@ class Schedule extends React.Component {
         />
       );
     }
-    alert(5)
+   
     this.setState({ serviceIDRef: this.props.serviceIDRef });
     this.setState({ status: "Save Playlist" });
-    alert(6)
+
     myPreRenderedItems[dateIndex] = myPreRenderedItems[dateIndex].concat(items)
   this.setState({
     preRenderedItem: myPreRenderedItems
@@ -304,7 +302,7 @@ class Schedule extends React.Component {
         live={updateItem.live}
       />
     );
-
+    if(myPreRenderedItems[dateIndex] == undefined){myPreRenderedItems[dateIndex] = [];}
     myPreRenderedItems[dateIndex] = myPreRenderedItems[dateIndex].concat(items)
     this.setState({
       preRenderedItem: myPreRenderedItems
@@ -320,7 +318,7 @@ class Schedule extends React.Component {
 
 
     for (var index = 0; index < scheduleItems[dateIndex].length; index++) {
-      if (this.state.preRenderedItem[dateIndex][index].props.id === this.props.deleteId) {
+      if (myPreRenderedItems[dateIndex][index].props.id === this.props.deleteId) {
         
         scheduleItems[dateIndex].splice(index, 1);
         myPreRenderedItems[dateIndex].splice(index, myPreRenderedItems[dateIndex].length);
@@ -361,7 +359,7 @@ class Schedule extends React.Component {
       default:
         break;
     }
-    sessionStorage.setItem("data", JSON.stringify(this.state.preRenderedItem));
+    sessionStorage.setItem("data", JSON.stringify(myPreRenderedItems));
     sessionStorage.setItem("scheduleItems", JSON.stringify(scheduleItems));
 
   }
