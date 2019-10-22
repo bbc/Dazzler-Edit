@@ -9,7 +9,7 @@ const Big = require("big-integer");
 const http = require("http");
 const https = require("https");
 const bodyParser = require("body-parser");
-const configuration = require('../../config/env.json');
+//const configuration = require('../../config/env.json');
 const app = express();
 
 const config = {
@@ -23,7 +23,7 @@ const config = {
   }
 };
 
-process.env = configuration
+//process.env = configuration
 
 //app.use(bodyParser.raw({ type: '*/*' }));
 app.use(bodyParser.text({ type: "*/*" }));
