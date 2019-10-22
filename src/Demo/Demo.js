@@ -253,7 +253,7 @@ loopContent = (rows, startTime, finishTime) => {
     rows.map((row, index) => loopedContent.push(rows[index]));
   }
   
-
+ menuText = "Schedule";
   this.setState({
     display: ( <Schedule
         serviceIDRef={this.state.service.serviceIDRef}

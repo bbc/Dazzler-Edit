@@ -243,14 +243,14 @@ class Schedule extends React.Component {
       
     } else {
           
-         if (scheduleItems[dateIndex].length === 0 || scheduleItems[dateIndex][0] == item) {
+         if (scheduleItems[dateIndex].length === 0) {
 
-        var dateTime = moment().add(dateIndex, "d");
-        dateTime.set({hour:0,minute:0,second:0,millisecond:0})
+          
+        var dateTime = moment().add(dateIndex, "d").add(10, "m");
         item.startTime = dateTime
         console.log(item.startTime)
         // item.id = 0;
-        
+          
       } else {
        
         if (recalculate !== undefined) {
@@ -375,9 +375,10 @@ class Schedule extends React.Component {
   }
 
   loopContent(){
+    var digit = 2;
   alert("loop")
    let items = [];
-   var loop = JSON.parse(JSON.stringify(this.props.loopedContent));
+   let loop = JSON.parse(JSON.stringify(this.props.loopedContent));
    var start = moment(this.props.startLoop)._i[0] == undefined ? moment(this.props.startLoop)._i : moment(this.props.startLoop)._i[0];
    var end = moment(this.props.finishTime)._i[0] == undefined ? moment(this.props.finishTime)._i : moment(this.props.finishTime)._i[0];
   
@@ -395,28 +396,34 @@ class Schedule extends React.Component {
     />
   );
 
-  myPreRenderedItems[dateIndex] = myPreRenderedItems[dateIndex].concat(items)
-
   loop.map((item, index) => {
     if(index > 0){
     this.addScheduleItem(item)
     
     }
   });
-   for(let i = 0; i < loop.length; i++){
-     if(moment(loop[i].startTime).format("hh:mm:ss") < moment(end).format("hh:mm:ss")){
-      var loop = loop.concat(loop[i]);
-      console.log(loop)
-      this.addScheduleItem(loop[i])
-      }  
-   }
+   for(let i = 0; 1 < digit; i++){
+     
+      for(let j = 0; j == j; j++){
+        if(moment(loop[j].startTime) < moment(end)){
+          console.log(moment(loop[j].startTime).format("HH:mm:ss") + " vs " + moment(end).format("HH:mm:ss"))
+          console.log(loop[j])
+          this.addScheduleItem(loop[j])
+          loop = loop.concat(loop[j])
+      }else{
+        alert("in here")
+        digit = 1;
+        break;
+      }
+    }
+  }
 flag = false;
   }
   componentDidUpdate(prevProps) {
 
     switch (true) {
       case prevProps.item !== this.props.item && this.props.added:
-        alert("called")
+        
         this.addScheduleItem();
         break;
       case prevProps.deleteId !== this.props.deleteId && !this.props.added:
