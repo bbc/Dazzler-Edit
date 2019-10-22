@@ -27,7 +27,7 @@ class Loop extends React.Component {
       current: "",
       refresh: 0,
       startDate: new Date(),
-      finishDate: '',
+      finishDate: new Date(),
     };
   }
 
@@ -45,9 +45,8 @@ class Loop extends React.Component {
     }
   }
   render() {  
-   
+
     const { startDate, finishDate } = this.state;
-    console.log(finishDate)
     rows = [];
     duration = 0;
     copiedContent = this.state.data;
@@ -103,6 +102,18 @@ class Loop extends React.Component {
         Finish by: <Flatpickr data-enable-time
         value={finishDate}
         onChange={finishDate => { this.setState({finishDate}) }} />
+        <div class="ui form">
+  <div class="inline field">
+    <div class="ui checkbox">
+      <input type="checkbox" tabindex="0" class="hidden"/>
+      <label>Preserve Live</label>
+    </div>
+  </div>
+  </div>
+
+        <button onClick={() => {
+            this.props.loopContent(rows, this.state.startDate, this.state.finishDate);
+          }}> Go </button>
       </div>
       </div>
     );
