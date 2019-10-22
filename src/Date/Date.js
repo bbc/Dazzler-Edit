@@ -1,9 +1,6 @@
 import React from "react";
 import moment from "moment";
-import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
-import ChevronRightIcon from "@material-ui/icons/ChevronRight";
-import FastForward from "@material-ui/icons/FastForward";
-import FastRewind from "@material-ui/icons/FastRewind";
+
 
 var current = 0;
 class Date extends React.Component {
@@ -29,14 +26,14 @@ class Date extends React.Component {
   render() {
     return (
       <div className="dateContainer">
-        <button
+        {/* <button
           className="ui icon button"
           onClick={() => {
             this.props.previousDay(this.handleOtherClick(7));
           }}
         >
           <i className="angle double left icon"></i>
-        </button>
+        </button> */}
 
         <button
           className="ui icon button"
@@ -55,14 +52,14 @@ class Date extends React.Component {
         >
           <i className="right arrow icon"></i>
         </button>
-        <button
+        {/* <button
           className="ui icon button"
           onClick={() => {
             this.props.nextDay(this.handleClick(7));
           }}
         >
           <i className="angle double right icon"></i>
-        </button>
+        </button> */}
       </div>
     );
   }
