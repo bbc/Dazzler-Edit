@@ -180,28 +180,51 @@ class Schedule extends React.Component {
     let scratchpadItems = JSON.parse(JSON.stringify(this.props.pasted));
     let items = [];
     for (let i = 0; i < scratchpadItems.length; i++) {
+      this.addItemPosition(scratchpadItems[i]);
+
+      if( moment(scratchpadItems[i].startTime).format("YYYY-MM-DD") > moment(this.state.scheduleDate).format("YYYY-MM-DD")){ 
       
-      this.addItemPosition(scratchpadItems[i]);
-      scheduleItems[dateIndex].push(scratchpadItems[i])
-      this.addItemPosition(scratchpadItems[i]);
-      items.push(
+        if(scheduleItems[dateIndex + 1] == undefined){
+            scheduleItems[dateIndex + 1] = [];  myPreRenderedItems[dateIndex + 1] = [];
+          };
+  
+        scheduleItems[dateIndex + 1].push(scratchpadItems[i])  
+        
+        myPreRenderedItems[dateIndex + 1].push(
+          <SingleSchedule
+            fetchTime={this.props.fetchTime}
+            title={scratchpadItems[i].title}
+            startTime={moment(scratchpadItems[i].startTime).format("HH:mm:ss")}
+            date={moment(scratchpadItems[i].startTime)}
+            duration={scratchpadItems[i].duration}
+            deleteItem={this.props.deleteItem}
+            id={scratchpadItems[i].id}
+            live={scratchpadItems[i].live}
+          />
+        ); 
+      }
+
+     else{ 
+       scheduleItems[dateIndex].push(scratchpadItems[i])
+
+       myPreRenderedItems[dateIndex].push(
         <SingleSchedule
           fetchTime={this.props.fetchTime}
           title={scratchpadItems[i].title}
-          key={i}
           startTime={moment(scratchpadItems[i].startTime).format("HH:mm:ss")}
+          date={moment(scratchpadItems[i].startTime)}
           duration={scratchpadItems[i].duration}
           deleteItem={this.props.deleteItem}
           id={scratchpadItems[i].id}
           live={scratchpadItems[i].live}
         />
       );
+     }
     }
-   
-    this.setState({ serviceIDRef: this.props.serviceIDRef });
+
     this.setState({ status: "Save Playlist" });
 
-    myPreRenderedItems[dateIndex] = myPreRenderedItems[dateIndex].concat(items)
+    
   this.setState({
     preRenderedItem: myPreRenderedItems
   });
@@ -216,8 +239,8 @@ class Schedule extends React.Component {
       // item.id = `Live ${live+=1}`;
       
     } else {
-
-         if (scheduleItems[dateIndex].length === 0 || scheduleItems[dateIndex] == item) {
+          
+         if (scheduleItems[dateIndex].length === 0 || scheduleItems[dateIndex][0] == item) {
 
         var dateTime = moment().add(dateIndex, "d");
         dateTime.set({hour:0,minute:0,second:0,millisecond:0})
@@ -260,7 +283,7 @@ class Schedule extends React.Component {
     this.addItemPosition(updateItem);
 
     if( moment(updateItem.startTime).format("YYYY-MM-DD") > moment(this.state.scheduleDate).format("YYYY-MM-DD")){
-      alert("its after")
+  
     
       if(scheduleItems[dateIndex + 1] == undefined){
          alert("added"); scheduleItems[dateIndex + 1] = [];  myPreRenderedItems[dateIndex + 1] = [];
