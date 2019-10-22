@@ -9,17 +9,21 @@ const Big = require("big-integer");
 const http = require("http");
 const https = require("https");
 const bodyParser = require("body-parser");
+const configuration = require('../../config/env.json');
 const app = express();
 
 const config = {
   bbc_marathi_tv: {
     mid: "bbc_marathi_tv",
-    specials_collection: "p0715nv4",
-    live_brand: "w13xttvl",
+    loop_collection: process.env.LOOP_PID,
+    specials_collection: process.env.SPECIALS_PID,
+    live_brand: process.env.LIVE_BRAND_PID,
     clip_language: "marathi",
     webcast_channels: ["world_service_stream_05","world_service_stream_06","world_service_stream_07","world_service_stream_08"]
   }
 };
+
+process.env = configuration
 
 //app.use(bodyParser.raw({ type: '*/*' }));
 app.use(bodyParser.text({ type: "*/*" }));
@@ -101,6 +105,17 @@ app.get("/api/v1/webcast", function(req, res) {
     err => res.status(404).send("Not found") // TODO use proper error message
   );
 });
+// http://programmes.api.bbc.com/nitro/api/programmes?api_key=XXX&page_size=100&sort=group_position&sort_direction=ascending&group=p0510sbc
+
+app.get("/api/v1/loop", function(req, res) {
+  let q = {
+    group: config[req.query.sid].loop_collection,
+    sort: 'group_position',
+    sort_direction: 'ascending'
+  };
+  clip(q, req.query, res);
+});
+
 
 app.get("/api/v1/special", function(req, res) {
   let q = {
@@ -209,10 +224,11 @@ app.post("/api/v1/tva", function(req, res) {
   }
 });
 
+
 function postTVA(data, res) {
   var options = {
-    hostname: "api.live.bbc.co.uk",
     path: "/pips/import/tva/",
+    host: "api.live.bbc.co.uk",
     method: "POST",
     key: fs.readFileSync(process.env.KEY),
     cert: fs.readFileSync(process.env.CERT),
@@ -222,6 +238,12 @@ function postTVA(data, res) {
       "Content-Length": Buffer.byteLength(data)
     }
   };
+  // if(process.env.HOST){
+  //   options.path = "https://" + options.host + options.path;
+  //   options.host = process.env.HOST;
+  //   options.port = process.env.PORT;
+  
+  // }
   console.log(options);
   options.agent = new https.Agent(options);
   var req = https.request(options, function(post_res) {
@@ -248,8 +270,6 @@ function postTVA(data, res) {
   req.write(data);
   req.end();
 }
-
-// https://programmes.api.bbc.com/schedule?api_key=mUvZU43V0uGr7ItNBGnxYXgZLFVgx8Zo&sid=bbc_marathi_tv&date=2019-06-20
 
 function SpwRequest(sid, date) {
   return new Promise((resolve, reject) => {
@@ -302,9 +322,8 @@ function SpwRequest(sid, date) {
 function nitroRequest(feed, query) {
   return new Promise((resolve, reject) => {
     var options = {
-      host: "programmes.api.bbc.com",
-      path:
-        "/nitro/api/" +
+      host:"programmes.api.bbc.com",
+      path: "/nitro/api/" +
         feed +
         "?api_key=" +
         process.env.NITRO_KEY +
@@ -314,6 +333,14 @@ function nitroRequest(feed, query) {
         accept: "application/json"
       }
     };
+
+    // if(process.env.HOST){
+    //   options.path = "http://" + options.host + options.path;
+    //   options.host = process.env.HOST;
+    //   options.port = process.env.PORT;
+
+    // }
+    
     var request = http.get(options, response => {
       if (response.statusCode < 200 || response.statusCode > 299) {
         reject(new Error("Invalid status code: " + response.statusCode));
