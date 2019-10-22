@@ -48,6 +48,7 @@ var scheduleItems = [];
 var scratchPadItems = [];
 var loopItems = [];
 var copiedContent = [];
+var loopedContent = [];
 var icons = [
   <MailIcon />,
   <Movie />,
@@ -125,6 +126,7 @@ class Demo extends React.Component {
     this.deleteItem = this.deleteItem.bind(this);
     this.copyContent = this.copyContent.bind(this);
     this.clearContent = this.clearContent.bind(this);
+    this.loopContent = this.loopContent.bind(this);
 
     this.state = {
       open: false,
@@ -158,6 +160,7 @@ console.log(copiedContent);
           clipTime={time}
           length={scheduleItems.length}
           pasted={copiedContent}
+          loopedContent={''}
           deleteItem={this.deleteItem}
           text="Today's "
           loadPlaylist={this.loadPlaylist}
@@ -243,7 +246,36 @@ console.log(copiedContent);
     this.setState({ open: false });
   };
 
+loopContent = (rows, startTime, finishTime) => {
+ 
+  loopedContent = [];
+  if (rows.length > 0) {
+    rows.map((row, index) => loopedContent.push(rows[index]));
+  }
+  
 
+  this.setState({
+    display: ( <Schedule
+        serviceIDRef={this.state.service.serviceIDRef}
+        fetchTime={this.fetchTime}
+        clipTime={time}
+        length={scheduleItems.length}
+        loopedContent={loopedContent}
+        addedLoop={true}
+        startLoop={startTime}
+        finishTime={finishTime}
+        deleteItem={this.deleteItem}
+        added={false}
+        text={text}
+        loadPlaylist={this.loadPlaylist}
+        nextSchedule={this.nextDay}
+        scheduleDate={this.state.scheduleDate}
+      />
+    )
+  });
+    
+
+}
   copyContent(rows) {
     copiedContent = [];
     if (rows.length > 0) {
@@ -269,6 +301,7 @@ console.log(copiedContent);
         <Schedule
           serviceIDRef={this.state.service.serviceIDRef}
           fetchTime={this.fetchTime}
+          loopedContent={""}
           clipTime={time}
           deleteId={id}
           length={scheduleItems.length}
@@ -358,6 +391,7 @@ console.log(copiedContent);
             item={newItem2}
             length={scheduleItems.length}
             pasted={copiedContent}
+            loopedContent={""}
             text="Today's "
             added={true}
             deleteItem={this.deleteItem}
@@ -374,7 +408,7 @@ console.log(copiedContent);
           <Loop
             data={loopItems}
             deleteItem={this.deleteItem}
-            copyContent={this.copyContent}
+            loopContent={this.loopContent}
             clearContent={this.clearContent}
           />
         )
@@ -439,6 +473,7 @@ console.log(copiedContent);
                 fetchTime={this.fetchTime}
                 clipTime={time}
                 nextSchedule={this.nextDay}
+                loopedContent={''}
                 length={scheduleItems.length}
                 pasted={copiedContent}
                 text="Today's "
@@ -467,7 +502,7 @@ console.log(copiedContent);
             data={loopItems}
             deleteItem={this.deleteItem}
             clearContent={this.clearContent}
-            copyContent={this.copyContent}
+            loopContent={this.loopContent}
           />
           )
         });
@@ -485,6 +520,7 @@ console.log(copiedContent);
           clipTime={time}
           length = {scheduleItems.length}
           pasted={copiedContent}
+          loopedContent={''}
           text="Today's "
           deleteItem={this.deleteItem}
           nextSchedule={this.nextDay}
