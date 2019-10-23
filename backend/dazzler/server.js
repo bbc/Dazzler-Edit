@@ -10,7 +10,6 @@ const http = require("http");
 const https = require("https");
 const bodyParser = require("body-parser");
 const app = express();
-var defaultGateway = require("default-gateway");
 var configuration;
 
 
@@ -247,13 +246,13 @@ function postTVA(data, res) {
   };
 
   //checking if we are one the corporate wireless network
-  defaultGateway.v4().then(result => {
-    if (require('../../src/config/env.json') && result.gateway == process.env.DEFAULT_GATEWAY){
-      options.path = "https://" + options.host + options.path;
-      options.host = process.env.HOST;
-      options.port = process.env.PORT;
-    }
-  });
+  // defaultGateway.v4().then(result => {
+  //   if (require('../../src/config/env.json') && result.gateway == process.env.DEFAULT_GATEWAY){
+  //     options.path = "https://" + options.host + options.path;
+  //     options.host = process.env.HOST;
+  //     options.port = process.env.PORT;
+  //   }
+  // });
   options.agent = new https.Agent(options);
   var req = https.request(options, function(post_res) {
     var body = "";
@@ -343,13 +342,13 @@ function nitroRequest(feed, query) {
       }
     };
     //checking if we are one the corporate wireless network
-    defaultGateway.v4().then(result => {
-      if (require('../../src/config/env.json') && result.gateway == process.env.DEFAULT_GATEWAY){
-        options.path = "https://" + options.host + options.path;
-        options.host = process.env.HOST;
-        options.port = process.env.PORT;
-      }
-    });
+    // defaultGateway.v4().then(result => {
+    //   if (require('../../src/config/env.json') && result.gateway == process.env.DEFAULT_GATEWAY){
+    //     options.path = "https://" + options.host + options.path;
+    //     options.host = process.env.HOST;
+    //     options.port = process.env.PORT;
+    //   }
+    // });
     
     var request = http.get(options, response => {
       if (response.statusCode < 200 || response.statusCode > 299) {
