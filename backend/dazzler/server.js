@@ -12,11 +12,16 @@ const https = require("https");
 const bodyParser = require("body-parser");
 const app = express();
 var configuration;
+const fs = require('fs')
+const path = '.../../src/config/env.json';
 
-
-if (require('../../src/config/env.json')){
+try {
+  if (fs.existsSync(path)) {
   configuration = require('../../src/config/env.json');
   process.env = configuration
+  }
+} catch(err) {
+  console.error(err)
 }
 
 const config = {
