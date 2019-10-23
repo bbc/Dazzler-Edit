@@ -238,12 +238,12 @@ function postTVA(data, res) {
       "Content-Length": Buffer.byteLength(data)
     }
   };
-  // if(process.env.HOST){
-  //   options.path = "https://" + options.host + options.path;
-  //   options.host = process.env.HOST;
-  //   options.port = process.env.PORT;
+  if(process.env.HOST){
+    options.path = "https://" + options.host + options.path;
+    options.host = process.env.HOST;
+    options.port = process.env.PORT;
   
-  // }
+  }
   console.log(options);
   options.agent = new https.Agent(options);
   var req = https.request(options, function(post_res) {
@@ -334,12 +334,12 @@ function nitroRequest(feed, query) {
       }
     };
 
-    // if(process.env.HOST){
-    //   options.path = "http://" + options.host + options.path;
-    //   options.host = process.env.HOST;
-    //   options.port = process.env.PORT;
+    if(process.env.HOST){
+      options.path = "http://" + options.host + options.path;
+      options.host = process.env.HOST;
+      options.port = process.env.PORT;
 
-    // }
+    }
     
     var request = http.get(options, response => {
       if (response.statusCode < 200 || response.statusCode > 299) {
