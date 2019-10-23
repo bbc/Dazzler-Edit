@@ -118,6 +118,12 @@ export const styles = theme => ({
   }
 });
 
+//checking if we are running locally
+var URLPrefix = '';
+if (require('../config/env.json')){
+  URLPrefix = 'http://localhost:8080';
+}
+
 export class Clips extends React.Component {
   constructor(props) {
     super(props);
@@ -145,7 +151,7 @@ export class Clips extends React.Component {
       console.log("have page %d want page %d", this.props.page, prevProps.page);
       axios
       .get(
-        "http://localhost:8080"+
+        URLPrefix + 
         "/api/v1/clip" +
         "?sid=" + this.props.sid + 
         "&page=" + (this.state.page+1) + // nitro is 1 based
