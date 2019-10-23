@@ -291,10 +291,11 @@ class Schedule extends React.Component {
 
     if( moment(updateItem.startTime).format("YYYY-MM-DD") > moment(this.state.scheduleDate).format("YYYY-MM-DD") && updateItem.live == undefined){
       console.log(updateItem.startTime)
-     alert("after")
+    //  alert("after")
     
       if(scheduleItems[dateIndex + 1] == undefined){
-         alert("added"); scheduleItems[dateIndex + 1] = [];  myPreRenderedItems[dateIndex + 1] = [];
+        //  alert("added"); 
+         scheduleItems[dateIndex + 1] = [];  myPreRenderedItems[dateIndex + 1] = [];
         };
 
       scheduleItems[dateIndex + 1].push(updateItem)  
@@ -376,7 +377,7 @@ class Schedule extends React.Component {
 
   loopContent(){
     var digit = 2;
-  alert("loop")
+  // alert("loop")
    let items = [];
    let loop = JSON.parse(JSON.stringify(this.props.loopedContent));
    var start = moment(this.props.startLoop)._i[0] == undefined ? moment(this.props.startLoop)._i : moment(this.props.startLoop)._i[0];
@@ -411,7 +412,7 @@ class Schedule extends React.Component {
           this.addScheduleItem(loop[j])
           loop = loop.concat(loop[j])
       }else{
-        alert("in here")
+        // alert("in here")
         digit = 1;
         break;
       }
