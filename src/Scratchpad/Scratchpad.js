@@ -2,7 +2,6 @@ import React, { Fragment } from "react";
 import ReactDataGrid from "react-data-grid";
 import moment from "moment";
 var rows = [];
-var copiedContent = [];
 var length = 0;
 var duration = 0;
 const columns = [
@@ -12,15 +11,11 @@ const columns = [
   { key: "Delete", name: "Delete" }
 ];
 class Scratchpad extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      data: [],
-      status: "",
-      current: "",
-      refresh: 0
-    };
-  }
+  state = {
+    data: [],
+    status: "",
+    current: ""
+  };
 
   componentDidMount() {
     this.setState({ data: this.props.data });
@@ -31,17 +26,15 @@ class Scratchpad extends React.Component {
     if (prevProps.data.length !== this.props.data.length) {
       if (this.props.data.length === 0) {
         this.setState({ current: "Clear" });
-        this.setState({ refresh: 1 });
       }
     }
   }
   render() {
     rows = [];
     duration = 0;
-    copiedContent = this.state.data;
-    if (copiedContent.length > 0) {
-      length = copiedContent.length;
-      copiedContent.map((item, idx) => {
+    if (this.props.data.length > 0) {
+      length = this.props.data.length;
+      this.props.data.map((item, idx) => {
         return (
           (duration += moment.duration(item.duration)._milliseconds),
           (item.newDuration =
@@ -84,7 +77,7 @@ class Scratchpad extends React.Component {
         <button
           class="ui button active"
           onClick={() => {
-            this.props.clearContent();
+            this.props.clearContent(false);
           }}
         >
           <i class="trash icon"></i> {this.state.current}

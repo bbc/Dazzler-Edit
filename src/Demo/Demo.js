@@ -282,7 +282,21 @@ loopContent = (rows, startTime, finishTime) => {
       rows.map((row, index) => copiedContent.push(rows[index]));
     }
   }
-  clearContent() {
+  clearContent(loop) {
+    if(loop){
+      loopItems = [];
+      this.setState({
+        display: (
+          <Loop
+            data={loopItems}
+            deleteItem={this.deleteItem}
+            loopContent={this.loopContent}
+            clearContent={this.clearContent}
+          />
+        )
+      });
+
+    }else{
     scratchPadItems = [];
     this.setState({
       display: (
@@ -294,6 +308,7 @@ loopContent = (rows, startTime, finishTime) => {
         />
       )
     });
+  }
   }
   deleteItem(id) {
     this.setState({
