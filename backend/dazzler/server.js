@@ -9,10 +9,15 @@ const Big = require("big-integer");
 const http = require("http");
 const https = require("https");
 const bodyParser = require("body-parser");
-const configuration = require('../../config/env.json');
 const app = express();
+var defaultGateway = require("default-gateway");
+var configuration;
 
-process.env = configuration
+
+if (require('../../src/config/env.json')){
+  configuration = require('../../config/env.json');
+  process.env = configuration
+}
 
 const config = {
   bbc_marathi_tv: {
@@ -239,13 +244,15 @@ function postTVA(data, res) {
       "Content-Length": Buffer.byteLength(data)
     }
   };
-  // if(process.env.HOST){
-  //   options.path = "https://" + options.host + options.path;
-  //   options.host = process.env.HOST;
-  //   options.port = process.env.PORT;
-  
-  // }
-  console.log(options);
+
+  //checking if we are one the corporate wireless network
+  defaultGateway.v4().then(result => {
+    if (require('../../config/env.json') && result.gateway == process.env.DEFAULT_GATEWAY){
+      options.path = "https://" + options.host + options.path;
+      options.host = process.env.HOST;
+      options.port = process.env.PORT;
+    }
+  });
   options.agent = new https.Agent(options);
   var req = https.request(options, function(post_res) {
     var body = "";
@@ -334,13 +341,14 @@ function nitroRequest(feed, query) {
         accept: "application/json"
       }
     };
-
-    // if(process.env.HOST){
-    //   options.path = "http://" + options.host + options.path;
-    //   options.host = process.env.HOST;
-    //   options.port = process.env.PORT;
-
-    // }
+    //checking if we are one the corporate wireless network
+    defaultGateway.v4().then(result => {
+      if (require('../../config/env.json') && result.gateway == process.env.DEFAULT_GATEWAY){
+        options.path = "https://" + options.host + options.path;
+        options.host = process.env.HOST;
+        options.port = process.env.PORT;
+      }
+    });
     
     var request = http.get(options, response => {
       if (response.statusCode < 200 || response.statusCode > 299) {

@@ -383,12 +383,15 @@ class Schedule extends React.Component {
   }
 
   loopContent(){
+    var start = moment(this.props.startLoop)._i[0] == undefined ? moment(this.props.startLoop)._i : moment(this.props.startLoop)._i[0];
+    var end = moment(this.props.finishTime)._i[0] == undefined ? moment(this.props.finishTime)._i : moment(this.props.finishTime)._i[0];
+    if(!moment(start).isAfter(moment(end))){
+      
     var digit = 2;
   // alert("loop")
   //  let items = [];
    let loop = JSON.parse(JSON.stringify(this.props.loopedContent));
-   var start = moment(this.props.startLoop)._i[0] == undefined ? moment(this.props.startLoop)._i : moment(this.props.startLoop)._i[0];
-   var end = moment(this.props.finishTime)._i[0] == undefined ? moment(this.props.finishTime)._i : moment(this.props.finishTime)._i[0];
+
 
   //  scheduleItems[dateIndex].map((item, index)=>{
   //    if(item.startTime > start && item.startTime < end){
@@ -433,7 +436,10 @@ class Schedule extends React.Component {
     }
   }
 flag = false;
+  }else{
+    alert("invalid loop")
   }
+}
   componentDidUpdate(prevProps) {
 
     switch (true) {
