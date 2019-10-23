@@ -7,8 +7,7 @@ import 'flatpickr/dist/themes/material_green.css'
 var rows = [];
 var length = 0;
 var duration = 0;
-var start = new Date()
-var finish = new Date()
+
 const columns = [
   { key: "pid", name: "pid" },
   { key: "title", name: "Title" },
@@ -22,8 +21,8 @@ class Loop extends React.Component {
       data: [],
       status: "",
       current: "",
-      startDate: start.setMinutes(start.getMinutes() + 10),
-      finishDate: finish.setHours(finish.getHours() + 2)
+      startDate: new Date(),
+      finishDate: new Date(),
     };
   }
 
@@ -31,6 +30,8 @@ class Loop extends React.Component {
     this.setState({ data: this.props.data });
     this.setState({ status: "Copy" });
     this.setState({ current: "Clear" });
+    this.setState({startDate : this.state.startDate.setMinutes(this.state.startDate.getMinutes() + 10)})
+    this.setState({finishDate : this.state.finishDate.setHours(this.state.finishDate.getHours() + 2)})
   }
   componentDidUpdate(prevProps) {
     if (prevProps.data.length !== this.props.data.length) {
