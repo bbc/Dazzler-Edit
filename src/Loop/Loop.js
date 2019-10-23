@@ -4,12 +4,7 @@ import moment from "moment";
 import Flatpickr from 'react-flatpickr'
 import 'flatpickr/dist/themes/material_green.css'
 
-
-
-
-
 var rows = [];
-var copiedContent = [];
 var length = 0;
 var duration = 0;
 const columns = [
@@ -25,7 +20,6 @@ class Loop extends React.Component {
       data: [],
       status: "",
       current: "",
-      refresh: 0,
       startDate: new Date(),
       finishDate: new Date(),
     };
@@ -40,7 +34,6 @@ class Loop extends React.Component {
     if (prevProps.data.length !== this.props.data.length) {
       if (this.props.data.length === 0) {
         this.setState({ current: "Clear" });
-        this.setState({ refresh: 1 });
       }
     }
   }
@@ -49,10 +42,9 @@ class Loop extends React.Component {
     const { startDate, finishDate } = this.state;
     rows = [];
     duration = 0;
-    copiedContent = this.state.data;
-    if (copiedContent.length > 0) {
-      length = copiedContent.length;
-      copiedContent.map((item, idx) => {
+    if (this.props.data.length > 0) {
+      length = this.props.data.length;
+      this.props.data.map((item, idx) => {
         return (
           (duration += moment.duration(item.duration)._milliseconds),
           (item.newDuration =
@@ -86,7 +78,7 @@ class Loop extends React.Component {
         <button
           class="ui button active"
           onClick={() => {
-            this.props.clearContent();
+            this.props.clearContent(true);
           }}
         >
           <i class="trash icon"></i> {this.state.current}

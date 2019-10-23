@@ -242,7 +242,6 @@ class Schedule extends React.Component {
       item.startTime = moment(item.title.substring(18,38))
       
     } else {
-          
          if (scheduleItems[dateIndex].length === 0) {
 
           
@@ -282,11 +281,20 @@ class Schedule extends React.Component {
 
 
   addScheduleItem(updateItem) {
-
     let items = [];
     if (updateItem === undefined) {
       updateItem = this.props.item;
     }
+    // var updateItem = {
+    //   title: updateItem.title,
+    //   pid: updateItem.pid,
+    //   isLive: updateItem.isLive,
+    //   versionCrid: updateItem.versionCrid,
+    //   startTime: updateItem.startTime,
+    //   duration: updateItem.duration
+    // }
+
+    console.log(updateItem)
     this.addItemPosition(updateItem);
 
     if( moment(updateItem.startTime).format("YYYY-MM-DD") > moment(this.state.scheduleDate).format("YYYY-MM-DD") && updateItem.live == undefined){
