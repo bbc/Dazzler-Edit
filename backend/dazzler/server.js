@@ -2,6 +2,7 @@
 // https://github.com/bbc/sample-cloud-apps/nodejs-helloworld/src/helloworld/server.js
 const auth = require("./auth");
 const express = require("express");
+const axios = require("axios");
 const fs = require("fs");
 const parseString = require("xml2js").parseString;
 const querystring = require("querystring");
@@ -116,7 +117,6 @@ app.get("/api/v1/loop", function(req, res) {
   clip(q, req.query, res);
 });
 
-
 app.get("/api/v1/special", function(req, res) {
   let q = {
     group: config[req.query.sid].specials_collection
@@ -204,19 +204,55 @@ app.get("/api/v1/episode", function(req, res) {
   );
 });
 
-app.post("/api/v1/tva", function(req, res) {
-  if (req.body.includes('serviceIDRef="TVMAR01')) {
+app.put('/api/v1/loop', async (req, res, next) => {
+  let user = "dazzler"; // assume local
+  if(process.env.environment) {
+    // assume cosmos
     if (req.header("sslclientcertsubject")) {
       const subject = parseSSLsubject(req);
-      if (auth(subject.emailAddress)) {
-        postTVA(req.body, res);
-      } else {
-        console.log(subject.emailAddress +" is not authorised to save schedules");
-        res.status(403).send(subject.emailAddress +" is not authorised to save schedules");
-      }
+      user = subject.emailAddress;
     } else {
       console.log("missing authentification header");
       res.status(403).send("missing authentification header");
+    }
+  }
+  if (auth(user)) {
+    const collection_pid = config.bbc_marathi_tv.loop_collection;
+    const members = JSON.parse(req.body);
+    try {
+      await clearCollection(collection_pid);
+      await setCollectionMembers(collection_pid, members);
+      res.json({pid:collection_pid, members:members});
+    } catch (e) {
+      // this will eventually be handled by our error handling middleware
+      next(e);
+    }
+} else {
+    const message = user +" is not authorised to save the loop";
+    console.log(message);
+    res.status(403).send(message);
+  }
+});
+
+app.post("/api/v1/tva", function(req, res) {
+  if (req.body.includes('serviceIDRef="TVMAR01')) {
+    let user = "dazzler"; // assume local
+    if(process.env.environment) {
+      // assume cosmos
+      if (req.header("sslclientcertsubject")) {
+        const subject = parseSSLsubject(req);
+        user = subject.emailAddress;
+      } else {
+        console.log("missing authentification header");
+        res.status(403).send("missing authentification header");
+      }
+    }
+    if (auth(user)) {
+      postTVA(req.body, res);
+    } else {
+      const message = user +" is not authorised to save schedules";
+      console.log(message);
+      res.status(403).send(message);
     }
   } else {
     console.log("Marathi only please");
@@ -224,6 +260,78 @@ app.post("/api/v1/tva", function(req, res) {
   }
 });
 
+async function clearCollection(pid) {
+  var config = {
+    key: fs.readFileSync(process.env.KEY),
+    cert: fs.readFileSync(process.env.CERT),
+    passphrase: process.env.PASSPHRASE
+  };
+  const members = await getCollectionMembers(pid);
+  for(let i=0; i<members.length; i++) {
+    await axios.delete(`https://api.live.bbc.co.uk/pips/api/v1/membership/pid.${members[i]}`, config);
+  }
+}
+
+async function getCollectionMembers(pid) {
+  var config = {
+    key: fs.readFileSync(process.env.KEY),
+    cert: fs.readFileSync(process.env.CERT),
+    passphrase: process.env.PASSPHRASE
+  };
+  const membersXml = await axios.get(`https://api.test.bbc.co.uk/pips/api/v1/collection/pid.${pid}/group_of/`, config)
+  const members = await xml2json(membersXml);
+  const membership = members.pips.results[0].membership;
+  /* this is good if we need the positions but we only use the results for delete
+  let r = [];
+  for(let i=0; i<membership.length; i++) {
+          const pid = membership[i].$.pid;
+          const position = membership[i].position[0]
+          r[position] = pid;
+  }
+  return r.filter(function (el) { return el != null; });
+  */
+  return Array.from(membership, x => x.$.pid);;
+}
+
+async function setCollectionMembers(pid, data) {
+  for(let i=0; i<data.length; i++) {
+    await createMembership(pid, data[i], i+1);
+  }
+}
+
+async function createMembership(collection, member, position) {
+  const xml = `<pips xmlns="http://ns.webservices.bbc.co.uk/2006/02/pips" xmlns:pips-meta="http://ns.webservices.bbc.co.uk/2006/02/pips-meta" xmlns:xsd="http://www.w3.org/2001/XMLSchema-datatypes" release="219">
+  <membership>
+    <partner>
+      <link rel="pips-meta:partner" pid="s0000001"/>
+    </partner>
+    <ids/>
+    <group>
+      <link rel="pips-meta:collection" pid="${collection}"/>
+    </group>
+    <member>
+      <link rel="pips-meta:clip" pid="${member}"/>
+    </member>
+    <position>${position}</position>
+    <title></title>
+    <synopses/>
+    <links/>
+  </membership>
+</pips>`;
+  return await postPIPS(xml);
+}
+
+async function postPIPS(object_type, data) {
+
+  var config = {
+    key: fs.readFileSync(process.env.KEY),
+    cert: fs.readFileSync(process.env.CERT),
+    passphrase: process.env.PASSPHRASE,
+    headers: {'Content-Type': 'text/xml'}
+  };
+
+  return await axios.post(`https://api.live.bbc.co.uk/pips/api/v1/${object_type}/`, data, config);
+}
 
 function postTVA(data, res) {
   var options = {
@@ -407,6 +515,18 @@ function parseSSLsubject(req) {
     data[key] = val;
   }
   return data;
+}
+
+async function xml2json(xml) {
+  return new Promise((resolve, reject) => {
+      parseString(xml, function (err, json) {
+          if (err)
+              reject(err);
+          else
+              resolve(json);
+      });
+
+  });
 }
 
 // We do the "listen" call in index.js - making this module easier to test
