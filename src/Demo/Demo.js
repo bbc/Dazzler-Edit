@@ -63,8 +63,15 @@ var viewIcons = [<LiveTv />, <Assignment />, <LoopIcon/>];
 var count = -1;
 var URLPrefix = '';
 //checking if running locally
-if (require('../config/env.json')){
-  URLPrefix = 'http://localhost:8080';
+const fs = require('fs')
+const path = '../config/env.json';
+
+try {
+  if (fs.existsSync(path)) {
+    URLPrefix = 'http://localhost:8080';
+  }
+} catch(err) {
+  console.error(err)
 }
 
 const styles = theme => ({
