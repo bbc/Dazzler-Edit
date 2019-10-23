@@ -40,6 +40,8 @@ import PreviousSchedule from "../PreviousSchedule/PreviousSchedule";
 import NextSchedule from "../NextSchedule/NextSchedule";
 import Loop from "../Loop/Loop";
 
+
+
 const drawerWidth = 240;
 var menuText = "Schedule";
 var text = "Today's ";
@@ -59,6 +61,11 @@ var icons = [
 ];
 var viewIcons = [<LiveTv />, <Assignment />, <LoopIcon/>];
 var count = -1;
+var URLPrefix = '';
+//checking if running locally
+if (require('../../src/config/env.json')){
+  URLPrefix = 'http://localhost:8080/';
+}
 
 const styles = theme => ({
   root: {
@@ -173,7 +180,7 @@ console.log(copiedContent);
     // Episodes
     axios
       .get(
-        "http://localhost:8080/api/v1/episode?sid=" + this.state.service.sid
+        "api/v1/episode?sid=" + this.state.service.sid
       )
       .then(response => {
         this.setState({
@@ -187,7 +194,7 @@ console.log(copiedContent);
     // get user
     axios
       .get(
-        "http://localhost:8080/api/v1/user"
+        URLPrefix + "api/v1/user"
       )
       .then(response => {
         console.log('user', JSON.stringify(response.data));
@@ -203,7 +210,7 @@ console.log(copiedContent);
     //get request for specials
     axios
       .get(
-        "http://localhost:8080/api/v1/special?sid=" + this.state.service.sid
+        URLPrefix + "/api/v1/special?sid=" + this.state.service.sid
       )
       .then(response => {
         this.setState({
@@ -219,7 +226,7 @@ console.log(copiedContent);
     const days = 5; // to allow us to edit future schedules
     axios
       .get(
-        "http://localhost:8080/api/v1/webcast" +
+        URLPrefix + "/api/v1/webcast" +
           "?sid=" + this.state.service.sid +
           "&start=" + day.format() +
           "&end=" + day.add(days, 'days').utc().format()
