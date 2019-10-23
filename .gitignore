@@ -7,7 +7,6 @@ node_modules
 
 #config
 src/config
-src/test
 .vscode
 
 
