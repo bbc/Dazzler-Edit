@@ -6,7 +6,7 @@ node_modules
 .pnp.js
 
 #config
-config
+src/config
 .vscode
 
 
