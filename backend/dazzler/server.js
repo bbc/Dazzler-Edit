@@ -12,6 +12,8 @@ const bodyParser = require("body-parser");
 const configuration = require('../../config/env.json');
 const app = express();
 
+process.env = configuration
+
 const config = {
   bbc_marathi_tv: {
     mid: "bbc_marathi_tv",
@@ -22,8 +24,6 @@ const config = {
     webcast_channels: ["world_service_stream_05","world_service_stream_06","world_service_stream_07","world_service_stream_08"]
   }
 };
-
-process.env = configuration
 
 //app.use(bodyParser.raw({ type: '*/*' }));
 app.use(bodyParser.text({ type: "*/*" }));
@@ -108,6 +108,7 @@ app.get("/api/v1/webcast", function(req, res) {
 // http://programmes.api.bbc.com/nitro/api/programmes?api_key=XXX&page_size=100&sort=group_position&sort_direction=ascending&group=p0510sbc
 
 app.get("/api/v1/loop", function(req, res) {
+
   let q = {
     group: config[req.query.sid].loop_collection,
     sort: 'group_position',

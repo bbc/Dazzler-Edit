@@ -55,6 +55,7 @@ class Schedule extends React.Component {
 
       data.map((item, index)=>{
         item.map(unit => {
+          console.log(unit)
           items.push(<SingleSchedule
           fetchTime={this.props.fetchTime}
           title={unit.props.title}
@@ -242,9 +243,7 @@ class Schedule extends React.Component {
       item.startTime = moment(item.title.substring(18,38))
       
     } else {
-         if (scheduleItems[dateIndex].length === 0) {
-
-          
+         if (scheduleItems[dateIndex].length === 0) {   
         var dateTime = moment().add(dateIndex, "d").add(10, "m");
         item.startTime = dateTime
         console.log(item.startTime)
@@ -386,14 +385,21 @@ class Schedule extends React.Component {
   loopContent(){
     var digit = 2;
   // alert("loop")
-   let items = [];
+  //  let items = [];
    let loop = JSON.parse(JSON.stringify(this.props.loopedContent));
    var start = moment(this.props.startLoop)._i[0] == undefined ? moment(this.props.startLoop)._i : moment(this.props.startLoop)._i[0];
    var end = moment(this.props.finishTime)._i[0] == undefined ? moment(this.props.finishTime)._i : moment(this.props.finishTime)._i[0];
+
+  //  scheduleItems[dateIndex].map((item, index)=>{
+  //    if(item.startTime > start && item.startTime < end){
+  //      scheduleItems.splice(index, 1)
+  //      myPreRenderedItems.splice(index, 1)
+  //    }
+  //  })
   
    loop[0].startTime = moment(start);
    scheduleItems[dateIndex].push(loop[0])
-   items.push(
+   myPreRenderedItems[dateIndex].push(
     <SingleSchedule
       fetchTime={this.props.fetchTime}
       title={loop[0].title}
@@ -408,9 +414,9 @@ class Schedule extends React.Component {
   loop.map((item, index) => {
     if(index > 0){
     this.addScheduleItem(item)
-    
     }
   });
+
    for(let i = 0; 1 < digit; i++){
      
       for(let j = 0; j == j; j++){

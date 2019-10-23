@@ -7,6 +7,8 @@ import 'flatpickr/dist/themes/material_green.css'
 var rows = [];
 var length = 0;
 var duration = 0;
+var start = new Date()
+var finish = new Date()
 const columns = [
   { key: "pid", name: "pid" },
   { key: "title", name: "Title" },
@@ -20,8 +22,8 @@ class Loop extends React.Component {
       data: [],
       status: "",
       current: "",
-      startDate: new Date(),
-      finishDate: new Date(),
+      startDate: start.setMinutes(start.getMinutes() + 10),
+      finishDate: finish.setHours(finish.getHours() + 2)
     };
   }
 
