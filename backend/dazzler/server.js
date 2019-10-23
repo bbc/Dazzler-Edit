@@ -15,7 +15,7 @@ var configuration;
 
 
 if (require('../../src/config/env.json')){
-  configuration = require('../../config/env.json');
+  configuration = require('../../src/config/env.json');
   process.env = configuration
 }
 
@@ -131,6 +131,7 @@ app.get("/api/v1/special", function(req, res) {
 });
 
 app.get("/api/v1/clip", function(req, res) {
+  
   let q = {
     tag_name: config[req.query.sid].clip_language
   };
@@ -247,7 +248,7 @@ function postTVA(data, res) {
 
   //checking if we are one the corporate wireless network
   defaultGateway.v4().then(result => {
-    if (require('../../config/env.json') && result.gateway == process.env.DEFAULT_GATEWAY){
+    if (require('../../src/config/env.json') && result.gateway == process.env.DEFAULT_GATEWAY){
       options.path = "https://" + options.host + options.path;
       options.host = process.env.HOST;
       options.port = process.env.PORT;
@@ -343,7 +344,7 @@ function nitroRequest(feed, query) {
     };
     //checking if we are one the corporate wireless network
     defaultGateway.v4().then(result => {
-      if (require('../../config/env.json') && result.gateway == process.env.DEFAULT_GATEWAY){
+      if (require('../../src/config/env.json') && result.gateway == process.env.DEFAULT_GATEWAY){
         options.path = "https://" + options.host + options.path;
         options.host = process.env.HOST;
         options.port = process.env.PORT;

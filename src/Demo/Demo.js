@@ -63,8 +63,8 @@ var viewIcons = [<LiveTv />, <Assignment />, <LoopIcon/>];
 var count = -1;
 var URLPrefix = '';
 //checking if running locally
-if (require('../../src/config/env.json')){
-  URLPrefix = 'http://localhost:8080/';
+if (require('../config/env.json')){
+  URLPrefix = 'http://localhost:8080';
 }
 
 const styles = theme => ({
@@ -180,7 +180,7 @@ console.log(copiedContent);
     // Episodes
     axios
       .get(
-        "api/v1/episode?sid=" + this.state.service.sid
+        URLPrefix + "api/v1/episode?sid=" + this.state.service.sid
       )
       .then(response => {
         this.setState({

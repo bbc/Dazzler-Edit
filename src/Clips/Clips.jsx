@@ -120,8 +120,8 @@ export const styles = theme => ({
 
 //checking if we are running locally
 var URLPrefix = '';
-if (require('../../src/config/env.json')){
-  URLPrefix = 'http://localhost:8080/';
+if (require('../config/env.json')){
+  URLPrefix = 'http://localhost:8080';
 }
 
 export class Clips extends React.Component {
