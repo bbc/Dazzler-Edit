@@ -88,8 +88,8 @@ class Schedule extends React.Component {
   }
 
   savePlaylist() {
-    
-    if (scheduleItems[dateIndex].length === 0) {
+    const data = scheduleItems[dateIndex];
+    if (data.length === 0) {
       console.log("nothing to save - button should be disabled");
       return;
     }
@@ -98,8 +98,8 @@ class Schedule extends React.Component {
       savePlaylist: "ui right floated primary loading button"
     });
 
-    const first = scheduleItems[dateIndex][0];
-    const last = scheduleItems[dateIndex][scheduleItems[dateIndex].length - 1];
+    const first = data[0];
+    const last = data[data.length - 1];
 
     const start = moment.utc(first.startTime, "HH:mm:ss");
     const end = moment
@@ -111,15 +111,15 @@ class Schedule extends React.Component {
         `      <Schedule start="${start.format()}" end="${end.format()}" serviceIDRef="${
           this.props.serviceIDRef
         }">`;
-    for (let i = 0; i < scheduleItems[dateIndex].length; i++) {
-      tva += this.makeScheduleEvent(this.props.serviceIDRef, scheduleItems[dateIndex][i]);
+    for (let i = 0; i < data.length; i++) {
+      tva += this.makeScheduleEvent(this.props.serviceIDRef, data[i]);
     }
     tva += "\n      </Schedule>\n    </ProgramLocationTable>\n" + tvaEnd;
     console.log(tva);
 
     axios({
       method: "post",
-      url: URLPrefix + "api/v1/tva",
+      url: "http://localhost:8080/api/v1/tva",
       data: tva
     })
       .then(response => {
@@ -129,7 +129,6 @@ class Schedule extends React.Component {
         this.setState({ status: "Playlist Saved" });
       })
       .catch(error => {
-        console.log(error)
         this.setState({
           savePlaylist: "ui right floated small primary labeled icon button"
         });
