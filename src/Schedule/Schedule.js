@@ -7,13 +7,19 @@ import axios from "axios";
 var live = 0;
 var count = -2;
 var dateIndex = 0;
+var text = '';
 const tvaStart =
   '<TVAMain xmlns="urn:tva:metadata:2007" xmlns:mpeg7="urn:tva:mpeg7:2005" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xml:lang="en-GB" xsi:schemaLocation="urn:tva:metadata:2007 tva_metadata_3-1_v141.xsd">\n  <ProgramDescription>\n';
 const tvaEnd = "  </ProgramDescription>\n</TVAMain>";
 var scheduleItems = [[]];
-var text = '';
 var myPreRenderedItems = [[]];
 var flag = true;
+var URLPrefix = '';
+//checking if running locally
+
+if(process.env.NODE_ENV == "development"){
+  URLPrefix = 'http://localhost:8080';
+}
 
 class Schedule extends React.Component {
   constructor(props) {
@@ -82,8 +88,7 @@ class Schedule extends React.Component {
   }
 
   savePlaylist() {
-    const data = scheduleItems;
-    if (data.length === 0) {
+    if (myPreRenderedItems[dateIndex].length === 0) {
       console.log("nothing to save - button should be disabled");
       return;
     }
@@ -92,8 +97,8 @@ class Schedule extends React.Component {
       savePlaylist: "ui right floated primary loading button"
     });
 
-    const first = data[0];
-    const last = data[data.length - 1];
+    const first = myPreRenderedItems[dateIndex][0];
+    const last = myPreRenderedItems[dateIndex][myPreRenderedItems[dateIndex].length - 1];
 
     const start = moment.utc(first.startTime, "HH:mm:ss");
     const end = moment
@@ -105,15 +110,15 @@ class Schedule extends React.Component {
         `      <Schedule start="${start.format()}" end="${end.format()}" serviceIDRef="${
           this.props.serviceIDRef
         }">`;
-    for (let i = 0; i < data.length; i++) {
-      tva += this.makeScheduleEvent(this.props.serviceIDRef, data[i]);
+    for (let i = 0; i < myPreRenderedItems[dateIndex].length; i++) {
+      tva += this.makeScheduleEvent(this.props.serviceIDRef, myPreRenderedItems[dateIndex][i]);
     }
     tva += "\n      </Schedule>\n    </ProgramLocationTable>\n" + tvaEnd;
     console.log(tva);
 
     axios({
       method: "post",
-      url: "http://localhost:8080/api/v1/tva",
+      url: URLPrefix + "api/v1/tva",
       data: tva
     })
       .then(response => {
