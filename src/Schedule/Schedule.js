@@ -15,8 +15,8 @@ var scheduleItems = [[]];
 var myPreRenderedItems = [[]];
 var flag = true;
 var URLPrefix = '';
-//checking if running locally
 
+//checking if running locally
 if(process.env.NODE_ENV == "development"){
   URLPrefix = 'http://localhost:8080';
 }
@@ -88,7 +88,8 @@ class Schedule extends React.Component {
   }
 
   savePlaylist() {
-    if (myPreRenderedItems[dateIndex].length === 0) {
+    
+    if (scheduleItems[dateIndex].length === 0) {
       console.log("nothing to save - button should be disabled");
       return;
     }
@@ -97,8 +98,8 @@ class Schedule extends React.Component {
       savePlaylist: "ui right floated primary loading button"
     });
 
-    const first = myPreRenderedItems[dateIndex][0];
-    const last = myPreRenderedItems[dateIndex][myPreRenderedItems[dateIndex].length - 1];
+    const first = scheduleItems[dateIndex][0];
+    const last = scheduleItems[dateIndex][scheduleItems[dateIndex].length - 1];
 
     const start = moment.utc(first.startTime, "HH:mm:ss");
     const end = moment
@@ -110,8 +111,8 @@ class Schedule extends React.Component {
         `      <Schedule start="${start.format()}" end="${end.format()}" serviceIDRef="${
           this.props.serviceIDRef
         }">`;
-    for (let i = 0; i < myPreRenderedItems[dateIndex].length; i++) {
-      tva += this.makeScheduleEvent(this.props.serviceIDRef, myPreRenderedItems[dateIndex][i]);
+    for (let i = 0; i < scheduleItems[dateIndex].length; i++) {
+      tva += this.makeScheduleEvent(this.props.serviceIDRef, scheduleItems[dateIndex][i]);
     }
     tva += "\n      </Schedule>\n    </ProgramLocationTable>\n" + tvaEnd;
     console.log(tva);
@@ -128,6 +129,7 @@ class Schedule extends React.Component {
         this.setState({ status: "Playlist Saved" });
       })
       .catch(error => {
+        console.log(error)
         this.setState({
           savePlaylist: "ui right floated small primary labeled icon button"
         });
