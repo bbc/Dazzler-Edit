@@ -182,7 +182,7 @@ console.log(copiedContent);
     // Episodes
     axios
       .get(
-        URLPrefix + "api/v1/episode?sid=" + this.state.service.sid
+        URLPrefix + "/api/v1/episode?sid=" + this.state.service.sid
       )
       .then(response => {
         this.setState({
@@ -196,7 +196,7 @@ console.log(copiedContent);
     // get user
     axios
       .get(
-        URLPrefix + "api/v1/user"
+        URLPrefix + "/api/v1/user"
       )
       .then(response => {
         console.log('user', JSON.stringify(response.data));
