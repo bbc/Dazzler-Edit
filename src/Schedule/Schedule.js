@@ -119,7 +119,7 @@ class Schedule extends React.Component {
 
     axios({
       method: "post",
-      url: "http://localhost:8080/api/v1/tva",
+      url: URLPrefix + "/api/v1/tva",
       data: tva
     })
       .then(response => {
