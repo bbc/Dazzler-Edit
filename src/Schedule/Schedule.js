@@ -7,7 +7,7 @@ import axios from "axios";
 var live = 0;
 var count = -2;
 var dateIndex = 0;
-var text = '';
+var text = "Today's ";
 const tvaStart =
   '<TVAMain xmlns="urn:tva:metadata:2007" xmlns:mpeg7="urn:tva:mpeg7:2005" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xml:lang="en-GB" xsi:schemaLocation="urn:tva:metadata:2007 tva_metadata_3-1_v141.xsd">\n  <ProgramDescription>\n';
 const tvaEnd = "  </ProgramDescription>\n</TVAMain>";
@@ -51,39 +51,79 @@ class Schedule extends React.Component {
     };
   }
   componentDidMount() {
-
-    var myPreRenderedItems = [[]];
+    
     let items = [];
-    this.setState({ serviceIDRef: this.props.serviceIDRef });
-    if (sessionStorage.getItem("data") != null) {
-      var data = JSON.parse(sessionStorage.getItem("data"));
-      var scheduleData = JSON.parse(sessionStorage.getItem("data"));
-
-      data.map((item, index)=>{
-        item.map(unit => {
-          console.log(unit)
-          items.push(<SingleSchedule
+    axios
+    .get(
+      URLPrefix + 
+      "/api/v1/schedule" +
+      "?sid=" + this.props.sid + 
+      "&date=" + moment.utc().format('YYYY-MM-DD')
+    )
+    .then(response => {
+      response['data']['p:schedule']['p:item'].map((item, index)=>{
+        var obj = {
+          title: 'Loaded from schedule ' + index,
+          startTime: moment(item['p:broadcast'][0]['p:published_time'][0]['$']['start']),
+          duration: item['p:broadcast'][0]['p:published_time'][0]['$']['duration'],
+          id: 'something',
+          live: item['p:broadcast'][0]['p:live'][0]['$']['value'],
+          crid: item['p:version'][0]['p:crid'][0]['$']['uri']
+        }
+        
+        myPreRenderedItems[dateIndex].push(
+          <SingleSchedule
           fetchTime={this.props.fetchTime}
-          title={unit.props.title}
-          startTime={unit.props.startTime}
-          duration={unit.props.duration}
+          title={obj.title}
+          startTime={moment(obj.startTime).format("HH:mm:ss")}
+          duration={obj.duration}
           deleteItem={this.props.deleteItem}
-          id={unit.props.id}
-          live={unit.props.live}
-        />
-          )
-        })
-        myPreRenderedItems[index] = myPreRenderedItems.concat(items)
+          id={obj.id}
+          live={obj.live}
+        />)
+
+      scheduleItems[0].push(obj)
       })
+      
+
+      this.setState({ serviceIDRef: this.props.serviceIDRef });
+        this.setState({
+          preRenderedItem: myPreRenderedItems
+        });
+      })
+    .catch(e => {
+      console.log(e);
+    });
+
+    // if (sessionStorage.getItem("data") != null) {
+    //   var data = JSON.parse(sessionStorage.getItem("data"));
+    //   var scheduleData = JSON.parse(sessionStorage.getItem("data"));
+
+    //   data.map((item, index)=>{
+    //     item.map(unit => {
+    //       console.log(unit)
+    //       items.push(<SingleSchedule
+    //       fetchTime={this.props.fetchTime}
+    //       title={unit.props.title}
+    //       startTime={unit.props.startTime}
+    //       duration={unit.props.duration}
+    //       deleteItem={this.props.deleteItem}
+    //       id={unit.props.id}
+    //       live={unit.props.live}
+    //     />
+    //       )
+    //     })
+    //     myPreRenderedItems[index] = myPreRenderedItems.concat(items)
+    //   })
   
-      scheduleItems = JSON.parse(sessionStorage.getItem("scheduleItems"));
+    //   scheduleItems = JSON.parse(sessionStorage.getItem("scheduleItems"));
 
 
-      this.setState({
-        preRenderedItem: myPreRenderedItems
-      });
+    //   this.setState({
+    //     preRenderedItem: myPreRenderedItems
+    //   });
      
-    }
+    // }
 
   }
 
@@ -165,7 +205,6 @@ class Schedule extends React.Component {
 
   previousDay = CDate => {
     dateIndex -= 1;
-    if(dateIndex < 0){dateIndex = 0};
     text = moment(CDate).isAfter(moment()) ? "Future " : "Previous ";
 
     
@@ -304,10 +343,10 @@ class Schedule extends React.Component {
 
     if( moment(updateItem.startTime).format("YYYY-MM-DD") > moment(this.state.scheduleDate).format("YYYY-MM-DD") && updateItem.live == undefined){
       console.log(updateItem.startTime)
-    //  alert("after")
+    
     
       if(scheduleItems[dateIndex + 1] == undefined){
-        //  alert("added"); 
+    
          scheduleItems[dateIndex + 1] = [];  myPreRenderedItems[dateIndex + 1] = [];
         };
 
@@ -333,7 +372,6 @@ class Schedule extends React.Component {
     });
 
     }else{
-      
     scheduleItems[dateIndex].push(updateItem);
     items.push(
       <SingleSchedule
@@ -349,6 +387,7 @@ class Schedule extends React.Component {
     );
     if(myPreRenderedItems[dateIndex] == undefined){myPreRenderedItems[dateIndex] = [];}
     myPreRenderedItems[dateIndex] = myPreRenderedItems[dateIndex].concat(items)
+    console.log(myPreRenderedItems)
     this.setState({
       preRenderedItem: myPreRenderedItems
     });
@@ -479,7 +518,7 @@ flag = false;
       scheduleDate={this.state.scheduleDate}
     />
         <div className="dateContainer">
-          <h2>{this.props.text}Schedule</h2>
+          <h2>{text}Schedule</h2>
         </div>
         <table className="ui compact celled definition table">
           <thead>
