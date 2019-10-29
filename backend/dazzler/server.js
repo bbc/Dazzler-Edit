@@ -29,7 +29,7 @@ const config = {
   }
 };
 
-app.use(bodyParser.text({ type: "*/*", limit: '500mb' }));
+app.use(bodyParser.text({ type: "*/*", limit: '500kb' }));
 
 app.use(express.static(__dirname+"/../edit"));
 
@@ -254,7 +254,6 @@ app.post("/api/v1/tva", function(req, res) {
     }
     if (auth(user)) {
       postTVA(req.body, res);
-      console.log('posted')
     } else {
       const message = user +" is not authorised to save schedules";
       console.log(message);
