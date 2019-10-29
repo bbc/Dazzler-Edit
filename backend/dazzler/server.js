@@ -29,8 +29,7 @@ const config = {
   }
 };
 
-//app.use(bodyParser.raw({ type: '*/*' }));
-app.use(bodyParser.text({ type: "*/*" }));
+app.use(bodyParser.text({ type: "*/*", limit: '500mb' }));
 
 app.use(express.static(__dirname+"/../edit"));
 
@@ -243,7 +242,7 @@ app.post("/api/v1/tva", function(req, res) {
 
   if (req.body.includes('serviceIDRef="TVMAR01')) {
     let user = "dazzler"; // assume local
-    if(process.env.environment) {
+     if(process.env.environment) {
       // assume cosmos
       if (req.header("sslclientcertsubject")) {
         const subject = parseSSLsubject(req);
@@ -255,6 +254,7 @@ app.post("/api/v1/tva", function(req, res) {
     }
     if (auth(user)) {
       postTVA(req.body, res);
+      console.log('posted')
     } else {
       const message = user +" is not authorised to save schedules";
       console.log(message);

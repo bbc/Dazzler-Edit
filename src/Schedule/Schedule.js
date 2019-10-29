@@ -250,7 +250,7 @@ class Schedule extends React.Component {
       
     } else {
          if (scheduleItems[dateIndex].length === 0) {   
-        var dateTime = moment().add(dateIndex, "d").add(10, "m");
+        var dateTime = moment().add(dateIndex, "d").add(10, "m");
         item.startTime = dateTime
         console.log(item.startTime)
         // item.id = 0;
