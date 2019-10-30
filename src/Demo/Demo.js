@@ -164,8 +164,7 @@ console.log(copiedContent);
     this.setState({
       display: (
         <Schedule
-          serviceIDRef={this.state.service.serviceIDRef}
-          sid={this.state.service.sid}
+          service={this.state.service}
           fetchTime={this.fetchTime}
           clipTime={time}
           length={scheduleItems.length}
@@ -266,8 +265,7 @@ loopContent = (rows, startTime, finishTime) => {
  menuText = "Schedule";
   this.setState({
     display: ( <Schedule
-        serviceIDRef={this.state.service.serviceIDRef}
-        sid={this.state.service.sid}
+        service={this.state.service}
         fetchTime={this.fetchTime}
         clipTime={time}
         length={scheduleItems.length}
@@ -325,8 +323,7 @@ loopContent = (rows, startTime, finishTime) => {
     this.setState({
       display: (
         <Schedule
-          serviceIDRef={this.state.service.serviceIDRef}
-          sid={this.state.service.sid}
+          service={this.state.service}
           fetchTime={this.fetchTime}
           loopedContent={""}
           clipTime={time}
@@ -412,8 +409,7 @@ loopContent = (rows, startTime, finishTime) => {
       this.setState({
         display: (
           <Schedule
-            serviceIDRef={this.state.service.serviceIDRef}
-            sid={this.state.service.sid}
+            service={this.state.service}
             fetchTime={this.fetchTime}
             clipTime={time}
             item={newItem2}
@@ -497,8 +493,7 @@ loopContent = (rows, startTime, finishTime) => {
           return this.setState({
             display: (
               <Schedule
-                serviceIDRef={this.state.service.serviceIDRef}
-                sid={this.state.service.sid}
+                service={this.state.service}
                 fetchTime={this.fetchTime}
                 clipTime={time}
                 nextSchedule={this.nextDay}
@@ -544,8 +539,7 @@ loopContent = (rows, startTime, finishTime) => {
       display: (
         
         <Schedule
-          serviceIDRef={this.state.service.serviceIDRef}
-          sid={this.state.service.sid}
+          service={this.state.service}
           fetchTime={this.fetchTime}
           clipTime={time}
           length = {scheduleItems.length}
