@@ -7,7 +7,7 @@ import axios from "axios";
 var live = 0;
 var count = -2;
 var dateIndex = 0;
-var text = '';
+var text = "Today's ";
 const tvaStart =
   '<TVAMain xmlns="urn:tva:metadata:2007" xmlns:mpeg7="urn:tva:mpeg7:2005" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xml:lang="en-GB" xsi:schemaLocation="urn:tva:metadata:2007 tva_metadata_3-1_v141.xsd">\n  <ProgramDescription>\n';
 const tvaEnd = "  </ProgramDescription>\n</TVAMain>";
@@ -20,6 +20,9 @@ var URLPrefix = '';
 if(process.env.NODE_ENV == "development"){
   URLPrefix = 'http://localhost:8080';
 }
+
+//setting active session
+sessionStorage.setItem('activeSession', '');
 
 class Schedule extends React.Component {
   constructor(props) {
@@ -50,42 +53,87 @@ class Schedule extends React.Component {
       .format("LL"),
     };
   }
-  componentDidMount() {
-
-    var myPreRenderedItems = [[]];
-    let items = [];
-    this.setState({ serviceIDRef: this.props.serviceIDRef });
-    if (sessionStorage.getItem("data") != null) {
-      var data = JSON.parse(sessionStorage.getItem("data"));
-      var scheduleData = JSON.parse(sessionStorage.getItem("data"));
-
-      data.map((item, index)=>{
-        item.map(unit => {
-          console.log(unit)
-          items.push(<SingleSchedule
-          fetchTime={this.props.fetchTime}
-          title={unit.props.title}
-          startTime={unit.props.startTime}
-          duration={unit.props.duration}
-          deleteItem={this.props.deleteItem}
-          id={unit.props.id}
-          live={unit.props.live}
-        />
-          )
-        })
-        myPreRenderedItems[index] = myPreRenderedItems.concat(items)
-      })
-  
-      scheduleItems = JSON.parse(sessionStorage.getItem("scheduleItems"));
-
-
-      this.setState({
-        preRenderedItem: myPreRenderedItems
-      });
-     
-    }
-
+    componentDidMount() {
+        this.setState({ serviceIDRef: this.props.service.serviceIDRef });
+        let items = [];
+        scheduleItems = [[]];
+        myPreRenderedItems = [[]];  
+            if (sessionStorage.getItem("data") != null) {
+          var data = JSON.parse(sessionStorage.getItem("data"));    
+          data[0].map((item, index)=>{
+    
+            myPreRenderedItems[dateIndex].push(
+        <SingleSchedule
+              fetchTime={this.props.fetchTime}
+              title={item.props.title}
+              startTime={item.props.startTime}
+              duration={item.props.duration}
+              deleteItem={this.props.deleteItem}
+              id={item.props.id}
+              live={item.props.live}
+            />
+              )
+        scheduleItems[0].push(item)
+            })
+         
+          }
+    if(sessionStorage.getItem('activeSession').length == 0){
+        axios
+        .get(
+          URLPrefix + 
+          "/api/v1/schedule" +
+          "?sid=" + this.props.service.sid + 
+          "&date=" + moment.utc().format('YYYY-MM-DD')
+        )
+        .then(response => {
+      console.log(response)
+          response['data']['p:schedule']['p:item'].map((item, index)=>{
+            var obj = {
+              title: 'Loaded from schedule ' + index,
+              startTime: moment(item['p:broadcast'][0]['p:published_time'][0]['$']['start']),
+              duration: item['p:broadcast'][0]['p:published_time'][0]['$']['duration'],
+              id: 'something',
+              live: item['p:broadcast'][0]['p:live'][0]['$']['value'],
+              crid: item['p:version'][0]['p:crid'][0]['$']['uri']
+            }
+            
+            myPreRenderedItems[dateIndex].push(
+              <SingleSchedule
+              fetchTime={this.props.fetchTime}
+              title={obj.title}
+              startTime={moment(obj.startTime).format("HH:mm:ss")}
+              duration={obj.duration}
+              deleteItem={this.props.deleteItem}
+              id={obj.id}
+              live={obj.live}
+              isLive={obj.live}
+            />)
+    
+          scheduleItems[0].push(obj)
+          })
+            this.setState({
+                preRenderedItem: myPreRenderedItems
+              });
+    sessionStorage.setItem('activeSession', 1)
+    sessionStorage.setItem("data", JSON.stringify(myPreRenderedItems));
+   })        .catch(e => {
+          console.log(e);
+        });
   }
+
+sessionStorage.setItem('ScheduleItems', scheduleItems)
+            
+                // scheduleItems = JSON.parse(sessionStorage.getItem("scheduleItems"));         
+              
+                  this.setState({
+              preRenderedItem: myPreRenderedItems
+            });
+  
+
+    
+    
+    
+      }
 
   savePlaylist() {
     const data = scheduleItems[dateIndex];
@@ -109,10 +157,10 @@ class Schedule extends React.Component {
     let tva =tvaStart +
         "    <ProgramLocationTable>\n" +
         `      <Schedule start="${start.format()}" end="${end.format()}" serviceIDRef="${
-          this.props.serviceIDRef
+          this.props.service.serviceIDRef
         }">`;
     for (let i = 0; i < data.length; i++) {
-      tva += this.makeScheduleEvent(this.props.serviceIDRef, data[i]);
+      tva += this.makeScheduleEvent(this.props.service.serviceIDRef, data[i]);
     }
     tva += "\n      </Schedule>\n    </ProgramLocationTable>\n" + tvaEnd;
     console.log(tva);
@@ -165,8 +213,8 @@ class Schedule extends React.Component {
 
   previousDay = CDate => {
     dateIndex -= 1;
-    if(dateIndex < 0){dateIndex = 0};
-    text = moment(CDate).isAfter(moment()) ? "Future " : "Previous ";
+    if(dateIndex < 0){text = "Previous "};
+    // text = moment(CDate).isAfter(moment()) ? "Future " : "Previous ";
 
     
     if (moment(CDate).format("LL") === moment().format("LL")) {
@@ -185,7 +233,7 @@ class Schedule extends React.Component {
   }
  
   pasteContent() {
-
+    sessionStorage.setItem('ScheduleItems', JSON.stringify(scheduleItems))
     let scratchpadItems = JSON.parse(JSON.stringify(this.props.pasted));
     let items = [];
     for (let i = 0; i < scratchpadItems.length; i++) {
@@ -250,7 +298,7 @@ class Schedule extends React.Component {
       
     } else {
          if (scheduleItems[dateIndex].length === 0) {   
-        var dateTime = moment().add(dateIndex, "d").add(10, "m");
+        var dateTime = moment().add(dateIndex, "d").add(10, "m");
         item.startTime = dateTime
         console.log(item.startTime)
         // item.id = 0;
@@ -268,11 +316,12 @@ class Schedule extends React.Component {
 
             // item.id = recalculate
         } else {
+  
           var index = scheduleItems[dateIndex + 1] == undefined ? 0 : 1
           const lastItem = scheduleItems[dateIndex + index][scheduleItems[dateIndex + index].length - 1];
           item.startTime = moment(lastItem.startTime)
             .add(moment.duration(lastItem.duration));
-
+            console.log(lastItem)
             console.log(lastItem.startTime)
             console.log(scheduleItems[dateIndex + index][scheduleItems[dateIndex + index].length - 1])
             console.log(item.startTime)
@@ -479,7 +528,7 @@ flag = false;
       scheduleDate={this.state.scheduleDate}
     />
         <div className="dateContainer">
-          <h2>{this.props.text}Schedule</h2>
+          <h2>{text}Schedule</h2>
         </div>
         <table className="ui compact celled definition table">
           <thead>

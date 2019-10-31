@@ -41,7 +41,6 @@ class Loop extends React.Component {
     }
   }
   render() {  
-
     const { startDate, finishDate } = this.state;
     rows = [];
     duration = 0;
