@@ -96,14 +96,19 @@ class Loop extends React.Component {
         Finish by: <Flatpickr data-enable-time
         value={finishDate}
         onChange={finishDate => { this.setState({finishDate}) }} />
+        <br/>
+        <br/>
         <div class="ui form">
-  <div class="inline field">
-    <div class="ui checkbox">
-      <input type="checkbox" tabindex="0" class="hidden"/>
-      <label>Preserve Live</label>
+          <div class="inline field">
+            <div class="ui checkbox">
+              <input type="checkbox" tabindex="0" class="hidden"/>
+              <label>Preserve Live</label>
+              <br/>
+              <input type="checkbox" tabindex="0" class="hidden"/>
+              <label>Include all live events</label>
+          </div>
+      </div>
     </div>
-  </div>
-  </div>
 
         <button onClick={() => {
             this.props.loopContent(rows, this.state.startDate, this.state.finishDate);

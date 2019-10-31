@@ -91,11 +91,14 @@ class Schedule extends React.Component {
             var obj = {
               title: 'Loaded from schedule ' + index,
               startTime: moment(item['p:broadcast'][0]['p:published_time'][0]['$']['start']),
-              duration: item['p:broadcast'][0]['p:published_time'][0]['$']['duration'],
+              duration: moment.duration(item['p:broadcast'][0]['p:published_time'][0]['$']['duration']).toISOString(),
               id: 'something',
               live: item['p:broadcast'][0]['p:live'][0]['$']['value'],
-              crid: item['p:version'][0]['p:crid'][0]['$']['uri']
+              versionCrid: item['p:version'][0]['p:crid'][0]['$']['uri']
             }
+      
+
+            
             
             myPreRenderedItems[dateIndex].push(
               <SingleSchedule
@@ -519,6 +522,7 @@ flag = false;
   }
 
   render() {
+   
     return (
 
       <div>
