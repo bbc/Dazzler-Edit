@@ -8,6 +8,8 @@ node_modules
 #config
 src/config
 .vscode
+config
+
 
 
 
