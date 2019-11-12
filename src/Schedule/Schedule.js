@@ -192,7 +192,6 @@ class Schedule extends React.Component {
   }
 
   makeScheduleEvent(serviceIDRef, broadcast) {
-    alert(broadcast.versionCrid);
     const startDateTime = moment.utc(broadcast.startTime, "HH:mm:ss");
 
     let imi = "imi:dazzler:" + serviceIDRef + "/" + startDateTime.unix();
@@ -519,9 +518,11 @@ class Schedule extends React.Component {
       for (let i = 0; 1 < digit; i++) {
         for (let j = 0; j == j; j++) {
           if (
-            moment(loop[j].startTime)
-              .add(moment.duration(loop[j].duration))
-              .add(moment.duration(loop[j].duration)) < moment(end)
+            moment(loop[j].startTime).add(
+              moment
+                .duration(loop[j].duration)
+                .add(moment.duration(loop[j].duration))
+            ) < moment(end).subtract(moment.duration(loop[j].duration))
           ) {
             var obj = JSON.parse(JSON.stringify(loop[j]));
             this.addScheduleItem(obj);

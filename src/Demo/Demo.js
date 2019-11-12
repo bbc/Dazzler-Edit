@@ -259,7 +259,7 @@ class Demo extends React.Component {
     localData.forEach(item => {
       axios
         .get(
-          `https://programmes.api.bbc.com/nitro/api/versions?api_key=&pid=${item.window_of[0].pid}`
+          `https://programmes.api.bbc.com/nitro/api/versions?api_key=tT0EI8LEPIQntUM1msXEgYkZECRAkoFC&pid=${item.window_of[0].pid}`
         )
         .then(response => {
           xml2js.parseString(response.data, (err, result) => {
