@@ -11,9 +11,9 @@ if __name__ == "__main__" and os.path.exists(FILE) == False:
  
     target = open(FILE, 'w')
     for key, value in config["configuration"].items():
-        target.write("%s=%s\n" % (key, value))
+        target.write("%s=\"%s\"\n" % (key, value))
     for key, value in config["secure_configuration"].items():
-        target.write("%s=%s\n" % (key, value))
+        target.write("%s=\"%s\"\n" % (key, value))
     target.write("cosmos_env=%s\n" % config["environment"]);
 
     target.write("KEY=/etc/pki/tls/private/client.key\n");

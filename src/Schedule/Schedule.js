@@ -192,7 +192,6 @@ class Schedule extends React.Component {
   }
 
   makeScheduleEvent(serviceIDRef, broadcast) {
-    alert(broadcast.versionCrid);
     const startDateTime = moment.utc(broadcast.startTime, "HH:mm:ss");
 
     let imi = "imi:dazzler:" + serviceIDRef + "/" + startDateTime.unix();
