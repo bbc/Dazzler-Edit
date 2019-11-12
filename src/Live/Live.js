@@ -151,7 +151,7 @@ export class Live extends React.Component {
         title: this.props.live[i].title,
         info: this.props.live[i].startTime,
         pid: this.props.live[i].pid,
-        versionPid: this.props.live[i].versionPid,
+        versionPid: this.props.live[i].window_of[1].pid,
         stream: this.props.live[i].service.sid.replace(/_/g, " "),
         add: (
           <button
@@ -208,7 +208,7 @@ export class Live extends React.Component {
                           {row.title}
                           <span className="tooltiptext">
                             {/* {row.stream}  */}
-                            {row.pid}
+                            {row.versionPid}
                           </span>
                         </div>
                       </TableCell>
