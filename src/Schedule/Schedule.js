@@ -192,6 +192,7 @@ class Schedule extends React.Component {
   }
 
   makeScheduleEvent(serviceIDRef, broadcast) {
+    alert(broadcast.versionCrid);
     const startDateTime = moment.utc(broadcast.startTime, "HH:mm:ss");
 
     let imi = "imi:dazzler:" + serviceIDRef + "/" + startDateTime.unix();
@@ -305,7 +306,7 @@ class Schedule extends React.Component {
     } else {
       if (
         scheduleItems[dateIndex].length === 0 ||
-        (scheduleItems[dateIndex][0] == item && !this.props.addedLoop)
+        scheduleItems[dateIndex][0] == item
       ) {
         var dateTime = moment()
           .add(dateIndex, "d")
@@ -522,8 +523,9 @@ class Schedule extends React.Component {
               .add(moment.duration(loop[j].duration))
               .add(moment.duration(loop[j].duration)) < moment(end)
           ) {
-            this.addScheduleItem(loop[j]);
-            loop = loop.concat(loop[j]);
+            var obj = JSON.parse(JSON.stringify(loop[j]));
+            this.addScheduleItem(obj);
+            loop = loop.concat(obj);
           } else {
             digit = 1;
             break;
