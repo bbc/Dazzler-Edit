@@ -116,7 +116,7 @@ app.get("/api/v1/webcast", function(req, res) {
     q.page_size = req.query.page_size;
   }
   nitroRequest("schedules", q).then(
-    r => res.json(add_crids_to_webcast(r.nitro.results)),
+    r => res.json(add_crids_to_webcast(r.nitro.results.items)),
     err => res.status(404).send("Not found") // TODO use proper error message
   );
 });
@@ -516,7 +516,7 @@ function pid2crid(pid) {
 }
 
 function add_crids_to_webcast(items) {
-  if (items != null) {
+  if (items != null && items != undefined) {
     for (let i = 0; i < items.length; i++) {
       const pid = items[i].window_of[0].pid;
       items[i].window_of[0].crid = pid2crid(pid);
