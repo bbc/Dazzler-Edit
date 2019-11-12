@@ -303,7 +303,10 @@ class Schedule extends React.Component {
       item.live = "live";
       item.startTime = moment(item.title.substring(18, 38));
     } else {
-      if (scheduleItems[dateIndex].length === 0) {
+      if (
+        scheduleItems[dateIndex].length === 0 ||
+        (scheduleItems[dateIndex][0] == item && !this.props.addedLoop)
+      ) {
         var dateTime = moment()
           .add(dateIndex, "d")
           .add(10, "m");
@@ -514,17 +517,14 @@ class Schedule extends React.Component {
 
       for (let i = 0; 1 < digit; i++) {
         for (let j = 0; j == j; j++) {
-          if (moment(loop[j].startTime) < moment(end)) {
-            console.log(
-              moment(loop[j].startTime).format("HH:mm:ss") +
-                " vs " +
-                moment(end).format("HH:mm:ss")
-            );
-            console.log(loop[j]);
+          if (
+            moment(loop[j].startTime)
+              .add(moment.duration(loop[j].duration))
+              .add(moment.duration(loop[j].duration)) < moment(end)
+          ) {
             this.addScheduleItem(loop[j]);
             loop = loop.concat(loop[j]);
           } else {
-            // alert("in here")
             digit = 1;
             break;
           }
@@ -534,6 +534,7 @@ class Schedule extends React.Component {
       alert("invalid loop");
     }
   }
+
   componentDidUpdate(prevProps) {
     switch (true) {
       case prevProps.item !== this.props.item && this.props.added:
