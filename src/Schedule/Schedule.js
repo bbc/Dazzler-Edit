@@ -141,40 +141,47 @@ class Schedule extends React.Component {
   }
 
   savePlaylist() {
-    const data = scheduleItems[dateIndex];
-    if (data.length === 0) {
-      console.log("nothing to save - button should be disabled");
-      return;
-    }
+    // const data = scheduleItems[dateIndex];
+    // if (data.length === 0) {
+    //   console.log("nothing to save - button should be disabled");
+    //   return;
+    // }
 
-    this.setState({
-      savePlaylist: "ui right floated primary loading button"
-    });
+    // this.setState({
+    //   savePlaylist: "ui right floated primary loading button"
+    // });
 
-    const first = data[0];
-    const last = data[data.length - 1];
+    // const first = data[0];
+    // const last = data[data.length - 1];
 
-    const start = moment.utc(first.startTime, "HH:mm:ss");
-    const end = moment
-      .utc(last.startTime, "HH:mm:ss")
-      .add(moment.duration(last.duration));
+    // const start = moment.utc(first.startTime, "HH:mm:ss");
+    // const end = moment
+    //   .utc(last.startTime, "HH:mm:ss")
+    //   .add(moment.duration(last.duration));
 
-    let tva =
-      tvaStart +
-      "    <ProgramLocationTable>\n" +
-      `      <Schedule start="${start.format()}" end="${end.format()}" serviceIDRef="${
-        this.props.service.serviceIDRef
-      }">`;
-    for (let i = 0; i < data.length; i++) {
-      tva += this.makeScheduleEvent(this.props.service.serviceIDRef, data[i]);
-    }
-    tva += "\n      </Schedule>\n    </ProgramLocationTable>\n" + tvaEnd;
-    console.log(tva);
+    // let tva =
+    //   tvaStart +
+    //   "    <ProgramLocationTable>\n" +
+    //   `      <Schedule start="${start.format()}" end="${end.format()}" serviceIDRef="${
+    //     this.props.service.serviceIDRef
+    //   }">`;
+    // for (let i = 0; i < data.length; i++) {
+    //   tva += this.makeScheduleEvent(this.props.service.serviceIDRef, data[i]);
+    // }
+    // tva += "\n      </Schedule>\n    </ProgramLocationTable>\n" + tvaEnd;
+    // console.log(tva);
 
     axios({
       method: "post",
       url: URLPrefix + "/api/v1/tva",
-      data: tva
+      data: `<TVAMain xmlns="urn:tva:metadata:2007" xmlns:mpeg7="urn:tva:mpeg7:2005" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xml:lang="en-GB" xsi:schemaLocation="urn:tva:metadata:2007 tva_metadata_3-1_v141.xsd">
+      <ProgramDescription>
+        <ProgramLocationTable>
+          <Schedule start="2019-11-12T00:00:00Z" end="2019-11-12T23:59:59Z" serviceIDRef="TVMAR01">      
+          </Schedule>
+        </ProgramLocationTable>
+      </ProgramDescription>
+    </TVAMain>`
     })
       .then(response => {
         this.setState({

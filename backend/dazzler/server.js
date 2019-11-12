@@ -1,4 +1,3 @@
-
 // https://github.com/bbc/sample-cloud-apps/nodejs-helloworld/src/helloworld/server.js
 const auth = require("./auth");
 const express = require("express");
@@ -13,9 +12,9 @@ const bodyParser = require("body-parser");
 const app = express();
 var configuration;
 
-if(!process.env.AUTHORISED_USERS){
-  configuration = require('../../src/config/env.json');
-  process.env = configuration
+if (!process.env.AUTHORISED_USERS) {
+  configuration = require("../../src/config/env.json");
+  process.env = configuration;
 }
 
 const config = {
@@ -25,13 +24,18 @@ const config = {
     specials_collection: process.env.SPECIALS_PID,
     live_brand: process.env.LIVE_BRAND_PID,
     clip_language: "marathi",
-    webcast_channels: ["world_service_stream_05","world_service_stream_06","world_service_stream_07","world_service_stream_08"]
+    webcast_channels: [
+      "world_service_stream_05",
+      "world_service_stream_06",
+      "world_service_stream_07",
+      "world_service_stream_08"
+    ]
   }
 };
 
-app.use(bodyParser.text({ type: "*/*", limit: '500kb' }));
+app.use(bodyParser.text({ type: "*/*", limit: "500kb" }));
 
-app.use(express.static(__dirname+"/../edit"));
+app.use(express.static(__dirname + "/../edit"));
 
 // /status is used by ELB health checkers to assert that the service is running OK
 app.get("/status", function(req, res) {
@@ -90,11 +94,11 @@ app.get("/api/v1/webcast", function(req, res) {
     start_from: req.query.start,
     start_to: req.query.end
   };
-  if(req.query.hasOwnProperty('brand')) {
-    q.descendants_of =  req.query.brand;
+  if (req.query.hasOwnProperty("brand")) {
+    q.descendants_of = req.query.brand;
   }
-  if(req.query.hasOwnProperty('sid')) {
-    q.descendants_of =  config[req.query.sid].live_brand;
+  if (req.query.hasOwnProperty("sid")) {
+    q.descendants_of = config[req.query.sid].live_brand;
     q.sid = config[req.query.sid].webcast_channels;
   }
   if (req.query.hasOwnProperty("page")) {
@@ -111,11 +115,10 @@ app.get("/api/v1/webcast", function(req, res) {
 // http://programmes.api.bbc.com/nitro/api/programmes?api_key=XXX&page_size=100&sort=group_position&sort_direction=ascending&group=p0510sbc
 
 app.get("/api/v1/loop", function(req, res) {
-
   let q = {
     group: config[req.query.sid].loop_collection,
-    sort: 'group_position',
-    sort_direction: 'ascending'
+    sort: "group_position",
+    sort_direction: "ascending"
   };
   clip(q, req.query, res);
 });
@@ -128,7 +131,6 @@ app.get("/api/v1/special", function(req, res) {
 });
 
 app.get("/api/v1/clip", function(req, res) {
-  
   let q = {
     tag_name: config[req.query.sid].clip_language
   };
@@ -148,9 +150,9 @@ function clip(q, query, res) {
     r => {
       let pids = [];
       let clips = r.nitro.results;
-      for(let i=0; i<clips.items.length; i++) {
+      for (let i = 0; i < clips.items.length; i++) {
         const version = clips.items[i].available_versions.version;
-        for(let j=0; j<version.length; j++) {
+        for (let j = 0; j < version.length; j++) {
           pids.push(version[j].pid);
         }
       }
@@ -166,9 +168,9 @@ function clip(q, query, res) {
               }
             }
           }
-          for(let i=0; i<clips.items.length; i++) {
+          for (let i = 0; i < clips.items.length; i++) {
             const version = clips.items[i].available_versions.version;
-            for(let j=0; j<version.length; j++) {
+            for (let j = 0; j < version.length; j++) {
               version[j].crid = map.get(version[j].pid);
             }
           }
@@ -185,7 +187,9 @@ app.get("/api/v1/episode", function(req, res) {
   let q = {
     mixin: ["images", "available_versions"],
     entity_type: "episode",
-    availability: "available"
+    sort: "release_date",
+    sort_direction: "descending",
+    duration: "short"
   };
   if (req.query.hasOwnProperty("sid")) {
     q.master_brand = config[req.query.sid].mid;
@@ -208,9 +212,9 @@ app.get("/api/v1/episode", function(req, res) {
   );
 });
 
-app.put('/api/v1/loop', async (req, res, next) => {
+app.put("/api/v1/loop", async (req, res, next) => {
   let user = "dazzler"; // assume local
-  if(process.env.environment) {
+  if (process.env.environment) {
     // assume cosmos
     if (req.header("sslclientcertsubject")) {
       const subject = parseSSLsubject(req);
@@ -226,23 +230,22 @@ app.put('/api/v1/loop', async (req, res, next) => {
     try {
       await clearCollection(collection_pid);
       await setCollectionMembers(collection_pid, members);
-      res.json({pid:collection_pid, members:members});
+      res.json({ pid: collection_pid, members: members });
     } catch (e) {
       // this will eventually be handled by our error handling middleware
       next(e);
     }
-} else {
-    const message = user +" is not authorised to save the loop";
+  } else {
+    const message = user + " is not authorised to save the loop";
     console.log(message);
     res.status(403).send(message);
   }
 });
 
 app.post("/api/v1/tva", function(req, res) {
-
   if (req.body.includes('serviceIDRef="TVMAR01')) {
     let user = "dazzler"; // assume local
-     if(process.env.environment) {
+    if (process.env.environment) {
       // assume cosmos
       if (req.header("sslclientcertsubject")) {
         const subject = parseSSLsubject(req);
@@ -255,7 +258,7 @@ app.post("/api/v1/tva", function(req, res) {
     if (auth(user)) {
       postTVA(req.body, res);
     } else {
-      const message = user +" is not authorised to save schedules";
+      const message = user + " is not authorised to save schedules";
       console.log(message);
       res.status(403).send(message);
     }
@@ -272,8 +275,11 @@ async function clearCollection(pid) {
     passphrase: process.env.PASSPHRASE
   };
   const members = await getCollectionMembers(pid);
-  for(let i=0; i<members.length; i++) {
-    await axios.delete(`https://api.live.bbc.co.uk/pips/api/v1/membership/pid.${members[i]}`, config);
+  for (let i = 0; i < members.length; i++) {
+    await axios.delete(
+      `https://api.live.bbc.co.uk/pips/api/v1/membership/pid.${members[i]}`,
+      config
+    );
   }
 }
 
@@ -283,7 +289,10 @@ async function getCollectionMembers(pid) {
     cert: fs.readFileSync(process.env.CERT),
     passphrase: process.env.PASSPHRASE
   };
-  const membersXml = await axios.get(`https://api.test.bbc.co.uk/pips/api/v1/collection/pid.${pid}/group_of/`, config)
+  const membersXml = await axios.get(
+    `https://api.test.bbc.co.uk/pips/api/v1/collection/pid.${pid}/group_of/`,
+    config
+  );
   const members = await xml2json(membersXml);
   const membership = members.pips.results[0].membership;
   /* this is good if we need the positions but we only use the results for delete
@@ -295,12 +304,12 @@ async function getCollectionMembers(pid) {
   }
   return r.filter(function (el) { return el != null; });
   */
-  return Array.from(membership, x => x.$.pid);;
+  return Array.from(membership, x => x.$.pid);
 }
 
 async function setCollectionMembers(pid, data) {
-  for(let i=0; i<data.length; i++) {
-    await createMembership(pid, data[i], i+1);
+  for (let i = 0; i < data.length; i++) {
+    await createMembership(pid, data[i], i + 1);
   }
 }
 
@@ -327,15 +336,18 @@ async function createMembership(collection, member, position) {
 }
 
 async function postPIPS(object_type, data) {
-
   var config = {
     key: fs.readFileSync(process.env.KEY),
     cert: fs.readFileSync(process.env.CERT),
     passphrase: process.env.PASSPHRASE,
-    headers: {'Content-Type': 'text/xml'}
+    headers: { "Content-Type": "text/xml" }
   };
 
-  return await axios.post(`https://api.live.bbc.co.uk/pips/api/v1/${object_type}/`, data, config);
+  return await axios.post(
+    `https://api.live.bbc.co.uk/pips/api/v1/${object_type}/`,
+    data,
+    config
+  );
 }
 
 function postTVA(data, res) {
@@ -437,8 +449,9 @@ function SpwRequest(sid, date) {
 function nitroRequest(feed, query) {
   return new Promise((resolve, reject) => {
     var options = {
-      host:"programmes.api.bbc.com",
-      path: "/nitro/api/" +
+      host: "programmes.api.bbc.com",
+      path:
+        "/nitro/api/" +
         feed +
         "?api_key=" +
         process.env.NITRO_KEY +
@@ -456,7 +469,7 @@ function nitroRequest(feed, query) {
     //     options.port = process.env.PORT;
     //   }
     // });
-    
+
     var request = http.get(options, response => {
       if (response.statusCode < 200 || response.statusCode > 299) {
         reject(new Error("Invalid status code: " + response.statusCode));
@@ -505,7 +518,7 @@ function add_crids_to_webcast(items) {
 function add_crids_to_episodes(items) {
   if (items != null) {
     for (let i = 0; i < items.length; i++) {
-      for(let j=0; j < items[i].available_versions.version.length; j++) {
+      for (let j = 0; j < items[i].available_versions.version.length; j++) {
         let version = items[i].available_versions.version[j];
         version.crid = pid2crid(version.pid);
       }
@@ -527,13 +540,10 @@ function parseSSLsubject(req) {
 
 async function xml2json(xml) {
   return new Promise((resolve, reject) => {
-      parseString(xml, function (err, json) {
-          if (err)
-              reject(err);
-          else
-              resolve(json);
-      });
-
+    parseString(xml, function(err, json) {
+      if (err) reject(err);
+      else resolve(json);
+    });
   });
 }
 
