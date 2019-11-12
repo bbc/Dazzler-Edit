@@ -59,7 +59,19 @@ app.get("/api/v1/schedule", function(req, res) {
   SpwRequest(req.query.sid, req.query.date).then(
     r => {
       if (r) {
-        res.json(r);
+        const s = r['p:schedule']['p:item'];
+        let promises = [];
+        for(let i=0; i<s.length; i++) {
+          if(s[i].hasOwnProperty('p:episode')) {
+            continue;
+          }
+          const pid = s[i]["p:version"][0]["p:version_of"][0]["p:link"][0].$.pid;
+          promises.push(nitroRequest("programmes", {pid:pid, mixin:'ancestor_titles'}));
+        }
+        Promise.all(promises).then(function(results) {
+            addClips(s, results);
+            res.json(r);
+          });
       } else {
         res.status(404).send("Not found"); // TODO use proper error message
       }
@@ -136,6 +148,17 @@ app.get("/api/v1/clip", function(req, res) {
   };
   clip(q, req.query, res);
 });
+
+function addClips(schedule_items, clips) {
+  for(let i=0; i<schedule_items.length; i++) {
+    const pid = schedule_items[i]["p:version"][0]["p:version_of"][0]["p:link"][0].$.pid;
+    for(let j=0; j<clips.items.length; j++) {
+      if(clips.items[j].pid === pid) {
+          schedule_items[i]["p:clip"] = clips.items[j];
+      }
+    }
+  }
+}
 
 function clip(q, query, res) {
   if (query.hasOwnProperty("page")) {
@@ -412,7 +435,7 @@ function SpwRequest(sid, date) {
     };
 
     var request = https.get(options, response => {
-      if (response.statusCode == 404) {
+      if (response.statusCode === 404) {
         resolve(null);
         return;
       }
