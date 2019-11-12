@@ -116,7 +116,7 @@ app.get("/api/v1/webcast", function(req, res) {
     q.page_size = req.query.page_size;
   }
   nitroRequest("schedules", q).then(
-    r => res.json(add_crids_to_webcast(r.nitro.results.items)),
+    r => res.json(add_crids_to_webcast(r.nitro.results)),
     err => res.status(404).send("Not found") // TODO use proper error message
   );
 });
@@ -203,12 +203,14 @@ function clip(q, query, res) {
     err => res.status(404).send("Not found") // TODO use proper error message
   );
 }
-
+// http://programmes.api.bbc.com/nitro/api/programmes?api_key=&master_brand=bbc_marathi_tv&page_size=100&entity_type=episode&sort=release_date&sort_direction=descending&mixin=available_versions
 app.get("/api/v1/episode", function(req, res) {
   let q = {
     mixin: ["images", "available_versions"],
     entity_type: "episode",
-    availability: "available"
+    sort:"release_date",
+    sort_direction: "descending",
+    duration: "short"
   };
   if (req.query.hasOwnProperty("sid")) {
     q.master_brand = config[req.query.sid].mid;
@@ -480,6 +482,7 @@ function nitroRequest(feed, query) {
     //   }
     // });
     
+    console.log(options);
     var request = http.get(options, response => {
       if (response.statusCode < 200 || response.statusCode > 299) {
         reject(new Error("Invalid status code: " + response.statusCode));
@@ -516,7 +519,8 @@ function pid2crid(pid) {
 }
 
 function add_crids_to_webcast(items) {
-  if (items != null && items != undefined) {
+  console.log('add_crids_to_webcast');
+  if (items != null && items.total>0) {
     for (let i = 0; i < items.length; i++) {
       const pid = items[i].window_of[0].pid;
       items[i].window_of[0].crid = pid2crid(pid);
