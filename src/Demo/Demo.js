@@ -210,6 +210,7 @@ class Demo extends React.Component {
     axios
       .get(URLPrefix + "/api/v1/special?sid=" + this.state.service.sid)
       .then(response => {
+        console.log("SPECIALS RESPONSE", response);
         this.setState({
           specials: response.data.items
         });

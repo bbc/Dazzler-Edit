@@ -166,7 +166,12 @@ class Schedule extends React.Component {
         this.props.service.serviceIDRef
       }">`;
     for (let i = 0; i < data.length; i++) {
-      tva += this.makeScheduleEvent(this.props.service.serviceIDRef, data[i]);
+      tva += this.makeScheduleEvent(
+        this.props.service.serviceIDRef,
+        data[i],
+        i,
+        end
+      );
     }
     tva += "\n      </Schedule>\n    </ProgramLocationTable>\n" + tvaEnd;
     console.log(tva);
@@ -191,7 +196,23 @@ class Schedule extends React.Component {
       });
   }
 
-  makeScheduleEvent(serviceIDRef, broadcast) {
+  makeScheduleEvent(serviceIDRef, broadcast, index, end) {
+    if (index == scheduleItems[dateIndex].length - 1) {
+      var duration = broadcast.duration;
+    } else {
+      var time = moment(
+        myPreRenderedItems[dateIndex][index].props.startTime.toString(),
+        "HH:mm:ss"
+      );
+      var nextStart = moment(
+        myPreRenderedItems[dateIndex][index + 1].props.startTime.toString(),
+        "HH:mm:ss"
+      );
+      var calculatedDuration = moment.duration(nextStart.diff(time));
+      var duration = calculatedDuration.toISOString();
+      console.log("our ting " + duration);
+      console.log("real ting", broadcast.duration);
+    }
     const startDateTime = moment.utc(broadcast.startTime, "HH:mm:ss");
     let imi = "imi:dazzler:" + serviceIDRef + "/" + startDateTime.unix();
 
@@ -208,7 +229,7 @@ class Schedule extends React.Component {
               </AVAttributes>
             </InstanceDescription>
             <PublishedStartTime>${startDateTime.format()}</PublishedStartTime>
-            <PublishedDuration>${broadcast.duration}</PublishedDuration>
+            <PublishedDuration>${duration}</PublishedDuration>
             <Live value="${broadcast.live === "live" ? true : false}"/>
             <Repeat value="${false}"/>
             <Free value="true"/>
@@ -308,7 +329,7 @@ class Schedule extends React.Component {
       ) {
         var dateTime = moment()
           .add(dateIndex, "d")
-          .add(10, "m");
+          .add(6, "m");
         item.startTime = dateTime;
         console.log(item.startTime);
         // item.id = 0;
