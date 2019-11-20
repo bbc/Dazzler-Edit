@@ -133,6 +133,7 @@ class Demo extends React.Component {
     this.copyContent = this.copyContent.bind(this);
     this.clearContent = this.clearContent.bind(this);
     this.loopContent = this.loopContent.bind(this);
+    this.lastItem = this.lastItem.bind(this);
 
     this.state = {
       open: false,
@@ -167,6 +168,7 @@ class Demo extends React.Component {
         <Schedule
           service={this.state.service}
           fetchTime={this.fetchTime}
+          lastItem={this.lastItem}
           clipTime={time}
           length={scheduleItems.length}
           pasted={copiedContent}
@@ -275,6 +277,10 @@ class Demo extends React.Component {
     console.log(this.state.live);
   };
 
+  lastItem = scheduleTime => {
+    this.setState({ scheduleTime: scheduleTime });
+  };
+
   handleDrawerOpen = () => {
     this.setState({ open: true });
   };
@@ -295,6 +301,7 @@ class Demo extends React.Component {
         <Schedule
           service={this.state.service}
           fetchTime={this.fetchTime}
+          lastItem={this.lastItem}
           clipTime={time}
           length={scheduleItems.length}
           loopedContent={loopedContent}
@@ -327,6 +334,7 @@ class Demo extends React.Component {
             deleteItem={this.deleteItem}
             loopContent={this.loopContent}
             clearContent={this.clearContent}
+            scheduleTime={this.state.scheduleTime}
           />
         )
       });
@@ -350,6 +358,7 @@ class Demo extends React.Component {
         <Schedule
           service={this.state.service}
           fetchTime={this.fetchTime}
+          lastItem={this.lastItem}
           loopedContent={""}
           clipTime={time}
           deleteId={id}
@@ -436,6 +445,7 @@ class Demo extends React.Component {
           <Schedule
             service={this.state.service}
             fetchTime={this.fetchTime}
+            lastItem={this.lastItem}
             clipTime={time}
             item={newItem2}
             length={scheduleItems.length}
@@ -458,6 +468,7 @@ class Demo extends React.Component {
             deleteItem={this.deleteItem}
             loopContent={this.loopContent}
             clearContent={this.clearContent}
+            scheduleTime={this.state.scheduleTime}
           />
         )
       });
@@ -521,6 +532,7 @@ class Demo extends React.Component {
             <Schedule
               service={this.state.service}
               fetchTime={this.fetchTime}
+              lastItem={this.lastItem}
               clipTime={time}
               nextSchedule={this.nextDay}
               loopedContent={""}
@@ -553,6 +565,7 @@ class Demo extends React.Component {
               deleteItem={this.deleteItem}
               clearContent={this.clearContent}
               loopContent={this.loopContent}
+              scheduleTime={this.state.scheduleTime}
             />
           )
         });
@@ -566,6 +579,7 @@ class Demo extends React.Component {
         <Schedule
           service={this.state.service}
           fetchTime={this.fetchTime}
+          lastItem={this.lastItem}
           clipTime={time}
           length={scheduleItems.length}
           pasted={copiedContent}
