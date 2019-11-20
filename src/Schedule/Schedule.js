@@ -15,7 +15,7 @@ var myPreRenderedItems = [[]];
 var URLPrefix = "";
 
 //checking if running locally
-if (process.env.NODE_ENV == "development") {
+if (process.env.NODE_ENV === "development") {
   URLPrefix = "http://localhost:8080";
 }
 
@@ -53,13 +53,12 @@ class Schedule extends React.Component {
 
   componentDidMount() {
     this.setState({ serviceIDRef: this.props.service.serviceIDRef });
-    let items = [];
     scheduleItems = [[]];
     myPreRenderedItems = [[]];
     if (sessionStorage.getItem("data") != null) {
       var data = JSON.parse(sessionStorage.getItem("data"));
       data[dateIndex].map((item, index) => {
-        myPreRenderedItems[dateIndex].push(
+        return myPreRenderedItems[dateIndex].push(
           <SingleSchedule
             fetchTime={this.props.fetchTime}
             title={item.props.title}
@@ -73,7 +72,7 @@ class Schedule extends React.Component {
       });
       scheduleItems = JSON.parse(sessionStorage.getItem("scheduleItems"));
     }
-    if (sessionStorage.getItem("activeSession").length == 0) {
+    if (sessionStorage.getItem("activeSession").length === 0) {
       axios
         .get(
           URLPrefix +
@@ -85,7 +84,7 @@ class Schedule extends React.Component {
         )
         .then(response => {
           console.log(response);
-          response["data"]["p:schedule"]["p:item"].map((item, index) => {
+          return response["data"]["p:schedule"]["p:item"].map((item, index) => {
             var obj = {
               title: "Loaded from schedule " + index,
               startTime: moment(
@@ -197,7 +196,7 @@ class Schedule extends React.Component {
   }
 
   makeScheduleEvent(serviceIDRef, broadcast, index, end) {
-    if (index == scheduleItems[dateIndex].length - 1) {
+    if (index === scheduleItems[dateIndex].length - 1) {
       var duration = broadcast.duration;
     } else {
       var time = moment(
@@ -210,8 +209,6 @@ class Schedule extends React.Component {
       );
       var calculatedDuration = moment.duration(nextStart.diff(time));
       var duration = calculatedDuration.toISOString();
-      console.log("our ting " + duration);
-      console.log("real ting", broadcast.duration);
     }
     const startDateTime = moment.utc(broadcast.startTime, "HH:mm:ss");
     let imi = "imi:dazzler:" + serviceIDRef + "/" + startDateTime.unix();
@@ -262,7 +259,6 @@ class Schedule extends React.Component {
   pasteContent() {
     sessionStorage.setItem("ScheduleItems", JSON.stringify(scheduleItems));
     let scratchpadItems = JSON.parse(JSON.stringify(this.props.pasted));
-    let items = [];
     for (let i = 0; i < scratchpadItems.length; i++) {
       this.addItemPosition(scratchpadItems[i]);
 
@@ -270,7 +266,7 @@ class Schedule extends React.Component {
         moment(scratchpadItems[i].startTime).format("YYYY-MM-DD") >
         moment(this.state.scheduleDate).format("YYYY-MM-DD")
       ) {
-        if (scheduleItems[dateIndex + 1] == undefined) {
+        if (scheduleItems[dateIndex + 1] === undefined) {
           scheduleItems[dateIndex + 1] = [];
           myPreRenderedItems[dateIndex + 1] = [];
         }
@@ -315,7 +311,7 @@ class Schedule extends React.Component {
   }
 
   addItemPosition(item, recalculate) {
-    if (scheduleItems[dateIndex] == undefined) {
+    if (scheduleItems[dateIndex] === undefined) {
       scheduleItems[dateIndex] = [];
     }
 
@@ -325,7 +321,7 @@ class Schedule extends React.Component {
     } else {
       if (
         scheduleItems[dateIndex].length === 0 ||
-        scheduleItems[dateIndex][0] == item
+        scheduleItems[dateIndex][0] === item
       ) {
         var dateTime = moment()
           .add(dateIndex, "d")
@@ -346,7 +342,7 @@ class Schedule extends React.Component {
 
           // item.id = recalculate
         } else {
-          var index = scheduleItems[dateIndex + 1] == undefined ? 0 : 1;
+          var index = scheduleItems[dateIndex + 1] === undefined ? 0 : 1;
           const lastItem =
             scheduleItems[dateIndex + index][
               scheduleItems[dateIndex + index].length - 1
@@ -389,12 +385,12 @@ class Schedule extends React.Component {
     if (
       moment(updateItem.startTime).format("YYYY-MM-DD") >
         moment(this.state.scheduleDate).format("YYYY-MM-DD") &&
-      updateItem.live == undefined
+      updateItem.live === undefined
     ) {
       console.log(updateItem.startTime);
       //  alert("after")
 
-      if (scheduleItems[dateIndex + 1] == undefined) {
+      if (scheduleItems[dateIndex + 1] === undefined) {
         //  alert("added");
         scheduleItems[dateIndex + 1] = [];
         myPreRenderedItems[dateIndex + 1] = [];
@@ -436,7 +432,7 @@ class Schedule extends React.Component {
           live={updateItem.live}
         />
       );
-      if (myPreRenderedItems[dateIndex] == undefined) {
+      if (myPreRenderedItems[dateIndex] === undefined) {
         myPreRenderedItems[dateIndex] = [];
       }
       myPreRenderedItems[dateIndex] = myPreRenderedItems[dateIndex].concat(
@@ -488,31 +484,31 @@ class Schedule extends React.Component {
 
   loopContent() {
     var start =
-      moment(this.props.startLoop)._i[0] == undefined
+      moment(this.props.startLoop)._i[0] === undefined
         ? moment(this.props.startLoop)._i
         : moment(this.props.startLoop)._i[0];
     var end =
-      moment(this.props.finishTime)._i[0] == undefined
+      moment(this.props.finishTime)._i[0] === undefined
         ? moment(this.props.finishTime)._i
         : moment(this.props.finishTime)._i[0];
 
-    // scheduleItems[dateIndex].map((item, index) => {
-    //   alert(item.startTime);
-    //   if (
-    //     moment(item.startTime).isAfter(
-    //       moment(start) && moment(item.startTime).isBefore(moment(end))
-    //     )
-    //   ) {
-    //     alert("it is");
-    //     scheduleItems.splice(index, 1);
-    //     myPreRenderedItems.splice(index, 1);
-    //   }
-    // });
+    scheduleItems[dateIndex].map((item, index) => {
+      if (
+        moment(item.startTime).isAfter(moment(start)) &&
+        moment(item.startTime)
+          .add(moment.duration(item.duration))
+          .isBefore(moment(end))
+      ) {
+        scheduleItems[dateIndex] = scheduleItems[dateIndex].splice(index, 1);
+        myPreRenderedItems[dateIndex] = myPreRenderedItems[dateIndex].splice(
+          index,
+          1
+        );
+      }
+    });
 
     if (!moment(start).isAfter(moment(end))) {
       var digit = 2;
-      // alert("loop")
-      //  let items = [];
       let loop = JSON.parse(JSON.stringify(this.props.loopedContent));
 
       loop[0].startTime = moment(start);
@@ -536,7 +532,7 @@ class Schedule extends React.Component {
       });
 
       for (let i = 0; 1 < digit; i++) {
-        for (let j = 0; j == j; j++) {
+        for (let j = 0; j === j; j++) {
           if (
             moment(loop[j].startTime).add(
               moment
