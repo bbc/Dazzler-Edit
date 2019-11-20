@@ -550,7 +550,7 @@ class Schedule extends React.Component {
                   moment
                     .duration(loop[j].duration)
                     .add(moment.duration(loop[j].duration))
-                ) < moment(end).subtract(moment.duration(loop[j].duration))
+                ) < moment(end)
               ) {
                 var obj = JSON.parse(JSON.stringify(loop[j]));
                 this.addScheduleItem(obj);

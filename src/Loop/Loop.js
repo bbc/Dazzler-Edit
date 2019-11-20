@@ -27,6 +27,11 @@ class Loop extends React.Component {
   }
 
   componentDidMount() {
+    if (this.props.scheduleTime == undefined) {
+      this.setState({ time: new Date() });
+    } else {
+      this.setState({ time: new Date(this.props.scheduleTime) });
+    }
     this.setState({ data: this.props.data });
     this.setState({ status: "Copy" });
     this.setState({ current: "Clear" });
@@ -49,13 +54,7 @@ class Loop extends React.Component {
     }
   }
   render() {
-    const { startDate, finishDate } = this.state;
-    if (this.props.scheduleTime == undefined) {
-      var time = startDate;
-    } else {
-      var time = new Date(this.props.scheduleTime);
-      alert(time);
-    }
+    const { startDate, finishDate, time } = this.state;
 
     rows = [];
     duration = 0;
@@ -107,7 +106,7 @@ class Loop extends React.Component {
             data-enable-time
             value={time}
             onChange={time => {
-              this.setState({ startDate: time });
+              this.setState({ time });
             }}
           />
           <br />
