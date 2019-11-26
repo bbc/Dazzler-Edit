@@ -376,11 +376,12 @@ class Demo extends React.Component {
   }
 
   handleClick = (item, isLive) => {
+    console.log("ITEM", item);
     count++;
-
     const newItem2 = {
       ...item
     };
+
     switch (item.item_type) {
       case "episode":
         {
@@ -420,6 +421,9 @@ class Demo extends React.Component {
         }
         newItem2.captureChannel = item.service.sid; // TODO make use of this
         newItem2.isLive = true;
+
+        // newItem2.startTime = moment(item.scheduled_time.start);
+        // newItem2.scheduled_time = item.scheduled_time.start;
         // newItem2.id = count;
         break;
       default:

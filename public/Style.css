@@ -48,3 +48,7 @@
 .live {
   background-color: #daa520;
 }
+
+.current {
+  background-color: green;
+}
