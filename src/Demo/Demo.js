@@ -266,7 +266,7 @@ class Demo extends React.Component {
         )
         .then(response => {
           xml2js.parseString(response.data, (err, result) => {
-            console.log(result);
+            console.log("RESULT!", result);
             item.versionCrid =
               result.nitro.results[0].version[0].identifiers[0].identifier[0]._;
           });

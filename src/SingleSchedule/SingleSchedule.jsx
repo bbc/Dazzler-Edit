@@ -57,7 +57,7 @@ class SingleSchedule extends React.Component {
           <td className="collapsing" className={this.props.style}>
             <input type="checkbox" /> <label></label>
           </td>
-          <td className={this.props.current}>{this.props.startTime}</td>
+          <td className={this.props.style}>{this.props.startTime}</td>
           <td className={this.props.style}>{this.props.title}</td>
           <td className={this.props.style}>
             {moment.duration(this.props.duration)._data.minutes}:

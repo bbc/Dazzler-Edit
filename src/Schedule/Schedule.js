@@ -83,8 +83,7 @@ class Schedule extends React.Component {
             moment.utc().format("YYYY-MM-DD")
         )
         .then(response => {
-          console.log(response);
-          return response["data"]["p:schedule"]["p:item"].map((item, index) => {
+          response["data"]["p:schedule"]["p:item"].map((item, index) => {
             var obj = {
               title: "Loaded from schedule " + index,
               startTime: moment(
@@ -115,6 +114,7 @@ class Schedule extends React.Component {
 
             scheduleItems[0].push(obj);
           });
+
           this.setState({
             preRenderedItem: myPreRenderedItems
           });
@@ -598,32 +598,6 @@ class Schedule extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    // setInterval(() => {
-    //   myPreRenderedItems[dateIndex].map((item, index) => {
-    //     if (
-    //       moment().isSameOrAfter(moment(item.props.startime)) &&
-    //       moment().isSameOrBefore(
-    //         moment(item.startTime).add(moment(item.duration))
-    //       )
-    //     ) {
-    //       myPreRenderedItems[dateIndex][index] = (
-    //         <SingleSchedule
-    //           fetchTime={this.props.fetchTime}
-    //           title={scheduleItems[dateIndex][index].title}
-    //           startTime={moment(
-    //             scheduleItems[dateIndex][index].startTime
-    //           ).format("HH:mm:ss")}
-    //           duration={scheduleItems[dateIndex][index].duration}
-    //           deleteItem={this.props.deleteItem}
-    //           id={scheduleItems[dateIndex][index].id}
-    //           live={scheduleItems[dateIndex][index].live}
-    //           styling={"current"}
-    //         />
-    //       );
-    //       this.setState({ preRenderedItem: myPreRenderedItems });
-    //     }
-    //   });
-    // });
     switch (true) {
       case prevProps.item !== this.props.item && this.props.added:
         this.addScheduleItem();
@@ -638,6 +612,12 @@ class Schedule extends React.Component {
       var item = scheduleItems[dateIndex][scheduleItems[dateIndex].length - 1];
       this.props.lastItem(
         moment(item.startTime).add(moment.duration(item.duration))
+      );
+    } else {
+      this.props.lastItem(
+        moment()
+          .add(dateIndex, "d")
+          .add(6, "m")
       );
     }
     sessionStorage.setItem("data", JSON.stringify(myPreRenderedItems));
