@@ -211,7 +211,7 @@ function clip(q, query, res) {
     err => res.status(404).send("Not found") // TODO use proper error message
   );
 }
-
+// http://programmes.api.bbc.com/nitro/api/programmes?api_key=&master_brand=bbc_marathi_tv&page_size=100&entity_type=episode&sort=release_date&sort_direction=descending&mixin=available_versions
 app.get("/api/v1/episode", function(req, res) {
   let q = {
     mixin: ["images", "available_versions"],
@@ -441,7 +441,9 @@ function SpwRequest(sid, date) {
     };
 
     var request = https.get(options, response => {
-      if (response.statusCode === 404) {
+      if (response.statusCode 
+          
+          404) {
         resolve(null);
         return;
       }
@@ -535,7 +537,8 @@ function pid2crid(pid) {
 }
 
 function add_crids_to_webcast(items) {
-  if (items != null) {
+  console.log('add_crids_to_webcast');
+  if (items != null && items.total>0) {
     for (let i = 0; i < items.length; i++) {
       const pid = items[i].window_of[0].pid;
       items[i].window_of[0].crid = pid2crid(pid);
