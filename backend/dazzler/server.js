@@ -59,19 +59,22 @@ app.get("/api/v1/schedule", function(req, res) {
   SpwRequest(req.query.sid, req.query.date).then(
     r => {
       if (r) {
-        const s = r['p:schedule']['p:item'];
+        const s = r["p:schedule"]["p:item"];
         let promises = [];
-        for(let i=0; i<s.length; i++) {
-          if(s[i].hasOwnProperty('p:episode')) {
+        for (let i = 0; i < s.length; i++) {
+          if (s[i].hasOwnProperty("p:episode")) {
             continue;
           }
-          const pid = s[i]["p:version"][0]["p:version_of"][0]["p:link"][0].$.pid;
-          promises.push(nitroRequest("programmes", {pid:pid, mixin:'ancestor_titles'}));
+          const pid =
+            s[i]["p:version"][0]["p:version_of"][0]["p:link"][0].$.pid;
+          promises.push(
+            nitroRequest("programmes", { pid: pid, mixin: "ancestor_titles" })
+          );
         }
         Promise.all(promises).then(function(results) {
-            addClips(s, results);
-            res.json(r);
-          });
+          addClips(s, results);
+          res.json(r);
+        });
       } else {
         res.status(404).send("Not found"); // TODO use proper error message
       }
@@ -150,11 +153,14 @@ app.get("/api/v1/clip", function(req, res) {
 });
 
 function addClips(schedule_items, clips) {
-  for(let i=0; i<schedule_items.length; i++) {
-    const pid = schedule_items[i]["p:version"][0]["p:version_of"][0]["p:link"][0].$.pid;
-    for(let j=0; j<clips.items.length; j++) {
-      if(clips.items[j].pid === pid) {
+  for (let i = 0; i < schedule_items.length; i++) {
+    const pid =
+      schedule_items[i]["p:version"][0]["p:version_of"][0]["p:link"][0].$.pid;
+    for (let j = 0; j < clips.items.length; j++) {
+      if (clips.hasOwnProperty("items")) {
+        if (clips.items[j].pid === pid) {
           schedule_items[i]["p:clip"] = clips.items[j];
+        }
       }
     }
   }
@@ -541,9 +547,11 @@ function add_crids_to_webcast(items) {
 function add_crids_to_episodes(items) {
   if (items != null) {
     for (let i = 0; i < items.length; i++) {
-      for (let j = 0; j < items[i].available_versions.version.length; j++) {
-        let version = items[i].available_versions.version[j];
-        version.crid = pid2crid(version.pid);
+      if (items[i].available_versions.hasOwnProperty("version")) {
+        for (let j = 0; j < items[i].available_versions.version.length; j++) {
+          let version = items[i].available_versions.version[j];
+          version.crid = pid2crid(version.pid);
+        }
       }
     }
   }

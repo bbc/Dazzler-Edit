@@ -318,6 +318,7 @@ class Schedule extends React.Component {
     if (item.isLive) {
       item.live = "live";
       item.startTime = moment(item.title.substring(18, 38));
+      item.duration = item.duration;
       //need to sort here
     } else {
       if (
