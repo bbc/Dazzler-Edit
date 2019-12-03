@@ -609,20 +609,23 @@ class Schedule extends React.Component {
       default:
         break;
     }
-    if (scheduleItems[dateIndex].length > 0) {
-      var item = scheduleItems[dateIndex][scheduleItems[dateIndex].length - 1];
-      this.props.lastItem(
-        moment(item.startTime).add(moment.duration(item.duration))
-      );
-    } else {
-      this.props.lastItem(
-        moment()
-          .add(dateIndex, "d")
-          .add(6, "m")
-      );
+    if (scheduleItems[dateIndex] != undefined) {
+      if (scheduleItems[dateIndex].length > 0) {
+        var item =
+          scheduleItems[dateIndex][scheduleItems[dateIndex].length - 1];
+        this.props.lastItem(
+          moment(item.startTime).add(moment.duration(item.duration))
+        );
+      } else {
+        this.props.lastItem(
+          moment()
+            .add(dateIndex, "d")
+            .add(6, "m")
+        );
+      }
+      sessionStorage.setItem("data", JSON.stringify(myPreRenderedItems));
+      sessionStorage.setItem("scheduleItems", JSON.stringify(scheduleItems));
     }
-    sessionStorage.setItem("data", JSON.stringify(myPreRenderedItems));
-    sessionStorage.setItem("scheduleItems", JSON.stringify(scheduleItems));
   }
 
   render() {

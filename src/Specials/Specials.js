@@ -141,18 +141,25 @@ export class Specials extends React.Component {
       cells.push({
         id: this.props.specials[i].pid,
         title: this.props.specials[i].title,
-        duration:
-          moment.duration(
-            this.props.specials[i].available_versions.version[0].duration
-          )._data.minutes +
-          " minutes " +
-          moment.duration(
-            this.props.specials[i].available_versions.version[0].duration
-          )._data.seconds +
-          "seconds",
+        duration: this.props.specials[i].available_versions.hasOwnProperty(
+          "version"
+        )
+          ? moment.duration(
+              this.props.specials[i].available_versions.version[0].duration
+            )._data.minutes +
+            " minutes " +
+            moment.duration(
+              this.props.specials[i].available_versions.version[0].duration
+            )._data.seconds +
+            "seconds"
+          : 0,
         from: diffDays + " days ago",
         pid: this.props.specials[i].pid,
-        versions: this.props.specials[i].available_versions.version.length,
+        versions: this.props.specials[i].available_versions.hasOwnProperty(
+          "version"
+        )
+          ? this.props.specials[i].available_versions.version.length
+          : 0,
         add: (
           <button
             className="ui compact icon button"

@@ -180,9 +180,11 @@ function clip(q, query, res) {
       let pids = [];
       let clips = r.nitro.results;
       for (let i = 0; i < clips.items.length; i++) {
-        const version = clips.items[i].available_versions.version;
-        for (let j = 0; j < version.length; j++) {
-          pids.push(version[j].pid);
+        if (clips.items[i].available_versions.hasOwnProperty("version")) {
+          const version = clips.items[i].available_versions.version;
+          for (let j = 0; j < version.length; j++) {
+            pids.push(version[j].pid);
+          }
         }
       }
       nitroRequest("versions", { pid: pids }).then(
@@ -198,9 +200,11 @@ function clip(q, query, res) {
             }
           }
           for (let i = 0; i < clips.items.length; i++) {
-            const version = clips.items[i].available_versions.version;
-            for (let j = 0; j < version.length; j++) {
-              version[j].crid = map.get(version[j].pid);
+            if (clips.items[i].available_versions.hasOwnProperty("version")) {
+              const version = clips.items[i].available_versions.version;
+              for (let j = 0; j < version.length; j++) {
+                version[j].crid = map.get(version[j].pid);
+              }
             }
           }
           res.json(clips);
@@ -518,7 +522,9 @@ function nitroRequest(feed, query) {
       response.on("error", err => reject(new Error(err)));
     });
     request.on("error", err => reject(new Error(err)));
-  });
+  }).catch(error => {
+    console.log(error);
+  }); // Error: Whoops!;
 }
 
 const pidchars = "0123456789bcdfghjklmnpqrstvwxyz";

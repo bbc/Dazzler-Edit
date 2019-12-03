@@ -20,31 +20,27 @@ class SingleSchedule extends React.Component {
     }
   }
   render() {
-    if (this.props.prev === 1) {
-      var additional = null;
-    } else if (this.props.prev !== 1 && this.props.style !== undefined) {
-      additional = (
-        <td>
-          <button
-            className="mini ui button"
-            onClick={() => this.props.deleteItem(this.props.id)}
-          >
-            <i class="trash alternate outline icon"></i>
-          </button>
-        </td>
-      );
-    } else {
-      additional = (
-        <td>
-          <button
-            className="mini ui button"
-            onClick={() => this.props.deleteItem(this.props.id)}
-          >
-            Delete
-          </button>
-        </td>
-      );
-    }
+    var additional = (
+      <td>
+        <button
+          className="mini ui button"
+          onClick={() => this.props.deleteItem(this.props.id)}
+        >
+          <i class="trash alternate outline icon"></i>
+        </button>
+      </td>
+    );
+    //  var additional = (
+    //     <td>
+    //       <button
+    //         className="mini ui button"
+    //         onClick={() => this.props.deleteItem(this.props.id)}
+    //       >
+    //         Delete
+    //       </button>
+    //     </td>
+    //   );
+
     this.props.flag === true ? (status = <Arrow />) : (status = null);
 
     return (
