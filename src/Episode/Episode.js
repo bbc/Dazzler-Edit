@@ -113,11 +113,9 @@ export const styles = theme => ({
   }
 });
 
-
 var cells = [];
 var isEpisode = false;
 export class Episode extends React.Component {
-
   state = {
     rows: [].sort((a, b) => (a < b ? -1 : 1)),
     page: 0,
@@ -129,11 +127,15 @@ export class Episode extends React.Component {
     cells = [];
     for (let i = 0; i < this.props.episodes.length; i++) {
       const episode = this.props.episodes[i];
-      const version = 0 // TODO - pick a version
+      const version = 0; // TODO - pick a version
+      console.log("EPISODE!!!", episode);
+
       cells.push({
         id: episode.pid,
         title: episode.presentation_title,
-        duration: episode.available_versions.version[version].duration,
+        duration: episode.available_versions.hasOwnProperty("version")
+          ? episode.available_versions.version[version].duration
+          : 0,
         releaseDate: episode.release_date,
         pid: episode.pid,
         add: (
@@ -147,8 +149,9 @@ export class Episode extends React.Component {
           </button>
         )
       });
+
+      this.setState({ rows: cells });
     }
-    this.setState({ rows: cells });
   };
 
   handleChangePage = (event, page) => {
@@ -160,7 +163,6 @@ export class Episode extends React.Component {
   };
 
   render() {
-
     const { classes } = this.props;
     const { rows, rowsPerPage, page } = this.state;
 
@@ -185,7 +187,11 @@ export class Episode extends React.Component {
                   .map(row => (
                     <TableRow key={row.id}>
                       <TableCell component="th" scope="row">
-                        {row.title}
+                        <div className="tooltip">
+                          {" "}
+                          {row.title}
+                          <span className="tooltiptext">PID = {row.pid}</span>
+                        </div>
                       </TableCell>
                       <TableCell align="right">{row.releaseDate}</TableCell>
                       <TableCell align="right">{row.duration}</TableCell>

@@ -13,19 +13,18 @@ import FirstPageIcon from "@material-ui/icons/FirstPage";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import LastPageIcon from "@material-ui/icons/LastPage";
-import moment from 'moment';
+import moment from "moment";
 import Spinner from "../Spinner/Spinner";
 import axios from "axios";
 
-
- const actionsStyles = theme => ({
+const actionsStyles = theme => ({
   root: {
     flexShrink: 0,
     color: theme.palette.text.secondary,
     marginLeft: theme.spacing.unit * 2.5
   }
 });
- class TablePaginationActions extends React.Component {
+class TablePaginationActions extends React.Component {
   handleFirstPageButtonClick = event => {
     this.props.onChangePage(event, 0);
   };
@@ -81,8 +80,7 @@ import axios from "axios";
         </IconButton>
         <IconButton
           onClick={this.handleLastPageButtonClick}
-          disabled={page >= 
-            Math.ceil(count / rowsPerPage) - 1}
+          disabled={page >= Math.ceil(count / rowsPerPage) - 1}
           aria-label="Last Page"
         >
           {theme.direction === "rtl" ? <FirstPageIcon /> : <LastPageIcon />}
@@ -119,15 +117,15 @@ export const styles = theme => ({
 });
 
 //checking if we are running locally
-var URLPrefix = '';
-if(process.env.NODE_ENV == "development"){
-  URLPrefix = 'http://localhost:8080';
+var URLPrefix = "";
+if (process.env.NODE_ENV == "development") {
+  URLPrefix = "http://localhost:8080";
 }
 
 export class Clips extends React.Component {
   constructor(props) {
     super(props);
-  
+
     this.state = {
       spinner: false,
       totalRows: 0,
@@ -141,32 +139,33 @@ export class Clips extends React.Component {
   }
 
   componentDidMount = () => {
-
     this.setState({ sid: this.props.sid });
-  }
+  };
 
   componentDidUpdate(prevProps) {
     console.log("Clips update", this.state.page);
-    if(this.state.page !== this.state.previousPage) {
+    if (this.state.page !== this.state.previousPage) {
       console.log("have page %d want page %d", this.props.page, prevProps.page);
       axios
-      .get(
-        URLPrefix + 
-        "/api/v1/clip" +
-        "?sid=" + this.props.sid + 
-        "&page=" + (this.state.page+1) + // nitro is 1 based
-        "&page_size=" + this.state.rowsPerPage
-      )
-      .then(response => {
-        console.log("CLIP", response);
-        this.setState({previousPage: response.data.page - 1});    
-        this.setState({page: response.data.page - 1});    
-        this.setState({rows: response.data.items});    
-        this.setState({totalRows: response.data.total});    
+        .get(
+          URLPrefix +
+          "/api/v1/clip" +
+          "?sid=" +
+          this.props.sid +
+          "&page=" +
+          (this.state.page + 1) + // nitro is 1 based
+            "&page_size=" +
+            this.state.rowsPerPage
+        )
+        .then(response => {
+          this.setState({ previousPage: response.data.page - 1 });
+          this.setState({ page: response.data.page - 1 });
+          this.setState({ rows: response.data.items });
+          this.setState({ totalRows: response.data.total });
         })
-      .catch(e => {
-        console.log(e);
-      });
+        .catch(e => {
+          console.log(e);
+        });
     }
   }
 
@@ -180,11 +179,22 @@ export class Clips extends React.Component {
   };
 
   formattedDuration(clip) {
-    return moment.duration(clip.available_versions.version[0].duration).humanize();
+    return moment
+      .duration(clip.available_versions.version[0].duration)
+      .humanize();
   }
 
   addButton(clip) {
-    return <button className="ui compact icon button" onClick  = { () => {this.props.handleClick(clip)} }><i className="plus icon"></i></button>
+    return (
+      <button
+        className="ui compact icon button"
+        onClick={() => {
+          this.props.handleClick(clip);
+        }}
+      >
+        <i className="plus icon"></i>
+      </button>
+    );
   }
 
   render() {
@@ -193,64 +203,64 @@ export class Clips extends React.Component {
     const emptyRows =
       rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
 
-       //if(rows.length === 0){
-       //  this.setState({spinner : true})
-       //  return <Spinner />
-      // }
+    //if(rows.length === 0){
+    //  this.setState({spinner : true})
+    //  return <Spinner />
+    // }
 
     return (
-      
-        <div>
-      <Paper className={classes.root}>
-        <div className={classes.tableWrapper}>
-          <Table className={classes.table}>
-          
-            <TableBody>
-            <th>Title</th>
-            <th>Duration</th>
-            <th>Add</th>
+      <div>
+        <Paper className={classes.root}>
+          <div className={classes.tableWrapper}>
+            <Table className={classes.table}>
+              <TableBody>
+                <th>Title</th>
+                <th>Duration</th>
+                <th>Add</th>
 
-              {rows.map(row => (
+                {rows.map(row => (
                   <TableRow key={row.pid}>
                     <TableCell component="th" scope="row">
-                      <div className="tooltip"> {row.title} 
-                      <span className="tooltiptext">PID = {row.pid}</span>
+                      <div className="tooltip">
+                        {" "}
+                        {row.title}
+                        <span className="tooltiptext">PID = {row.pid}</span>
                       </div>
-                      
                     </TableCell>
-                    <TableCell align="right">{this.formattedDuration(row)}</TableCell>
+                    <TableCell align="right">
+                      {this.formattedDuration(row)}
+                    </TableCell>
 
                     <TableCell align="right">{this.addButton(row)}</TableCell>
                   </TableRow>
                 ))}
-            
-              {emptyRows > 0 && (
-                <TableRow style={{ height: 48 * emptyRows }}>
-                  <TableCell colSpan={6} />
+
+                {emptyRows > 0 && (
+                  <TableRow style={{ height: 48 * emptyRows }}>
+                    <TableCell colSpan={6} />
+                  </TableRow>
+                )}
+              </TableBody>
+              <TableFooter>
+                <TableRow>
+                  <TablePagination
+                    rowsPerPageOptions={[5, 10, 25]}
+                    colSpan={3}
+                    count={totalRows}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    SelectProps={{
+                      native: true
+                    }}
+                    onChangePage={this.handleChangePage}
+                    onChangeRowsPerPage={this.handleChangeRowsPerPage}
+                    ActionsComponent={TablePaginationActionsWrapped}
+                  />
                 </TableRow>
-              )}
-            </TableBody>
-            <TableFooter>
-              <TableRow>
-                
-                <TablePagination
-                  rowsPerPageOptions={[5, 10, 25]}
-                  colSpan={3}
-                  count={totalRows}
-                  rowsPerPage={rowsPerPage}
-                  page={page}
-                  SelectProps={{
-                    native: true
-                  }}
-                  onChangePage={this.handleChangePage}
-                  onChangeRowsPerPage={this.handleChangeRowsPerPage}
-                  ActionsComponent={TablePaginationActionsWrapped}
-                />
-              </TableRow>
-            </TableFooter>
-          </Table>
-        </div>
-      </Paper>
+              </TableFooter>
+            </Table>
+          </div>
+        </Paper>
       </div>
     );
   }
@@ -260,5 +270,4 @@ Clips.propTypes = {
   classes: PropTypes.object.isRequired
 };
 
-export default withStyles (styles)(Clips)
-
+export default withStyles(styles)(Clips);

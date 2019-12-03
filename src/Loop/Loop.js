@@ -1,8 +1,8 @@
 import React, { Fragment } from "react";
 import ReactDataGrid from "react-data-grid";
 import moment from "moment";
-import Flatpickr from 'react-flatpickr'
-import 'flatpickr/dist/themes/material_green.css'
+import Flatpickr from "react-flatpickr";
+import "flatpickr/dist/themes/material_green.css";
 
 var rows = [];
 var length = 0;
@@ -22,16 +22,29 @@ class Loop extends React.Component {
       status: "",
       current: "",
       startDate: new Date(),
-      finishDate: new Date(),
+      finishDate: new Date()
     };
   }
 
   componentDidMount() {
+    if (this.props.scheduleTime == undefined) {
+      this.setState({ time: new Date() });
+    } else {
+      this.setState({ time: new Date(this.props.scheduleTime) });
+    }
     this.setState({ data: this.props.data });
     this.setState({ status: "Copy" });
     this.setState({ current: "Clear" });
-    this.setState({startDate : this.state.startDate.setMinutes(this.state.startDate.getMinutes() + 10)})
-    this.setState({finishDate : this.state.finishDate.setHours(this.state.finishDate.getHours() + 2)})
+    this.setState({
+      startDate: this.state.startDate.setMinutes(
+        this.state.startDate.getMinutes() + 10
+      )
+    });
+    this.setState({
+      finishDate: this.state.finishDate.setHours(
+        this.state.finishDate.getHours() + 2
+      )
+    });
   }
   componentDidUpdate(prevProps) {
     if (prevProps.data.length !== this.props.data.length) {
@@ -40,8 +53,9 @@ class Loop extends React.Component {
       }
     }
   }
-  render() {  
-    const { startDate, finishDate } = this.state;
+  render() {
+    const { startDate, finishDate, time } = this.state;
+
     rows = [];
     duration = 0;
     if (this.props.data.length > 0) {
@@ -87,33 +101,47 @@ class Loop extends React.Component {
         </button>
 
         <div class="ui text container">
-        Start:   <Flatpickr data-enable-time
-        value={startDate}
-        onChange={startDate => { this.setState({startDate}) }} />
-        <br/>
-        <br/>
-        <br/>
-        Finish by: <Flatpickr data-enable-time
-        value={finishDate}
-        onChange={finishDate => { this.setState({finishDate}) }} />
-        <br/>
-        <br/>
-        <div class="ui form">
-          <div class="inline field">
-            <div class="ui checkbox">
-              <input type="checkbox" tabindex="0" class="hidden"/>
-              <label>Preserve Live</label>
-              <br/>
-              <input type="checkbox" tabindex="0" class="hidden"/>
-              <label>Include all live events</label>
+          Start:{" "}
+          <Flatpickr
+            data-enable-time
+            value={time}
+            onChange={time => {
+              this.setState({ time });
+            }}
+          />
+          <br />
+          <br />
+          <br />
+          Finish by:{" "}
+          <Flatpickr
+            data-enable-time
+            value={finishDate}
+            onChange={finishDate => {
+              this.setState({ finishDate });
+            }}
+          />
+          <br />
+          <br />
+          <div class="ui form">
+            <div class="inline field">
+              <div class="ui checkbox">
+                <input type="checkbox" tabindex="0" class="hidden" />
+                <label>Preserve Live</label>
+                <br />
+                <input type="checkbox" tabindex="0" class="hidden" />
+                <label>Include all live events</label>
+              </div>
+            </div>
           </div>
-      </div>
-    </div>
-
-        <button onClick={() => {
-            this.props.loopContent(rows, this.state.startDate, this.state.finishDate);
-          }}> Go </button>
-      </div>
+          <button
+            onClick={() => {
+              this.props.loopContent(rows, time, this.state.finishDate);
+            }}
+          >
+            {" "}
+            Go{" "}
+          </button>
+        </div>
       </div>
     );
   }

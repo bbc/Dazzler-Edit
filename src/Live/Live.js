@@ -138,8 +138,9 @@ export class Live extends React.Component {
       this.props.live[i].startTime = moment(
         this.props.live[i].scheduled_time.start
       ).format("HH:mm:ss");
-        
-      this.props.live[i].title = "Live programme at "+this.props.live[i].scheduled_time.start;
+
+      this.props.live[i].title =
+        "Live programme at " + this.props.live[i].scheduled_time.start;
       this.props.live[i].duration = moment.duration(
         durationTime,
         "milliseconds"
@@ -150,6 +151,7 @@ export class Live extends React.Component {
         title: this.props.live[i].title,
         info: this.props.live[i].startTime,
         pid: this.props.live[i].pid,
+        versionPid: this.props.live[i].window_of[1].pid,
         stream: this.props.live[i].service.sid.replace(/_/g, " "),
         add: (
           <button
@@ -204,7 +206,10 @@ export class Live extends React.Component {
                         <div className="tooltip">
                           {" "}
                           {row.title}
-                          <span className="tooltiptext">{row.stream}</span>
+                          <span className="tooltiptext">
+                            {/* {row.stream}  */}
+                            {row.versionPid}
+                          </span>
                         </div>
                       </TableCell>
                       <TableCell align="right">{row.info}</TableCell>
