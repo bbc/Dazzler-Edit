@@ -149,7 +149,7 @@ export class Episode extends React.Component {
       axios
         .get(
           URLPrefix +
-          "/api/v1/episode" +
+          "/api/v1.1/episode" +
           "?sid=" +
           this.props.sid +
           "&type=" +

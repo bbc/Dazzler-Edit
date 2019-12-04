@@ -72,7 +72,6 @@ class Schedule extends React.Component {
       scheduleItems = JSON.parse(sessionStorage.getItem("scheduleItems"));
     }
     if (sessionStorage.getItem("activeSession") == undefined) {
-      alert("in here");
       axios
         .get(
           URLPrefix +

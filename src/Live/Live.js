@@ -14,7 +14,9 @@ import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import LastPageIcon from "@material-ui/icons/LastPage";
 import moment from "moment";
-
+import Spinner from "../Spinner/Spinner";
+import axios from "axios";
+const type = "Live";
 const actionsStyles = theme => ({
   root: {
     flexShrink: 0,
@@ -113,63 +115,86 @@ export const styles = theme => ({
     overflowX: "hidden"
   }
 });
-var cells = [];
-var isLive = true;
+
+//checking if we are running locally
+var URLPrefix = "";
+if (process.env.NODE_ENV == "development") {
+  URLPrefix = "http://localhost:8080";
+}
+
 export class Live extends React.Component {
   constructor(props) {
     super(props);
+
+    this.state = {
+      spinner: false,
+      totalRows: 0,
+      rows: [],
+      page: 0,
+      previousPage: -1,
+      rowsPerPage: 5,
+      data: [],
+      sid: ""
+    };
   }
 
-  state = {
-    rows: [].sort((a, b) => (a < b ? -1 : 1)),
-    page: 0,
-    rowsPerPage: 6,
-    data: []
-  };
-
   componentDidMount = () => {
-    cells = [];
-    for (let i = 0; i < this.props.live.length; i++) {
-      var durationTime =
-        moment(this.props.live[i].scheduled_time.end) -
-        moment(this.props.live[i].scheduled_time.start);
-
-      this.props.live[i].isLive = true;
-      this.props.live[i].startTime = moment(
-        this.props.live[i].scheduled_time.start
-      ).format("HH:mm:ss");
-
-      this.props.live[i].title =
-        "Live programme at " + this.props.live[i].scheduled_time.start;
-      this.props.live[i].duration = moment.duration(
-        durationTime,
-        "milliseconds"
-      );
-
-      cells.push({
-        id: this.props.live[i].pid,
-        title: this.props.live[i].title,
-        info: this.props.live[i].startTime,
-        pid: this.props.live[i].pid,
-        versionPid: this.props.live[i].window_of[1].pid,
-        stream: this.props.live[i].service.sid.replace(/_/g, " "),
-        add: (
-          <button
-            className="ui compact icon button"
-            onClick={() => {
-              this.props.handleClick(this.props.live[i], isLive);
-            }}
-          >
-            <i className="plus icon"></i>
-          </button>
-        )
-      });
-    }
-
-    this.setState({ rows: cells });
+    this.setState({ sid: this.props.sid });
   };
+
+  componentDidUpdate(prevProps) {
+    //get request for webcasts
+    const day = moment()
+      .millisecond(0)
+      .second(0)
+      .add(5, "minutes")
+      .utc(); // TODO DAZZLER-68
+    const days = 5; // to allow us to edit future schedules
+    console.log("Live update", this.state.page);
+    if (this.state.page !== this.state.previousPage) {
+      console.log("have page %d want page %d", this.props.page, prevProps.page);
+      axios
+        .get(
+          URLPrefix +
+            "/api/v1/webcast" +
+            "?sid=" +
+            this.props.sid +
+            "&start=" +
+            day.format() +
+            "&end=" +
+            day
+              .add(days, "days")
+              .utc()
+              .format()
+        )
+        .then(response => {
+          console.log("Live RESPONSE", response.data.items);
+          response.data.items.map(item => {
+            var durationTime =
+              moment(item.scheduled_time.end) -
+              moment(item.scheduled_time.start);
+
+            item.isLive = true;
+            item.startTime = moment(item.scheduled_time.start).format(
+              "HH:mm:ss"
+            );
+
+            item.title = "Live programme at " + item.scheduled_time.start;
+            item.duration = moment.duration(durationTime, "milliseconds");
+          });
+          this.setState({ previousPage: response.data.page - 1 });
+          this.setState({ page: response.data.page - 1 });
+          this.setState({ rows: response.data.items });
+          this.setState({ totalRows: response.data.total });
+        })
+        .catch(e => {
+          console.log(e);
+        });
+    }
+  }
 
   handleChangePage = (event, page) => {
+    console.log("Live handleChangePage", this.state.page, page);
     this.setState({ page });
   };
 
@@ -177,16 +202,37 @@ export class Live extends React.Component {
     this.setState({ page: 0, rowsPerPage: event.target.value });
   };
 
+  formattedDuration(clip) {
+    try {
+      return moment.duration(clip.duration).humanize();
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  addButton(clip) {
+    return (
+      <button
+        className="ui compact icon button"
+        onClick={() => {
+          this.props.handleClick(clip);
+        }}
+      >
+        <i className="plus icon"></i>
+      </button>
+    );
+  }
+
   render() {
     const { classes } = this.props;
-    const { rows, rowsPerPage, page } = this.state;
-
+    const { rows, rowsPerPage, page, totalRows } = this.state;
     const emptyRows =
       rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
 
-    if (this.props.live.length === 0) {
-      return <h1> No Live Content</h1>;
-    }
+    //if(rows.length === 0){
+    //  this.setState({spinner : true})
+    //  return <Spinner />
+    // }
 
     return (
       <div>
@@ -195,28 +241,27 @@ export class Live extends React.Component {
             <Table className={classes.table}>
               <TableBody>
                 <th>Title</th>
-                <th>Start Time</th>
+                <th>Duration</th>
                 <th>Add</th>
 
-                {rows
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map(row => (
-                    <TableRow key={row.id}>
-                      <TableCell component="th" scope="row">
-                        <div className="tooltip">
-                          {" "}
-                          {row.title}
-                          <span className="tooltiptext">
-                            {/* {row.stream}  */}
-                            {row.versionPid}
-                          </span>
-                        </div>
-                      </TableCell>
-                      <TableCell align="right">{row.info}</TableCell>
+                {rows.map(row => (
+                  <TableRow key={row.pid}>
+                    <TableCell component="th" scope="row">
+                      <div className="tooltip">
+                        {" "}
+                        {row.title == undefined
+                          ? row.presentation_title
+                          : row.title}
+                        <span className="tooltiptext">PID = {row.pid}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell align="right">
+                      {this.formattedDuration(row)}
+                    </TableCell>
 
-                      <TableCell align="right">{row.add}</TableCell>
-                    </TableRow>
-                  ))}
+                    <TableCell align="right">{this.addButton(row)}</TableCell>
+                  </TableRow>
+                ))}
 
                 {emptyRows > 0 && (
                   <TableRow style={{ height: 48 * emptyRows }}>
@@ -229,7 +274,7 @@ export class Live extends React.Component {
                   <TablePagination
                     rowsPerPageOptions={[5, 10, 25]}
                     colSpan={3}
-                    count={rows.length}
+                    count={totalRows}
                     rowsPerPage={rowsPerPage}
                     page={page}
                     SelectProps={{

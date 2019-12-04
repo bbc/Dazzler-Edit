@@ -1,14 +1,13 @@
-import React, { Component } from 'react';
-import Demo from '../Demo/Demo';
-
+import React, { Component } from "react";
+import Editor from "../Editor/Editor";
 
 class App extends Component {
   render() {
     return (
-        <div>
-          <Demo />
-        </div>
-    ); 
+      <div>
+        <Editor />
+      </div>
+    );
   }
 }
 

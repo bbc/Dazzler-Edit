@@ -126,7 +126,7 @@ const styles = theme => ({
   }
 });
 
-class Demo extends React.Component {
+class Editor extends React.Component {
   constructor(props) {
     super(props);
     this.handleClick = this.handleClick.bind(this);
@@ -184,19 +184,6 @@ class Demo extends React.Component {
         />
       )
     });
-
-    // Episodes
-    axios
-      .get(URLPrefix + "/api/v1/episode?sid=" + this.state.service.sid)
-      .then(response => {
-        this.setState({
-          episodes: response.data.items
-        });
-      })
-      .catch(e => {
-        console.log(e);
-      });
-
     // get user
     axios
       .get(URLPrefix + "/api/v1/user")
@@ -210,76 +197,7 @@ class Demo extends React.Component {
       .catch(e => {
         console.log(e);
       });
-
-    //get request for specials
-    axios
-      .get(URLPrefix + "/api/v1/special?sid=" + this.state.service.sid)
-      .then(response => {
-        console.log("SPECIALS RESPONSE", response);
-        this.setState({
-          specials: response.data.items
-        });
-      })
-      .catch(e => {
-        console.log(e);
-      });
-
-    //get request for webcasts
-    const day = moment()
-      .millisecond(0)
-      .second(0)
-      .add(5, "minutes")
-      .utc(); // TODO DAZZLER-68
-    const days = 5; // to allow us to edit future schedules
-    axios
-      .get(
-        URLPrefix +
-          "/api/v1/webcast" +
-          "?sid=" +
-          this.state.service.sid +
-          "&start=" +
-          day.format() +
-          "&end=" +
-          day
-            .add(days, "days")
-            .utc()
-            .format()
-      )
-      .then(response => {
-        var items = response.data.items;
-        console.log("LIVE RESPONSE", response);
-        for (let i = 0; i < items.length; i++) {
-          this.setState({
-            live: [...this.state.live, items[i]]
-          });
-        }
-
-        this.fetchCrid();
-      })
-      .catch(e => {
-        console.log(e);
-      });
   }
-  fetchCrid = () => {
-    var localData = this.state.live;
-    localData.forEach(item => {
-      axios
-        .get(
-          `https://programmes.api.bbc.com/nitro/api/versions?api_key=tT0EI8LEPIQntUM1msXEgYkZECRAkoFC&pid=${item.window_of[0].pid}`
-        )
-        .then(response => {
-          xml2js.parseString(response.data, (err, result) => {
-            console.log("RESULT!", result);
-            item.versionCrid =
-              result.nitro.results[0].version[0].identifiers[0].identifier[0]._;
-          });
-        });
-    });
-
-    this.setState({ live: localData });
-    console.log(this.state.live);
-  };
-
   lastItem = scheduleTime => {
     this.setState({ scheduleTime: scheduleTime });
   };
@@ -501,7 +419,7 @@ class Demo extends React.Component {
         this.setState({ title: "Upcoming Live Broadcasts" });
         this.setState({
           panelShow: (
-            <Live live={this.state.live} handleClick={this.handleClick} />
+            <Live sid={this.state.service.sid} handleClick={this.handleClick} />
           )
         });
       case "a":
@@ -524,7 +442,7 @@ class Demo extends React.Component {
         this.setState({
           panelShow: (
             <Specials
-              specials={this.state.specials}
+              sid={this.state.service.sid}
               handleClick={this.handleClick}
             />
           )
@@ -737,9 +655,9 @@ class Demo extends React.Component {
   }
 }
 
-Demo.propTypes = {
+Editor.propTypes = {
   classes: PropTypes.object.isRequired,
   theme: PropTypes.object.isRequired
 };
 
-export default withStyles(styles, { withTheme: true })(Demo);
+export default withStyles(styles, { withTheme: true })(Editor);
