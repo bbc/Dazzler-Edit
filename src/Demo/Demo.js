@@ -22,6 +22,7 @@ import LoopIcon from "@material-ui/icons/Loop";
 import Payment from "@material-ui/icons/VideoLibrary";
 import Lock from "@material-ui/icons/Star";
 import Assignment from "@material-ui/icons/Assignment";
+import SlowMotionVideoIcon from "@material-ui/icons/SlowMotionVideo";
 import Movie from "@material-ui/icons/Movie";
 import Opacity from "@material-ui/icons/Opacity";
 import Picture from "@material-ui/icons/PictureInPicture";
@@ -33,6 +34,7 @@ import moment from "moment";
 import Episode from "../Episode/Episode";
 import Live from "../Live/Live";
 import Clips from "../Clips/Clips";
+import Jupiter from "../Jupiter/Jupiter";
 import Scratchpad from "../Scratchpad/Scratchpad";
 import Date from "../Date/Date";
 import Schedule from "../Schedule/Schedule";
@@ -55,7 +57,7 @@ var icons = [
   <Movie />,
   <Payment />,
   <Picture />,
-  <Lock />,
+  <SlowMotionVideoIcon />,
   <Opacity />
 ];
 var viewIcons = [<LiveTv />, <Assignment />, <LoopIcon />];
@@ -142,6 +144,7 @@ class Demo extends React.Component {
       panelShow: null,
       count: 0,
       clips: [],
+      jupiter: [],
       specials: [],
       episodes: [],
       live: [],
@@ -481,7 +484,7 @@ class Demo extends React.Component {
 
   iHandleClick = text => {
     switch (text) {
-      case "Clips":
+      case "Web Clips":
         this.setState({ isPaneOpen: true });
         this.setState({ title: "Available Clips" });
         this.setState({
@@ -527,8 +530,17 @@ class Demo extends React.Component {
           )
         });
         break;
-      case "Extra":
-        return this.setState({ show: <Date /> });
+      case "Jupiter Clips":
+        this.setState({ isPaneOpen: true });
+        this.setState({ title: "Jupiter Clips" });
+        this.setState({
+          panelShow: (
+            <Jupiter
+              sid={this.state.service.sid}
+              handleClick={this.handleClick}
+            />
+          )
+        });
       case "Schedule":
         menuText = text;
         return this.setState({
@@ -686,7 +698,7 @@ class Demo extends React.Component {
           </center>
           <Divider />
           <List>
-            {["Live", "Clips", "Episodes", "Specials", "Extra"].map(
+            {["Live", "Web Clips", "Episodes", "Specials", "Jupiter Clips"].map(
               (text, index) => (
                 <ListItem
                   button

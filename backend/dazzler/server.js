@@ -146,9 +146,16 @@ app.get("/api/v1/special", function(req, res) {
 });
 
 app.get("/api/v1/clip", function(req, res) {
-  let q = {
-    tag_name: config[req.query.sid].clip_language
-  };
+  let q = {};
+  if (req.query.hasOwnProperty("type")) {
+    if (req.query.type === "web") {
+      q.tag_name = config[req.query.sid].clip_language;
+    } else {
+      q.master_brand = config[req.query.sid].mid;
+    }
+  } else {
+    q.tag_name = config[req.query.sid].clip_language;
+  }
   clip(q, req.query, res);
 });
 
