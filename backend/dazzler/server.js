@@ -65,8 +65,7 @@ app.get("/api/v1/schedule", function(req, res) {
           if (s[i].hasOwnProperty("p:episode")) {
             continue;
           }
-          const pid =
-            s[i]["p:version"][0]["p:version_of"][0]["p:link"][0].$.pid;
+          const pid = s[i]["p:version"][0]["p:version_of"][0]["p:link"][0].$.pid;
           promises.push(
             nitroRequest("programmes", { pid: pid, mixin: "ancestor_titles" })
           );
