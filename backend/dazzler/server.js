@@ -59,13 +59,13 @@ app.get("/api/v1/schedule", function(req, res) {
   SpwRequest(req.query.sid, req.query.date).then(
     r => {
       if (r) {
-        const s = r["p:schedule"]["p:item"];
+        const s = r["schedule"]["item"];
         let promises = [];
         for (let i = 0; i < s.length; i++) {
-          if (s[i].hasOwnProperty("p:episode")) {
+          if (s[i].hasOwnProperty("episode")) {
             continue;
           }
-          const pid = s[i]["p:version"][0]["p:version_of"][0]["p:link"][0].$.pid;
+          const pid = s[i]["version"][0]["version_of"][0]["link"][0].$.pid;
           promises.push(
             nitroRequest("programmes", { pid: pid, mixin: "ancestor_titles" })
           );
@@ -75,6 +75,7 @@ app.get("/api/v1/schedule", function(req, res) {
           res.json(r);
         });
       } else {
+        console.log('schedule error');
         res.status(404).send("Not found"); // TODO use proper error message
       }
     },
@@ -160,15 +161,14 @@ app.get("/api/v1/clip", function(req, res) {
 
 function addClips(schedule_items, clips) {
   for (let i = 0; i < schedule_items.length; i++) {
-    const pid = schedule_items[i]["p:version"][0]["p:version_of"][0]["p:link"][0].$.pid;
-    if(clips.hasOwnProperty('items')) {
-      for (let j = 0; j < clips.items.length; j++) {
-        if (clips.hasOwnProperty("items")) {
-          if (clips.items[j].pid === pid) {
-            schedule_items[i]["p:clip"] = clips.items[j];
+    const pid = schedule_items[i]["version"][0]["version_of"][0]["link"][0].$.pid;
+    for (let j = 0; j < clips.length; j++) {
+      const clip = clips[j].nitro.results;
+        if (clip.hasOwnProperty("items")) {
+          if (clip.items[0].pid === pid) {
+            schedule_items[i]["clip"] = clip.items[0];
           }
         }
-      }
     }
   }
 }
@@ -592,6 +592,7 @@ function SpwRequest(sid, date) {
 
     var request = https.get(options, response => {
       if (response.statusCode == 404) {
+        console.log('spw 404');
         resolve(null);
         return;
       }
@@ -602,13 +603,19 @@ function SpwRequest(sid, date) {
         return;
       }
 
+      console.log("spw status code: " + response.statusCode);
+
       var body = [];
       response.on("data", chunk => {
         body.push(chunk);
       });
       response.on("end", () => {
         try {
-          parseString(Buffer.concat(body).toString(), function(err, result) {
+          parseString(Buffer.concat(body).toString(), 
+	    {
+		tagNameProcessors: [onlyName]
+	    },
+		function(err, result) {
             if (err) {
               reject(err);
             } else {
@@ -616,6 +623,7 @@ function SpwRequest(sid, date) {
             }
           });
         } catch (e) {
+ 		console.log('spw', e);
           reject(new Error(e));
         }
       });
@@ -624,6 +632,10 @@ function SpwRequest(sid, date) {
     request.on("error", err => reject(new Error(err)));
   });
 }
+
+function onlyName(name) {
+  return name.split(':')[1]
+} 
 
 function nitroRequest(feed, query) {
   return new Promise((resolve, reject) => {
