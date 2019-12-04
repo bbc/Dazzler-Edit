@@ -184,6 +184,22 @@ class Editor extends React.Component {
         />
       )
     });
+<<<<<<< HEAD:src/Editor/Editor.js
+=======
+
+    // Episodes
+    axios
+      .get(URLPrefix + "/api/v1.1/episode?sid=" + this.state.service.sid)
+      .then(response => {
+        this.setState({
+          episodes: response.data.items
+        });
+      })
+      .catch(e => {
+        console.log(e);
+      });
+
+>>>>>>> master:src/Demo/Demo.js
     // get user
     axios
       .get(URLPrefix + "/api/v1/user")

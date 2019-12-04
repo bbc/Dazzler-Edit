@@ -65,8 +65,7 @@ app.get("/api/v1/schedule", function(req, res) {
           if (s[i].hasOwnProperty("p:episode")) {
             continue;
           }
-          const pid =
-            s[i]["p:version"][0]["p:version_of"][0]["p:link"][0].$.pid;
+          const pid = s[i]["p:version"][0]["p:version_of"][0]["p:link"][0].$.pid;
           promises.push(
             nitroRequest("programmes", { pid: pid, mixin: "ancestor_titles" })
           );
@@ -161,9 +160,8 @@ app.get("/api/v1/clip", function(req, res) {
 
 function addClips(schedule_items, clips) {
   for (let i = 0; i < schedule_items.length; i++) {
-    const pid =
-      schedule_items[i]["p:version"][0]["p:version_of"][0]["p:link"][0].$.pid;
-    if (clips.hasOwnProperty("items")) {
+    const pid = schedule_items[i]["p:version"][0]["p:version_of"][0]["p:link"][0].$.pid;
+    if(clips.hasOwnProperty('items')) {
       for (let j = 0; j < clips.items.length; j++) {
         if (clips.hasOwnProperty("items")) {
           if (clips.items[j].pid === pid) {
@@ -255,6 +253,73 @@ app.get("/api/v1/episode", function(req, res) {
     },
     err => res.status(404).send("Not found") // TODO use proper error message
   );
+
+});
+
+app.get('/api/v1.1/episode', async (req, res, next) => {
+  let q = {
+    mixin: ["images", "available_versions"],
+    entity_type: "episode"
+  };
+  if (req.query.hasOwnProperty("sid")) {
+    q.master_brand = config[req.query.sid].mid;
+  }
+  if (req.query.hasOwnProperty("pid")) {
+    q.pid = req.query.pid;
+  }
+  if (req.query.hasOwnProperty("page")) {
+    q.page = req.query.page;
+  }
+  if (req.query.hasOwnProperty("page_size")) {
+    q.page_size = req.query.page_size;
+  }
+  try {
+    q.availability = 'available';
+    let url = `http://programmes.api.bbc.com/nitro/api/programmes/?api_key=${process.env.NITRO_KEY}&`+querystring.stringify(q);
+    console.log(url);
+    let r = await axios({
+      url: url,
+      method: 'get',
+      timeout: 8000,
+      headers: {
+          'Accept': 'application/json',
+      }
+    })
+    if(res.status !== 200){
+      // test for status you want, etc
+      console.log(res.status)
+    }    
+    // Don't forget to return something   
+    const r1 = r.data
+    q.availability = 'PT24H';
+    url = `http://programmes.api.bbc.com/nitro/api/programmes/?api_key=${process.env.NITRO_KEY}&`+querystring.stringify(q);
+    console.log(url);
+    r = await axios({
+      url: url,
+      method: 'get',
+      timeout: 8000,
+      headers: {
+          'Accept': 'application/json',
+      }
+    })
+    if(r.status !== 200){
+      // test for status you want, etc
+      console.log(r.status)
+    }    
+    // Don't forget to return something   
+    const r2 = r.data
+    let items = r1.nitro.results.items.concat(r2.nitro.results.items);
+    console.log(items);
+    console.log('items', items.length);
+    res.json({
+      total:items.length,
+      items: items
+    });
+  }
+  catch(e) {
+    console.log(JSON.stringify(e));
+    res.status(404).send("error");
+  }
 });
 
 app.get("/api/v1.1/episode", async (req, res, next) => {
