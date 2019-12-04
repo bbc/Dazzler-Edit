@@ -185,6 +185,7 @@ function clip(q, query, res) {
   }
   q.mixin = ["images", "available_versions"];
   q.entity_type = "clip";
+  q.availability = "available";
   nitroRequest("programmes", q).then(
     r => {
       let pids = [];
