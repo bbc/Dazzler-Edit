@@ -160,6 +160,7 @@ export class Jupiter extends React.Component {
             this.state.rowsPerPage
         )
         .then(response => {
+          console.log("JUPITER", response);
           this.setState({ previousPage: response.data.page - 1 });
           this.setState({ page: response.data.page - 1 });
           this.setState({ rows: response.data.items });

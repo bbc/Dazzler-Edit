@@ -512,7 +512,7 @@ class Demo extends React.Component {
         this.setState({
           panelShow: (
             <Episode
-              episodes={this.state.episodes}
+              sid={this.state.service.sid}
               handleClick={this.handleClick}
             />
           )

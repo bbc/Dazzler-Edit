@@ -163,10 +163,12 @@ function addClips(schedule_items, clips) {
   for (let i = 0; i < schedule_items.length; i++) {
     const pid =
       schedule_items[i]["p:version"][0]["p:version_of"][0]["p:link"][0].$.pid;
-    for (let j = 0; j < clips.items.length; j++) {
-      if (clips.hasOwnProperty("items")) {
-        if (clips.items[j].pid === pid) {
-          schedule_items[i]["p:clip"] = clips.items[j];
+    if (clips.hasOwnProperty("items")) {
+      for (let j = 0; j < clips.items.length; j++) {
+        if (clips.hasOwnProperty("items")) {
+          if (clips.items[j].pid === pid) {
+            schedule_items[i]["p:clip"] = clips.items[j];
+          }
         }
       }
     }
@@ -182,6 +184,7 @@ function clip(q, query, res) {
   }
   q.mixin = ["images", "available_versions"];
   q.entity_type = "clip";
+  q.availability = "available";
   nitroRequest("programmes", q).then(
     r => {
       let pids = [];
@@ -222,6 +225,7 @@ function clip(q, query, res) {
     err => res.status(404).send("Not found") // TODO use proper error message
   );
 }
+
 // http://programmes.api.bbc.com/nitro/api/programmes?api_key=&master_brand=bbc_marathi_tv&page_size=100&entity_type=episode&sort=release_date&sort_direction=descending&mixin=available_versions
 app.get("/api/v1/episode", function(req, res) {
   let q = {
@@ -252,6 +256,77 @@ app.get("/api/v1/episode", function(req, res) {
   );
 });
 
+app.get("/api/v1.1/episode", async (req, res, next) => {
+  let q = {
+    mixin: ["images", "available_versions"],
+    entity_type: "episode"
+  };
+  if (req.query.hasOwnProperty("sid")) {
+    q.master_brand = config[req.query.sid].mid;
+  }
+  if (req.query.hasOwnProperty("pid")) {
+    q.pid = req.query.pid;
+  }
+  if (req.query.hasOwnProperty("page")) {
+    q.page = req.query.page;
+  }
+  if (req.query.hasOwnProperty("page_size")) {
+    q.page_size = req.query.page_size;
+  }
+  //try {
+  q.availability = "available";
+  let url =
+    `http://programmes.api.bbc.com/nitro/api/programmes/?api_key=${process.env.NITRO_KEY}&` +
+    querystring.stringify(q);
+  console.log(url);
+  let r = await axios({
+    url: url,
+    method: "get",
+    timeout: 8000,
+    headers: {
+      Accept: "application/json"
+    }
+  });
+  if (res.status !== 200) {
+    // test for status you want, etc
+    console.log(res.status);
+  }
+  // Don't forget to return something
+  const r1 = r.data;
+  q.availability = "PT24H";
+  url =
+    `http://programmes.api.bbc.com/nitro/api/programmes/?api_key=${process.env.NITRO_KEY}&` +
+    querystring.stringify(q);
+  console.log(url);
+  r = await axios({
+    url: url,
+    method: "get",
+    timeout: 8000,
+    headers: {
+      Accept: "application/json"
+    }
+  });
+  if (r.status !== 200) {
+    // test for status you want, etc
+    console.log(r.status);
+  }
+  // Don't forget to return something
+  const r2 = r.data;
+  let items = r1.nitro.results.items.concat(r2.nitro.results.items);
+  console.log(items);
+  console.log("items", items.length);
+  res.json({
+    total: items.length,
+    items: items
+  });
+  /*
+  }
+  catch(e) {
+    console.log(JSON.stringify(e));
+    res.status(404).send("error");
+  }*/
+});
+
 app.put("/api/v1/loop", async (req, res, next) => {
   let user = "dazzler"; // assume local
   if (process.env.environment) {
@@ -265,7 +340,7 @@ app.put("/api/v1/loop", async (req, res, next) => {
     }
   }
   if (auth(user)) {
-    const collection_pid = config.bbc_marathi_tv.loop_collection;
+    const collection_pid = config[req.query.sid].loop_collection;
     const members = JSON.parse(req.body);
     try {
       await clearCollection(collection_pid);
@@ -501,15 +576,6 @@ function nitroRequest(feed, query) {
         accept: "application/json"
       }
     };
-    //checking if we are one the corporate wireless network
-    // defaultGateway.v4().then(result => {
-    //   if (require('../../src/config/env.json') && result.gateway == process.env.DEFAULT_GATEWAY){
-    //     options.path = "https://" + options.host + options.path;
-    //     options.host = process.env.HOST;
-    //     options.port = process.env.PORT;
-    //   }
-    // });
-
     var request = http.get(options, response => {
       if (response.statusCode < 200 || response.statusCode > 299) {
         reject(new Error("Invalid status code: " + response.statusCode));

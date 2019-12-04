@@ -13,7 +13,10 @@ import FirstPageIcon from "@material-ui/icons/FirstPage";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import LastPageIcon from "@material-ui/icons/LastPage";
-
+import moment from "moment";
+import Spinner from "../Spinner/Spinner";
+import axios from "axios";
+const type = "Episode";
 const actionsStyles = theme => ({
   root: {
     flexShrink: 0,
@@ -113,48 +116,64 @@ export const styles = theme => ({
   }
 });
 
-var cells = [];
-var isEpisode = false;
+//checking if we are running locally
+var URLPrefix = "";
+if (process.env.NODE_ENV == "development") {
+  URLPrefix = "http://localhost:8080";
+}
+
 export class Episode extends React.Component {
-  state = {
-    rows: [].sort((a, b) => (a < b ? -1 : 1)),
-    page: 0,
-    rowsPerPage: 6,
-    data: []
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      spinner: false,
+      totalRows: 0,
+      rows: [],
+      page: 0,
+      previousPage: -1,
+      rowsPerPage: 5,
+      data: [],
+      sid: ""
+    };
+  }
 
   componentDidMount = () => {
-    cells = [];
-    for (let i = 0; i < this.props.episodes.length; i++) {
-      const episode = this.props.episodes[i];
-      const version = 0; // TODO - pick a version
-      console.log("EPISODE!!!", episode);
-
-      cells.push({
-        id: episode.pid,
-        title: episode.presentation_title,
-        duration: episode.available_versions.hasOwnProperty("version")
-          ? episode.available_versions.version[version].duration
-          : 0,
-        releaseDate: episode.release_date,
-        pid: episode.pid,
-        add: (
-          <button
-            className="ui compact icon button"
-            onClick={() => {
-              this.props.handleClick(episode, isEpisode);
-            }}
-          >
-            <i className="plus icon"></i>
-          </button>
-        )
-      });
-
-      this.setState({ rows: cells });
-    }
+    this.setState({ sid: this.props.sid });
   };
 
+  componentDidUpdate(prevProps) {
+    console.log("Episode update", this.state.page);
+    if (this.state.page !== this.state.previousPage) {
+      console.log("have page %d want page %d", this.props.page, prevProps.page);
+      axios
+        .get(
+          URLPrefix +
+          "/api/v1/episode" +
+          "?sid=" +
+          this.props.sid +
+          "&type=" +
+          type +
+          "&page=" +
+          (this.state.page + 1) + // nitro is 1 based
+            "&page_size=" +
+            this.state.rowsPerPage
+        )
+        .then(response => {
+          console.log("EPISODES", response.data.items);
+          this.setState({ previousPage: response.data.page - 1 });
+          this.setState({ page: response.data.page - 1 });
+          this.setState({ rows: response.data.items });
+          this.setState({ totalRows: response.data.total });
+        })
+        .catch(e => {
+          console.log(e);
+        });
+    }
+  }
+
   handleChangePage = (event, page) => {
+    console.log("Episode handleChangePage", this.state.page, page);
     this.setState({ page });
   };
 
@@ -162,16 +181,40 @@ export class Episode extends React.Component {
     this.setState({ page: 0, rowsPerPage: event.target.value });
   };
 
+  formattedDuration(clip) {
+    try {
+      return moment
+        .duration(clip.available_versions.version[0].duration)
+        .humanize();
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  addButton(clip) {
+    return (
+      <button
+        className="ui compact icon button"
+        onClick={() => {
+          this.props.handleClick(clip);
+        }}
+      >
+        <i className="plus icon"></i>
+      </button>
+    );
+  }
+
   render() {
     const { classes } = this.props;
-    const { rows, rowsPerPage, page } = this.state;
-
+    const { rows, rowsPerPage, page, totalRows } = this.state;
     const emptyRows =
       rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
 
-    if (this.props.episodes.length === 0) {
-      return <h1>No Episodes</h1>;
-    }
+    //if(rows.length === 0){
+    //  this.setState({spinner : true})
+    //  return <Spinner />
+    // }
+
     return (
       <div>
         <Paper className={classes.root}>
@@ -179,25 +222,27 @@ export class Episode extends React.Component {
             <Table className={classes.table}>
               <TableBody>
                 <th>Title</th>
-                <th>Release Date</th>
                 <th>Duration</th>
                 <th>Add</th>
-                {rows
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map(row => (
-                    <TableRow key={row.id}>
-                      <TableCell component="th" scope="row">
-                        <div className="tooltip">
-                          {" "}
-                          {row.title}
-                          <span className="tooltiptext">PID = {row.pid}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell align="right">{row.releaseDate}</TableCell>
-                      <TableCell align="right">{row.duration}</TableCell>
-                      <TableCell align="right">{row.add}</TableCell>
-                    </TableRow>
-                  ))}
+
+                {rows.map(row => (
+                  <TableRow key={row.pid}>
+                    <TableCell component="th" scope="row">
+                      <div className="tooltip">
+                        {" "}
+                        {row.title == undefined
+                          ? row.presentation_title
+                          : row.title}
+                        <span className="tooltiptext">PID = {row.pid}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell align="right">
+                      {this.formattedDuration(row)}
+                    </TableCell>
+
+                    <TableCell align="right">{this.addButton(row)}</TableCell>
+                  </TableRow>
+                ))}
 
                 {emptyRows > 0 && (
                   <TableRow style={{ height: 48 * emptyRows }}>
@@ -210,7 +255,7 @@ export class Episode extends React.Component {
                   <TablePagination
                     rowsPerPageOptions={[5, 10, 25]}
                     colSpan={3}
-                    count={rows.length}
+                    count={totalRows}
                     rowsPerPage={rowsPerPage}
                     page={page}
                     SelectProps={{
