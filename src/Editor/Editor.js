@@ -184,8 +184,6 @@ class Editor extends React.Component {
         />
       )
     });
-<<<<<<< HEAD:src/Editor/Editor.js
-=======
 
     // Episodes
     axios
@@ -199,7 +197,6 @@ class Editor extends React.Component {
         console.log(e);
       });
 
->>>>>>> master:src/Demo/Demo.js
     // get user
     axios
       .get(URLPrefix + "/api/v1/user")
