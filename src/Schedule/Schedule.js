@@ -20,7 +20,6 @@ if (process.env.NODE_ENV === "development") {
 }
 
 //setting active session
-sessionStorage.setItem("activeSession", "");
 
 class Schedule extends React.Component {
   constructor(props) {
@@ -72,7 +71,7 @@ class Schedule extends React.Component {
       });
       scheduleItems = JSON.parse(sessionStorage.getItem("scheduleItems"));
     }
-    if (sessionStorage.getItem("activeSession").length === 0) {
+    if (sessionStorage.getItem("activeSession") == undefined) {
       axios
         .get(
           URLPrefix +

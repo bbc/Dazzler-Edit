@@ -1,5 +1,5 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import Demo from "./Demo/Demo";
+import Editor from "./Editor/Editor";
 
-ReactDOM.render(<Demo />, document.querySelector("#root"));
+ReactDOM.render(<Editor />, document.querySelector("#root"));

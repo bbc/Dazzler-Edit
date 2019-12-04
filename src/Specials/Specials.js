@@ -13,11 +13,10 @@ import FirstPageIcon from "@material-ui/icons/FirstPage";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import LastPageIcon from "@material-ui/icons/LastPage";
-import Schedule from "../Schedule/Schedule";
 import moment from "moment";
-import Demo from "../Demo/Demo";
-import App from "../App/App";
-
+import Spinner from "../Spinner/Spinner";
+import axios from "axios";
+const type = "Specials";
 const actionsStyles = theme => ({
   root: {
     flexShrink: 0,
@@ -116,66 +115,65 @@ export const styles = theme => ({
     overflowX: "hidden"
   }
 });
-var cells = [];
+
+//checking if we are running locally
+var URLPrefix = "";
+if (process.env.NODE_ENV == "development") {
+  URLPrefix = "http://localhost:8080";
+}
+
 export class Specials extends React.Component {
   constructor(props) {
     super(props);
+
+    this.state = {
+      spinner: false,
+      totalRows: 0,
+      rows: [],
+      page: 0,
+      previousPage: -1,
+      rowsPerPage: 5,
+      data: [],
+      sid: ""
+    };
   }
 
-  state = {
-    rows: [].sort((a, b) => (a < b ? -1 : 1)),
-    page: 0,
-    rowsPerPage: 6,
-    data: []
-  };
-
   componentDidMount = () => {
-    cells = [];
-    for (let i = 0; i < this.props.specials.length; i++) {
-      var date1 = new Date();
-      var date2 = new Date(this.props.specials[i].updated_time.split("T")[0]);
-      var timeDiff = Math.abs(date2.getTime() - date1.getTime());
-
-      var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24) - 1);
-
-      cells.push({
-        id: this.props.specials[i].pid,
-        title: this.props.specials[i].title,
-        duration: this.props.specials[i].available_versions.hasOwnProperty(
-          "version"
-        )
-          ? moment.duration(
-              this.props.specials[i].available_versions.version[0].duration
-            )._data.minutes +
-            " minutes " +
-            moment.duration(
-              this.props.specials[i].available_versions.version[0].duration
-            )._data.seconds +
-            "seconds"
-          : 0,
-        from: diffDays + " days ago",
-        pid: this.props.specials[i].pid,
-        versions: this.props.specials[i].available_versions.hasOwnProperty(
-          "version"
-        )
-          ? this.props.specials[i].available_versions.version.length
-          : 0,
-        add: (
-          <button
-            className="ui compact icon button"
-            onClick={() => {
-              this.props.handleClick(this.props.specials[i]);
-            }}
-          >
-            <i className="plus icon"></i>
-          </button>
-        )
-      });
-    }
-    this.setState({ rows: cells });
+    this.setState({ sid: this.props.sid });
   };
+
+  componentDidUpdate(prevProps) {
+    console.log("Specials update", this.state.page);
+    if (this.state.page !== this.state.previousPage) {
+      console.log("have page %d want page %d", this.props.page, prevProps.page);
+      axios
+        .get(
+          URLPrefix +
+          "/api/v1/special" +
+          "?sid=" +
+          this.props.sid +
+          "&type=" +
+          type +
+          "&page=" +
+          (this.state.page + 1) + // nitro is 1 based
+            "&page_size=" +
+            this.state.rowsPerPage
+        )
+        .then(response => {
+          console.log("Specials", response.data.items);
+          this.setState({ previousPage: response.data.page - 1 });
+          this.setState({ page: response.data.page - 1 });
+          this.setState({ rows: response.data.items });
+          this.setState({ totalRows: response.data.total });
+        })
+        .catch(e => {
+          console.log(e);
+        });
+    }
+  }
 
   handleChangePage = (event, page) => {
+    console.log("Specials handleChangePage", this.state.page, page);
     this.setState({ page });
   };
 
@@ -183,12 +181,39 @@ export class Specials extends React.Component {
     this.setState({ page: 0, rowsPerPage: event.target.value });
   };
 
+  formattedDuration(clip) {
+    try {
+      return moment
+        .duration(clip.available_versions.version[0].duration)
+        .humanize();
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  addButton(clip) {
+    return (
+      <button
+        className="ui compact icon button"
+        onClick={() => {
+          this.props.handleClick(clip);
+        }}
+      >
+        <i className="plus icon"></i>
+      </button>
+    );
+  }
+
   render() {
     const { classes } = this.props;
-    const { rows, rowsPerPage, page } = this.state;
-
+    const { rows, rowsPerPage, page, totalRows } = this.state;
     const emptyRows =
       rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
+
+    //if(rows.length === 0){
+    //  this.setState({spinner : true})
+    //  return <Spinner />
+    // }
 
     return (
       <div>
@@ -200,24 +225,24 @@ export class Specials extends React.Component {
                 <th>Duration</th>
                 <th>Add</th>
 
-                {rows
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map(row => (
-                    <TableRow key={row.id}>
-                      <TableCell component="th" scope="row">
-                        <div className="tooltip">
-                          {" "}
-                          {row.title}
-                          <span className="tooltiptext">
-                            pid = {row.pid} version = {row.versions}
-                          </span>
-                        </div>
-                      </TableCell>
-                      <TableCell align="right">{row.duration}</TableCell>
+                {rows.map(row => (
+                  <TableRow key={row.pid}>
+                    <TableCell component="th" scope="row">
+                      <div className="tooltip">
+                        {" "}
+                        {row.title == undefined
+                          ? row.presentation_title
+                          : row.title}
+                        <span className="tooltiptext">PID = {row.pid}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell align="right">
+                      {this.formattedDuration(row)}
+                    </TableCell>
 
-                      <TableCell align="right">{row.add}</TableCell>
-                    </TableRow>
-                  ))}
+                    <TableCell align="right">{this.addButton(row)}</TableCell>
+                  </TableRow>
+                ))}
 
                 {emptyRows > 0 && (
                   <TableRow style={{ height: 48 * emptyRows }}>
@@ -230,7 +255,7 @@ export class Specials extends React.Component {
                   <TablePagination
                     rowsPerPageOptions={[5, 10, 25]}
                     colSpan={3}
-                    count={rows.length}
+                    count={totalRows}
                     rowsPerPage={rowsPerPage}
                     page={page}
                     SelectProps={{
