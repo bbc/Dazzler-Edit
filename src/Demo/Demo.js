@@ -184,7 +184,7 @@ class Demo extends React.Component {
 
     // Episodes
     axios
-      .get(URLPrefix + "/api/v1/episode?sid=" + this.state.service.sid)
+      .get(URLPrefix + "/api/v1.1/episode?sid=" + this.state.service.sid)
       .then(response => {
         this.setState({
           episodes: response.data.items

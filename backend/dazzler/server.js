@@ -251,6 +251,7 @@ app.get("/api/v1/episode", function(req, res) {
   nitroRequest("programmes", q).then(
     r => {
       add_crids_to_episodes(r.nitro.results.items);
+      add_versions_to_episodes(r.nitro.results.items);
       res.json(r.nitro.results);
     },
     err => res.status(404).send("Not found") // TODO use proper error message
@@ -275,7 +276,7 @@ app.get('/api/v1.1/episode', async (req, res, next) => {
   if (req.query.hasOwnProperty("page_size")) {
     q.page_size = req.query.page_size;
   }
-  //try {
+  try {
     q.availability = 'available';
     let url = `http://programmes.api.bbc.com/nitro/api/programmes/?api_key=${process.env.NITRO_KEY}&`+querystring.stringify(q);
     console.log(url);
@@ -317,12 +318,11 @@ app.get('/api/v1.1/episode', async (req, res, next) => {
       total:items.length,
       items: items
     });
-    /*
   }
   catch(e) {
     console.log(JSON.stringify(e));
     res.status(404).send("error");
-  }*/
+  }
 });
 
 app.put("/api/v1/loop", async (req, res, next) => {
