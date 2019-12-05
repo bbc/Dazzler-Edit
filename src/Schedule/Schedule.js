@@ -184,7 +184,7 @@ class Schedule extends React.Component {
             live={item.props.live}
             isLive={item.props.live}
             date={item.props.date}
-            insertionType={""}
+            insertionType={item.props.insertionType}
             selected={""}
           />
         );
@@ -721,9 +721,7 @@ class Schedule extends React.Component {
                 loop = loop.concat(obj);
               } else {
                 var element =
-                  myPreRenderedItems[dateIndex][
-                    myPreRenderedItems[dateIndex].length - 1
-                  ].props;
+                  scheduleItems[dateIndex][scheduleItems[dateIndex].length - 1];
 
                 myPreRenderedItems[dateIndex][
                   myPreRenderedItems[dateIndex].length - 1
@@ -731,7 +729,7 @@ class Schedule extends React.Component {
                   <SingleSchedule
                     getItem={this.getItem}
                     title={element.title}
-                    startTime={element.startTime}
+                    startTime={moment(element.startTime).format("HH:mm:ss")}
                     duration={element.duration}
                     deleteItem={this.props.deleteItem}
                     date={moment(element.startTime)}
