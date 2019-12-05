@@ -50,19 +50,28 @@
 }
 
 .current {
-  background-color: green;
+  background-image: url("arrow.png");
 }
 
 .loop {
-  background-color: #e8b5ff;
+  background-color: #a1bad8;
 }
 .inLoop {
-  background-color: red;
+  background-color: #cde3ef;
 }
 .endLoop {
-  background-color: green;
+  background-color: #9ecce7;
 }
 
 .chosen {
-  background-color: orange;
+  background-image: url("arrow.png");
+}
+
+.futureEpisode {
+  background-color: pink;
+}
+
+.arrow {
+  margin-left: 90%;
+  margin-bottom: -22%;
 }

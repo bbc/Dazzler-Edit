@@ -185,6 +185,7 @@ class Schedule extends React.Component {
             isLive={item.props.live}
             date={item.props.date}
             insertionType={""}
+            selected={""}
           />
         );
       } else {
@@ -201,7 +202,8 @@ class Schedule extends React.Component {
             isLive={item.props.live}
             insertionType={item.props.insertionType}
             chosen={true}
-            insertionType={"chosen"}
+            selected={"chosen"}
+            // insertionType={"chosen"}
           />
         );
         insertPosition = i;
@@ -565,22 +567,23 @@ class Schedule extends React.Component {
         i++
       ) {
         var element = myPreRenderedItems[dateIndex][i].props;
-
-        myPreRenderedItems[dateIndex][i] = (
-          <SingleSchedule
-            getItem={this.getItem}
-            title={element.title}
-            startTime={moment(element.date)
-              .add(moment.duration(newDuration))
-              .format("HH:mm:ss")}
-            date={moment(element.date).add(moment.duration(newDuration))}
-            duration={element.duration}
-            deleteItem={this.props.deleteItem}
-            id={element.id}
-            live={element.live}
-            insertionType={element.insertionType}
-          />
-        );
+        if (!element.isLive) {
+          myPreRenderedItems[dateIndex][i] = (
+            <SingleSchedule
+              getItem={this.getItem}
+              title={element.title}
+              startTime={moment(element.date)
+                .add(moment.duration(newDuration))
+                .format("HH:mm:ss")}
+              date={moment(element.date).add(moment.duration(newDuration))}
+              duration={element.duration}
+              deleteItem={this.props.deleteItem}
+              id={element.id}
+              live={element.live}
+              insertionType={element.insertionType}
+            />
+          );
+        }
       }
     }
     console.log(myPreRenderedItems[dateIndex]);

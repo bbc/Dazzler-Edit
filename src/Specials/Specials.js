@@ -152,8 +152,6 @@ export class Specials extends React.Component {
           "/api/v1/special" +
           "?sid=" +
           this.props.sid +
-          "&type=" +
-          type +
           "&page=" +
           (this.state.page + 1) + // nitro is 1 based
             "&page_size=" +

@@ -1,6 +1,6 @@
 import React, { Fragment } from "react";
 import moment from "moment";
-import Arrow from "@material-ui/icons/ArrowRightAlt";
+import Arrow from "@material-ui/icons/ArrowRight";
 
 var status;
 class SingleSchedule extends React.Component {
@@ -32,15 +32,23 @@ class SingleSchedule extends React.Component {
     );
 
     return (
-      <Fragment className={this.props.live}>
+      <Fragment>
         <tr className={this.props.live}>
           <td
+            className={"current"}
             onClick={() =>
               this.props.getItem(this.props.startTime, this.props.chosen)
             }
           >
             {" "}
-            {status}
+            <div className="current">
+              {this.props.selected == "chosen" ? (
+                <Arrow className="arrow" fontSize="large" />
+              ) : (
+                ""
+              )}
+              {status}
+            </div>
           </td>
           <td className="collapsing" className={this.props.insertionType}>
             <input type="checkbox" /> <label></label>

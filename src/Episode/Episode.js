@@ -163,8 +163,15 @@ export class Episode extends React.Component {
           console.log("EPISODES", response.data.items);
           this.setState({ previousPage: response.data.page - 1 });
           this.setState({ page: response.data.page - 1 });
-          this.setState({ rows: response.data.items });
           this.setState({ totalRows: response.data.total });
+
+          response.data.items.map(item => {
+            if (moment(item.release_date).isAfter(moment())) {
+              item.insertionType = "futureEpisode";
+            }
+          });
+
+          this.setState({ rows: response.data.items });
         })
         .catch(e => {
           console.log(e);
@@ -226,7 +233,7 @@ export class Episode extends React.Component {
                 <th>Add</th>
 
                 {rows.map(row => (
-                  <TableRow key={row.pid}>
+                  <TableRow key={row.pid} className={row.insertionType}>
                     <TableCell component="th" scope="row">
                       <div className="tooltip">
                         {" "}
@@ -257,7 +264,7 @@ export class Episode extends React.Component {
                     colSpan={3}
                     count={totalRows}
                     rowsPerPage={rowsPerPage}
-                    page={page}
+                    page={0}
                     SelectProps={{
                       native: true
                     }}
