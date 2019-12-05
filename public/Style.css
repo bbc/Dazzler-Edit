@@ -56,3 +56,13 @@
 .loop {
   background-color: #e8b5ff;
 }
+.inLoop {
+  background-color: red;
+}
+.endLoop {
+  background-color: green;
+}
+
+.chosen {
+  background-color: orange;
+}

@@ -20,7 +20,7 @@ class SingleSchedule extends React.Component {
     }
   }
   render() {
-    var additional = (
+    var deleteButton = (
       <td>
         <button
           className="mini ui button"
@@ -30,36 +30,28 @@ class SingleSchedule extends React.Component {
         </button>
       </td>
     );
-    //  var additional = (
-    //     <td>
-    //       <button
-    //         className="mini ui button"
-    //         onClick={() => this.props.deleteItem(this.props.id)}
-    //       >
-    //         Delete
-    //       </button>
-    //     </td>
-    //   );
-
-    this.props.flag === true ? (status = <Arrow />) : (status = null);
 
     return (
       <Fragment className={this.props.live}>
         <tr className={this.props.live}>
-          <td onClick={() => this.props.fetchTime(this.props.id, status)}>
+          <td
+            onClick={() =>
+              this.props.getItem(this.props.startTime, this.props.chosen)
+            }
+          >
             {" "}
             {status}
           </td>
-          <td className="collapsing" className={this.props.style}>
+          <td className="collapsing" className={this.props.insertionType}>
             <input type="checkbox" /> <label></label>
           </td>
-          <td className={this.props.style}>{this.props.startTime}</td>
-          <td className={this.props.style}>{this.props.title}</td>
-          <td className={this.props.style}>
+          <td className={this.props.insertionType}>{this.props.startTime}</td>
+          <td className={this.props.insertionType}>{this.props.title}</td>
+          <td className={this.props.insertionType}>
             {moment.duration(this.props.duration)._data.minutes}:
             {this.timeFormat()}
           </td>
-          {additional}
+          {deleteButton}
         </tr>
       </Fragment>
     );

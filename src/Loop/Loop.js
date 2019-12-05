@@ -123,15 +123,7 @@ class Loop extends React.Component {
           <br />
           <br />
           <div class="ui form">
-            <div class="inline field">
-              <div class="ui checkbox">
-                <input type="checkbox" tabindex="0" class="hidden" />
-                <label>Preserve Live</label>
-                <br />
-                <input type="checkbox" tabindex="0" class="hidden" />
-                <label>Include all live events</label>
-              </div>
-            </div>
+            <div class="inline field"></div>
           </div>
           <button
             onClick={() => {
