@@ -397,7 +397,7 @@ class Schedule extends React.Component {
       scheduleItems[dateIndex] = [];
     }
 
-    if (insertPosition != undefined) {
+    if (insertPosition != undefined && !item.isLive) {
       const lastItem = scheduleItems[dateIndex][insertPosition];
 
       try {
@@ -408,6 +408,7 @@ class Schedule extends React.Component {
         console.log(error);
       }
     } else if (item.isLive) {
+      insertPosition = undefined;
       item.live = "live";
       item.startTime = moment(item.title.substring(18, 38));
       item.duration = item.duration;
@@ -475,7 +476,6 @@ class Schedule extends React.Component {
         updateItem.live === undefined
       ) {
         if (scheduleItems[dateIndex + 1] === undefined) {
-          //  alert("added");
           scheduleItems[dateIndex + 1] = [];
           myPreRenderedItems[dateIndex + 1] = [];
         }
@@ -610,13 +610,14 @@ class Schedule extends React.Component {
       insertPosition = undefined;
       this.setState({ preRenderedItem: myPreRenderedItems });
 
-      scheduleItems[dateIndex].map(item => {
-        console.log("BOOM", item.startTime);
+      myPreRenderedItems[dateIndex].map(item => {
+        console.log("BOOM", item.props.date);
       });
     }
   }
 
   recalculateStartTimes(position) {
+    insertPosition = undefined;
     //recalculate everything or only after live
     console.log(myPreRenderedItems[dateIndex]);
     let items = [];
@@ -632,6 +633,7 @@ class Schedule extends React.Component {
           )}
           duration={scheduleItems[dateIndex][i].duration}
           deleteItem={this.props.deleteItem}
+          date={moment(scheduleItems[dateIndex][i].startTime)}
           id={scheduleItems[dateIndex][i].id}
           live={scheduleItems[dateIndex][i].live}
           insertionType={scheduleItems[dateIndex][i].insertionType}
@@ -643,6 +645,7 @@ class Schedule extends React.Component {
 
     this.setState({ preRenderedItem: myPreRenderedItems.concat(items) });
     console.log("updated", myPreRenderedItems[dateIndex]);
+    console.log(scheduleItems[dateIndex]);
   }
   deleteScheduleItems() {
     // var myPreRenderedItems = this.state.preRenderedItem;
