@@ -152,8 +152,6 @@ export class Specials extends React.Component {
           "/api/v1/special" +
           "?sid=" +
           this.props.sid +
-          "&type=" +
-          type +
           "&page=" +
           (this.state.page + 1) + // nitro is 1 based
             "&page_size=" +
@@ -182,13 +180,11 @@ export class Specials extends React.Component {
   };
 
   formattedDuration(clip) {
-    try {
-      return moment
-        .duration(clip.available_versions.version[0].duration)
-        .humanize();
-    } catch (error) {
-      console.log(error);
-    }
+    const duration = moment.duration(
+      clip.available_versions.version[0].duration
+    );
+    const formatted = moment.utc(duration.asMilliseconds()).format("HH:mm:ss");
+    return formatted;
   }
 
   addButton(clip) {

@@ -163,8 +163,15 @@ export class Episode extends React.Component {
           console.log("EPISODES", response.data.items);
           this.setState({ previousPage: response.data.page - 1 });
           this.setState({ page: response.data.page - 1 });
-          this.setState({ rows: response.data.items });
           this.setState({ totalRows: response.data.total });
+
+          response.data.items.map(item => {
+            if (moment(item.release_date).isAfter(moment())) {
+              item.insertionType = "futureEpisode";
+            }
+          });
+
+          this.setState({ rows: response.data.items });
         })
         .catch(e => {
           console.log(e);
@@ -182,13 +189,11 @@ export class Episode extends React.Component {
   };
 
   formattedDuration(clip) {
-    try {
-      return moment
-        .duration(clip.available_versions.version[0].duration)
-        .humanize();
-    } catch (error) {
-      console.log(error);
-    }
+    const duration = moment.duration(
+      clip.available_versions.version[0].duration
+    );
+    const formatted = moment.utc(duration.asMilliseconds()).format("HH:mm:ss");
+    return formatted;
   }
 
   addButton(clip) {
@@ -226,7 +231,7 @@ export class Episode extends React.Component {
                 <th>Add</th>
 
                 {rows.map(row => (
-                  <TableRow key={row.pid}>
+                  <TableRow key={row.pid} className={row.insertionType}>
                     <TableCell component="th" scope="row">
                       <div className="tooltip">
                         {" "}
@@ -257,7 +262,7 @@ export class Episode extends React.Component {
                     colSpan={3}
                     count={totalRows}
                     rowsPerPage={rowsPerPage}
-                    page={page}
+                    page={0}
                     SelectProps={{
                       native: true
                     }}

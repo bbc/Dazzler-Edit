@@ -60,7 +60,8 @@ var icons = [
   <SlowMotionVideoIcon />,
   <Opacity />
 ];
-var viewIcons = [<LiveTv />, <Assignment />, <LoopIcon />];
+// var viewIcons = [<LiveTv />, <Assignment />, <LoopIcon />];
+var viewIcons = [<LiveTv />, <LoopIcon />];
 var count = -1;
 var URLPrefix = "";
 //checking if running locally
@@ -130,7 +131,6 @@ class Editor extends React.Component {
   constructor(props) {
     super(props);
     this.handleClick = this.handleClick.bind(this);
-    this.fetchTime = this.fetchTime.bind(this);
     this.deleteItem = this.deleteItem.bind(this);
     this.copyContent = this.copyContent.bind(this);
     this.clearContent = this.clearContent.bind(this);
@@ -170,7 +170,6 @@ class Editor extends React.Component {
       display: (
         <Schedule
           service={this.state.service}
-          fetchTime={this.fetchTime}
           lastItem={this.lastItem}
           clipTime={time}
           length={scheduleItems.length}
@@ -234,7 +233,6 @@ class Editor extends React.Component {
       display: (
         <Schedule
           service={this.state.service}
-          fetchTime={this.fetchTime}
           lastItem={this.lastItem}
           clipTime={time}
           length={scheduleItems.length}
@@ -291,7 +289,6 @@ class Editor extends React.Component {
       display: (
         <Schedule
           service={this.state.service}
-          fetchTime={this.fetchTime}
           lastItem={this.lastItem}
           loopedContent={""}
           clipTime={time}
@@ -382,7 +379,6 @@ class Editor extends React.Component {
         display: (
           <Schedule
             service={this.state.service}
-            fetchTime={this.fetchTime}
             lastItem={this.lastItem}
             clipTime={time}
             item={newItem2}
@@ -478,7 +474,6 @@ class Editor extends React.Component {
           display: (
             <Schedule
               service={this.state.service}
-              fetchTime={this.fetchTime}
               lastItem={this.lastItem}
               clipTime={time}
               nextSchedule={this.nextDay}
@@ -518,27 +513,6 @@ class Editor extends React.Component {
         });
     }
   };
-
-  fetchTime(clipTime) {
-    var time = clipTime;
-    this.setState({
-      display: (
-        <Schedule
-          service={this.state.service}
-          fetchTime={this.fetchTime}
-          lastItem={this.lastItem}
-          clipTime={time}
-          length={scheduleItems.length}
-          pasted={copiedContent}
-          loopedContent={""}
-          text="Today's "
-          deleteItem={this.deleteItem}
-          nextSchedule={this.nextDay}
-          scheduleDate={this.state.scheduleDate}
-        />
-      )
-    });
-  }
 
   render() {
     const { classes, theme } = this.props;
@@ -608,7 +582,8 @@ class Editor extends React.Component {
           </center>
           <Divider />
           <List>
-            {["Schedule", "Scratchpad", "Loop"].map((text, index) => (
+            {/* {["Schedule", "Scratchpad", "Loop"].map((text, index) => ( */}
+            {["Schedule", "Loop"].map((text, index) => (
               <ListItem
                 button
                 key={text}

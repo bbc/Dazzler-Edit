@@ -179,11 +179,12 @@ export class Clips extends React.Component {
   };
 
   formattedDuration(clip) {
-    return moment
-      .duration(clip.available_versions.version[0].duration)
-      .humanize();
+    const duration = moment.duration(
+      clip.available_versions.version[0].duration
+    );
+    const formatted = moment.utc(duration.asMilliseconds()).format("HH:mm:ss");
+    return formatted;
   }
-
   addButton(clip) {
     return (
       <button

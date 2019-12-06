@@ -203,11 +203,9 @@ export class Live extends React.Component {
   };
 
   formattedDuration(clip) {
-    try {
-      return moment.duration(clip.duration).humanize();
-    } catch (error) {
-      console.log(error);
-    }
+    const duration = clip.duration;
+    const formatted = moment.utc(duration.asMilliseconds()).format("HH:mm:ss");
+    return formatted;
   }
 
   addButton(clip) {
