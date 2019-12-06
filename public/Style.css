@@ -53,14 +53,14 @@
   background-image: url("arrow.png");
 }
 
-.loop {
+.loopStart {
   background-color: #a1bad8;
 }
-.inLoop {
+.midLoop {
   background-color: #cde3ef;
 }
-.endLoop {
-  background-color: #96add1;
+.loopEnd {
+  background-color: #8095b5;
 }
 
 .chosen {

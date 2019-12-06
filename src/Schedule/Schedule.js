@@ -558,7 +558,7 @@ class Schedule extends React.Component {
           deleteItem={this.props.deleteItem}
           id={element.id}
           live={element.live}
-          insertionType={""}
+          insertionType={element.insertionType}
         />
       );
       for (
@@ -580,7 +580,7 @@ class Schedule extends React.Component {
             deleteItem={this.props.deleteItem}
             id={item.id}
             live={item.live}
-            insertionType={""}
+            insertionType={item.insertionType}
           />
         );
 
@@ -598,7 +598,7 @@ class Schedule extends React.Component {
               deleteItem={this.props.deleteItem}
               id={updateItem.id}
               live={updateItem.live}
-              insertionType={""}
+              insertionType={updateItem.insertionType}
             />
           );
           insertPosition = undefined;
@@ -634,6 +634,7 @@ class Schedule extends React.Component {
           deleteItem={this.props.deleteItem}
           id={scheduleItems[dateIndex][i].id}
           live={scheduleItems[dateIndex][i].live}
+          insertionType={scheduleItems[dateIndex][i].insertionType}
         />
       );
     }
@@ -704,9 +705,18 @@ class Schedule extends React.Component {
           var digit = 2;
           let loop = JSON.parse(JSON.stringify(this.props.loopedContent));
 
+          loop.map((item, index) => {
+            if (index == 0) {
+              item.insertionType = "loopStart";
+            } else if (index == loop.length - 1) {
+              item.insertionType = "loopEnd";
+            } else {
+              item.insertionType = "midLoop";
+            }
+          });
+
           loop[0].startTime = moment(start);
           scheduleItems[dateIndex].push(loop[0]);
-          loop[0].insertionType = "loop";
           myPreRenderedItems[dateIndex].push(
             <SingleSchedule
               getItem={this.getItem}
@@ -723,7 +733,6 @@ class Schedule extends React.Component {
 
           loop.map((item, index) => {
             if (index > 0) {
-              item.insertionType = "inLoop";
               this.addScheduleItem(item);
             }
           });
@@ -738,7 +747,6 @@ class Schedule extends React.Component {
                 ) < moment(end)
               ) {
                 var obj = JSON.parse(JSON.stringify(loop[j]));
-                obj.insertionType = "inLoop";
                 this.addScheduleItem(obj);
                 loop = loop.concat(obj);
               } else {
