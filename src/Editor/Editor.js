@@ -60,7 +60,8 @@ var icons = [
   <SlowMotionVideoIcon />,
   <Opacity />
 ];
-var viewIcons = [<LiveTv />, <Assignment />, <LoopIcon />];
+// var viewIcons = [<LiveTv />, <Assignment />, <LoopIcon />];
+var viewIcons = [<LiveTv />, <LoopIcon />];
 var count = -1;
 var URLPrefix = "";
 //checking if running locally
@@ -568,7 +569,8 @@ class Editor extends React.Component {
           </center>
           <Divider />
           <List>
-            {["Schedule", "Scratchpad", "Loop"].map((text, index) => (
+            {/* {["Schedule", "Scratchpad", "Loop"].map((text, index) => ( */}
+            {["Schedule", "Loop"].map((text, index) => (
               <ListItem
                 button
                 key={text}
