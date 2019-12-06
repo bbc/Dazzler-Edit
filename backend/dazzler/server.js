@@ -312,6 +312,8 @@ app.get('/api/v1.1/episode', async (req, res, next) => {
     console.log(items);
     console.log('items', items.length);
     res.json({
+      page_size: q.page_size,
+      page: q.page,
       total:items.length,
       items: items
     });
