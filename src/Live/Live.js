@@ -151,6 +151,9 @@ export class Live extends React.Component {
       .utc(); // TODO DAZZLER-68
     const days = 5; // to allow us to edit future schedules
     console.log("Live update", this.state.page);
+    if(isNaN(this.state.page)) this.state.page = 0;
+    if(isNaN(this.props.page)) this.props.page = 0;
+    if(isNaN(prevProps.page)) prevProps.page = 0;
     if (this.state.page !== this.state.previousPage) {
       console.log("have page %d want page %d", this.props.page, prevProps.page);
       axios

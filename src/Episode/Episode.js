@@ -144,6 +144,9 @@ export class Episode extends React.Component {
 
   componentDidUpdate(prevProps) {
     console.log("Episode update", this.state.page);
+    if(isNan(this.state.page)) this.state.page = 0;
+    if(isNan(this.props.page)) this.props.page = 0;
+    if(isNan(prevProps.page)) prevProps.page = 0;
     if (this.state.page !== this.state.previousPage) {
       console.log("have page %d want page %d", this.props.page, prevProps.page);
       axios
@@ -152,8 +155,6 @@ export class Episode extends React.Component {
           "/api/v1.1/episode" +
           "?sid=" +
           this.props.sid +
-          "&type=" +
-          type +
           "&page=" +
           (this.state.page + 1) + // nitro is 1 based
             "&page_size=" +
