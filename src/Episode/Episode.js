@@ -144,9 +144,9 @@ export class Episode extends React.Component {
 
   componentDidUpdate(prevProps) {
     console.log("Episode update", this.state.page);
-    if(isNan(this.state.page)) this.state.page = 0;
-    if(isNan(this.props.page)) this.props.page = 0;
-    if(isNan(prevProps.page)) prevProps.page = 0;
+    if(isNaN(this.state.page)) this.state.page = 0;
+    if(isNaN(this.props.page)) this.props.page = 0;
+    if(isNaN(prevProps.page)) prevProps.page = 0;
     if (this.state.page !== this.state.previousPage) {
       console.log("have page %d want page %d", this.props.page, prevProps.page);
       axios
