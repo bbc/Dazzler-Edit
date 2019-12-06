@@ -400,9 +400,13 @@ class Schedule extends React.Component {
     if (insertPosition != undefined) {
       const lastItem = scheduleItems[dateIndex][insertPosition];
 
-      item.startTime = moment(lastItem.startTime).add(
-        moment.duration(lastItem.duration)
-      );
+      try {
+        item.startTime = moment(lastItem.startTime).add(
+          moment.duration(lastItem.duration)
+        );
+      } catch (error) {
+        console.log(error);
+      }
     } else if (item.isLive) {
       item.live = "live";
       item.startTime = moment(item.title.substring(18, 38));
@@ -453,7 +457,6 @@ class Schedule extends React.Component {
     }
     item.id = count += 1;
   }
-
   addScheduleItem(updateItem, position) {
     var position;
     let items = [];
@@ -462,136 +465,155 @@ class Schedule extends React.Component {
     }
 
     console.log(updateItem);
+
     this.addItemPosition(updateItem);
 
-    if (
-      moment(updateItem.startTime).format("YYYY-MM-DD") >
-        moment(this.state.scheduleDate).format("YYYY-MM-DD") &&
-      updateItem.live === undefined
-    ) {
-      if (scheduleItems[dateIndex + 1] === undefined) {
-        //  alert("added");
-        scheduleItems[dateIndex + 1] = [];
-        myPreRenderedItems[dateIndex + 1] = [];
+    if (insertPosition == undefined) {
+      if (
+        moment(updateItem.startTime).format("YYYY-MM-DD") >
+          moment(this.state.scheduleDate).format("YYYY-MM-DD") &&
+        updateItem.live === undefined
+      ) {
+        if (scheduleItems[dateIndex + 1] === undefined) {
+          //  alert("added");
+          scheduleItems[dateIndex + 1] = [];
+          myPreRenderedItems[dateIndex + 1] = [];
+        }
+
+        scheduleItems[dateIndex + 1].push(updateItem);
+
+        items.push(
+          <SingleSchedule
+            getItem={this.getItem}
+            title={updateItem.title}
+            startTime={moment(updateItem.startTime).format("HH:mm:ss")}
+            date={moment(updateItem.startTime)}
+            duration={updateItem.duration}
+            deleteItem={this.props.deleteItem}
+            id={updateItem.id}
+            live={updateItem.live}
+            insertionType={updateItem.insertionType}
+          />
+        );
+
+        myPreRenderedItems[dateIndex + 1] = myPreRenderedItems[
+          dateIndex + 1
+        ].concat(items);
+        console.log(myPreRenderedItems);
+        this.setState({
+          preRenderedItem: myPreRenderedItems
+        });
+      } else {
+        scheduleItems[dateIndex].push(updateItem);
+        items.push(
+          <SingleSchedule
+            getItem={this.getItem}
+            title={updateItem.title}
+            startTime={moment(updateItem.startTime).format("HH:mm:ss")}
+            date={moment(updateItem.startTime)}
+            duration={updateItem.duration}
+            deleteItem={this.props.deleteItem}
+            id={updateItem.id}
+            live={updateItem.live}
+            insertionType={updateItem.insertionType}
+          />
+        );
+        if (myPreRenderedItems[dateIndex] === undefined) {
+          myPreRenderedItems[dateIndex] = [];
+        }
+
+        myPreRenderedItems[dateIndex] = myPreRenderedItems[dateIndex].concat(
+          items
+        );
+        // this.setState({
+        //   preRenderedItem: myPreRenderedItems
+        // });
       }
-
-      scheduleItems[dateIndex + 1].push(updateItem);
-
-      items.push(
-        <SingleSchedule
-          getItem={this.getItem}
-          title={updateItem.title}
-          startTime={moment(updateItem.startTime).format("HH:mm:ss")}
-          date={moment(updateItem.startTime)}
-          duration={updateItem.duration}
-          deleteItem={this.props.deleteItem}
-          id={updateItem.id}
-          live={updateItem.live}
-          insertionType={updateItem.insertionType}
-        />
-      );
-
-      myPreRenderedItems[dateIndex + 1] = myPreRenderedItems[
-        dateIndex + 1
-      ].concat(items);
-      console.log(myPreRenderedItems);
       this.setState({
         preRenderedItem: myPreRenderedItems
       });
-    } else {
-      scheduleItems[dateIndex].push(updateItem);
-      items.push(
-        <SingleSchedule
-          getItem={this.getItem}
-          title={updateItem.title}
-          startTime={moment(updateItem.startTime).format("HH:mm:ss")}
-          date={moment(updateItem.startTime)}
-          duration={updateItem.duration}
-          deleteItem={this.props.deleteItem}
-          id={updateItem.id}
-          live={updateItem.live}
-          insertionType={updateItem.insertionType}
-        />
-      );
-      if (myPreRenderedItems[dateIndex] === undefined) {
-        myPreRenderedItems[dateIndex] = [];
+      if (updateItem.isLive) {
+        this.sortData();
+        myPreRenderedItems[dateIndex].map((item, index) => {
+          if (item.props.live != undefined) {
+            position = index + 1;
+            myPreRenderedItems[dateIndex].splice(
+              index + 1,
+              myPreRenderedItems[dateIndex].length
+            );
+          }
+        });
+
+        this.recalculateStartTimes(position);
       }
-
-      myPreRenderedItems[dateIndex] = myPreRenderedItems[dateIndex].concat(
-        items
-      );
-      // this.setState({
-      //   preRenderedItem: myPreRenderedItems
-      // });
-    }
-    this.setState({
-      preRenderedItem: myPreRenderedItems
-    });
-    if (updateItem.isLive) {
-      this.sortData();
-      myPreRenderedItems[dateIndex].map((item, index) => {
-        if (item.props.live != undefined) {
-          position = index + 1;
-          myPreRenderedItems[dateIndex].splice(
-            index + 1,
-            myPreRenderedItems[dateIndex].length
-          );
-        }
-      });
-
-      this.recalculateStartTimes(position);
-    }
-    if (insertPosition != undefined) {
-      var newDuration =
-        myPreRenderedItems[dateIndex][myPreRenderedItems[dateIndex].length - 1]
-          .props.duration;
-      var item = myPreRenderedItems[dateIndex][insertPosition];
-
+    } else {
+      var element = myPreRenderedItems[dateIndex][insertPosition].props;
       myPreRenderedItems[dateIndex][insertPosition] = (
         <SingleSchedule
           getItem={this.getItem}
-          title={item.props.title}
-          startTime={item.props.startTime}
-          duration={item.props.duration}
+          title={element.title}
+          startTime={element.startTime}
+          date={moment(element.date)}
+          duration={element.duration}
           deleteItem={this.props.deleteItem}
-          id={item.props.id}
-          live={item.props.live}
-          isLive={item.props.live}
-          date={item.props.date}
-          insertionType={item.props.insertionType}
+          id={element.id}
+          live={element.live}
+          insertionType={""}
         />
       );
       for (
         let i = insertPosition + 1;
-        i < myPreRenderedItems[dateIndex].length - 1;
+        i < myPreRenderedItems[dateIndex].length;
         i++
       ) {
-        var element = myPreRenderedItems[dateIndex][i].props;
-        if (!element.isLive) {
-          myPreRenderedItems[dateIndex][i] = (
+        var item = myPreRenderedItems[dateIndex][i].props;
+
+        myPreRenderedItems[dateIndex][i] = (
+          <SingleSchedule
+            getItem={this.getItem}
+            title={item.title}
+            startTime={moment(item.date)
+              .add(moment.duration(updateItem.duration))
+              .format("HH:mm:ss")}
+            date={moment(item.date).add(moment.duration(updateItem.duration))}
+            duration={item.duration}
+            deleteItem={this.props.deleteItem}
+            id={item.id}
+            live={item.live}
+            insertionType={""}
+          />
+        );
+
+        scheduleItems[dateIndex][i].startTime = moment(item.date).add(
+          moment.duration(updateItem.duration)
+        );
+        if (i == myPreRenderedItems[dateIndex].length - 1) {
+          myPreRenderedItems[dateIndex].push(
             <SingleSchedule
               getItem={this.getItem}
-              title={element.title}
-              startTime={moment(element.date)
-                .add(moment.duration(newDuration))
-                .format("HH:mm:ss")}
-              date={moment(element.date).add(moment.duration(newDuration))}
-              duration={element.duration}
+              title={updateItem.title}
+              startTime={moment(updateItem.startTime).format("HH:mm:ss")}
+              date={moment(updateItem.startTime)}
+              duration={updateItem.duration}
               deleteItem={this.props.deleteItem}
-              id={element.id}
-              live={element.live}
-              insertionType={element.insertionType}
+              id={updateItem.id}
+              live={updateItem.live}
+              insertionType={""}
             />
           );
+          insertPosition = undefined;
+          scheduleItems[dateIndex].push(updateItem);
+          this.sortData();
+          break;
         }
       }
+      insertPosition = undefined;
+      this.setState({ preRenderedItem: myPreRenderedItems });
+
+      scheduleItems[dateIndex].map(item => {
+        console.log("BOOM", item.startTime);
+      });
     }
-    console.log(myPreRenderedItems[dateIndex]);
-    this.sortData();
-    insertPosition = undefined;
-    this.setState({
-      preRenderedItem: myPreRenderedItems
-    });
   }
 
   recalculateStartTimes(position) {
@@ -720,25 +742,6 @@ class Schedule extends React.Component {
                 this.addScheduleItem(obj);
                 loop = loop.concat(obj);
               } else {
-                var element =
-                  scheduleItems[dateIndex][scheduleItems[dateIndex].length - 1];
-
-                myPreRenderedItems[dateIndex][
-                  myPreRenderedItems[dateIndex].length - 1
-                ] = (
-                  <SingleSchedule
-                    getItem={this.getItem}
-                    title={element.title}
-                    startTime={moment(element.startTime).format("HH:mm:ss")}
-                    duration={element.duration}
-                    deleteItem={this.props.deleteItem}
-                    date={moment(element.startTime)}
-                    id={element.id}
-                    live={element.live}
-                    insertionType={"endLoop"}
-                  />
-                );
-
                 digit = 1;
                 break;
               }
