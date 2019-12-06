@@ -595,7 +595,7 @@ function SpwRequest(sid, date) {
     var request = https.get(options, response => {
       if (response.statusCode == 404) {
         console.log('spw 404');
-        resolve(null);
+        resolve('<schedule/>');
         return;
       }
 
