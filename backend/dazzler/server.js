@@ -5,6 +5,7 @@ const axios = require("axios");
 const fs = require("fs");
 const parseString = require("xml2js").parseString;
 const xml2js = require('xml2js-es6-promise');
+var convert = require('xml-js');
 const querystring = require("querystring");
 const Big = require("big-integer");
 const http = require("http");
@@ -59,28 +60,27 @@ app.get("/api/v1/user", function(req, res) {
 app.get("/api/v1/schedule", async (req, res) => {
   try {
     const r = await spwRequest(req.query.sid, req.query.date);
-    console.log(r.data);
-    const schedule = await xml2js(r.data, 
-           {
-               tagNameProcessors: [onlyName]
-           }
-    );
-    console.log(schedule);
-        const s = schedule["schedule"]["item"];
-        let promises = [];
-        for (let i = 0; i < s.length; i++) {
-          if (s[i].hasOwnProperty("episode")) {
-            continue;
-          }
-          const pid = s[i]["version"][0]["version_of"][0]["link"][0].$.pid;
-          promises.push(
-            nitroRequest("programmes", { pid: pid, mixin: "ancestor_titles" })
-          );
-        }
-        Promise.all(promises).then(function(results) {
-          addClips(s, results);
-          res.json(r);
-        });
+    //console.log(r.data);
+
+    const j = convert.xml2json(r.data, {compact: true, elementNameFn: function(val) {return val.split(':')[1];}});
+    const schedule = JSON.parse(j);
+    const s = schedule["schedule"]["item"];
+    let pids = [];
+    for (let i = 0; i < s.length; i++) {
+      if (s[i].hasOwnProperty("clip")) {
+        const pid = s[i]["version"][0]["version_of"][0]["link"][0].$.pid;
+        pids.push(pid);
+      }
+    }
+    if(pids.length > 0) {
+        const v = await nitroRequest("programmes", { pid: pids, mixin: "ancestor_titles" })
+        addClips(s, v);
+    }
+    console.log(JSON.stringify(s));
+    console.log(JSON.stringify(schedule._declaration));
+    console.log(JSON.stringify(schedule.schedule.service));
+    console.log(Object.keys(schedule.schedule.item));
+    res.json(r);
   } catch(e) {
     console.log(e);
     res.status(404).send("Not found") // TODO use proper error message
@@ -88,6 +88,7 @@ app.get("/api/v1/schedule", async (req, res) => {
 });
 
 function addClips(schedule_items, clips) {
+  console.log(clips);
   for (let i = 0; i < schedule_items.length; i++) {
     const pid = schedule_items[i]["version"][0]["version_of"][0]["link"][0].$.pid;
     for (let j = 0; j < clips.length; j++) {
