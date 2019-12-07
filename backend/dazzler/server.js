@@ -21,9 +21,9 @@ if (!process.env.AUTHORISED_USERS) {
 const config = {
   bbc_marathi_tv: {
     mid: "bbc_marathi_tv",
-    loop_collection: process.env.LOOP_PID,
-    specials_collection: process.env.SPECIALS_PID,
-    live_brand: process.env.LIVE_BRAND_PID,
+    loop_collection: process.env.LOOP_COLLECTION.trim(),
+    specials_collection: process.env.SPECIALS_COLLECTION.trim(),
+    live_brand: process.env.LIVE_BRAND.trim(),
     clip_language: "marathi",
     webcast_channels: [
       "world_service_stream_05",

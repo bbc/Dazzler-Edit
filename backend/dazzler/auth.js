@@ -2,11 +2,10 @@ const fs = require("fs");
 
 function auth(email) {
   if(process.env.AUTHORISED_USERS){
-    const auth = fs.readFileSync("/usr/lib/dazzler/auth.txt");
-    return auth.includes("," + email + ",");
+    const auth = ","+process.env.AUTHORISED_USERS.trim()+",";
+    return auth.includes(`,${email.trim()},`);
   }else{
-  const auth = fs.readFileSync("auth.txt");
-  return auth.includes("," + email + ",");
+  return true; // allow saving in the local environment
 }
 }
 
