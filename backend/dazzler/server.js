@@ -56,49 +56,62 @@ app.get("/api/v1/user", function(req, res) {
   }
 });
 
+function onlyName(name) {
+  return name.split(':')[1]
+} 
+
 app.get("/api/v1/schedule", async (req, res) => {
   try {
-    const r = await spwRequest(req.query.sid, req.query.date);
+    const sid = req.query.sid;
+    const date = req.query.date;
+    let url = `https://programmes.api.bbc.com/schedule?api_key=${process.env.SPW_KEY}&sid=${sid}&date=${date}`
+    console.log(url);
+    let r = await axios({
+      url: url,
+      method: 'get',
+      timeout: 8000,
+      key: fs.readFileSync(process.env.KEY),
+      cert: fs.readFileSync(process.env.CERT),
+      passphrase: process.env.PASSPHRASE,
+      headers: { 'Accept': 'application/xml', }
+    });
     const schedule = (await xml2js(r.data, {tagNameProcessors:[onlyName]})).schedule;
     const s = schedule.item;
     let pids = [];
     for (let i = 0; i < s.length; i++) {
       if (s[i].hasOwnProperty("clip")) {
-        const pid = s[i]["version"][0]["version_of"][0]["link"][0].$.pid;
+        const pid = s[i].version[0].version_of[0].link[0].$.pid;
         pids.push(pid);
       }
     }
     if(pids.length > 0) {
-        const v = await nitroRequest("programmes", { pid: pids, mixin: "ancestor_titles" })
-        addClips(s, v);
+        await addClips(s, pids);
     }
+    // work around circular dependencies
     let o = {};
     for(key of Object.keys(schedule)) {
         o[key] = schedule[key];
     }
-    res.json(o);
+    res.json({"total":s.length, item:s, sid:sid, date:date});
   } catch(e) {
-    console.log(e);
-    res.status(404).send("Not found") // TODO use proper error message
+    res.json({"total":0});
   }
 });
 
-function addClips(schedule_items, clips) {
-  console.log(clips);
+async function addClips(schedule_items, clip_pids) {
+  const r = await nitroRequest("programmes", { pid: clip_pids, mixin: "ancestor_titles" })
+  const clips = r.data.nitro.results.items;
   for (let i = 0; i < schedule_items.length; i++) {
-    const pid = schedule_items[i]["version"][0]["version_of"][0]["link"][0].$.pid;
+    const pid = schedule_items[i].version[0].version_of[0].link[0].$.pid;
     for (let j = 0; j < clips.length; j++) {
-      const clip = clips[j].data.nitro.results;
-        if (clip.hasOwnProperty("items")) {
-          if (clip.items[0].pid === pid) {
-            schedule_items[i]["clip"] = clip.items[0];
-          }
-        }
+      if (clip[j].pid === pid) {
+        schedule_items[i]["clip"] = clip[j];
+      }
     }
   }
 }
 
-app.get("/api/v1/broadcast", function(req, res) {
+app.get("/api/v1/broadcast", async (req, res) => {
   let q = {
     sid: req.query.sid,
     start_from: req.query.start,
@@ -110,23 +123,32 @@ app.get("/api/v1/broadcast", function(req, res) {
   if (req.query.hasOwnProperty("page_size")) {
     q.page_size = req.query.page_size;
   }
-  nitroRequest("schedules", q).then(
-    r => res.json(r.data.nitro.results),
-    err => res.status(404).send("Not found") // TODO use proper error message
-  );
+  try{
+    console.log('broadcast', q);
+    const r = await nitroRequest("schedules", q);
+    res.json(r.data.nitro.results);
+  } catch(e) {
+    res.status(404).send("Not found") // TODO use proper error message
+  }
 });
 
-app.get("/api/v1/webcast", function(req, res) {
-  let q = {
-    start_from: req.query.start,
-    start_to: req.query.end
-  };
+app.get("/api/v1/webcast", async (req, res) => {
+  console.log('webcast', req.query);
+  let q = {};
+  if (req.query.hasOwnProperty("start")) {
+    q.start_from = req.query.start;
+  }
+  if (req.query.hasOwnProperty("end")) {
+    q.start_to = req.query.end;
+  }
   if (req.query.hasOwnProperty("brand")) {
     q.descendants_of = req.query.brand;
   }
   if (req.query.hasOwnProperty("sid")) {
-    q.descendants_of = config[req.query.sid].live_brand;
     q.sid = config[req.query.sid].webcast_channels;
+    if(!q.hasOwnProperty("descendants_of")) {
+        q.descendants_of = config[req.query.sid].live_brand;
+    }
   }
   if (req.query.hasOwnProperty("page")) {
     q.page = req.query.page;
@@ -134,30 +156,31 @@ app.get("/api/v1/webcast", function(req, res) {
   if (req.query.hasOwnProperty("page_size")) {
     q.page_size = req.query.page_size;
   }
-  nitroRequest("schedules", q).then(
-    r => res.json(add_crids_to_webcast(r.data.nitro.results)),
-    err => res.status(404).send("Not found") // TODO use proper error message
-  );
+  try{
+    const r = await nitroRequest("schedules", q);
+    res.json(add_crids_to_webcast(r.data.nitro.results));
+  } catch(e) {
+    res.status(404).send("Not found") // TODO use proper error message
+  }
 });
-// http://programmes.api.bbc.com/nitro/api/programmes?api_key=XXX&page_size=100&sort=group_position&sort_direction=ascending&group=p0510sbc
 
-app.get("/api/v1/loop", function(req, res) {
+app.get("/api/v1/loop", async (req, res) => {
   let q = {
     group: config[req.query.sid].loop_collection,
     sort: "group_position",
     sort_direction: "ascending"
   };
-  clip(q, req.query, res);
+  await clip(q, req.query, res);
 });
 
-app.get("/api/v1/special", function(req, res) {
+app.get("/api/v1/special", async (req, res) => {
   let q = {
     group: config[req.query.sid].specials_collection
   };
-  clip(q, req.query, res);
+  await clip(q, req.query, res);
 });
 
-app.get("/api/v1/clip", function(req, res) {
+app.get("/api/v1/clip", async (req, res) => {
   let q = {};
   if (req.query.hasOwnProperty("type")) {
     if (req.query.type === "web") {
@@ -168,10 +191,10 @@ app.get("/api/v1/clip", function(req, res) {
   } else {
     q.tag_name = config[req.query.sid].clip_language;
   }
-  clip(q, req.query, res);
+  await clip(q, req.query, res);
 });
 
-function clip(q, query, res) {
+async function clip(q, query, res) {
   if (query.hasOwnProperty("page")) {
     q.page = query.page;
   }
@@ -181,80 +204,41 @@ function clip(q, query, res) {
   q.mixin = ["images", "available_versions"];
   q.entity_type = "clip";
   q.availability = "available";
-  nitroRequest("programmes", q).then(
-    response => {
-      let pids = [];
-      let clips = response.data.nitro.results;
-      for (let i = 0; i < clips.items.length; i++) {
-        if (clips.items[i].available_versions.hasOwnProperty("version")) {
-          const version = clips.items[i].available_versions.version;
-          for (let j = 0; j < version.length; j++) {
-            pids.push(version[j].pid);
-          }
+  try {
+    let pids = [];
+    let response = await nitroRequest("programmes", q);
+    let clips = response.data.nitro.results;
+    for (let i = 0; i < clips.items.length; i++) {
+      if (clips.items[i].available_versions.hasOwnProperty("version")) {
+        const version = clips.items[i].available_versions.version;
+        for (let j = 0; j < version.length; j++) {
+          pids.push(version[j].pid);
         }
       }
-      nitroRequest("versions", { pid: pids }).then(
-        response => {
-          const items = response.data.nitro.results.items;
-          let map = new Map();
-          for (let i = 0; i < items.length; i++) {
-            const ids = items[i].identifiers.identifier;
-            for (let j = 0; j < ids.length; j++) {
-              if (ids[j].type === "crid") {
-                map.set(items[i].pid, ids[j].$);
-              }
-            }
-          }
-          for (let i = 0; i < clips.items.length; i++) {
-            if (clips.items[i].available_versions.hasOwnProperty("version")) {
-              const version = clips.items[i].available_versions.version;
-              for (let j = 0; j < version.length; j++) {
-                version[j].crid = map.get(version[j].pid);
-              }
-            }
-          }
-          res.json(clips);
-        },
-        err => res.status(404).send("Not found") // TODO use proper error message
-      );
-    },
-    err => res.status(404).send("Not found") // TODO use proper error message
-  );
-}
-
-// http://programmes.api.bbc.com/nitro/api/programmes?api_key=&master_brand=bbc_marathi_tv&page_size=100&entity_type=episode&sort=release_date&sort_direction=descending&mixin=available_versions
-app.get("/api/v1/episode", function(req, res) {
-  let q = {
-    mixin: ["images", "available_versions"],
-    entity_type: "episode",
-    sort: "release_date",
-    sort_direction: "descending",
-    duration: "short"
-  };
-  if (req.query.hasOwnProperty("sid")) {
-    q.master_brand = config[req.query.sid].mid;
-  }
-  if (req.query.hasOwnProperty("pid")) {
-    q.pid = req.query.pid;
-  }
-  if (req.query.hasOwnProperty("page")) {
-    q.page = req.query.page;
-  }
-  if (req.query.hasOwnProperty("page_size")) {
-    q.page_size = req.query.page_size;
-  }
-  nitroRequest("programmes", q).then(
-    r => {
-      add_crids_to_episodes(r.data.nitro.results.items);
-      add_versions_to_episodes(r.data.nitro.results.items);
-      res.json(r.data.nitro.results);
-    },
-    err => res.status(404).send("Not found") // TODO use proper error message
-  );
-
-});
-
-function add_versions_to_episodes(items) {
+    }
+    response = await nitroRequest("versions", { pid: pids });
+    const items = response.data.nitro.results.items;
+    let map = new Map();
+    for (let i = 0; i < items.length; i++) {
+      const ids = items[i].identifiers.identifier;
+      for (let j = 0; j < ids.length; j++) {
+        if (ids[j].type === "crid") {
+          map.set(items[i].pid, ids[j].$);
+        }
+      }
+    }
+    for (let i = 0; i < clips.items.length; i++) {
+      if (clips.items[i].available_versions.hasOwnProperty("version")) {
+        const version = clips.items[i].available_versions.version;
+        for (let j = 0; j < version.length; j++) {
+          version[j].crid = map.get(version[j].pid);
+        }
+     }
+    }
+    res.json(clips);
+  } catch(e) {
+    res.status(404).send("Not found") // TODO use proper error message
+  } 
 }
 
 app.get("/api/v1.1/episode", async (req, res, next) => {
@@ -276,10 +260,7 @@ app.get("/api/v1.1/episode", async (req, res, next) => {
   }
   try {
     q.availability = "available";
-    let url =
-      `http://programmes.api.bbc.com/nitro/api/programmes/?api_key=${process.env.NITRO_KEY}&` +
-      querystring.stringify(q);
-    console.log(url);
+    let url = `http://programmes.api.bbc.com/nitro/api/programmes/?api_key=${process.env.NITRO_KEY}&` + querystring.stringify(q);
     let r = await axios({
       url: url,
       method: "get",
@@ -295,10 +276,7 @@ app.get("/api/v1.1/episode", async (req, res, next) => {
     // Don't forget to return something
     const r1 = r.data;
     q.availability = "PT24H";
-    url =
-      `http://programmes.api.bbc.com/nitro/api/programmes/?api_key=${process.env.NITRO_KEY}&` +
-      querystring.stringify(q);
-    console.log(url);
+    url = `http://programmes.api.bbc.com/nitro/api/programmes/?api_key=${process.env.NITRO_KEY}&` + querystring.stringify(q);
     r = await axios({
       url: url,
       method: "get",
@@ -314,8 +292,6 @@ app.get("/api/v1.1/episode", async (req, res, next) => {
     // Don't forget to return something
     const r2 = r.data;
     let items = r1.nitro.results.items.concat(r2.nitro.results.items);
-    console.log(items);
-    console.log("items", items.length);
     res.json({
       page_size: q.page_size,
       page: q.page,
@@ -514,26 +490,6 @@ function postTVA(data, res) {
   req.end();
 }
 
-function spwRequest(sid, date) {
-    let url = `https://programmes.api.bbc.com/schedule?api_key=${process.env.SPW_KEY}&sid=${sid}&date=${date}`
-    console.log(url);
-    return axios({
-      url: url,
-      method: 'get',
-      timeout: 8000,
-      key: fs.readFileSync(process.env.KEY),
-      cert: fs.readFileSync(process.env.CERT),
-      passphrase: process.env.PASSPHRASE,
-      headers: {
-          'Accept': 'application/xml',
-      }
-    });
-}
-
-function onlyName(name) {
-  return name.split(':')[1]
-} 
-
 function nitroRequest(feed, query) {
     let url = `http://programmes.api.bbc.com/nitro/api/${feed}/?api_key=${process.env.NITRO_KEY}&`+querystring.stringify(query);
     console.log(url);
@@ -561,7 +517,6 @@ function pid2crid(pid) {
 }
 
 function add_crids_to_webcast(items) {
-  console.log("add_crids_to_webcast");
   if (items != null && items.total > 0) {
     for (let i = 0; i < items.length; i++) {
       const pid = items[i].window_of[0].pid;
