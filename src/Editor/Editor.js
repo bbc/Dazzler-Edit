@@ -293,7 +293,7 @@ class Editor extends React.Component {
 
   handleClick = (item, isLive) => {
     console.log("ITEM", item);
-    count++;
+    //count++;
     const newItem2 = {
       ...item
     };
@@ -419,7 +419,8 @@ class Editor extends React.Component {
         });
         break;
       case "a":
-        return this.setState({ show: <Date /> });
+        this.setState({ show: <Date /> });
+        break;
       case "Episodes":
         this.setState({ isPaneOpen: true });
         this.setState({ title: "Episodes" });
@@ -455,9 +456,10 @@ class Editor extends React.Component {
             />
           )
         });
+        break;
       case "Schedule":
         menuText = text;
-        return this.setState({
+        this.setState({
           display: (
             <Schedule
               service={this.state.service}
@@ -473,9 +475,10 @@ class Editor extends React.Component {
             />
           )
         });
+        break;
       case "Scratchpad":
         menuText = text;
-        return this.setState({
+        this.setState({
           display: (
             <Scratchpad
               data={scratchPadItems}
@@ -485,9 +488,10 @@ class Editor extends React.Component {
             />
           )
         });
+        break;
       case "Loop":
         menuText = text;
-        return this.setState({
+        this.setState({
           display: (
             <Loop
               data={loopItems}
@@ -498,7 +502,7 @@ class Editor extends React.Component {
             />
           )
         });
-      break;
+        break;
       default: // DO NOTHING
     }
   };

@@ -85,7 +85,7 @@ class Schedule extends React.Component {
             `${URLPrefix}/api/v1/schedule?sid=${this.props.service.sid}&date=${moment.utc().format("YYYY-MM-DD")}`
           )
           .then(response => {
-            response["data"]["schedule"]["item"].map((item, index) => {
+            response["data"]["schedule"]["item"].forEach((item, index) => {
               var obj = {
                 title: this.getScheduleItemTitle(item, index),
                 startTime: moment(
@@ -599,7 +599,7 @@ class Schedule extends React.Component {
           scheduleItems[dateIndex][i].startTime = moment(item.date).add(
             moment.duration(updateItem.duration)
           );
-          if (i == myPreRenderedItems[dateIndex].length - 1) {
+          if (i === myPreRenderedItems[dateIndex].length - 1) {
             myPreRenderedItems[dateIndex].push(
               <SingleSchedule
                 getItem={this.getItem}
@@ -727,10 +727,10 @@ class Schedule extends React.Component {
             var digit = 2;
             let loop = JSON.parse(JSON.stringify(this.props.loopedContent));
 
-            loop.map((item, index) => {
-              if (index == 0) {
+            loop.forEach((item, index) => {
+              if (index === 0) {
                 item.insertionType = "loopStart";
-              } else if (index == loop.length - 1) {
+              } else if (index === loop.length - 1) {
                 item.insertionType = "loopEnd";
               } else {
                 item.insertionType = "midLoop";
@@ -753,14 +753,15 @@ class Schedule extends React.Component {
               />
             );
 
-            loop.map((item, index) => {
+            loop.forEach((item, index) => {
               if (index > 0) {
                 this.addScheduleItem(item);
               }
             });
 
             for (let i = 0; 1 < digit; i++) {
-              for (let j = 0; j === j; j++) {
+              // TODO check this for (let j = 0; j === j; j++) {
+              for (let j = 0; j === i; j++) {
                 if (
                   moment(loop[j].startTime).add(
                     moment
@@ -796,7 +797,7 @@ class Schedule extends React.Component {
         default:
           break;
       }
-      if (scheduleItems[dateIndex] != undefined) {
+      if (scheduleItems[dateIndex] !== undefined) {
         if (scheduleItems[dateIndex].length > 0) {
           var item =
             scheduleItems[dateIndex][scheduleItems[dateIndex].length - 1];
