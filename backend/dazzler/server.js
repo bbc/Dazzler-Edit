@@ -60,11 +60,10 @@ app.get("/api/v1/user", function(req, res) {
 app.get("/api/v1/schedule", async (req, res) => {
   try {
     const r = await spwRequest(req.query.sid, req.query.date);
-    //console.log(r.data);
-
-    const j = convert.xml2json(r.data, {compact: true, elementNameFn: function(val) {return val.split(':')[1];}});
-    const schedule = JSON.parse(j);
-    const s = schedule["schedule"]["item"];
+    //const j = convert.xml2json(r.data, {compact: true, elementNameFn: function(val) {return val.split(':')[1];}});
+    //const schedule = JSON.parse(j);
+    const schedule = (await xml2js(r.data, {tagNameProcessors:[onlyName]})).schedule;
+    const s = schedule.item;
     let pids = [];
     for (let i = 0; i < s.length; i++) {
       if (s[i].hasOwnProperty("clip")) {
@@ -76,11 +75,11 @@ app.get("/api/v1/schedule", async (req, res) => {
         const v = await nitroRequest("programmes", { pid: pids, mixin: "ancestor_titles" })
         addClips(s, v);
     }
-    console.log(JSON.stringify(s));
-    console.log(JSON.stringify(schedule._declaration));
-    console.log(JSON.stringify(schedule.schedule.service));
-    console.log(Object.keys(schedule.schedule.item));
-    res.json(r);
+    let o = {};
+    for(key of Object.keys(schedule)) {
+        o[key] = schedule[key];
+    }
+    res.json(o);
   } catch(e) {
     console.log(e);
     res.status(404).send("Not found") // TODO use proper error message
