@@ -155,7 +155,6 @@ export class Live extends React.Component {
         start = moment(date);
     }
     const end = moment(start).add(1, "days");
-    console.log("Live update", this.state.page, this.state.date);
     if (this.state.page !== this.state.previousPage) {
       console.log("have page %d want page %d", this.state.page, this.state.previousPage);
       axios

@@ -151,17 +151,24 @@ class Schedule extends React.Component {
     } catch (error) {}
   };
   getScheduleItemTitle = (item, index) => {
-    if (item.hasOwnProperty("episode")) {
-      let title = item.episode.title;
+    let title = null;
+    if (item.hasOwnProperty("item_type")) {
+      title = item.title;
+      if (title == null) {
+        title = item.presentation_title;
+      }
+    } else if (item.hasOwnProperty("episode")) {
+      title = item.episode.title;
       if (title == null) {
         title = item.episode.presentation_title;
       }
-      return title;
     } else if (item.hasOwnProperty("clip")) {
-      return item.clip.title;
-    } else {
-      return "Loaded From Schedule " + index;
+      title = item.clip.title;
     }
+    if (title == null) {
+      title = "Loaded From Schedule " + index;
+    }
+    return title;
   };
   getItem(startTime, chosen) {
     try {

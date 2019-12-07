@@ -145,7 +145,7 @@ export class Episode extends React.Component {
   componentDidUpdate(prevProps) {
     console.log("Episode update", this.state.page);
     if (this.state.page !== this.state.previousPage) {
-      console.log("have page %d want page %d", this.props.page, prevProps.page);
+      console.log("have page %d want page %d", this.state.page, this.state.previousPage);
       axios
         .get( `${URLPrefix}/api/v1/episode?sid=${this.props.sid}&page=${this.state.page+1}&page_size=${this.state.rowsPerPage}`)
         .then(response => {
