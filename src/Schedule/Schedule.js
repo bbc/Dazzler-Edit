@@ -87,10 +87,11 @@ class Schedule extends React.Component {
           .then(response => {
             response.data.item.forEach((item, index) => {
               const broadcast = item.broadcast[0];
+	      published_time = broadcast.published_time[0].$;
               let obj = {
                 title: this.getScheduleItemTitle(item, index),
-                startTime: moment(broadcast.published_time[0].$.start,
-                duration: moment.duration(broadcast.published_time[0].$.duration).toISOString(),
+                startTime: moment(published_time.start),
+                duration: moment.duration(published_time.duration).toISOString(),
                 id: index,
                 live: broadcast.live[0].$.value,
                 versionCrid: item.version[0].crid[0].$.uri
