@@ -153,7 +153,7 @@ class Editor extends React.Component {
       schedules: {}, // state store for loaded and/or edited schedules
       scheduleDate: moment().add(0, "d").format("LL"),
       display: "",
-      user: null,
+      user: { name: "anonymous" },
       service: {
         sid: "bbc_marathi_tv",
         name: "Marathi",
