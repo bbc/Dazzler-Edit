@@ -145,9 +145,16 @@ export class Live extends React.Component {
 
   componentDidUpdate(prevProps) {
     //get request for webcasts
+    const today = moment().millisecond(0).second(0).minute(0).hour(0).utc();
     const date = moment(this.state.date).millisecond(0).second(0).minute(0).hour(0).utc();
-    const start = date.add(moment().hour(), "hours").add(moment().minutes()+5, "minutes");
-    const end = start.add(1, "days");
+    let start = moment();
+    if(date.isSame(today)) {
+        start.add(5, 'minutes');
+    }
+    else {
+        start = moment(date);
+    }
+    const end = moment(start).add(1, "days");
     console.log("Live update", this.state.page, this.state.date);
     if (this.state.page !== this.state.previousPage) {
       console.log("have page %d want page %d", this.state.page, this.state.previousPage);
