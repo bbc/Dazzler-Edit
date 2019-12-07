@@ -49,7 +49,7 @@ class Schedule extends React.Component {
       status: "Save Playlist",
       index: null,
       preRenderedItem: [[]],
-      scheduleDate: moment().add(0, "d").format("LL")
+      scheduleDate: moment()
     };
   }
 
@@ -317,7 +317,7 @@ class Schedule extends React.Component {
     if (moment(CDate).format("LL") === moment().format("LL")) {
       text = "Today's ";
     }
-    this.setState({ scheduleDate: CDate });
+    this.setState({ scheduleDate: moment(CDate) });
     this.props.onDateChange(moment(CDate));
   };
   nextDay = CDate => {
@@ -327,7 +327,7 @@ class Schedule extends React.Component {
     if (moment(CDate).format("LL") === moment().format("LL")) {
       text = "Today's ";
     }
-    this.setState({ scheduleDate: CDate });
+    this.setState({ scheduleDate: moment(CDate) });
     this.props.onDateChange(moment(CDate));
   };
 
@@ -339,7 +339,7 @@ class Schedule extends React.Component {
 
       if (
         moment(scratchpadItems[i].startTime).format("YYYY-MM-DD") >
-        moment(this.state.scheduleDate).format("YYYY-MM-DD")
+        this.state.scheduleDate.format("YYYY-MM-DD")
       ) {
         if (scheduleItems[dateIndex + 1] === undefined) {
           scheduleItems[dateIndex + 1] = [];
@@ -471,7 +471,7 @@ class Schedule extends React.Component {
       if (insertPosition === undefined) {
         if (
           moment(updateItem.startTime).format("YYYY-MM-DD") >
-            moment(this.state.scheduleDate).format("YYYY-MM-DD") &&
+            this.state.scheduleDate.format("YYYY-MM-DD") &&
           updateItem.live === undefined
         ) {
           if (scheduleItems[dateIndex + 1] === undefined) {

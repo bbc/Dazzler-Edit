@@ -151,7 +151,7 @@ class Editor extends React.Component {
       episodes: [],
       live: [],
       schedules: {}, // state store for loaded and/or edited schedules
-      scheduleDate: moment().add(0, "d").format("LL"),
+      scheduleDate: moment()
       display: "",
       user: { name: "anonymous" },
       service: {
@@ -212,7 +212,8 @@ class Editor extends React.Component {
   };
 
   handleDateChange = (d) => {
-    console.log('handleDateChange', d);
+    console.log('handleDateChange', d.toString() );
+    this.setState({ scheduleDate: d });
   };
 
   loopContent = (rows, startTime, finishTime) => {
@@ -304,9 +305,7 @@ class Editor extends React.Component {
   handleClick = (item, isLive) => {
     console.log("ITEM", item);
     //count++;
-    const newItem2 = {
-      ...item
-    };
+    const newItem2 = { ...item };
 
     switch (item.item_type) {
       case "episode":
