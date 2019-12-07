@@ -138,6 +138,9 @@ class Editor extends React.Component {
     this.clearContent = this.clearContent.bind(this);
     this.loopContent = this.loopContent.bind(this);
     this.lastItem = this.lastItem.bind(this);
+    this.handleDrawerOpen = this.handleDrawerOpen.bind(this);
+    this.handleDrawerClose = this.handleDrawerClose.bind(this);
+    this.handleDateChange = this.handleDateChange.bind(this);
 
     this.state = {
       open: false,
