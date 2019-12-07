@@ -284,19 +284,17 @@ app.get("/api/v1/episode", async (req, res, next) => {
 
 async function get_episodes(q) {
     let url = `http://programmes.api.bbc.com/nitro/api/programmes/?api_key=${process.env.NITRO_KEY}&` + querystring.stringify(q);
-    let r = await axios({
+    let res = await axios({
       url: url,
       method: "get",
       timeout: 8000,
-      headers: {
-        Accept: "application/json"
-      }
+      headers: { Accept: "application/json" }
     });
     if (res.status !== 200) {
       // test for status you want, etc
       console.log(res.status);
     }
-    return r.data.nitro.results;
+    return res.data.nitro.results;
 }
 
 app.put("/api/v1/loop", async (req, res, next) => {
