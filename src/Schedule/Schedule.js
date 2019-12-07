@@ -812,7 +812,7 @@ class Schedule extends React.Component {
         <Date
           nextDay={this.nextDay}
           previousDay={this.previousDay}
-          scheduleDate={this.state.scheduleDate}
+          scheduleDate={moment(this.state.scheduleDate).format('LL')}
         />
         <div className="dateContainer">
           <h2>{text}Schedule</h2>
