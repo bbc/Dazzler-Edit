@@ -258,32 +258,54 @@ app.get("/api/v1/episode", async (req, res, next) => {
   if (req.query.hasOwnProperty("page_size")) {
     q.page_size = req.query.page_size;
   }
-  try {
-    let items = [];
-    q.availability = "available";
-    const available_episodes = await get_episodes(q);
-    if(available_episodes.total>0) {
+  if (req.query.hasOwnProperty("availability")) {
+    q.availability = req.query.availability;;
+    try {
+      let items = [];
+      const available_episodes = await get_episodes(q);
+      if(available_episodes.total>0) {
+        items = available_episodes.items;
+      }
+      res.json({
+        page_size: q.page_size,
+        page: q.page,
+        total: items.length,
+        items: items
+      });
+    } catch (e) {
+      console.log(JSON.stringify(e));
+      res.status(404).send("error");
+    }
+  }
+  else {
+    try {
+      let items = [];
+      q.availability = "available";
+      const available_episodes = await get_episodes(q);
+      if(available_episodes.total>0) {
         items = items.concat(available_episodes.items);
-    }
-    q.availability = "PT24H";
-    const future_episodes = await get_episodes(q);
-    if(future_episodes.total>0) {
+      }
+      q.availability = "PT24H";
+      const future_episodes = await get_episodes(q);
+      if(future_episodes.total>0) {
         items = items.concat(future_episodes.items);
+      }
+      res.json({
+        page_size: q.page_size,
+        page: q.page,
+        total: items.length,
+        items: items
+      });
+    } catch (e) {
+      console.log(JSON.stringify(e));
+      res.status(404).send("error");
     }
-    res.json({
-      page_size: q.page_size,
-      page: q.page,
-      total: items.length,
-      items: items
-    });
-  } catch (e) {
-    console.log(JSON.stringify(e));
-    res.status(404).send("error");
   }
 });
 
 async function get_episodes(q) {
     let url = `http://programmes.api.bbc.com/nitro/api/programmes/?api_key=${process.env.NITRO_KEY}&` + querystring.stringify(q);
+    console.log(url);
     let res = await axios({
       url: url,
       method: "get",
