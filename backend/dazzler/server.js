@@ -4,6 +4,7 @@ const express = require("express");
 const axios = require("axios");
 const fs = require("fs");
 const parseString = require("xml2js").parseString;
+const xml2js = require('xml2js-es6-promise');
 const querystring = require("querystring");
 const Big = require("big-integer");
 const http = require("http");
@@ -55,11 +56,17 @@ app.get("/api/v1/user", function(req, res) {
   }
 });
 
-app.get("/api/v1/schedule", function(req, res) {
-  SpwRequest(req.query.sid, req.query.date).then(
-    r => {
-      if (r) {
-        const s = r["schedule"]["item"];
+app.get("/api/v1/schedule", async (req, res) => {
+  try {
+    const r = await spwRequest(req.query.sid, req.query.date);
+    console.log(r.data);
+    const schedule = await xml2js(r.data, 
+           {
+               tagNameProcessors: [onlyName]
+           }
+    );
+    console.log(schedule);
+        const s = schedule["schedule"]["item"];
         let promises = [];
         for (let i = 0; i < s.length; i++) {
           if (s[i].hasOwnProperty("episode")) {
@@ -74,17 +81,25 @@ app.get("/api/v1/schedule", function(req, res) {
           addClips(s, results);
           res.json(r);
         });
-      } else {
-        console.log('schedule error');
-        res.status(404).send("Not found"); // TODO use proper error message
-      }
-    },
-    err => {
-      console.log(err);
-      res.status(404).send("Not found"); // TODO use proper error message
-    }
-  );
+  } catch(e) {
+    console.log(e);
+    res.status(404).send("Not found") // TODO use proper error message
+  }
 });
+
+function addClips(schedule_items, clips) {
+  for (let i = 0; i < schedule_items.length; i++) {
+    const pid = schedule_items[i]["version"][0]["version_of"][0]["link"][0].$.pid;
+    for (let j = 0; j < clips.length; j++) {
+      const clip = clips[j].data.nitro.results;
+        if (clip.hasOwnProperty("items")) {
+          if (clip.items[0].pid === pid) {
+            schedule_items[i]["clip"] = clip.items[0];
+          }
+        }
+    }
+  }
+}
 
 app.get("/api/v1/broadcast", function(req, res) {
   let q = {
@@ -99,7 +114,7 @@ app.get("/api/v1/broadcast", function(req, res) {
     q.page_size = req.query.page_size;
   }
   nitroRequest("schedules", q).then(
-    r => res.json(r.nitro.results),
+    r => res.json(r.data.nitro.results),
     err => res.status(404).send("Not found") // TODO use proper error message
   );
 });
@@ -123,7 +138,7 @@ app.get("/api/v1/webcast", function(req, res) {
     q.page_size = req.query.page_size;
   }
   nitroRequest("schedules", q).then(
-    r => res.json(add_crids_to_webcast(r.nitro.results)),
+    r => res.json(add_crids_to_webcast(r.data.nitro.results)),
     err => res.status(404).send("Not found") // TODO use proper error message
   );
 });
@@ -159,20 +174,6 @@ app.get("/api/v1/clip", function(req, res) {
   clip(q, req.query, res);
 });
 
-function addClips(schedule_items, clips) {
-  for (let i = 0; i < schedule_items.length; i++) {
-    const pid = schedule_items[i]["version"][0]["version_of"][0]["link"][0].$.pid;
-    for (let j = 0; j < clips.length; j++) {
-      const clip = clips[j].nitro.results;
-        if (clip.hasOwnProperty("items")) {
-          if (clip.items[0].pid === pid) {
-            schedule_items[i]["clip"] = clip.items[0];
-          }
-        }
-    }
-  }
-}
-
 function clip(q, query, res) {
   if (query.hasOwnProperty("page")) {
     q.page = query.page;
@@ -184,9 +185,9 @@ function clip(q, query, res) {
   q.entity_type = "clip";
   q.availability = "available";
   nitroRequest("programmes", q).then(
-    r => {
+    response => {
       let pids = [];
-      let clips = r.nitro.results;
+      let clips = response.data.nitro.results;
       for (let i = 0; i < clips.items.length; i++) {
         if (clips.items[i].available_versions.hasOwnProperty("version")) {
           const version = clips.items[i].available_versions.version;
@@ -196,8 +197,8 @@ function clip(q, query, res) {
         }
       }
       nitroRequest("versions", { pid: pids }).then(
-        r => {
-          const items = r.nitro.results.items;
+        response => {
+          const items = response.data.nitro.results.items;
           let map = new Map();
           for (let i = 0; i < items.length; i++) {
             const ids = items[i].identifiers.identifier;
@@ -247,14 +248,17 @@ app.get("/api/v1/episode", function(req, res) {
   }
   nitroRequest("programmes", q).then(
     r => {
-      add_crids_to_episodes(r.nitro.results.items);
-      add_versions_to_episodes(r.nitro.results.items);
-      res.json(r.nitro.results);
+      add_crids_to_episodes(r.data.nitro.results.items);
+      add_versions_to_episodes(r.data.nitro.results.items);
+      res.json(r.data.nitro.results);
     },
     err => res.status(404).send("Not found") // TODO use proper error message
   );
 
 });
+
+function add_versions_to_episodes(items) {
+}
 
 app.get('/api/v1.1/episode', async (req, res, next) => {
   let q = {
@@ -579,60 +583,20 @@ function postTVA(data, res) {
   req.end();
 }
 
-function SpwRequest(sid, date) {
-  return new Promise((resolve, reject) => {
-    var options = {
-      host: "programmes.api.bbc.com",
-      path: `/schedule?api_key=${process.env.SPW_KEY}&sid=${sid}&date=${date}`,
+function spwRequest(sid, date) {
+    let url = `https://programmes.api.bbc.com/schedule?api_key=${process.env.SPW_KEY}&sid=${sid}&date=${date}`
+    console.log(url);
+    return axios({
+      url: url,
+      method: 'get',
+      timeout: 8000,
       key: fs.readFileSync(process.env.KEY),
       cert: fs.readFileSync(process.env.CERT),
       passphrase: process.env.PASSPHRASE,
       headers: {
-        accept: "application/xml"
+          'Accept': 'application/xml',
       }
-    };
-
-    var request = https.get(options, response => {
-      if (response.statusCode == 404) {
-        console.log('spw 404');
-        resolve('<schedule/>');
-        return;
-      }
-
-      if (response.statusCode < 200 || response.statusCode > 299) {
-        console.log("Invalid status code: " + response.statusCode);
-        reject(new Error("Invalid status code: " + response.statusCode));
-        return;
-      }
-
-      console.log("spw status code: " + response.statusCode);
-
-      var body = [];
-      response.on("data", chunk => {
-        body.push(chunk);
-      });
-      response.on("end", () => {
-        try {
-          parseString(Buffer.concat(body).toString(), 
-	    {
-		tagNameProcessors: [onlyName]
-	    },
-		function(err, result) {
-            if (err) {
-              reject(err);
-            } else {
-              resolve(result);
-            }
-          });
-        } catch (e) {
- 		console.log('spw', e);
-          reject(new Error(e));
-        }
-      });
-      response.on("error", err => reject(new Error(err)));
     });
-    request.on("error", err => reject(new Error(err)));
-  });
 }
 
 function onlyName(name) {
@@ -640,42 +604,16 @@ function onlyName(name) {
 } 
 
 function nitroRequest(feed, query) {
-  return new Promise((resolve, reject) => {
-    var options = {
-      host: "programmes.api.bbc.com",
-      path:
-        "/nitro/api/" +
-        feed +
-        "?api_key=" +
-        process.env.NITRO_KEY +
-        "&" +
-        querystring.stringify(query),
+    let url = `http://programmes.api.bbc.com/nitro/api/${feed}/?api_key=${process.env.NITRO_KEY}&`+querystring.stringify(query);
+    console.log(url);
+    return axios({
+      url: url,
+      method: 'get',
+      timeout: 8000,
       headers: {
-        accept: "application/json"
+          'Accept': 'application/json',
       }
-    };
-    var request = http.get(options, response => {
-      if (response.statusCode < 200 || response.statusCode > 299) {
-        reject(new Error("Invalid status code: " + response.statusCode));
-      }
-
-      var data = "";
-      response.on("data", chunk => {
-        data += chunk;
-      });
-      response.on("end", () => {
-        try {
-          resolve(JSON.parse(data));
-        } catch (e) {
-          reject(new Error(e));
-        }
-      });
-      response.on("error", err => reject(new Error(err)));
     });
-    request.on("error", err => reject(new Error(err)));
-  }).catch(error => {
-    console.log(error);
-  }); // Error: Whoops!;
 }
 
 const pidchars = "0123456789bcdfghjklmnpqrstvwxyz";
