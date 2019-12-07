@@ -160,10 +160,10 @@ export class Episode extends React.Component {
           if(response.data.items.length === this.state.rowsPerPage) {
             this.setState({ totalRows: response.data.total });
             this.setState({ rows: response.data.items });
-
           }
           else {
             let items = [];
+            let total = response.data.total;
             if(response.data.items !== undefined && response.data.items.length>0) {
               items = response.data.items;
             }
@@ -175,6 +175,8 @@ export class Episode extends React.Component {
                   item.insertionType = "futureEpisode";
                   items.push(item);
                 });
+                this.setState({ totalRows: total + response.data.total });
+                this.setState({ rows: items });
             })
             .catch(e => {
               console.log(e);
