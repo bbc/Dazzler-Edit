@@ -140,6 +140,7 @@ export class Live extends React.Component {
 
   componentDidMount = () => {
     this.setState({ sid: this.props.sid });
+    this.setState({ date: this.props.date });
   };
 
   componentDidUpdate(prevProps) {

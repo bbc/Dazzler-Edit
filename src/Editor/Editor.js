@@ -424,6 +424,7 @@ class Editor extends React.Component {
         });
         break;
       case "Live":
+        console.log('show live', this.state.scheduleDate);
         this.setState({ isPaneOpen: true });
         this.setState({ title: "Upcoming Live Broadcasts" });
         this.setState({
