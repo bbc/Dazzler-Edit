@@ -82,30 +82,25 @@ class Schedule extends React.Component {
       if (sessionStorage.getItem("activeSession") == undefined) {
         axios
           .get(
-            URLPrefix +
-              "/api/v1/schedule" +
-              "?sid=" +
-              this.props.service.sid +
-              "&date=" +
-              moment.utc().format("YYYY-MM-DD")
+            `${URLPrefix}/api/v1/schedule?sid=${this.props.service.sid}&date=${moment.utc().format("YYYY-MM-DD")}`
           )
           .then(response => {
-            response["data"]["p:schedule"]["p:item"].map((item, index) => {
+            response["data"]["schedule"]["item"].map((item, index) => {
               var obj = {
                 title: this.getScheduleItemTitle(item, index),
                 startTime: moment(
-                  item["p:broadcast"][0]["p:published_time"][0]["$"]["start"]
+                  item["broadcast"][0]["published_time"][0]["$"]["start"]
                 ),
                 duration: moment
                   .duration(
-                    item["p:broadcast"][0]["p:published_time"][0]["$"][
+                    item["broadcast"][0]["published_time"][0]["$"][
                       "duration"
                     ]
                   )
                   .toISOString(),
                 id: index,
-                live: item["p:broadcast"][0]["p:live"][0]["$"]["value"],
-                versionCrid: item["p:version"][0]["p:crid"][0]["$"]["uri"]
+                live: item["broadcast"][0]["live"][0]["$"]["value"],
+                versionCrid: item["version"][0]["crid"][0]["$"]["uri"]
               };
 
               myPreRenderedItems[dateIndex].push(

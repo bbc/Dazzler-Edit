@@ -16,7 +16,6 @@ import LastPageIcon from "@material-ui/icons/LastPage";
 import moment from "moment";
 import Spinner from "../Spinner/Spinner";
 import axios from "axios";
-const type = "jupiter";
 const actionsStyles = theme => ({
   root: {
     flexShrink: 0,
@@ -147,22 +146,15 @@ export class Jupiter extends React.Component {
     if (this.state.page !== this.state.previousPage) {
       console.log("have page %d want page %d", this.props.page, prevProps.page);
       axios
-        .get(
-          URLPrefix +
-          "/api/v1/clip" +
-          "?sid=" +
-          this.props.sid +
-          "&type=" +
-          type +
-          "&page=" +
-          (this.state.page + 1) + // nitro is 1 based
-            "&page_size=" +
-            this.state.rowsPerPage
-        )
+        .get(`${URLPrefix}/api/v1/clip?sid=${this.props.sid}&type=jupiter&page=${this.state.page+1}&page_size=${this.state.rowsPerPage}`)
         .then(response => {
           console.log("JUPITER", response);
-          this.setState({ previousPage: response.data.page - 1 });
-          this.setState({ page: response.data.page - 1 });
+          const new_page = 0;
+          if(response.data.hasOwnProperty('page')) {
+            new_page = response.data.page - 1;
+          }
+          this.setState({ previousPage: new_page });
+          this.setState({ page: new_page });
           this.setState({ rows: response.data.items });
           this.setState({ totalRows: response.data.total });
         })

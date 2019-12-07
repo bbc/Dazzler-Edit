@@ -144,32 +144,14 @@ export class Live extends React.Component {
 
   componentDidUpdate(prevProps) {
     //get request for webcasts
-    const day = moment()
-      .millisecond(0)
-      .second(0)
-      .add(5, "minutes")
-      .utc(); // TODO DAZZLER-68
-    const days = 5; // to allow us to edit future schedules
+    const date = moment().millisecond(0).second(0).minute(0).hour(0).utc(); // TODO DAZZLER-68
+    const start = date.add(moment().hour(), "hours").add(moment().minutes()+5, "minutes");
+    const end = start.add(1, "days");
     console.log("Live update", this.state.page);
-    if(isNaN(this.state.page)) this.state.page = 0;
-    if(isNaN(this.props.page)) this.props.page = 0;
-    if(isNaN(prevProps.page)) prevProps.page = 0;
     if (this.state.page !== this.state.previousPage) {
       console.log("have page %d want page %d", this.props.page, prevProps.page);
       axios
-        .get(
-          URLPrefix +
-            "/api/v1/webcast" +
-            "?sid=" +
-            this.props.sid +
-            "&start=" +
-            day.format() +
-            "&end=" +
-            day
-              .add(days, "days")
-              .utc()
-              .format()
-        )
+        .get(`${URLPrefix}/api/v1/webcast?sid=${this.props.sid}&start=${start.format()}&end=${end.format()}`)
         .then(response => {
           console.log("Live RESPONSE", response.data.items);
           response.data.items.map(item => {
@@ -178,15 +160,16 @@ export class Live extends React.Component {
               moment(item.scheduled_time.start);
 
             item.isLive = true;
-            item.startTime = moment(item.scheduled_time.start).format(
-              "HH:mm:ss"
-            );
-
+            item.startTime = moment(item.scheduled_time.start).format( "HH:mm:ss");
             item.title = "Live programme at " + item.scheduled_time.start;
             item.duration = moment.duration(durationTime, "milliseconds");
           });
-          this.setState({ previousPage: response.data.page - 1 });
-          this.setState({ page: response.data.page - 1 });
+          const new_page = 0;
+          if(response.data.hasOwnProperty('page')) {
+            new_page = response.data.page - 1;
+          }
+          this.setState({ previousPage: new_page });
+          this.setState({ page: new_page });
           this.setState({ rows: response.data.items });
           this.setState({ totalRows: response.data.total });
         })

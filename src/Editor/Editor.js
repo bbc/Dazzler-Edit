@@ -149,9 +149,7 @@ class Editor extends React.Component {
       episodes: [],
       live: [],
       schedules: {}, // state store for loaded and/or edited schedules
-      scheduleDate: moment()
-        .add(0, "d")
-        .format("LL"),
+      scheduleDate: moment().add(0, "d").format("LL"),
       display: "",
       user: null,
       service: {
@@ -184,21 +182,9 @@ class Editor extends React.Component {
       )
     });
 
-    // Episodes
-    axios
-      .get(URLPrefix + "/api/v1.1/episode?sid=" + this.state.service.sid)
-      .then(response => {
-        this.setState({
-          episodes: response.data.items
-        });
-      })
-      .catch(e => {
-        console.log(e);
-      });
-
     // get user
     axios
-      .get(URLPrefix + "/api/v1/user")
+      .get(`${URLPrefix}/api/v1/user`)
       .then(response => {
         console.log("user", JSON.stringify(response.data));
         console.log("RESPONSE", response);
@@ -604,7 +590,7 @@ class Editor extends React.Component {
           </center>
           <Divider />
           <List>
-            {["Live", "Web Clips", "Episodes", "Specials", "Jupiter Clips"].map(
+            {["Live", "Episodes", "Jupiter Clips", "Web Clips", "Specials"].map(
               (text, index) => (
                 <ListItem
                   button

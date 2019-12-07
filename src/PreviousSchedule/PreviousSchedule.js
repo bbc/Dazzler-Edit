@@ -8,6 +8,11 @@ var videos = [];
 var prev;
 var current = moment().utcOffset(0);
 current.toISOString();
+var URLPrefix = "";
+//checking if running locally
+if (process.env.NODE_ENV === "development") {
+  URLPrefix = "http://localhost:8080";
+}
 
 class PreviousSchedule extends React.Component {
   state = {
@@ -23,20 +28,14 @@ class PreviousSchedule extends React.Component {
       .utcOffset(0)
       .format();
     axios
-      .get(
-        "/api/v1/broadcast?sid=" + this.props.sid +
-          "&start=" + this.props.scheduleDate +
-          "&end=" + end
-      )
+      .get( `${URLPrefix}/api/v1/broadcast?sid=${this.props.sid}&start=${this.props.scheduleDate}&end=${end}`)
       .then(response => {
         returnedData = response.data.items;
         for (let i = 0; i < returnedData.length; i++) {
           videos.push(
             <SingleSchedule
               title="From Broadcast"
-              startTime={moment(returnedData[i].published_time.start).format(
-                "HH:mm:ss"
-              )}
+              startTime={moment(returnedData[i].published_time.start).format( "HH:mm:ss")}
               duration={returnedData[i].published_time.duration}
               prev={prev}
             />
