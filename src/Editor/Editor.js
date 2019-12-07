@@ -87,6 +87,9 @@ const styles = theme => ({
       duration: theme.transitions.duration.enteringScreen
     })
   },
+  appBarName: {
+    marginLeft: auto
+  },
   menuButton: {
     marginLeft: 12,
     marginRight: 20
@@ -558,8 +561,8 @@ class Editor extends React.Component {
             <Typography variant="h6" color="inherit" noWrap>
               <center>{this.state.service.name}</center>
             </Typography>
-            <Typography variant="h6" color="inherit" noWrap>
-              <center>Your Name Here</center>
+            <Typography className={classes.appBarName} variant="h6" color="inherit" noWrap>
+              <center>{this.state.user.name}</center>
             </Typography>
           </Toolbar>
         </AppBar>

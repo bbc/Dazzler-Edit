@@ -127,6 +127,7 @@ export class Clips extends React.Component {
     super(props);
 
     this.state = {
+      componentName = "Web Clips";
       spinner: false,
       totalRows: 0,
       rows: [],
@@ -143,7 +144,7 @@ export class Clips extends React.Component {
   };
 
   componentDidUpdate(prevProps) {
-    console.log("Clips update", this.state.page);
+    console.log(this.state.componentName, "update", this.state.page);
     if (this.state.page !== this.state.previousPage) {
       console.log("have page %d want page %d", this.props.page, prevProps.page);
       axios
@@ -165,7 +166,7 @@ export class Clips extends React.Component {
   }
 
   handleChangePage = (event, page) => {
-    console.log("Clips handleChangePage", this.state.page, page);
+    console.log(this.state.componentName, "handleChangePage", this.state.page, page);
     this.setState({ page });
   };
 

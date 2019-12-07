@@ -318,7 +318,7 @@ class Schedule extends React.Component {
       text = "Today's ";
     }
     this.setState({ scheduleDate: CDate });
-    this.props.onDateChange(CDate);
+    this.props.onDateChange(moment(CDate));
   };
   nextDay = CDate => {
     dateIndex += 1;
@@ -328,7 +328,7 @@ class Schedule extends React.Component {
       text = "Today's ";
     }
     this.setState({ scheduleDate: CDate });
-    this.props.onDateChange(CDate);
+    this.props.onDateChange(moment(CDate));
   };
 
   pasteContent() {
