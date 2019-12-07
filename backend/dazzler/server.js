@@ -5,7 +5,6 @@ const axios = require("axios");
 const fs = require("fs");
 const parseString = require("xml2js").parseString;
 const xml2js = require('xml2js-es6-promise');
-var convert = require('xml-js');
 const querystring = require("querystring");
 const Big = require("big-integer");
 const http = require("http");
@@ -60,8 +59,6 @@ app.get("/api/v1/user", function(req, res) {
 app.get("/api/v1/schedule", async (req, res) => {
   try {
     const r = await spwRequest(req.query.sid, req.query.date);
-    //const j = convert.xml2json(r.data, {compact: true, elementNameFn: function(val) {return val.split(':')[1];}});
-    //const schedule = JSON.parse(j);
     const schedule = (await xml2js(r.data, {tagNameProcessors:[onlyName]})).schedule;
     const s = schedule.item;
     let pids = [];
@@ -260,74 +257,6 @@ app.get("/api/v1/episode", function(req, res) {
 function add_versions_to_episodes(items) {
 }
 
-app.get('/api/v1.1/episode', async (req, res, next) => {
-  let q = {
-    mixin: ["images", "available_versions"],
-    entity_type: "episode"
-  };
-  if (req.query.hasOwnProperty("sid")) {
-    q.master_brand = config[req.query.sid].mid;
-  }
-  if (req.query.hasOwnProperty("pid")) {
-    q.pid = req.query.pid;
-  }
-  if (req.query.hasOwnProperty("page")) {
-    q.page = req.query.page;
-  }
-  if (req.query.hasOwnProperty("page_size")) {
-    q.page_size = req.query.page_size;
-  }
-  try {
-    q.availability = 'available';
-    let url = `http://programmes.api.bbc.com/nitro/api/programmes/?api_key=${process.env.NITRO_KEY}&`+querystring.stringify(q);
-    console.log(url);
-    let r = await axios({
-      url: url,
-      method: 'get',
-      timeout: 8000,
-      headers: {
-          'Accept': 'application/json',
-      }
-    })
-    if(res.status !== 200){
-      // test for status you want, etc
-      console.log(res.status)
-    }    
-    // Don't forget to return something   
-    const r1 = r.data
-    q.availability = 'PT24H';
-    url = `http://programmes.api.bbc.com/nitro/api/programmes/?api_key=${process.env.NITRO_KEY}&`+querystring.stringify(q);
-    console.log(url);
-    r = await axios({
-      url: url,
-      method: 'get',
-      timeout: 8000,
-      headers: {
-          'Accept': 'application/json',
-      }
-    })
-    if(r.status !== 200){
-      // test for status you want, etc
-      console.log(r.status)
-    }    
-    // Don't forget to return something   
-    const r2 = r.data
-    let items = r1.nitro.results.items.concat(r2.nitro.results.items);
-    console.log(items);
-    console.log('items', items.length);
-    res.json({
-      page_size: q.page_size,
-      page: q.page,
-      total:items.length,
-      items: items
-    });
-  }
-  catch(e) {
-    console.log(JSON.stringify(e));
-    res.status(404).send("error");
-  }
-});
-
 app.get("/api/v1.1/episode", async (req, res, next) => {
   let q = {
     mixin: ["images", "available_versions"],
@@ -388,6 +317,8 @@ app.get("/api/v1.1/episode", async (req, res, next) => {
     console.log(items);
     console.log("items", items.length);
     res.json({
+      page_size: q.page_size,
+      page: q.page,
       total: items.length,
       items: items
     });
