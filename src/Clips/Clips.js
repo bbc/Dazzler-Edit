@@ -127,7 +127,8 @@ export class Clips extends React.Component {
     super(props);
 
     this.state = {
-      componentName = "Web Clips",
+      type: "web",
+      componentName: "Web Clips",
       spinner: false,
       totalRows: 0,
       rows: [],
@@ -148,7 +149,7 @@ export class Clips extends React.Component {
     if (this.state.page !== this.state.previousPage) {
       console.log("have page %d want page %d", this.props.page, prevProps.page);
       axios
-        .get(`${URLPrefix}/api/v1/clip?sid=${this.props.sid}&type=web&page=${this.state.page+1}&page_size=${this.state.rowsPerPage}`)
+        .get(`${URLPrefix}/api/v1/clip?sid=${this.props.sid}&type=${this.state.type}&page=${this.state.page+1}&page_size=${this.state.rowsPerPage}`)
         .then(response => {
           let new_page = 0;
           if(response.data.hasOwnProperty('page')) {
