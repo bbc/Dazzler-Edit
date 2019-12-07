@@ -158,8 +158,11 @@ export class Episode extends React.Component {
           this.setState({ totalRows: response.data.total });
 
           response.data.items.forEach(item => {
-            if (moment(item.release_date).isAfter(moment())) {
-              item.insertionType = "futureEpisode";
+            if(item !== null) {
+              const start = item.available_versions.version[0].availabilities.availability[0].scheduled_start;
+              if (moment(start).isAfter(moment())) {
+                item.insertionType = "futureEpisode";
+              }
             }
           });
 
