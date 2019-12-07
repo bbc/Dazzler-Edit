@@ -88,7 +88,7 @@ const styles = theme => ({
     })
   },
   appBarName: {
-    marginLeft: auto
+    marginLeft: "auto"
   },
   menuButton: {
     marginLeft: 12,
