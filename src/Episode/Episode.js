@@ -140,6 +140,7 @@ export class Episode extends React.Component {
 
   componentDidMount = () => {
     this.setState({ sid: this.props.sid });
+    this.setState({ date: this.props.date });
   };
 
   componentDidUpdate(prevProps) {
@@ -147,25 +148,38 @@ export class Episode extends React.Component {
     if (this.state.page !== this.state.previousPage) {
       console.log("have page %d want page %d", this.state.page, this.state.previousPage);
       axios
-        .get( `${URLPrefix}/api/v1/episode?sid=${this.props.sid}&page=${this.state.page+1}&page_size=${this.state.rowsPerPage}`)
+        .get(`${URLPrefix}/api/v1/episode?sid=${this.props.sid}&page=${this.state.page+1}&page_size=${this.state.rowsPerPage}&availability=available`)
         .then(response => {
-          console.log("EPISODES", response.data.items);
+          console.log("available EPISODES", response.data.items);
           let new_page = 0;
           if(response.data.hasOwnProperty('page')) {
             new_page = response.data.page - 1;
           }
           this.setState({ previousPage: new_page });
           this.setState({ page: new_page });
-          this.setState({ totalRows: response.data.total });
+          if(response.data.items.length === this.state.rowsPerPage) {
+            this.setState({ totalRows: response.data.total });
+            this.setState({ rows: response.data.items });
 
-          response.data.items.forEach(item => {
-            const start = item.available_versions.version[0].availabilities.availability[0].scheduled_start;
-            if (moment(start).isAfter(moment())) {
-              item.insertionType = "futureEpisode";
+          }
+          else {
+            let items = [];
+            if(response.data.items !== undefined && response.data.items.length>0) {
+              items = response.data.items;
             }
-          });
-
-          this.setState({ rows: response.data.items });
+            const ahead = 'P7D';
+            axios
+            .get(`${URLPrefix}/api/v1/episode?sid=${this.props.sid}&page=${this.state.page+1}&page_size=${this.state.rowsPerPage}&availability=${ahead}`)
+            .then(response => {
+                response.data.items.forEach(item => {
+                  item.insertionType = "futureEpisode";
+                  items.push(item);
+                });
+            })
+            .catch(e => {
+              console.log(e);
+            });
+          }
         })
         .catch(e => {
           console.log(e);
@@ -229,9 +243,7 @@ export class Episode extends React.Component {
                     <TableCell component="th" scope="row">
                       <div className="tooltip">
                         {" "}
-                        {row.title === undefined
-                          ? row.presentation_title
-                          : row.title}
+                        {row.title === undefined ? row.presentation_title : row.title}
                         <span className="tooltiptext">PID = {row.pid}</span>
                       </div>
                     </TableCell>
