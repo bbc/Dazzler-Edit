@@ -31,7 +31,6 @@ mkdir -p %{buildroot}/usr/lib/systemd/system/
 mkdir -p %{buildroot}%{_sysconfdir}/bake-scripts/dazzler
 mkdir -p %{buildroot}/usr/lib/dazzler
 cp %{_builddir}/backend/index.js %{buildroot}/usr/lib/dazzler
-cp %{_builddir}/backend/auth.txt %{buildroot}/usr/lib/dazzler
 cp -R %{_builddir}/backend/dazzler/ %{buildroot}/usr/lib/dazzler/
 cp -R %{_builddir}/backend/edit/ %{buildroot}/usr/lib/dazzler/
 cp -R %{_builddir}/backend/node_modules %{buildroot}/usr/lib/dazzler
