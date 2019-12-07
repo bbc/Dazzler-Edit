@@ -16,7 +16,6 @@ import LastPageIcon from "@material-ui/icons/LastPage";
 import moment from "moment";
 import Spinner from "../Spinner/Spinner";
 import axios from "axios";
-const type = "Specials";
 const actionsStyles = theme => ({
   root: {
     flexShrink: 0,
@@ -118,7 +117,7 @@ export const styles = theme => ({
 
 //checking if we are running locally
 var URLPrefix = "";
-if (process.env.NODE_ENV == "development") {
+if (process.env.NODE_ENV === "development") {
   URLPrefix = "http://localhost:8080";
 }
 
@@ -150,7 +149,7 @@ export class Specials extends React.Component {
         .get(`${URLPrefix}/api/v1/special?sid=${this.props.sid}&page=${this.state.page+1}&page_size=${this.state.rowsPerPage}`)
         .then(response => {
           console.log("Specials", response.data.items);
-          const new_page = 0;
+          let new_page = 0;
           if(response.data.hasOwnProperty('page')) {
             new_page = response.data.page - 1;
           }
@@ -221,7 +220,7 @@ export class Specials extends React.Component {
                     <TableCell component="th" scope="row">
                       <div className="tooltip">
                         {" "}
-                        {row.title == undefined
+                        {row.title === undefined
                           ? row.presentation_title
                           : row.title}
                         <span className="tooltiptext">PID = {row.pid}</span>

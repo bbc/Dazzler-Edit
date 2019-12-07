@@ -62,11 +62,10 @@ var icons = [
 ];
 // var viewIcons = [<LiveTv />, <Assignment />, <LoopIcon />];
 var viewIcons = [<LiveTv />, <LoopIcon />];
-var count = -1;
 var URLPrefix = "";
 //checking if running locally
 
-if (process.env.NODE_ENV == "development") {
+if (process.env.NODE_ENV === "development") {
   URLPrefix = "http://localhost:8080";
 }
 
@@ -328,7 +327,8 @@ class Editor extends React.Component {
           switch (item.window_of[i].result_type) {
             case "version":
               newItem2.versionPid = item.window_of[i].pid;
-              newItem2.versionCrid = newItem2.versionCrid;
+              //newItem2.versionCrid = newItem2.versionCrid;
+              console.log('window version', newItem2, item);
               break;
             case "episode":
               // do we want anything from the episode level?
@@ -417,6 +417,7 @@ class Editor extends React.Component {
             <Live sid={this.state.service.sid} handleClick={this.handleClick} />
           )
         });
+        break;
       case "a":
         return this.setState({ show: <Date /> });
       case "Episodes":
@@ -497,6 +498,8 @@ class Editor extends React.Component {
             />
           )
         });
+      break;
+      default: // DO NOTHING
     }
   };
 

@@ -27,7 +27,7 @@ class Loop extends React.Component {
   }
 
   componentDidMount() {
-    if (this.props.scheduleTime == undefined) {
+    if (this.props.scheduleTime === undefined) {
       this.setState({ time: new Date() });
     } else {
       this.setState({ time: new Date(this.props.scheduleTime) });

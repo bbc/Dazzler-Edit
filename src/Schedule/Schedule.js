@@ -79,7 +79,7 @@ class Schedule extends React.Component {
         });
         scheduleItems = JSON.parse(sessionStorage.getItem("scheduleItems"));
       }
-      if (sessionStorage.getItem("activeSession") == undefined) {
+      if (sessionStorage.getItem("activeSession") === undefined) {
         axios
           .get(
             `${URLPrefix}/api/v1/schedule?sid=${this.props.service.sid}&date=${moment.utc().format("YYYY-MM-DD")}`
@@ -176,7 +176,7 @@ class Schedule extends React.Component {
       for (let i = 0; i < myPreRenderedItems[dateIndex].length; i++) {
         var item = myPreRenderedItems[dateIndex][i];
         // (startTime == item.props.id && chosen != true)
-        if (chosen == true || startTime != item.props.startTime) {
+        if (chosen || startTime !== item.props.startTime) {
           myPreRenderedItems[dateIndex][i] = (
             <SingleSchedule
               getItem={this.getItem}
@@ -276,8 +276,9 @@ class Schedule extends React.Component {
   }
 
   makeScheduleEvent(serviceIDRef, broadcast, index, end) {
+    let duration = null;
     if (index === scheduleItems[dateIndex].length - 1) {
-      var duration = broadcast.duration;
+      duration = broadcast.duration;
     } else {
       var time = moment(
         myPreRenderedItems[dateIndex][index].props.startTime.toString(),
@@ -288,7 +289,7 @@ class Schedule extends React.Component {
         "HH:mm:ss"
       );
       var calculatedDuration = moment.duration(nextStart.diff(time));
-      var duration = calculatedDuration.toISOString();
+      duration = calculatedDuration.toISOString();
     }
     const startDateTime = moment.utc(broadcast.startTime, "HH:mm:ss");
     let imi = "imi:dazzler:" + serviceIDRef + "/" + startDateTime.unix();
@@ -405,7 +406,7 @@ class Schedule extends React.Component {
         scheduleItems[dateIndex] = [];
       }
 
-      if (insertPosition != undefined && !item.isLive) {
+      if (insertPosition !== undefined && !item.isLive) {
         const lastItem = scheduleItems[dateIndex][insertPosition];
 
         try {
@@ -419,7 +420,8 @@ class Schedule extends React.Component {
         insertPosition = undefined;
         item.live = "live";
         item.startTime = moment(item.title.substring(18, 38));
-        item.duration = item.duration;
+        // item.duration = item.duration;
+        console.log('addItemPosition', item);
       } else {
         if (
           scheduleItems[dateIndex].length === 0 ||
@@ -469,7 +471,6 @@ class Schedule extends React.Component {
   }
   addScheduleItem(updateItem, position) {
     try {
-      var position;
       let items = [];
 
       if (updateItem === undefined) {
@@ -480,7 +481,7 @@ class Schedule extends React.Component {
 
       this.addItemPosition(updateItem);
 
-      if (insertPosition == undefined) {
+      if (insertPosition === undefined) {
         if (
           moment(updateItem.startTime).format("YYYY-MM-DD") >
             moment(this.state.scheduleDate).format("YYYY-MM-DD") &&
@@ -545,8 +546,8 @@ class Schedule extends React.Component {
         });
         if (updateItem.isLive) {
           this.sortData();
-          myPreRenderedItems[dateIndex].map((item, index) => {
-            if (item.props.live != undefined) {
+          myPreRenderedItems[dateIndex].forEach((item, index) => {
+            if (item.props.live !== undefined) {
               position = index + 1;
               myPreRenderedItems[dateIndex].splice(
                 index + 1,
@@ -621,7 +622,7 @@ class Schedule extends React.Component {
         insertPosition = undefined;
         this.setState({ preRenderedItem: myPreRenderedItems });
 
-        myPreRenderedItems[dateIndex].map(item => {
+        myPreRenderedItems[dateIndex].forEach(item => {
           console.log("BOOM", item.props.date);
         });
       }
@@ -666,7 +667,6 @@ class Schedule extends React.Component {
   deleteScheduleItems() {
     try {
       // var myPreRenderedItems = this.state.preRenderedItem;
-      let items = [];
       var position;
 
       for (var index = 0; index < scheduleItems[dateIndex].length; index++) {
@@ -697,7 +697,7 @@ class Schedule extends React.Component {
           : moment(this.props.finishTime)._i[0];
 
       switch (true) {
-        case this.props.loopedContent.length == 0:
+        case this.props.loopedContent.length === 0:
           alert("Loop Empty");
           break;
 
@@ -706,7 +706,7 @@ class Schedule extends React.Component {
           break;
 
         default:
-          scheduleItems[dateIndex].map((item, index) => {
+          scheduleItems[dateIndex].forEach((item, index) => {
             if (
               moment(item.startTime).isAfter(moment(start)) &&
               moment(item.startTime)

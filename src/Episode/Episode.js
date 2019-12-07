@@ -16,7 +16,6 @@ import LastPageIcon from "@material-ui/icons/LastPage";
 import moment from "moment";
 import Spinner from "../Spinner/Spinner";
 import axios from "axios";
-const type = "Episode";
 const actionsStyles = theme => ({
   root: {
     flexShrink: 0,
@@ -118,7 +117,7 @@ export const styles = theme => ({
 
 //checking if we are running locally
 var URLPrefix = "";
-if (process.env.NODE_ENV == "development") {
+if (process.env.NODE_ENV === "development") {
   URLPrefix = "http://localhost:8080";
 }
 
@@ -144,16 +143,13 @@ export class Episode extends React.Component {
 
   componentDidUpdate(prevProps) {
     console.log("Episode update", this.state.page);
-    if(isNaN(this.state.page)) this.state.page = 0;
-    if(isNaN(this.props.page)) this.props.page = 0;
-    if(isNaN(prevProps.page)) prevProps.page = 0;
     if (this.state.page !== this.state.previousPage) {
       console.log("have page %d want page %d", this.props.page, prevProps.page);
       axios
         .get( `${URLPrefix}/api/v1.1/episode"}?sid=${this.props.sid}&page=${this.state.page+1}&page_size=${this.state.rowsPerPage}`)
         .then(response => {
           console.log("EPISODES", response.data.items);
-          const new_page = 0;
+          let new_page = 0;
           if(response.data.hasOwnProperty('page')) {
             new_page = response.data.page - 1;
           }
@@ -161,7 +157,7 @@ export class Episode extends React.Component {
           this.setState({ page: new_page });
           this.setState({ totalRows: response.data.total });
 
-          response.data.items.map(item => {
+          response.data.items.forEach(item => {
             if (moment(item.release_date).isAfter(moment())) {
               item.insertionType = "futureEpisode";
             }

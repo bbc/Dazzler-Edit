@@ -117,7 +117,7 @@ export const styles = theme => ({
 
 //checking if we are running locally
 var URLPrefix = "";
-if (process.env.NODE_ENV == "development") {
+if (process.env.NODE_ENV === "development") {
   URLPrefix = "http://localhost:8080";
 }
 
@@ -149,7 +149,7 @@ export class Jupiter extends React.Component {
         .get(`${URLPrefix}/api/v1/clip?sid=${this.props.sid}&type=jupiter&page=${this.state.page+1}&page_size=${this.state.rowsPerPage}`)
         .then(response => {
           console.log("JUPITER", response);
-          const new_page = 0;
+          let new_page = 0;
           if(response.data.hasOwnProperty('page')) {
             new_page = response.data.page - 1;
           }
