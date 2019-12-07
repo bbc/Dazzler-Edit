@@ -241,7 +241,7 @@ async function clip(q, query, res) {
   } 
 }
 
-app.get("/api/v1.1/episode", async (req, res, next) => {
+app.get("/api/v1/episode", async (req, res, next) => {
   let q = {
     mixin: ["images", "available_versions"],
     entity_type: "episode"
@@ -259,7 +259,30 @@ app.get("/api/v1.1/episode", async (req, res, next) => {
     q.page_size = req.query.page_size;
   }
   try {
+    let items = [];
     q.availability = "available";
+    const available_episodes = get_episodes(q);
+    if(available_episodes.total>0) {
+        items = items.concat(available_episodes.items);
+    }
+    q.availability = "PT24H";
+    const future_episodes = get_episodes(q);
+    if(future_episodes.total>0) {
+        items = items.concat(future_episodes.items);
+    }
+    res.json({
+      page_size: q.page_size,
+      page: q.page,
+      total: items.length,
+      items: items
+    });
+  } catch (e) {
+    console.log(JSON.stringify(e));
+    res.status(404).send("error");
+  }
+});
+
+async function get_episodes(q) {
     let url = `http://programmes.api.bbc.com/nitro/api/programmes/?api_key=${process.env.NITRO_KEY}&` + querystring.stringify(q);
     let r = await axios({
       url: url,
@@ -273,36 +296,8 @@ app.get("/api/v1.1/episode", async (req, res, next) => {
       // test for status you want, etc
       console.log(res.status);
     }
-    // Don't forget to return something
-    const r1 = r.data;
-    q.availability = "PT24H";
-    url = `http://programmes.api.bbc.com/nitro/api/programmes/?api_key=${process.env.NITRO_KEY}&` + querystring.stringify(q);
-    r = await axios({
-      url: url,
-      method: "get",
-      timeout: 8000,
-      headers: {
-        Accept: "application/json"
-      }
-    });
-    if (r.status !== 200) {
-      // test for status you want, etc
-      console.log(r.status);
-    }
-    // Don't forget to return something
-    const r2 = r.data;
-    let items = r1.nitro.results.items.concat(r2.nitro.results.items);
-    res.json({
-      page_size: q.page_size,
-      page: q.page,
-      total: items.length,
-      items: items
-    });
-  } catch (e) {
-    console.log(JSON.stringify(e));
-    res.status(404).send("error");
-  }
-});
+    return r.data.nitro.results;
+}
 
 app.put("/api/v1/loop", async (req, res, next) => {
   let user = "dazzler"; // assume local
