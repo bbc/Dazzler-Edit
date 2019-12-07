@@ -425,7 +425,11 @@ class Editor extends React.Component {
         this.setState({ title: "Upcoming Live Broadcasts" });
         this.setState({
           panelShow: (
-            <Live sid={this.state.service.sid} handleClick={this.handleClick} />
+            <Live
+              date={this.state.scheduleDate}
+	      sid={this.state.service.sid}
+	      handleClick={this.handleClick}
+	    />
           )
         });
         break;
@@ -438,6 +442,7 @@ class Editor extends React.Component {
         this.setState({
           panelShow: (
             <Episode
+              date={this.state.scheduleDate}
               sid={this.state.service.sid}
               handleClick={this.handleClick}
             />

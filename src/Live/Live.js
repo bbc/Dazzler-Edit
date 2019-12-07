@@ -133,7 +133,8 @@ export class Live extends React.Component {
       previousPage: -1,
       rowsPerPage: 5,
       data: [],
-      sid: ""
+      sid: "",
+      date: moment().format()
     };
   }
 
@@ -143,10 +144,10 @@ export class Live extends React.Component {
 
   componentDidUpdate(prevProps) {
     //get request for webcasts
-    const date = moment().millisecond(0).second(0).minute(0).hour(0).utc(); // TODO DAZZLER-68
+    const date = moment(this.state.date).millisecond(0).second(0).minute(0).hour(0).utc();
     const start = date.add(moment().hour(), "hours").add(moment().minutes()+5, "minutes");
     const end = start.add(1, "days");
-    console.log("Live update", this.state.page);
+    console.log("Live update", this.state.page, this.state.date);
     if (this.state.page !== this.state.previousPage) {
       console.log("have page %d want page %d", this.state.page, this.state.previousPage);
       axios

@@ -133,7 +133,8 @@ export class Episode extends React.Component {
       previousPage: -1,
       rowsPerPage: 5,
       data: [],
-      sid: ""
+      sid: "",
+      date: moment().format()
     };
   }
 
