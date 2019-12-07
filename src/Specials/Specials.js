@@ -197,8 +197,7 @@ export class Specials extends React.Component {
   render() {
     const { classes } = this.props;
     const { rows, rowsPerPage, page, totalRows } = this.state;
-    const emptyRows =
-      rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
+    const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
 
     //if(rows.length === 0){
     //  this.setState({spinner : true})
