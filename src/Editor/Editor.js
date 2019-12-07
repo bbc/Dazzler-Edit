@@ -151,7 +151,7 @@ class Editor extends React.Component {
       episodes: [],
       live: [],
       schedules: {}, // state store for loaded and/or edited schedules
-      scheduleDate: moment(),
+      scheduleDate: moment().format(),
       display: "",
       user: { name: "anonymous" },
       service: {

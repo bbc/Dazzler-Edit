@@ -49,7 +49,7 @@ class Schedule extends React.Component {
       status: "Save Playlist",
       index: null,
       preRenderedItem: [[]],
-      scheduleDate: moment()
+      scheduleDate: moment().format()
     };
   }
 
@@ -317,8 +317,9 @@ class Schedule extends React.Component {
     if (moment(CDate).format("LL") === moment().format("LL")) {
       text = "Today's ";
     }
-    this.setState({ scheduleDate: moment(CDate) });
-    this.props.onDateChange(moment(CDate));
+    const scheduleDateISO = moment(CDate).format();
+    this.setState({ scheduleDate: scheduleDateISO });
+    this.props.onDateChange(scheduleDateISO);
   };
   nextDay = CDate => {
     dateIndex += 1;
@@ -327,8 +328,9 @@ class Schedule extends React.Component {
     if (moment(CDate).format("LL") === moment().format("LL")) {
       text = "Today's ";
     }
-    this.setState({ scheduleDate: moment(CDate) });
-    this.props.onDateChange(moment(CDate));
+    const scheduleDateISO = moment(CDate).format();
+    this.setState({ scheduleDate: scheduleDateISO });
+    this.props.onDateChange(scheduleDateISO);
   };
 
   pasteContent() {
@@ -339,7 +341,7 @@ class Schedule extends React.Component {
 
       if (
         moment(scratchpadItems[i].startTime).format("YYYY-MM-DD") >
-        this.state.scheduleDate.format("YYYY-MM-DD")
+        moment(this.state.scheduleDate).format("YYYY-MM-DD")
       ) {
         if (scheduleItems[dateIndex + 1] === undefined) {
           scheduleItems[dateIndex + 1] = [];
@@ -471,7 +473,7 @@ class Schedule extends React.Component {
       if (insertPosition === undefined) {
         if (
           moment(updateItem.startTime).format("YYYY-MM-DD") >
-            this.state.scheduleDate.format("YYYY-MM-DD") &&
+            moment(this.state.scheduleDate).format("YYYY-MM-DD") &&
           updateItem.live === undefined
         ) {
           if (scheduleItems[dateIndex + 1] === undefined) {
