@@ -399,7 +399,7 @@ class Editor extends React.Component {
     switch (text) {
       case "Web Clips":
         this.setState({ isPaneOpen: true });
-        this.setState({ title: "Available Clips" });
+        this.setState({ title: "Web Clips" });
         this.setState({
           panelShow: (
             <Clips
