@@ -127,7 +127,7 @@ export class Clips extends React.Component {
     super(props);
 
     this.state = {
-      componentName = "Web Clips";
+      componentName = "Web Clips",
       spinner: false,
       totalRows: 0,
       rows: [],
