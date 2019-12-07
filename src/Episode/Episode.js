@@ -227,7 +227,7 @@ export class Episode extends React.Component {
                     <TableCell component="th" scope="row">
                       <div className="tooltip">
                         {" "}
-                        {row.title == undefined
+                        {row.title === undefined
                           ? row.presentation_title
                           : row.title}
                         <span className="tooltiptext">PID = {row.pid}</span>
