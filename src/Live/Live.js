@@ -148,28 +148,33 @@ export class Live extends React.Component {
     const end = start.add(1, "days");
     console.log("Live update", this.state.page);
     if (this.state.page !== this.state.previousPage) {
-      console.log("have page %d want page %d", this.props.page, prevProps.page);
+      console.log("have page %d want page %d", this.state.page, this.state.previousPage);
       axios
         .get(`${URLPrefix}/api/v1/webcast?sid=${this.props.sid}&start=${start.format()}&end=${end.format()}`)
         .then(response => {
-          console.log("Live RESPONSE", response.data.items);
-          response.data.items.forEach(item => {
-            var durationTime =
-              moment(item.scheduled_time.end) -
-              moment(item.scheduled_time.start);
+          console.log("Live RESPONSE", response.data);
+	  if(response.data.total>0) {
+		  response.data.items.forEach(item => {
+		    var durationTime =
+		      moment(item.scheduled_time.end) -
+		      moment(item.scheduled_time.start);
 
-            item.isLive = true;
-            item.startTime = moment(item.scheduled_time.start).format( "HH:mm:ss");
-            item.title = "Live programme at " + item.scheduled_time.start;
-            item.duration = moment.duration(durationTime, "milliseconds");
-          });
+		    item.isLive = true;
+		    item.startTime = moment(item.scheduled_time.start).format( "HH:mm:ss");
+		    item.title = "Live programme at " + item.scheduled_time.start;
+		    item.duration = moment.duration(durationTime, "milliseconds");
+		  });
+		  this.setState({ rows: response.data.items });
+	  }
+	  else {
+		  this.setState({ rows: [] });
+	  }
           let new_page = 0;
           if(response.data.hasOwnProperty('page')) {
             new_page = response.data.page - 1;
           }
           this.setState({ previousPage: new_page });
           this.setState({ page: new_page });
-          this.setState({ rows: response.data.items });
           this.setState({ totalRows: response.data.total });
         })
         .catch(e => {

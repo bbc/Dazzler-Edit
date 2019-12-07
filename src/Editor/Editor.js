@@ -414,6 +414,7 @@ class Editor extends React.Component {
         this.setState({
           panelShow: (
             <Clips
+	      type="web"
               sid={this.state.service.sid}
               handleClick={this.handleClick}
             />
