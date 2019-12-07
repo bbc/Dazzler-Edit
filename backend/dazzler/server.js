@@ -261,12 +261,12 @@ app.get("/api/v1/episode", async (req, res, next) => {
   try {
     let items = [];
     q.availability = "available";
-    const available_episodes = get_episodes(q);
+    const available_episodes = await get_episodes(q);
     if(available_episodes.total>0) {
         items = items.concat(available_episodes.items);
     }
     q.availability = "PT24H";
-    const future_episodes = get_episodes(q);
+    const future_episodes = await get_episodes(q);
     if(future_episodes.total>0) {
         items = items.concat(future_episodes.items);
     }
