@@ -85,22 +85,15 @@ class Schedule extends React.Component {
             `${URLPrefix}/api/v1/schedule?sid=${this.props.service.sid}&date=${moment.utc().format("YYYY-MM-DD")}`
           )
           .then(response => {
-            response["data"]["schedule"]["item"].forEach((item, index) => {
-              var obj = {
+            response.data.item.forEach((item, index) => {
+              const broadcast = item.broadcast[0];
+              let obj = {
                 title: this.getScheduleItemTitle(item, index),
-                startTime: moment(
-                  item["broadcast"][0]["published_time"][0]["$"]["start"]
-                ),
-                duration: moment
-                  .duration(
-                    item["broadcast"][0]["published_time"][0]["$"][
-                      "duration"
-                    ]
-                  )
-                  .toISOString(),
+                startTime: moment(broadcast.published_time[0].$.start,
+                duration: moment.duration(broadcast.published_time[0].$.duration).toISOString(),
                 id: index,
-                live: item["broadcast"][0]["live"][0]["$"]["value"],
-                versionCrid: item["version"][0]["crid"][0]["$"]["uri"]
+                live: broadcast.live[0].$.value,
+                versionCrid: item.version[0].crid[0].$.uri
               };
 
               myPreRenderedItems[dateIndex].push(
@@ -240,16 +233,9 @@ class Schedule extends React.Component {
       let tva =
         tvaStart +
         "    <ProgramLocationTable>\n" +
-        `      <Schedule start="${start.format()}" end="${end.format()}" serviceIDRef="${
-          this.props.service.serviceIDRef
-        }">`;
+        `      <Schedule start="${start.format()}" end="${end.format()}" serviceIDRef="${this.props.service.serviceIDRef}">`;
       for (let i = 0; i < data.length; i++) {
-        tva += this.makeScheduleEvent(
-          this.props.service.serviceIDRef,
-          data[i],
-          i,
-          end
-        );
+        tva += this.makeScheduleEvent( this.props.service.serviceIDRef, data[i], i, end);
       }
       tva += "\n      </Schedule>\n    </ProgramLocationTable>\n" + tvaEnd;
       console.log(tva);
