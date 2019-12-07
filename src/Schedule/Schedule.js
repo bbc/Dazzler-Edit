@@ -49,9 +49,7 @@ class Schedule extends React.Component {
       status: "Save Playlist",
       index: null,
       preRenderedItem: [[]],
-      scheduleDate: moment()
-        .add(0, "d")
-        .format("LL")
+      scheduleDate: moment().add(0, "d").format("LL")
     };
   }
 
@@ -320,6 +318,7 @@ class Schedule extends React.Component {
       text = "Today's ";
     }
     this.setState({ scheduleDate: CDate });
+    this.props.onDateChange(CDate);
   };
   nextDay = CDate => {
     dateIndex += 1;
@@ -329,6 +328,7 @@ class Schedule extends React.Component {
       text = "Today's ";
     }
     this.setState({ scheduleDate: CDate });
+    this.props.onDateChange(CDate);
   };
 
   pasteContent() {
@@ -840,9 +840,7 @@ class Schedule extends React.Component {
                 </div>
                 <div
                   className="ui left floated small primary labeled icon button"
-                  onClick={() => {
-                    this.pasteContent();
-                  }}
+                  onClick={() => {this.pasteContent();}}
                 >
                   Paste
                 </div>

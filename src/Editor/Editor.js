@@ -166,6 +166,7 @@ class Editor extends React.Component {
     this.setState({
       display: (
         <Schedule
+          onDateChange={this.handleDateChange}
           service={this.state.service}
           lastItem={this.lastItem}
           clipTime={time}
@@ -207,6 +208,10 @@ class Editor extends React.Component {
     this.setState({ open: false });
   };
 
+  handleDateChange = (d) => {
+    console.log('handleDateChange', d);
+  };
+
   loopContent = (rows, startTime, finishTime) => {
     loopedContent = [];
     if (rows.length > 0) {
@@ -217,6 +222,7 @@ class Editor extends React.Component {
     this.setState({
       display: (
         <Schedule
+          onDateChange={this.handleDateChange}
           service={this.state.service}
           lastItem={this.lastItem}
           clipTime={time}
@@ -273,6 +279,7 @@ class Editor extends React.Component {
     this.setState({
       display: (
         <Schedule
+          onDateChange={this.handleDateChange}
           service={this.state.service}
           lastItem={this.lastItem}
           loopedContent={""}
@@ -364,6 +371,7 @@ class Editor extends React.Component {
       this.setState({
         display: (
           <Schedule
+            onDateChange={this.handleDateChange}
             service={this.state.service}
             lastItem={this.lastItem}
             clipTime={time}
@@ -462,6 +470,7 @@ class Editor extends React.Component {
         this.setState({
           display: (
             <Schedule
+              onDateChange={this.handleDateChange}
               service={this.state.service}
               lastItem={this.lastItem}
               clipTime={time}
@@ -548,6 +557,9 @@ class Editor extends React.Component {
             </IconButton>
             <Typography variant="h6" color="inherit" noWrap>
               <center>{this.state.service.name}</center>
+            </Typography>
+            <Typography variant="h6" color="inherit" noWrap>
+              <center>Your Name Here</center>
             </Typography>
           </Toolbar>
         </AppBar>
