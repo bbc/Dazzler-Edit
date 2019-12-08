@@ -42,7 +42,7 @@ class SingleSchedule extends React.Component {
           >
             {" "}
             <div className="current">
-              {this.props.selected == "chosen" ? (
+              {this.props.selected === "chosen" ? (
                 <Arrow className="arrow" fontSize="large" />
               ) : (
                 ""
@@ -50,7 +50,7 @@ class SingleSchedule extends React.Component {
               {status}
             </div>
           </td>
-          <td className="collapsing" className={this.props.insertionType}>
+          <td className="collapsing {this.props.insertionType}">
             <input type="checkbox" /> <label></label>
           </td>
           <td className={this.props.insertionType}>{this.props.startTime}</td>

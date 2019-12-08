@@ -14,7 +14,7 @@ import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import LastPageIcon from "@material-ui/icons/LastPage";
 import moment from "moment";
-import Spinner from "../Spinner/Spinner";
+// import Spinner from "../Spinner/Spinner";
 import axios from "axios";
 
 const actionsStyles = theme => ({

@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React /*, { Fragment }*/ from "react";
 import ReactDataGrid from "react-data-grid";
 import moment from "moment";
 import Flatpickr from "react-flatpickr";
@@ -104,9 +104,9 @@ class Loop extends React.Component {
           Start:{" "}
           <Flatpickr
             data-enable-time
-            value={time}
-            onChange={time => {
-              this.setState({ time });
+            value={startDate}
+            onChange={startDate => {
+              this.setState({ startDate });
             }}
           />
           <br />

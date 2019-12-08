@@ -232,7 +232,6 @@ class Schedule extends React.Component {
   }
 
   getScheduleItemTitle = (item, index) => {
-    console.log(item);
     let title = null;
     if (item.hasOwnProperty("clip")) {
       const clip = item.clip[0];
@@ -768,101 +767,88 @@ class Schedule extends React.Component {
   }
 
   loopContent() {
+
+    if(this.props.loopedContent.length === 0) {
+      console.log("Loop Empty - TODO disable button");
+      return;
+    }
+
     try {
-      var start =
-        moment(this.props.startLoop)._i[0] === undefined
-          ? moment(this.props.startLoop)._i
-          : moment(this.props.startLoop)._i[0];
-      var end =
-        moment(this.props.finishTime)._i[0] === undefined
-          ? moment(this.props.finishTime)._i
-          : moment(this.props.finishTime)._i[0];
 
-      switch (true) {
-        case this.props.loopedContent.length === 0:
-          alert("Loop Empty");
-          break;
+      console.log('loopContent', 'state', this.state);
+      console.log('loopContent', 'props', this.props);
+      var start = moment(this.props.startLoop);
+      var end = moment(this.props.finishTime);
 
-        case moment(start).isAfter(moment(end)):
-          alert("invalid Loop");
-          break;
+      if(start.isAfter(end)) {
+          console.log("invalid Loop start after end", start, end);
+          return;
+      }
 
-        default:
-          scheduleItems[dateIndex].forEach((item, index) => {
-            if (
-              moment(item.startTime).isAfter(moment(start)) &&
-              moment(item.startTime)
-                .add(moment.duration(item.duration))
-                .isBefore(moment(end))
-            ) {
-              scheduleItems[dateIndex] = scheduleItems[dateIndex].splice(
-                index,
-                1
-              );
-              myPreRenderedItems[dateIndex] = myPreRenderedItems[
-                dateIndex
-              ].splice(index, 1);
-            }
-          });
+      // TODO add a comment here indicating if this is a delete, shift, etc.
+      scheduleItems[dateIndex].forEach((item, index) => {
+        const itemEnd = moment(item.startTime).add(moment.duration(item.duration));
+        if (
+          moment(item.startTime).isAfter(start) && itemEnd.isBefore(end)
+        ) {
+          scheduleItems[dateIndex] = scheduleItems[dateIndex].splice(index, 1);
+          myPreRenderedItems[dateIndex] = myPreRenderedItems[dateIndex].splice(index, 1);
+        }
+      });
 
-          if (!moment(start).isAfter(moment(end))) {
-            var digit = 2;
-            let loop = JSON.parse(JSON.stringify(this.props.loopedContent));
+      var digit = 2;
+      let loop = JSON.parse(JSON.stringify(this.props.loopedContent));
 
-            loop.forEach((item, index) => {
-              if (index === 0) {
-                item.insertionType = "loopStart";
-              } else if (index === loop.length - 1) {
-                item.insertionType = "loopEnd";
-              } else {
-                item.insertionType = "midLoop";
-              }
-            });
+      loop.forEach((item, index) => {
+        if (index === 0) {
+          item.insertionType = "loopStart";
+        } else if (index === loop.length - 1) {
+          item.insertionType = "loopEnd";
+        } else {
+          item.insertionType = "midLoop";
+        }
+      });
 
-            loop[0].startTime = moment(start);
-            scheduleItems[dateIndex].push(loop[0]);
-            myPreRenderedItems[dateIndex].push(
-              <SingleSchedule
-                getItem={this.getItem}
-                title={loop[0].title}
-                startTime={moment(loop[0].startTime).format("HH:mm:ss")}
-                date={moment(loop[0].startTime)}
-                duration={loop[0].duration}
-                deleteItem={this.props.deleteItem}
-                id={loop[0].id}
-                live={loop[0].live}
-                insertionType={loop[0].insertionType}
-              />
-            );
+      loop[0].startTime = moment(start);
+      scheduleItems[dateIndex].push(loop[0]);
+      myPreRenderedItems[dateIndex].push(
+        <SingleSchedule
+          getItem={this.getItem}
+          title={loop[0].title}
+          startTime={moment(loop[0].startTime).format("HH:mm:ss")}
+          date={moment(loop[0].startTime)}
+          duration={loop[0].duration}
+          deleteItem={this.props.deleteItem}
+          id={loop[0].id}
+          live={loop[0].live}
+          insertionType={loop[0].insertionType}
+        />
+      );
 
-            loop.forEach((item, index) => {
-              if (index > 0) {
-                this.addScheduleItem(item);
-              }
-            });
+      loop.forEach((item, index) => {
+        if (index > 0) {
+          this.addScheduleItem(item);
+        }
+      });
 
-            for (let i = 0; 1 < digit; i++) {
-              // TODO check this for (let j = 0; j === j; j++) {
-              for (let j = 0; j === i; j++) {
-                if (
-                  moment(loop[j].startTime).add(
-                    moment
-                      .duration(loop[j].duration)
-                      .add(moment.duration(loop[j].duration))
-                  ) < moment(end)
-                ) {
-                  var obj = JSON.parse(JSON.stringify(loop[j]));
-                  this.addScheduleItem(obj);
-                  loop = loop.concat(obj);
-                } else {
-                  digit = 1;
-                  break;
-                }
-              }
-            }
+      for (let i = 0; 1 < digit; i++) {
+        // TODO check this for (let j = 0; j === j; j++) {
+        for (let j = 0; j === i; j++) {
+          if (
+            moment(loop[j].startTime).add(
+              moment
+                .duration(loop[j].duration)
+                .add(moment.duration(loop[j].duration))
+            ) < moment(end)
+          ) {
+            var obj = JSON.parse(JSON.stringify(loop[j]));
+            this.addScheduleItem(obj);
+            loop = loop.concat(obj);
           } else {
-            alert("invalid loop");
+            digit = 1;
+            break;
           }
+        }
       }
     } catch (error) {}
   }
