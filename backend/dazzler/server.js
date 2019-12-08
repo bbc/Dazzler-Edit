@@ -78,9 +78,9 @@ app.get("/api/v1/schedule", async (req, res) => {
     const s = schedule.item;
     let pids = [];
     for (let i = 0; i < s.length; i++) {
-      if (s[i].hasOwnProperty("clip")) {
-        const pid = s[i].version[0].version_of[0].link[0].$.pid;
-        pids.push(pid);
+      const link = s[i].version[0].version_of[0].link[0].$;
+      if (link.rel === 'pips-meta:clip') {
+        pids.push(link.pid);
       }
     }
     if(pids.length > 0) {
@@ -88,7 +88,7 @@ app.get("/api/v1/schedule", async (req, res) => {
     }
     // work around circular dependencies
     let o = {};
-    for(key of Object.keys(schedule)) {
+    for(let key of Object.keys(schedule)) {
         o[key] = schedule[key];
     }
     res.json({"total":s.length, item:s, sid:sid, date:date});
@@ -103,8 +103,8 @@ async function addClips(schedule_items, clip_pids) {
   for (let i = 0; i < schedule_items.length; i++) {
     const pid = schedule_items[i].version[0].version_of[0].link[0].$.pid;
     for (let j = 0; j < clips.length; j++) {
-      if (clip[j].pid === pid) {
-        schedule_items[i]["clip"] = clip[j];
+      if (clips[j].pid === pid) {
+        schedule_items[i]["clip"] = [clips[j]];
       }
     }
   }

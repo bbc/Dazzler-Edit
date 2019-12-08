@@ -3,7 +3,6 @@ import SingleSchedule from "../SingleSchedule/SingleSchedule";
 import Date from "../Date/Date";
 import moment from "moment";
 import axios from "axios";
-import { thisExpression } from "@babel/types";
 
 var count = -2;
 var dateIndex = 0;
@@ -53,12 +52,8 @@ class Schedule extends React.Component {
     };
   }
 
-  componentDidMount() {
-    try {
-      this.setState({ serviceIDRef: this.props.service.serviceIDRef });
-      scheduleItems = [[]];
-      myPreRenderedItems = [[]];
-      if (sessionStorage.getItem("data") != null) {
+  readFromSessionStorage()  {
+    if (sessionStorage.getItem("data") != null) {
         var data = JSON.parse(sessionStorage.getItem("data"));
         data[dateIndex].map((item, index) => {
           return myPreRenderedItems[dateIndex].push(
@@ -77,7 +72,15 @@ class Schedule extends React.Component {
         });
         scheduleItems = JSON.parse(sessionStorage.getItem("scheduleItems"));
       }
-      if (sessionStorage.getItem("activeSession") === undefined) {
+  }
+
+  componentDidMount() {
+    try {
+      this.setState({ serviceIDRef: this.props.service.serviceIDRef });
+      scheduleItems = [[]];
+      myPreRenderedItems = [[]];
+      //this.readFromSessionStorage();
+      //if (sessionStorage.getItem("activeSession") === undefined) {
         axios
           .get(
             `${URLPrefix}/api/v1/schedule?sid=${this.props.service.sid}&date=${moment.utc().format("YYYY-MM-DD")}`
@@ -85,7 +88,7 @@ class Schedule extends React.Component {
           .then(response => {
             response.data.item.forEach((item, index) => {
               const broadcast = item.broadcast[0];
-	      const published_time = broadcast.published_time[0].$;
+	            const published_time = broadcast.published_time[0].$;
               let obj = {
                 title: this.getScheduleItemTitle(item, index),
                 startTime: moment(published_time.start),
@@ -116,15 +119,15 @@ class Schedule extends React.Component {
             this.setState({
               preRenderedItem: myPreRenderedItems
             });
-            sessionStorage.setItem("activeSession", 1);
+            //sessionStorage.setItem("activeSession", 1);
             // sessionStorage.setItem("data", JSON.stringify(myPreRenderedItems));
           })
           .catch(e => {
             console.log(e);
           });
-      }
+      //}
 
-      sessionStorage.setItem("ScheduleItems", scheduleItems);
+      //sessionStorage.setItem("ScheduleItems", scheduleItems);
 
       // scheduleItems = JSON.parse(sessionStorage.getItem("scheduleItems"));
 
@@ -151,19 +154,20 @@ class Schedule extends React.Component {
     } catch (error) {}
   };
   getScheduleItemTitle = (item, index) => {
+    console.log(item);
     let title = null;
-    if (item.hasOwnProperty("item_type")) {
-      title = item.title;
+    if (item.hasOwnProperty("clip")) {
+      const clip = item.clip[0];
+      title = clip.title;
       if (title == null) {
-        title = item.presentation_title;
+        title = clip.presentation_title;
       }
     } else if (item.hasOwnProperty("episode")) {
-      title = item.episode.title;
+      const episode = item.episode[0];
+      title = episode.title;
       if (title == null) {
-        title = item.episode.presentation_title;
+        title = episode.presentation_title;
       }
-    } else if (item.hasOwnProperty("clip")) {
-      title = item.clip.title;
     }
     if (title == null) {
       title = "Loaded From Schedule " + index;
@@ -807,8 +811,8 @@ class Schedule extends React.Component {
               .add(6, "m")
           );
         }
-        sessionStorage.setItem("data", JSON.stringify(myPreRenderedItems));
-        sessionStorage.setItem("scheduleItems", JSON.stringify(scheduleItems));
+        //sessionStorage.setItem("data", JSON.stringify(myPreRenderedItems));
+        //sessionStorage.setItem("scheduleItems", JSON.stringify(scheduleItems));
       }
     } catch (error) {}
   }
