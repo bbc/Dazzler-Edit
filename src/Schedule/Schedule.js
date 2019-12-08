@@ -52,28 +52,6 @@ class Schedule extends React.Component {
     };
   }
 
-  readFromSessionStorage()  {
-    if (sessionStorage.getItem("data") != null) {
-        var data = JSON.parse(sessionStorage.getItem("data"));
-        data[dateIndex].map((item, index) => {
-          return myPreRenderedItems[dateIndex].push(
-            <SingleSchedule
-              getItem={this.getItem}
-              title={item.props.title}
-              startTime={item.props.startTime}
-              duration={item.props.duration}
-              deleteItem={this.props.deleteItem}
-              date={moment(item.props.startTime)}
-              id={item.props.id}
-              live={item.props.live}
-              insertionType={item.props.insertionType}
-            />
-          );
-        });
-        scheduleItems = JSON.parse(sessionStorage.getItem("scheduleItems"));
-      }
-  }
-
   componentDidMount() {
     try {
       this.setState({ serviceIDRef: this.props.service.serviceIDRef });
@@ -143,6 +121,105 @@ class Schedule extends React.Component {
     }
   }
 
+  componentDidUpdate(prevProps) {
+    try {
+      if(this.props.added) {
+        if(prevProps.item !== this.props.item) {
+          this.addScheduleItem();
+        }
+      }
+      else {
+        if(prevProps.deleteId !== this.props.deleteId) {
+          this.deleteScheduleItems();
+        }
+      }
+      if (scheduleItems[dateIndex] !== undefined) {
+        if (scheduleItems[dateIndex].length > 0) {
+          var item = scheduleItems[dateIndex][scheduleItems[dateIndex].length - 1];
+          this.props.lastItem(
+            moment(item.startTime).add(moment.duration(item.duration))
+          );
+        } else {
+          this.props.lastItem(
+            moment().add(dateIndex, "d").add(6, "m")
+          );
+        }
+        //sessionStorage.setItem("data", JSON.stringify(myPreRenderedItems));
+        //sessionStorage.setItem("scheduleItems", JSON.stringify(scheduleItems));
+      }
+    } catch (error) {}
+  }
+
+  render() {
+    return (
+      <div>
+        <Date
+          nextDay={this.nextDay}
+          previousDay={this.previousDay}
+          scheduleDate={moment(this.state.scheduleDate).format('LL')}
+        />
+        <div className="dateContainer">
+          <h2>{text}Schedule</h2>
+        </div>
+        <table className="ui compact celled definition table">
+          <thead>
+            <tr>
+              <th>Select</th>
+              <th></th>
+              <th>Start</th>
+              <th>Title</th>
+              <th>Duration </th>
+              <th>Action</th>
+            </tr>
+          </thead>
+
+          <tbody>{this.state.preRenderedItem[dateIndex]}</tbody>
+          <tfoot className="full-width">
+            <tr>
+              <th></th>
+              <th colSpan="6">
+                <div
+                  className={this.state.savePlaylist}
+                  onClick={this.savePlaylist}
+                >
+                  {this.state.status}
+                </div>
+                <div
+                  className="ui left floated small primary labeled icon button"
+                  onClick={() => {this.pasteContent();}}
+                >
+                  Paste
+                </div>
+              </th>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    );
+  }
+
+  readFromSessionStorage()  {
+    if (sessionStorage.getItem("data") != null) {
+        var data = JSON.parse(sessionStorage.getItem("data"));
+        data[dateIndex].map((item, index) => {
+          return myPreRenderedItems[dateIndex].push(
+            <SingleSchedule
+              getItem={this.getItem}
+              title={item.props.title}
+              startTime={item.props.startTime}
+              duration={item.props.duration}
+              deleteItem={this.props.deleteItem}
+              date={moment(item.props.startTime)}
+              id={item.props.id}
+              live={item.props.live}
+              insertionType={item.props.insertionType}
+            />
+          );
+        });
+        scheduleItems = JSON.parse(sessionStorage.getItem("scheduleItems"));
+      }
+  }
+
   sortData = () => {
     try {
       scheduleItems[dateIndex].sort((a, b) => {
@@ -152,7 +229,8 @@ class Schedule extends React.Component {
         return moment(a.props.date) - moment(b.props.date);
       });
     } catch (error) {}
-  };
+  }
+
   getScheduleItemTitle = (item, index) => {
     console.log(item);
     let title = null;
@@ -173,7 +251,8 @@ class Schedule extends React.Component {
       title = "Loaded From Schedule " + index;
     }
     return title;
-  };
+  }
+
   getItem(startTime, chosen) {
     try {
       for (let i = 0; i < myPreRenderedItems[dateIndex].length; i++) {
@@ -331,7 +410,8 @@ class Schedule extends React.Component {
     const scheduleDateISO = moment(CDate).utc().format();
     this.setState({ scheduleDate: scheduleDateISO });
     this.props.onDateChange(scheduleDateISO);
-  };
+  }
+
   nextDay = CDate => {
     dateIndex += 1;
     text = moment(CDate).isBefore(moment()) ? "Previous " : "Future ";
@@ -342,7 +422,7 @@ class Schedule extends React.Component {
     const scheduleDateISO = moment(CDate).utc().format();
     this.setState({ scheduleDate: scheduleDateISO });
     this.props.onDateChange(scheduleDateISO);
-  };
+  }
 
   pasteContent() {
     sessionStorage.setItem("ScheduleItems", JSON.stringify(scheduleItems));
@@ -469,6 +549,7 @@ class Schedule extends React.Component {
       item.id = count += 1;
     } catch (error) {}
   }
+
   addScheduleItem(updateItem, position) {
     try {
       let items = [];
@@ -664,6 +745,7 @@ class Schedule extends React.Component {
       console.log(scheduleItems[dateIndex]);
     } catch (error) {}
   }
+
   deleteScheduleItems() {
     try {
       // var myPreRenderedItems = this.state.preRenderedItem;
@@ -783,86 +865,6 @@ class Schedule extends React.Component {
           }
       }
     } catch (error) {}
-  }
-
-  componentDidUpdate(prevProps) {
-    try {
-      switch (true) {
-        case prevProps.item !== this.props.item && this.props.added:
-          this.addScheduleItem();
-          break;
-        case prevProps.deleteId !== this.props.deleteId && !this.props.added:
-          this.deleteScheduleItems();
-          break;
-        default:
-          break;
-      }
-      if (scheduleItems[dateIndex] !== undefined) {
-        if (scheduleItems[dateIndex].length > 0) {
-          var item =
-            scheduleItems[dateIndex][scheduleItems[dateIndex].length - 1];
-          this.props.lastItem(
-            moment(item.startTime).add(moment.duration(item.duration))
-          );
-        } else {
-          this.props.lastItem(
-            moment()
-              .add(dateIndex, "d")
-              .add(6, "m")
-          );
-        }
-        //sessionStorage.setItem("data", JSON.stringify(myPreRenderedItems));
-        //sessionStorage.setItem("scheduleItems", JSON.stringify(scheduleItems));
-      }
-    } catch (error) {}
-  }
-
-  render() {
-    return (
-      <div>
-        <Date
-          nextDay={this.nextDay}
-          previousDay={this.previousDay}
-          scheduleDate={moment(this.state.scheduleDate).format('LL')}
-        />
-        <div className="dateContainer">
-          <h2>{text}Schedule</h2>
-        </div>
-        <table className="ui compact celled definition table">
-          <thead>
-            <tr>
-              <th>Select</th>
-              <th></th>
-              <th>Start</th>
-              <th>Title</th>
-              <th>Duration </th>
-              <th>Action</th>
-            </tr>
-          </thead>
-
-          <tbody>{this.state.preRenderedItem[dateIndex]}</tbody>
-          <tfoot className="full-width">
-            <tr>
-              <th></th>
-              <th colSpan="6">
-                <div
-                  className={this.state.savePlaylist}
-                  onClick={this.savePlaylist}
-                >
-                  {this.state.status}
-                </div>
-                <div
-                  className="ui left floated small primary labeled icon button"
-                  onClick={() => {this.pasteContent();}}
-                >
-                  Paste
-                </div>
-              </th>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
-    );
   }
 }
 export default Schedule;
