@@ -1,19 +1,17 @@
 import React /*, { Fragment }*/ from "react";
 import ReactDataGrid from "react-data-grid";
 import moment from "moment";
+import 'moment-duration-format';
 import Flatpickr from "react-flatpickr";
 import "flatpickr/dist/themes/material_green.css";
-
-var rows = [];
-var length = 0;
-var duration = 0;
 
 const columns = [
   { key: "pid", name: "pid" },
   { key: "title", name: "Title" },
-  { key: "newDuration", name: "duration" },
-  { key: "Delete", name: "Delete" }
+  { key: "durationAsString", name: "duration" },
+  { key: "action", name: "Action" }
 ];
+
 class Loop extends React.Component {
   constructor(props) {
     super(props);
@@ -21,57 +19,43 @@ class Loop extends React.Component {
       data: [],
       status: "",
       current: "",
-      startDate: new Date(),
-      finishDate: new Date()
+      startDate: moment(),
+      finishDate: moment().add(2, 'hours'),
+      duration: moment.duration('PT0S')
     };
   }
 
   componentDidMount() {
-    if (this.props.scheduleTime === undefined) {
-      this.setState({ time: new Date() });
-    } else {
-      this.setState({ time: new Date(this.props.scheduleTime) });
-    }
-    this.setState({ data: this.props.data });
-    this.setState({ status: "Copy" });
-    this.setState({ current: "Clear" });
     this.setState({
-      startDate: this.state.startDate.setMinutes(
-        this.state.startDate.getMinutes() + 10
-      )
-    });
-    this.setState({
-      finishDate: this.state.finishDate.setHours(
-        this.state.finishDate.getHours() + 2
-      )
+      data: this.props.data,
+      duration: this.props.duration,
+      status: "Copy",
+      current: "Clear",
+      startDate: moment(),
+      finishDate:  moment().add(2, 'hours')
     });
   }
+
   componentDidUpdate(prevProps) {
+    console.log('update loop', this.props);
     if (prevProps.data.length !== this.props.data.length) {
       if (this.props.data.length === 0) {
-        this.setState({ current: "Clear" });
+        this.setState({ 
+          current: "Clear", 
+          data: [],
+          duration: 0
+        });
+      }
+      else {
+        this.setState({ 
+          data: this.props.data,
+          duration: this.props.duration
+        });
       }
     }
   }
-  render() {
-    const { startDate, finishDate, time } = this.state;
 
-    rows = [];
-    duration = 0;
-    if (this.props.data.length > 0) {
-      length = this.props.data.length;
-      this.props.data.map((item, idx) => {
-        return (
-          (duration += moment.duration(item.duration)._milliseconds),
-          (item.newDuration =
-            moment.duration(item.duration)._data.minutes +
-            " minutes " +
-            moment.duration(item.duration)._data.seconds +
-            " seconds"),
-          rows.push(item)
-        );
-      });
-    }
+  render() {
     return (
       <div>
         <center>
@@ -81,14 +65,15 @@ class Loop extends React.Component {
         <button class="ui left floated button">
           {" "}
           Duration:{" "}
-          {moment(duration)
-            .utcOffset(0)
-            .format("HH:mm:ss")}{" "}
+          {moment.duration(this.state.duration).format("HH:mm:ss")}{" "}
         </button>
         <ReactDataGrid
           columns={columns}
-          rowGetter={i => rows[i]}
-          rowsCount={length}
+          rowGetter={i => this.state.data[i]}
+          rowsCount={this.state.data.length}
+          onGridRowsUpdated={this.onGridRowsUpdated}
+          enableCellSelect={true}
+          getCellActions={this.getCellActions}
           minHeight={300}
         />
         <button
@@ -104,18 +89,18 @@ class Loop extends React.Component {
           Start:{" "}
           <Flatpickr
             data-enable-time
-            value={startDate}
+            value={this.state.startDate}
             onChange={startDate => {
               this.setState({ startDate });
             }}
           />
-          <br />
-          <br />
-          <br />
+          <br/>
+          <br/>
+          <br/>
           Finish by:{" "}
           <Flatpickr
             data-enable-time
-            value={finishDate}
+            value={this.state.finishDate}
             onChange={finishDate => {
               this.setState({ finishDate });
             }}
@@ -127,7 +112,7 @@ class Loop extends React.Component {
           </div>
           <button
             onClick={() => {
-              this.props.loopContent(rows, time, this.state.finishDate);
+              this.props.loopContent(this.state.data, this.state.startDate, this.state.finishDate);
             }}
           >
             {" "}
@@ -137,6 +122,39 @@ class Loop extends React.Component {
       </div>
     );
   }
+
+  getCellActions = (column, row) => {
+    const cellActions = [
+      {
+        icon: <i className="trash icon" />,
+        callback: () => {
+          console.log('delete row', row.index);
+          const d = moment.duration(row.duration).valueOf();
+          this.props.deleteItem(row.index);
+          const rows = [...this.state.data];
+          rows.splice(row.index, 1);
+          // do the following until round trip from the editor works
+          this.setState({ 
+            data: rows,
+            duration: this.state.duration - d
+          });
+        }
+      }
+    ];
+    return column.key === "action" ? cellActions : null;
+  }
+
+  onGridRowsUpdated = ({ fromRow, toRow, updated }) => {
+    this.setState(state => {
+      const rows = state.data.slice();
+      for (let i = fromRow; i <= toRow; i++) {
+        rows[i] = { ...rows[i], ...updated };
+      }
+      return { data: rows };
+    });
+  }
+
 }
 
+ 
 export default Loop;

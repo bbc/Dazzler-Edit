@@ -31,6 +31,7 @@ import "react-sliding-pane/dist/react-sliding-pane.css";
 import axios from "axios";
 import Specials from "../Specials/Specials";
 import moment from "moment";
+import 'moment-duration-format';
 import Episode from "../Episode/Episode";
 import Live from "../Live/Live";
 import Clips from "../Clips/Clips";
@@ -49,7 +50,6 @@ var text = "Today's ";
 var time = -2;
 var scheduleItems = [];
 var scratchPadItems = [];
-var loopItems = [];
 var copiedContent = [];
 var loopedContent = [];
 var icons = [
@@ -154,6 +154,8 @@ class Editor extends React.Component {
       specials: [],
       episodes: [],
       live: [],
+      loop: [],
+      loopDuration: moment.duration(),
       schedules: {}, // state store for loaded and/or edited schedules
       scheduleDate: moment().utc().format(),
       display: "",
@@ -203,6 +205,12 @@ class Editor extends React.Component {
         console.log(e);
       });
   }
+
+  componentDidUpdate(prevProps) {
+    console.log('editor componentDidUpdate');
+    this.render();
+  }
+
   lastItem = scheduleTime => {
     this.setState({ scheduleTime: scheduleTime });
   };
@@ -257,12 +265,14 @@ class Editor extends React.Component {
   }
   clearContent(loop) {
     if (loop) {
-      loopItems = [];
       this.setState({
+        loop: [],
+        loopDuration: moment.duration(),
         display: (
           <Loop
-            data={loopItems}
-            deleteItem={this.deleteItem}
+            data={this.state.loop}
+            duration={this.state.loopDuration.valueOf()}
+            deleteItem={this.deleteItemFromLoop}
             loopContent={this.loopContent}
             clearContent={this.clearContent}
             scheduleTime={this.state.scheduleTime}
@@ -283,6 +293,27 @@ class Editor extends React.Component {
       });
     }
   }
+
+  deleteItemFromLoop = (index) => {
+    const r = this.state.loop[index];
+    let loop = [...this.state.loop];
+    loop.splice(index, 1);
+    this.setState({
+      loop:loop,
+      loopDuration: this.state.loopDuration.subtract(moment.duration(r.duration)),
+      display: (
+          <Loop
+            data={this.state.loop}
+            duration={this.state.loopDuration.valueOf()}
+            deleteItem={this.deleteItemFromLoop}
+            loopContent={this.loopContent}
+            clearContent={this.clearContent}
+            scheduleTime={this.state.scheduleTime}
+          />
+        )
+    });
+  }
+
   deleteItem(id) {
     this.setState({
       display: (
@@ -360,7 +391,10 @@ class Editor extends React.Component {
         console.log(item.item_type, isLive);
     }
 
-    if (menuText === "Scratchpad") {
+    console.log(newItem2);
+
+    switch (menuText) {
+      case "Scratchpad":
       scratchPadItems.push(newItem2);
       this.setState({
         display: (
@@ -372,7 +406,8 @@ class Editor extends React.Component {
           />
         )
       });
-    } else if (menuText === "Schedule") {
+      break
+    case "Schedule":
       scheduleItems.push(newItem2);
       this.setState({
         display: (
@@ -393,19 +428,28 @@ class Editor extends React.Component {
           />
         )
       });
-    } else {
-      loopItems.push(newItem2);
+      break;
+    case "Loop":
+      newItem2.durationAsString = moment.duration(newItem2.duration).format("HH:mm:ss");
+      newItem2.index = this.state.loop.length;
+      console.log('add item to loop', newItem2);
+      const n = this.state.loop.concat(newItem2);
       this.setState({
+        loop: n,
+        loopDuration: this.state.loopDuration.add(newItem2.duration),
         display: (
           <Loop
-            data={loopItems}
-            deleteItem={this.deleteItem}
+            data={n}
+            duration={this.state.loopDuration.valueOf()}
+            deleteItem={this.deleteItemFromLoop}
             loopContent={this.loopContent}
             clearContent={this.clearContent}
             scheduleTime={this.state.scheduleTime}
           />
         )
       });
+      break;
+    default:
     }
   };
 
@@ -517,8 +561,9 @@ class Editor extends React.Component {
         this.setState({
           display: (
             <Loop
-              data={loopItems}
-              deleteItem={this.deleteItem}
+              data={this.state.loop}
+              duration={this.state.loopDuration.valueOf()}
+              deleteItem={this.deleteItemFromLoop}
               clearContent={this.clearContent}
               loopContent={this.loopContent}
               scheduleTime={this.state.scheduleTime}
