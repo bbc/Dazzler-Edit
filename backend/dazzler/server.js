@@ -7,7 +7,6 @@ const parseString = require("xml2js").parseString;
 const xml2js = require('xml2js-es6-promise');
 const querystring = require("querystring");
 const Big = require("big-integer");
-const http = require("http");
 const https = require("https");
 const bodyParser = require("body-parser");
 const app = express();
@@ -321,15 +320,9 @@ async function get_episodes(q) {
 
 app.put("/api/v1/loop", async (req, res, next) => {
   let user = "dazzler"; // assume local
-  if (process.env.environment) {
-    // assume cosmos
-    if (req.header("sslclientcertsubject")) {
-      const subject = parseSSLsubject(req);
-      user = subject.emailAddress;
-    } else {
-      console.log("missing authentification header");
-      res.status(403).send("missing authentification header");
-    }
+  if (req.header("sslclientcertsubject")) {
+    const subject = parseSSLsubject(req);
+    user = subject.emailAddress;
   }
   if (auth(user)) {
     const collection_pid = config[req.query.sid].loop_collection;
@@ -352,15 +345,9 @@ app.put("/api/v1/loop", async (req, res, next) => {
 app.post("/api/v1/tva", function(req, res) {
   if (req.body.includes('serviceIDRef="TVMAR01')) {
     let user = "dazzler"; // assume local
-    if (process.env.environment) {
-      // assume cosmos
-      if (req.header("sslclientcertsubject")) {
-        const subject = parseSSLsubject(req);
-        user = subject.emailAddress;
-      } else {
-        console.log("missing authentification header");
-        res.status(403).send("missing authentification header");
-      }
+    if (req.header("sslclientcertsubject")) {
+      const subject = parseSSLsubject(req);
+      user = subject.emailAddress;
     }
     if (auth(user)) {
       postTVA(req.body, res);
