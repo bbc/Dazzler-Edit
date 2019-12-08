@@ -1,5 +1,5 @@
 import React from "react";
-import SingleSchedule from "../SingleSchedule/SingleSchedule";
+import ScheduleItem from "../ScheduleItem/ScheduleItem";
 // import axios from "axios";
 import moment from "moment";
 
@@ -28,7 +28,7 @@ class NextSchedule extends React.Component {
       console.log(this.props.updatedItems)
       this.props.updatedItems.map((item, index)=>{
         videos.push(
-                  <SingleSchedule
+                  <ScheduleItem
                   title={item.title}
                   startTime={moment(item.startTime).format("HH:mm:ss")}
                   duration={item.duration}
@@ -48,7 +48,7 @@ class NextSchedule extends React.Component {
     //     returnedData = response.data.items;
     //     for (let i = 0; i < returnedData.length; i++) {
     //       videos.push(
-    //         <SingleSchedule
+    //         <ScheduleItem
     //           title="From Broadcast"
     //           startTime={moment(returnedData[i].published_time.start).format(
     //             "HH:mm:ss"
@@ -71,7 +71,7 @@ class NextSchedule extends React.Component {
 
     this.props.updatedItems.map((item, index)=>{
       videos.push(
-                <SingleSchedule
+                <ScheduleItem
                 title={item.title}
                 startTime={moment(item.startTime).format("HH:mm:ss")}
                 duration={item.duration}
@@ -102,7 +102,7 @@ class NextSchedule extends React.Component {
     //       returnedData = response.data.items;
     //       for (let i = 0; i < returnedData.length; i++) {
     //         videos.push(
-    //           <SingleSchedule
+    //           <ScheduleItem
     //             title="From Broadcast"
     //             startTime={moment(returnedData[i].published_time.start).format(
     //               "HH:mm:ss"

@@ -1,13 +1,18 @@
 import React from "react";
 import PropTypes from "prop-types";
 import classNames from "classnames";
+import Box from '@material-ui/core/Box';
+import ExpansionPanel from '@material-ui/core/ExpansionPanel';
+import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
+import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
+import Typography from '@material-ui/core/Typography';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { withStyles } from "@material-ui/core/styles";
 import Drawer from "@material-ui/core/Drawer";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import List from "@material-ui/core/List";
-import Typography from "@material-ui/core/Typography";
 import Divider from "@material-ui/core/Divider";
 import IconButton from "@material-ui/core/IconButton";
 import MenuIcon from "@material-ui/icons/Menu";
@@ -146,6 +151,7 @@ class Editor extends React.Component {
       open: false,
       Title: "",
       isPaneOpen: false,
+      isLoopOpen: true,
       panelShow: null,
       itemType: '',
       count: 0,
@@ -187,6 +193,7 @@ class Editor extends React.Component {
           loadPlaylist={this.loadPlaylist}
           nextSchedule={this.nextDay}
           scheduleDate={this.state.scheduleDate}
+          user={this.state.user}
         />
       )
     });
@@ -253,7 +260,8 @@ class Editor extends React.Component {
           loadPlaylist={this.loadPlaylist}
           nextSchedule={this.nextDay}
           scheduleDate={this.state.scheduleDate}
-        />
+          user={this.state.user}
+       />
       )
     });
   };
@@ -332,6 +340,7 @@ class Editor extends React.Component {
           loadPlaylist={this.loadPlaylist}
           nextSchedule={this.nextDay}
           scheduleDate={this.state.scheduleDate}
+          user={this.state.user}
         />
       )
     });
@@ -425,6 +434,7 @@ class Editor extends React.Component {
             deleteItem={this.deleteItem}
             nextSchedule={this.nextDay}
             scheduleDate={this.state.scheduleDate}
+            user={this.state.user}
           />
         )
       });
@@ -539,6 +549,7 @@ class Editor extends React.Component {
               text="Today's "
               deleteItem={this.deleteItem}
               scheduleDate={this.state.scheduleDate}
+              user={this.state.user}
             />
           )
         });
@@ -693,14 +704,115 @@ class Editor extends React.Component {
           })}
         >
           <div className={classes.drawerHeader} />
-          <Typography paragraph>
-            {/* <Date
-              nextDay={this.nextDay}
-              previousDay={this.previousDay}
-              scheduleDate={this.state.scheduleDate}
-            /> */}
-            {this.state.display}
-          </Typography>
+        <Box display="flex" flexDirection="row" p={1} m={1} bgcolor="background.paper">
+          <Box>
+          <ExpansionPanel>
+          <ExpansionPanelSummary
+          expandIcon={<ExpandMoreIcon />}
+          aria-controls="panel1bh-content"
+          id="panel1bh-header"
+        >
+          <Typography className={classes.heading}>Live</Typography>
+        </ExpansionPanelSummary>
+        <ExpansionPanelDetails>
+        <Live
+              date={this.state.scheduleDate}
+	            sid={this.state.service.sid}
+	            handleClick={this.handleClick}
+	          />
+        </ExpansionPanelDetails>
+          </ExpansionPanel>
+          <ExpansionPanel>
+        <ExpansionPanelSummary
+          expandIcon={<ExpandMoreIcon />}
+          aria-controls="panel2bh-content"
+          id="panel2bh-header"
+        >
+          <Typography className={classes.heading}>Episodes</Typography>
+        </ExpansionPanelSummary>
+        <ExpansionPanelDetails>
+        <Episode
+              date={this.state.scheduleDate}
+              sid={this.state.service.sid}
+              handleClick={this.handleClick}
+            />
+        </ExpansionPanelDetails>
+      </ExpansionPanel>
+      <ExpansionPanel>
+        <ExpansionPanelSummary
+          expandIcon={<ExpandMoreIcon />}
+          aria-controls="panel3bh-content"
+          id="panel2bh-header"
+        >
+          <Typography className={classes.heading}>Jupiter Clips</Typography>
+        </ExpansionPanelSummary>
+        <ExpansionPanelDetails>
+        <Clips
+              type="jupiter"
+              sid={this.state.service.sid}
+              handleClick={this.handleClick}
+            />
+        </ExpansionPanelDetails>
+      </ExpansionPanel>
+      <ExpansionPanel>
+        <ExpansionPanelSummary
+          expandIcon={<ExpandMoreIcon />}
+          aria-controls="panel4bh-content"
+          id="panel2bh-header"
+        >
+          <Typography className={classes.heading}>Web Clips</Typography>
+        </ExpansionPanelSummary>
+        <ExpansionPanelDetails>
+        <Clips
+              type="web"
+              sid={this.state.service.sid}
+              handleClick={this.handleClick}
+            />
+        </ExpansionPanelDetails>
+      </ExpansionPanel>
+      <ExpansionPanel>
+        <ExpansionPanelSummary
+          expandIcon={<ExpandMoreIcon />}
+          aria-controls="panel5bh-content"
+          id="panel2bh-header"
+        >
+          <Typography className={classes.heading}>Specials</Typography>
+        </ExpansionPanelSummary>
+        <ExpansionPanelDetails>
+        <Specials
+              sid={this.state.service.sid}
+              handleClick={this.handleClick}
+            />
+        </ExpansionPanelDetails>
+      </ExpansionPanel>
+          </Box>
+          <Box flexGrow={1}>
+          <Loop
+            data={this.state.loop}
+            duration={this.state.loopDuration.valueOf()}
+            deleteItem={this.deleteItemFromLoop}
+            loopContent={this.loopContent}
+            clearContent={this.clearContent}
+            scheduleTime={this.state.scheduleTime}
+          />
+          </Box>
+          <Box flexGrow={1}>
+          <Schedule
+          onDateChange={this.handleDateChange}
+          service={this.state.service}
+          clipTime={time}
+          length={scheduleItems.length}
+          pasted={copiedContent}
+          loopedContent={""}
+          deleteItem={this.deleteItem}
+          text="Today's "
+          loadPlaylist={this.loadPlaylist}
+          nextSchedule={this.nextDay}
+          scheduleDate={this.state.scheduleDate}
+          user={this.state.user}
+        />
+          </Box>
+        </Box>
         </main>
       </div>
     );

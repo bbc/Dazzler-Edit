@@ -47,6 +47,7 @@
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.14.0",
     "moment-duration-format": "^2.3.2",
+    "react-pure-grid": "^2.1.1",
     "typescript": "^3.5.2"
   }
 }
