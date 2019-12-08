@@ -143,20 +143,23 @@ export class Specials extends React.Component {
 
   componentDidUpdate(prevProps) {
     console.log("Specials update", this.state.page);
+    console.log(prevProps);
     if (this.state.page !== this.state.previousPage) {
-      console.log("have page %d want page %d", this.props.page, prevProps.page);
+      console.log("have page %d want page %d", this.state.previousPage, this.state.page);
       axios
-        .get(`${URLPrefix}/api/v1/special?sid=${this.props.sid}&page=${this.state.page+1}&page_size=${this.state.rowsPerPage}`)
+        .get(`${URLPrefix}/api/v1/special?sid=${this.state.sid}&page=${this.state.page+1}&page_size=${this.state.rowsPerPage}`)
         .then(response => {
           console.log("Specials", response.data.items);
           let new_page = 0;
           if(response.data.hasOwnProperty('page')) {
             new_page = response.data.page - 1;
           }
-          this.setState({ previousPage: new_page });
-          this.setState({ page: new_page });
-          this.setState({ rows: response.data.items });
-          this.setState({ totalRows: response.data.total });
+          this.setState({ 
+            previousPage: new_page,
+            page: new_page,
+            rows: response.data.items,
+            totalRows: response.data.total
+          });
         })
         .catch(e => {
           console.log(e);

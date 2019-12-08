@@ -144,7 +144,7 @@ export class Jupiter extends React.Component {
   componentDidUpdate(prevProps) {
     console.log("Jupiter update", this.state.page);
     if (this.state.page !== this.state.previousPage) {
-      console.log("have page %d want page %d", this.props.page, prevProps.page);
+      console.log("have page %d want page %d", this.state.previousPage, this.state.page);
       axios
         .get(`${URLPrefix}/api/v1/clip?sid=${this.props.sid}&type=jupiter&page=${this.state.page+1}&page_size=${this.state.rowsPerPage}`)
         .then(response => {
@@ -153,10 +153,12 @@ export class Jupiter extends React.Component {
           if(response.data.hasOwnProperty('page')) {
             new_page = response.data.page - 1;
           }
-          this.setState({ previousPage: new_page });
-          this.setState({ page: new_page });
-          this.setState({ rows: response.data.items });
-          this.setState({ totalRows: response.data.total });
+          this.setState({ 
+            previousPage: new_page,
+            page: new_page,
+            rows: response.data.items,
+            totalRows: response.data.total
+          });
         })
         .catch(e => {
           console.log(e);

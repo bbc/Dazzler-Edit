@@ -49,7 +49,7 @@ class Schedule extends React.Component {
       status: "Save Playlist",
       index: null,
       preRenderedItem: [[]],
-      scheduleDate: moment().format()
+      scheduleDate: moment().utc().format()
     };
   }
 
@@ -239,7 +239,7 @@ class Schedule extends React.Component {
       let tva =
         tvaStart +
         "    <ProgramLocationTable>\n" +
-        `      <Schedule start="${start.format()}" end="${end.format()}" serviceIDRef="${this.props.service.serviceIDRef}">`;
+        `      <Schedule start="${start.utc().format()}" end="${end.utc().format()}" serviceIDRef="${this.props.service.serviceIDRef}">`;
       for (let i = 0; i < data.length; i++) {
         tva += this.makeScheduleEvent( this.props.service.serviceIDRef, data[i], i, end);
       }
@@ -298,7 +298,7 @@ class Schedule extends React.Component {
                 <VideoAttributes><AspectRatio>16:9</AspectRatio><Color type="color"/></VideoAttributes>
               </AVAttributes>
             </InstanceDescription>
-            <PublishedStartTime>${startDateTime.format()}</PublishedStartTime>
+            <PublishedStartTime>${startDateTime.utc().format()}</PublishedStartTime>
             <PublishedDuration>${duration}</PublishedDuration>
             <Live value="${broadcast.live === "live" ? true : false}"/>
             <Repeat value="${false}"/>
@@ -324,7 +324,7 @@ class Schedule extends React.Component {
     if (moment(CDate).format("LL") === moment().format("LL")) {
       text = "Today's ";
     }
-    const scheduleDateISO = moment(CDate).format();
+    const scheduleDateISO = moment(CDate).utc().format();
     this.setState({ scheduleDate: scheduleDateISO });
     this.props.onDateChange(scheduleDateISO);
   };
@@ -335,7 +335,7 @@ class Schedule extends React.Component {
     if (moment(CDate).format("LL") === moment().format("LL")) {
       text = "Today's ";
     }
-    const scheduleDateISO = moment(CDate).format();
+    const scheduleDateISO = moment(CDate).utc().format();
     this.setState({ scheduleDate: scheduleDateISO });
     this.props.onDateChange(scheduleDateISO);
   };

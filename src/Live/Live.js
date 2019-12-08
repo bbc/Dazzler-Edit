@@ -134,7 +134,7 @@ export class Live extends React.Component {
       rowsPerPage: 5,
       data: [],
       sid: "",
-      date: moment().format()
+      date: moment().utc().format()
     };
   }
 
@@ -154,11 +154,12 @@ export class Live extends React.Component {
     else {
         start = moment(date);
     }
-    const end = moment(start).add(1, "days");
+    const end = moment(start).add(1, "days").utc().format();
+    start = start.utc().format();
     if (this.state.page !== this.state.previousPage) {
       console.log("have page %d want page %d", this.state.page, this.state.previousPage);
       axios
-        .get(`${URLPrefix}/api/v1/webcast?sid=${this.props.sid}&start=${start.format()}&end=${end.format()}`)
+        .get(`${URLPrefix}/api/v1/webcast?sid=${this.props.sid}&start=${start}&end=${end}`)
         .then(response => {
           console.log("Live RESPONSE", response.data);
 	  if(response.data.total>0) {

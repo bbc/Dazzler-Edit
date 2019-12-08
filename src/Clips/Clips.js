@@ -127,7 +127,6 @@ export class Clips extends React.Component {
     super(props);
 
     this.state = {
-      componentName: "Web Clips",
       spinner: false,
       totalRows: 0,
       rows: [],
@@ -135,18 +134,29 @@ export class Clips extends React.Component {
       previousPage: -1,
       rowsPerPage: 5,
       data: [],
-      sid: ""
+      sid: "",
+      type: "web"
     };
   }
 
   componentDidMount = () => {
     this.setState({ sid: this.props.sid });
+    this.setState({ type: this.props.type });
   };
 
   componentDidUpdate(prevProps) {
-    console.log(this.state.componentName, "update", this.state.page);
-    if (this.state.page !== this.state.previousPage) {
-      console.log("have page %d want page %d", this.props.page, prevProps.page);
+    console.log("update %s page %d -> %d", this.state.type, this.state.previousPage, this.state.page);
+    console.log(prevProps);
+    let reload = false;
+    if(this.state.sid !== prevProps.sid) {
+      reload = true;
+    }
+    if(this.state.type !== prevProps.type) {
+      reload = true;
+    }
+    if(this.state.page !== this.state.previousPage) reload = true;
+    if (reload) {
+      console.log("have page %d want page %d", this.state.previousPage, this.state.page);
       axios
         .get(`${URLPrefix}/api/v1/clip?sid=${this.props.sid}&type=${this.props.type}&page=${this.state.page+1}&page_size=${this.state.rowsPerPage}`)
         .then(response => {
@@ -154,10 +164,12 @@ export class Clips extends React.Component {
           if(response.data.hasOwnProperty('page')) {
             new_page = response.data.page - 1;
           }
-          this.setState({ previousPage: new_page });
-          this.setState({ page: new_page });
-          this.setState({ rows: response.data.items });
-          this.setState({ totalRows: response.data.total });
+          this.setState({ 
+            previousPage: new_page,
+            page: new_page,
+            rows: response.data.items,
+            totalRows: response.data.total
+          });
         })
         .catch(e => {
           console.log(e);
@@ -166,7 +178,7 @@ export class Clips extends React.Component {
   }
 
   handleChangePage = (event, page) => {
-    console.log(this.state.componentName, "handleChangePage", this.state.page, page);
+    console.log(this.state.type, "handleChangePage", this.state.page, page);
     this.setState({ page });
   };
 

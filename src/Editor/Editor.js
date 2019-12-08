@@ -147,6 +147,7 @@ class Editor extends React.Component {
       Title: "",
       isPaneOpen: false,
       panelShow: null,
+      itemType: '',
       count: 0,
       clips: [],
       jupiter: [],
@@ -154,7 +155,7 @@ class Editor extends React.Component {
       episodes: [],
       live: [],
       schedules: {}, // state store for loaded and/or edited schedules
-      scheduleDate: moment().format(),
+      scheduleDate: moment().utc().format(),
       display: "",
       user: { name: "anonymous" },
       service: {
@@ -411,12 +412,25 @@ class Editor extends React.Component {
   iHandleClick = text => {
     switch (text) {
       case "Web Clips":
-        this.setState({ isPaneOpen: true });
-        this.setState({ title: "Web Clips" });
-        this.setState({
+        this.setState({ 
+          isPaneOpen: true,
+          title: "Web Clips",
+          itemType: "web",
           panelShow: (
             <Clips
-	      type="web"
+              type={this.state.itemType}
+              sid={this.state.service.sid}
+              handleClick={this.handleClick}
+            />
+          )
+        });
+        break;
+        case "Jupiter Clips":
+        this.setState({ 
+          isPaneOpen: true,
+          title: "Jupiter Clips",
+          panelShow: (
+            <Jupiter
               sid={this.state.service.sid}
               handleClick={this.handleClick}
             />
@@ -425,15 +439,15 @@ class Editor extends React.Component {
         break;
       case "Live":
         console.log('show live', this.state.scheduleDate);
-        this.setState({ isPaneOpen: true });
-        this.setState({ title: "Upcoming Live Broadcasts" });
-        this.setState({
+        this.setState({ 
+          isPaneOpen: true,
+          title: "Upcoming Live Broadcasts",
           panelShow: (
             <Live
               date={this.state.scheduleDate}
-	      sid={this.state.service.sid}
-	      handleClick={this.handleClick}
-	    />
+	            sid={this.state.service.sid}
+	            handleClick={this.handleClick}
+	          />
           )
         });
         break;
@@ -441,9 +455,9 @@ class Editor extends React.Component {
         this.setState({ show: <Date /> });
         break;
       case "Episodes":
-        this.setState({ isPaneOpen: true });
-        this.setState({ title: "Episodes" });
         this.setState({
+          isPaneOpen: true,
+          title: "Episodes",
           panelShow: (
             <Episode
               date={this.state.scheduleDate}
@@ -454,23 +468,11 @@ class Editor extends React.Component {
         });
         break;
       case "Specials":
-        this.setState({ isPaneOpen: true });
-        this.setState({ title: "Specials" });
         this.setState({
+          isPaneOpen: true,
+          title: "Specials",
           panelShow: (
             <Specials
-              sid={this.state.service.sid}
-              handleClick={this.handleClick}
-            />
-          )
-        });
-        break;
-      case "Jupiter Clips":
-        this.setState({ isPaneOpen: true });
-        this.setState({ title: "Jupiter Clips" });
-        this.setState({
-          panelShow: (
-            <Jupiter
               sid={this.state.service.sid}
               handleClick={this.handleClick}
             />

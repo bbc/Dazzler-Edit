@@ -134,7 +134,7 @@ export class Episode extends React.Component {
       rowsPerPage: 5,
       data: [],
       sid: "",
-      date: moment().format()
+      date: moment().utc().format()
     };
   }
 
@@ -155,11 +155,13 @@ export class Episode extends React.Component {
           if(response.data.hasOwnProperty('page')) {
             new_page = response.data.page - 1;
           }
-          this.setState({ previousPage: new_page });
-          this.setState({ page: new_page });
           if(response.data.items.length === this.state.rowsPerPage) {
-            this.setState({ totalRows: response.data.total });
-            this.setState({ rows: response.data.items });
+            this.setState({ 
+              previousPage: new_page,
+              page: new_page,
+              totalRows: response.data.total,
+              rows: response.data.items 
+            });
           }
           else {
             let items = [];
@@ -171,12 +173,17 @@ export class Episode extends React.Component {
             axios
             .get(`${URLPrefix}/api/v1/episode?sid=${this.props.sid}&page=${this.state.page+1}&page_size=${this.state.rowsPerPage}&availability=${ahead}`)
             .then(response => {
+                console.log("upcoming EPISODES", response.data.items);
                 response.data.items.forEach(item => {
                   item.insertionType = "futureEpisode";
                   items.push(item);
                 });
-                this.setState({ totalRows: total + response.data.total });
-                this.setState({ rows: items });
+                this.setState({ 
+                  previousPage: new_page,
+                  page: new_page,
+                  totalRows: total + response.data.total,
+                  rows: items 
+                });
             })
             .catch(e => {
               console.log(e);
