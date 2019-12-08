@@ -46,6 +46,7 @@
   "devDependencies": {
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.14.0",
+    "moment-duration-format": "^2.3.2",
     "typescript": "^3.5.2"
   }
 }
