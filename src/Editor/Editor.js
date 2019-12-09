@@ -20,8 +20,6 @@ import LiveTv from "@material-ui/icons/LiveTv";
 import MailIcon from "@material-ui/icons/Schedule";
 import LoopIcon from "@material-ui/icons/Loop";
 import Payment from "@material-ui/icons/VideoLibrary";
-// import Lock from "@material-ui/icons/Star";
-// import Assignment from "@material-ui/icons/Assignment";
 import SlowMotionVideoIcon from "@material-ui/icons/SlowMotionVideo";
 import Movie from "@material-ui/icons/Movie";
 import Opacity from "@material-ui/icons/Opacity";
@@ -35,18 +33,17 @@ import 'moment-duration-format';
 import Episode from "../Episode/Episode";
 import Live from "../Live/Live";
 import Clips from "../Clips/Clips";
-import Jupiter from "../Jupiter/Jupiter";
 import Scratchpad from "../Scratchpad/Scratchpad";
 import Date from "../Date/Date";
-import Schedule from "../Schedule/Schedule";
-// import PreviousSchedule from "../PreviousSchedule/PreviousSchedule";
-// import NextSchedule from "../NextSchedule/NextSchedule";
-// import xml2js from "xml2js";
+import SchedulePicker from "../SchedulePicker/SchedulePicker";
+import ScheduleToolbar from "../ScheduleToolbar/ScheduleToolbar";
+import ScheduleView from "../ScheduleView/ScheduleView";
 import Loop from "../Loop/Loop";
+import {deleteItemClosingGap} from "../ScheduleDao/ScheduleDao";
+import ScheduleObject from "../ScheduleObject";
 
 const drawerWidth = 240;
 var menuText = "Schedule";
-var text = "Today's ";
 var time = -2;
 var scheduleItems = [];
 var scratchPadItems = [];
@@ -132,8 +129,12 @@ const styles = theme => ({
 class Editor extends React.Component {
   constructor(props) {
     super(props);
+    
+    this.handleScheduleDelete = this.handleScheduleDelete.bind(this);
+    this.handleAddLive = this.handleAddLive.bind(this);
+    this.handleAddClip = this.handleAddClip.bind(this);
+    this.handleAddEpisode = this.handleAddEpisode.bind(this);
     this.handleClick = this.handleClick.bind(this);
-    this.deleteItem = this.deleteItem.bind(this);
     this.copyContent = this.copyContent.bind(this);
     this.clearContent = this.clearContent.bind(this);
     this.loopContent = this.loopContent.bind(this);
@@ -141,8 +142,12 @@ class Editor extends React.Component {
     this.handleDrawerOpen = this.handleDrawerOpen.bind(this);
     this.handleDrawerClose = this.handleDrawerClose.bind(this);
     this.handleDateChange = this.handleDateChange.bind(this);
+    this.handleScheduleDelete = this.handleScheduleDelete.bind(this);
 
     this.state = {
+      schedule:[],
+      scheduleDate: moment().utc().format('YYYY-MM-DD'),
+      scheduleInsertionPoint: -1,
       open: false,
       Title: "",
       isPaneOpen: false,
@@ -157,9 +162,8 @@ class Editor extends React.Component {
       loop: [],
       loopDuration: moment.duration(),
       schedules: {}, // state store for loaded and/or edited schedules
-      scheduleDate: moment().utc().format(),
       display: "",
-      user: { name: "anonymous" },
+      user: { name: "anonymous", auth: true },
       service: {
         sid: "bbc_marathi_tv",
         name: "Marathi",
@@ -169,25 +173,25 @@ class Editor extends React.Component {
   }
 
   componentDidMount() {
-    console.log("DidMount", time);
-    console.log(scheduleItems);
-    console.log(copiedContent);
+    console.log("Editor DidMount", time);
     this.setState({
       display: (
-        <Schedule
-          onDateChange={this.handleDateChange}
-          service={this.state.service}
-          lastItem={this.lastItem}
-          clipTime={time}
-          length={scheduleItems.length}
-          pasted={copiedContent}
-          loopedContent={""}
-          deleteItem={this.deleteItem}
-          text="Today's "
-          loadPlaylist={this.loadPlaylist}
-          nextSchedule={this.nextDay}
+      <div>
+        <SchedulePicker
+          sid={this.state.service.sid}
           scheduleDate={this.state.scheduleDate}
+          onDateChange={this.handleDateChange}
         />
+        <ScheduleView 
+          onRowSelected={this.handleScheduleRowSelect}
+          onDelete={this.handleScheduleDelete} 
+          data={this.state.schedule} lastUpdated=""
+        />
+        <ScheduleToolbar
+          saveAllowed={this.state.user.auth} 
+          onSaveClicked={this.savePlaylist}
+        />
+      </div>
       )
     });
 
@@ -208,7 +212,6 @@ class Editor extends React.Component {
 
   componentDidUpdate(prevProps) {
     console.log('editor componentDidUpdate');
-    this.render();
   }
 
   lastItem = scheduleTime => {
@@ -223,9 +226,55 @@ class Editor extends React.Component {
     this.setState({ open: false });
   };
 
-  handleDateChange = (d) => {
-    console.log('handleDateChange', d.toString() );
-    this.setState({ scheduleDate: d });
+  handleScheduleDelete(index) {
+    const schedule = deleteItemClosingGap(this.state.schedule, index);
+    const date = this.state.scheduleDate;
+    this.setState({
+      schedule: schedule,
+      display: (
+        <div>
+          <SchedulePicker
+            sid={this.state.service.sid}
+            scheduleDate={date}
+            onDateChange={this.handleDateChange}
+          />
+          <ScheduleView 
+          onRowSelected={this.handleScheduleRowSelect}
+            onDelete={this.handleScheduleDelete} 
+            data={schedule} lastUpdated=""
+          />
+          <ScheduleToolbar
+            saveAllowed={this.state.user.auth} 
+            onSaveClicked={this.savePlaylist}
+          />
+        </div>
+        )
+    });
+  }
+  
+  handleDateChange = (date, schedule) => {
+    this.setState({
+      scheduleDate: date,
+      schedule: schedule,
+      display: (
+        <div>
+          <SchedulePicker
+            sid={this.state.service.sid}
+            scheduleDate={date}
+            onDateChange={this.handleDateChange}
+          />
+          <ScheduleView 
+          onRowSelected={this.handleScheduleRowSelect}
+            onDelete={this.handleScheduleDelete} 
+            data={schedule} lastUpdated=""
+          />
+          <ScheduleToolbar
+            saveAllowed={this.state.user.auth} 
+            onSaveClicked={this.savePlaylist}
+          />
+        </div>
+        )
+    });
   };
 
   loopContent = (rows, startTime, finishTime) => {
@@ -237,23 +286,22 @@ class Editor extends React.Component {
     menuText = "Schedule";
     this.setState({
       display: (
-        <Schedule
-          onDateChange={this.handleDateChange}
-          service={this.state.service}
-          lastItem={this.lastItem}
-          clipTime={time}
-          length={scheduleItems.length}
-          loopedContent={loopedContent}
-          addedLoop={true}
-          startLoop={startTime}
-          finishTime={finishTime}
-          deleteItem={this.deleteItem}
-          added={false}
-          text={text}
-          loadPlaylist={this.loadPlaylist}
-          nextSchedule={this.nextDay}
+      <div>
+        <SchedulePicker
+          sid={this.state.service.sid}
           scheduleDate={this.state.scheduleDate}
+          onDateChange={this.handleDateChange}
         />
+        <ScheduleView 
+        onRowSelected={this.handleScheduleRowSelect}
+          onDelete={this.handleScheduleDelete} 
+          data={this.state.schedule} lastUpdated=""
+        />
+        <ScheduleToolbar
+          saveAllowed={this.state.user.auth} 
+          onSaveClicked={this.savePlaylist}
+        />
+      </div>
       )
     });
   };
@@ -314,27 +362,121 @@ class Editor extends React.Component {
     });
   }
 
-  deleteItem(id) {
+  handleDelete(id) {
     this.setState({
       display: (
-        <Schedule
-          onDateChange={this.handleDateChange}
-          service={this.state.service}
-          lastItem={this.lastItem}
-          loopedContent={""}
-          clipTime={time}
-          deleteId={id}
-          length={scheduleItems.length}
-          pasted={copiedContent}
-          deleteItem={this.deleteItem}
-          added={false}
-          text={text}
-          loadPlaylist={this.loadPlaylist}
-          nextSchedule={this.nextDay}
+      <div>
+        <SchedulePicker
+          sid={this.state.service.sid}
           scheduleDate={this.state.scheduleDate}
+          onDateChange={this.handleDateChange}
         />
+        <ScheduleView 
+        onRowSelected={this.handleScheduleRowSelect}
+          onDelete={this.handleScheduleDelete} 
+          data={this.state.schedule} lastUpdated=""
+        />
+        <ScheduleToolbar
+          saveAllowed={this.state.user.auth} 
+          onSaveClicked={this.savePlaylist}
+        />
+      </div>
       )
     });
+  }
+
+  handleAddLive(item) {
+    console.log("LIVE ITEM", item);
+    const startTime = moment(item.scheduled_time.start);
+    const newItem = {
+      captureChannel: item.service.sid, // TODO make use of this
+      title: 'Live broadcast segment',
+      duration: item.duration.toISOString(),
+      startTime:startTime,
+      live: true,
+      insertionType: ''
+    }
+    for (let i = 0; i < item.window_of.length; i++) {
+      switch (item.window_of[i].result_type) {
+        case "version":
+          newItem.versionPid = item.window_of[i].pid;
+          newItem.versionCrid = item.window_of[i].crid;
+          break;
+        default: // DO Nothing
+      }
+    }
+    console.log(newItem);
+    let scheduleObject = new ScheduleObject();
+    scheduleObject.items = this.state.schedule;
+    scheduleObject.addLive(newItem);
+    console.log(scheduleObject.items);
+    this.setState({
+      schedule: scheduleObject.items,
+      display: (
+      <div>
+        <SchedulePicker
+          sid={this.state.service.sid}
+          scheduleDate={this.state.scheduleDate}
+          onDateChange={this.handleDateChange}
+        />
+        <ScheduleView 
+        onRowSelected={this.handleScheduleRowSelect}
+          onDelete={this.handleScheduleDelete} 
+          data={this.state.schedule} lastUpdated=""
+        />
+        <ScheduleToolbar
+          saveAllowed={this.state.user.auth} 
+          onSaveClicked={this.savePlaylist}
+        />
+      </div>
+      )
+    });
+  }
+
+  handleAddEpisode(item) {
+    console.log("ITEM", item);
+    const version = item.available_versions.version[0]; // TODO pick a version
+    const newItem = {
+      title: item.title?item.title:item.presentation_title,
+      duration: moment.duration(version.duration).toISOString(),
+      live: false,
+      insertionType: ''
+    };
+    this.pasteIntoSchedule(newItem);
+  }
+
+  handleScheduleRowSelect = (index) => {
+    console.log('handleScheduleDelete', index);
+    this.setState({scheduleInsertionPoint: index});
+  }
+
+  handleAddClip(item) {
+    console.log("ITEM", item);
+    const version = item.available_versions.version[0]; // TODO pick a version
+    const newItem = {
+      title: item.title,
+      duration: moment.duration(version.duration).toISOString(),
+      live: false,
+      insertionType: ''
+    };
+    this.pasteIntoSchedule(newItem);
+  }
+
+  pasteIntoSchedule(items, copies) {
+    if(!Array.isArray(items))
+      items = [items];
+    if(copies === undefined) copies = 1;
+    console.log('pasteIntoSchedule', items, copies);
+    let n = [...items];
+    while(copies>1) {
+      n = n.concat(items);
+      copies--;
+    }
+    console.log("insert %d items at index %d", n.length, this.state.scheduleInsertionPoint);
+    let index = this.state.scheduleInsertionPoint;
+    let sched = new ScheduleObject();
+    sched.items = this.state.schedule;
+    sched.addFloating(index, n);    
   }
 
   handleClick = (item, isLive) => {
@@ -400,7 +542,7 @@ class Editor extends React.Component {
         display: (
           <Scratchpad
             data={scratchPadItems}
-            deleteItem={this.deleteItem}
+            deleteItem={this.deleteItemFromScratchpad}
             copyContent={this.copyContent}
             clearContent={this.clearContent}
           />
@@ -411,22 +553,23 @@ class Editor extends React.Component {
       scheduleItems.push(newItem2);
       this.setState({
         display: (
-          <Schedule
-            onDateChange={this.handleDateChange}
-            service={this.state.service}
-            lastItem={this.lastItem}
-            clipTime={time}
-            item={newItem2}
-            length={scheduleItems.length}
-            pasted={copiedContent}
-            loopedContent={""}
-            text="Today's "
-            added={true}
-            deleteItem={this.deleteItem}
-            nextSchedule={this.nextDay}
-            scheduleDate={this.state.scheduleDate}
-          />
-        )
+      <div>
+        <SchedulePicker
+          sid={this.state.service.sid}
+          scheduleDate={this.state.scheduleDate}
+          onDateChange={this.handleDateChange}
+        />
+        <ScheduleView 
+          onDelete={this.handleScheduleDelete} 
+          onRowSelected={this.handleScheduleRowSelect}
+          data={this.state.schedule} lastUpdated=""
+        />
+        <ScheduleToolbar
+          saveAllowed={this.state.user.auth} 
+          onSaveClicked={this.savePlaylist}
+        />
+      </div>
+      )
       });
       break;
     case "Loop":
@@ -462,9 +605,9 @@ class Editor extends React.Component {
           itemType: "web",
           panelShow: (
             <Clips
-              type={this.state.itemType}
+              type="web"
               sid={this.state.service.sid}
-              handleClick={this.handleClick}
+              handleClick={this.handleAddClip}
             />
           )
         });
@@ -474,9 +617,10 @@ class Editor extends React.Component {
           isPaneOpen: true,
           title: "Jupiter Clips",
           panelShow: (
-            <Jupiter
+            <Clips
+            type="jupiter"
               sid={this.state.service.sid}
-              handleClick={this.handleClick}
+              handleClick={this.handleAddClip}
             />
           )
         });
@@ -490,7 +634,7 @@ class Editor extends React.Component {
             <Live
               date={this.state.scheduleDate}
 	            sid={this.state.service.sid}
-	            handleClick={this.handleClick}
+	            handleClick={this.handleAddLive}
 	          />
           )
         });
@@ -506,7 +650,7 @@ class Editor extends React.Component {
             <Episode
               date={this.state.scheduleDate}
               sid={this.state.service.sid}
-              handleClick={this.handleClick}
+              handleClick={this.handleAddEpisode}
             />
           )
         });
@@ -518,7 +662,7 @@ class Editor extends React.Component {
           panelShow: (
             <Specials
               sid={this.state.service.sid}
-              handleClick={this.handleClick}
+              handleClick={this.handleAddClip}
             />
           )
         });
@@ -527,19 +671,22 @@ class Editor extends React.Component {
         menuText = text;
         this.setState({
           display: (
-            <Schedule
-              onDateChange={this.handleDateChange}
-              service={this.state.service}
-              lastItem={this.lastItem}
-              clipTime={time}
-              nextSchedule={this.nextDay}
-              loopedContent={""}
-              length={scheduleItems.length}
-              pasted={copiedContent}
-              text="Today's "
-              deleteItem={this.deleteItem}
-              scheduleDate={this.state.scheduleDate}
-            />
+      <div>
+        <SchedulePicker
+          sid={this.state.service.sid}
+          scheduleDate={this.state.scheduleDate}
+          onDateChange={this.handleDateChange}
+        />
+        <ScheduleView 
+          onRowSelected={this.handleScheduleRowSelect}
+          onDelete={this.handleScheduleDelete} 
+          data={this.state.schedule} lastUpdated=""
+        />
+        <ScheduleToolbar
+          saveAllowed={this.state.user.auth} 
+          onSaveClicked={this.savePlaylist}
+        />
+      </div>
           )
         });
         break;
@@ -549,7 +696,7 @@ class Editor extends React.Component {
           display: (
             <Scratchpad
               data={scratchPadItems}
-              deleteItem={this.deleteItem}
+              deleteItem={this.deleteItemFromScratchpad}
               clearContent={this.clearContent}
               copyContent={this.copyContent}
             />
