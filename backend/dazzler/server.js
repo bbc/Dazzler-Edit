@@ -518,14 +518,14 @@ function pid2crid(pid) {
   return `crid://bbc.co.uk/${pid.substring(0, 1)}/${n}`;
 }
 
-function add_crids_to_webcast(items) {
-  if (items != null && items.total > 0) {
-    for (let i = 0; i < items.length; i++) {
-      const pid = items[i].window_of[0].pid;
-      items[i].window_of[0].crid = pid2crid(pid);
+function add_crids_to_webcast(results) {
+  if (results != null && results.total > 0) {
+    for (let i = 0; i < results.items.length; i++) {
+      const pid = results.items[i].window_of[0].pid;
+      results.items[i].window_of[0].crid = pid2crid(pid);
     }
   }
-  return items;
+  return results;
 }
 
 function add_crids_to_episodes(items) {
