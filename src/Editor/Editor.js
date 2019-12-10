@@ -29,7 +29,7 @@ import "react-sliding-pane/dist/react-sliding-pane.css";
 import axios from "axios";
 import Specials from "../Specials/Specials";
 import moment from "moment";
-import 'moment-duration-format';
+import "moment-duration-format";
 import Episode from "../Episode/Episode";
 import Live from "../Live/Live";
 import Clips from "../Clips/Clips";
@@ -127,7 +127,7 @@ const styles = theme => ({
 class Editor extends React.Component {
   constructor(props) {
     super(props);
-    
+
     this.handleScheduleDelete = this.handleScheduleDelete.bind(this);
     this.handleAddLive = this.handleAddLive.bind(this);
     this.handleAddClip = this.handleAddClip.bind(this);
@@ -142,15 +142,17 @@ class Editor extends React.Component {
     this.handleScheduleDelete = this.handleScheduleDelete.bind(this);
 
     this.state = {
-      schedule:[],
-      scheduleDate: moment().utc().format('YYYY-MM-DD'),
+      schedule: [],
+      scheduleDate: moment()
+        .utc()
+        .format("YYYY-MM-DD"),
       scheduleInsertionPoint: -1,
       scheduleModified: false,
       open: false,
       Title: "",
       isPaneOpen: false,
       panelShow: null,
-      itemType: '',
+      itemType: "",
       count: 0,
       clips: [],
       jupiter: [],
@@ -174,23 +176,24 @@ class Editor extends React.Component {
     console.log("Editor DidMount", time);
     this.setState({
       display: (
-      <div>
-        <SchedulePicker
-          enabled={!this.state.scheduleModified}
-          sid={this.state.service.sid}
-          scheduleDate={this.state.scheduleDate}
-          onDateChange={this.handleDateChange}
-        />
-        <ScheduleView 
-          onRowSelected={this.handleScheduleRowSelect}
-          onDelete={this.handleScheduleDelete} 
-          data={this.state.schedule} lastUpdated=""
-        />
-        <ScheduleToolbar
-          saveEnabled={this.state.scheduleModified && this.state.user.auth}
-          onSaveClicked={this.savePlaylist}
-        />
-      </div>
+        <div>
+          <SchedulePicker
+            enabled={!this.state.scheduleModified}
+            sid={this.state.service.sid}
+            scheduleDate={this.state.scheduleDate}
+            onDateChange={this.handleDateChange}
+          />
+          <ScheduleView
+            onRowSelected={this.handleScheduleRowSelect}
+            onDelete={this.handleScheduleDelete}
+            data={this.state.schedule}
+            lastUpdated=""
+          />
+          <ScheduleToolbar
+            saveEnabled={this.state.scheduleModified && this.state.user.auth}
+            onSaveClicked={this.savePlaylist}
+          />
+        </div>
       )
     });
 
@@ -210,7 +213,7 @@ class Editor extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    console.log('editor componentDidUpdate');
+    console.log("editor componentDidUpdate");
   }
 
   lastItem = scheduleTime => {
@@ -237,25 +240,26 @@ class Editor extends React.Component {
       display: (
         <div>
           <SchedulePicker
-          enabled={!this.state.scheduleModified}
+            enabled={!this.state.scheduleModified}
             sid={this.state.service.sid}
             scheduleDate={this.state.scheduleDate}
             onDateChange={this.handleDateChange}
           />
-          <ScheduleView 
-          onRowSelected={this.handleScheduleRowSelect}
-            onDelete={this.handleScheduleDelete} 
-            data={scheduleObject.items} lastUpdated=""
+          <ScheduleView
+            onRowSelected={this.handleScheduleRowSelect}
+            onDelete={this.handleScheduleDelete}
+            data={scheduleObject.items}
+            lastUpdated=""
           />
           <ScheduleToolbar
-          saveEnabled={this.state.scheduleModified && this.state.user.auth}
+            saveEnabled={this.state.scheduleModified && this.state.user.auth}
             onSaveClicked={this.savePlaylist}
           />
         </div>
-        )
+      )
     });
   }
-  
+
   handleDateChange = (date, schedule) => {
     this.setState({
       scheduleDate: date,
@@ -263,22 +267,23 @@ class Editor extends React.Component {
       display: (
         <div>
           <SchedulePicker
-          enabled={!this.state.scheduleModified}
+            enabled={!this.state.scheduleModified}
             sid={this.state.service.sid}
             scheduleDate={date}
             onDateChange={this.handleDateChange}
           />
-          <ScheduleView 
-          onRowSelected={this.handleScheduleRowSelect}
-            onDelete={this.handleScheduleDelete} 
-            data={schedule} lastUpdated=""
+          <ScheduleView
+            onRowSelected={this.handleScheduleRowSelect}
+            onDelete={this.handleScheduleDelete}
+            data={schedule}
+            lastUpdated=""
           />
           <ScheduleToolbar
-          saveEnabled={this.state.scheduleModified && this.state.user.auth}
+            saveEnabled={this.state.scheduleModified && this.state.user.auth}
             onSaveClicked={this.savePlaylist}
           />
         </div>
-        )
+      )
     });
   };
 
@@ -319,46 +324,49 @@ class Editor extends React.Component {
     }
   }
 
-  deleteItemFromLoop = (index) => {
+  deleteItemFromLoop = index => {
     const r = this.state.loop[index];
     let loop = [...this.state.loop];
     loop.splice(index, 1);
     this.setState({
-      loop:loop,
-      loopDuration: this.state.loopDuration.subtract(moment.duration(r.duration)),
+      loop: loop,
+      loopDuration: this.state.loopDuration.subtract(
+        moment.duration(r.duration)
+      ),
       display: (
-          <Loop
-            data={this.state.loop}
-            duration={this.state.loopDuration.valueOf()}
-            deleteItem={this.deleteItemFromLoop}
-            loopContent={this.loopContent}
-            clearContent={this.clearContent}
-            scheduleTime={this.state.scheduleTime}
-          />
-        )
+        <Loop
+          data={this.state.loop}
+          duration={this.state.loopDuration.valueOf()}
+          deleteItem={this.deleteItemFromLoop}
+          loopContent={this.loopContent}
+          clearContent={this.clearContent}
+          scheduleTime={this.state.scheduleTime}
+        />
+      )
     });
-  }
+  };
 
   handleDelete(id) {
     this.setState({
       display: (
-      <div>
-        <SchedulePicker
-        enabled={!this.state.scheduleModified}
-          sid={this.state.service.sid}
-          scheduleDate={this.state.scheduleDate}
-          onDateChange={this.handleDateChange}
-        />
-        <ScheduleView 
-        onRowSelected={this.handleScheduleRowSelect}
-          onDelete={this.handleScheduleDelete} 
-          data={this.state.schedule} lastUpdated=""
-        />
-        <ScheduleToolbar
-        saveEnabled={this.state.scheduleModified && this.state.user.auth}
-          onSaveClicked={this.savePlaylist}
-        />
-      </div>
+        <div>
+          <SchedulePicker
+            enabled={!this.state.scheduleModified}
+            sid={this.state.service.sid}
+            scheduleDate={this.state.scheduleDate}
+            onDateChange={this.handleDateChange}
+          />
+          <ScheduleView
+            onRowSelected={this.handleScheduleRowSelect}
+            onDelete={this.handleScheduleDelete}
+            data={this.state.schedule}
+            lastUpdated=""
+          />
+          <ScheduleToolbar
+            saveEnabled={this.state.scheduleModified && this.state.user.auth}
+            onSaveClicked={this.savePlaylist}
+          />
+        </div>
       )
     });
   }
@@ -368,12 +376,12 @@ class Editor extends React.Component {
     const startTime = moment(item.scheduled_time.start);
     const newItem = {
       captureChannel: item.service.sid, // TODO make use of this
-      title: 'Live broadcast segment',
+      title: "Live broadcast segment",
       duration: item.duration.toISOString(),
-      startTime:startTime,
+      startTime: startTime,
       live: true,
-      insertionType: ''
-    }
+      insertionType: ""
+    };
     for (let i = 0; i < item.window_of.length; i++) {
       switch (item.window_of[i].result_type) {
         case "version":
@@ -394,23 +402,24 @@ class Editor extends React.Component {
     this.setState({
       schedule: scheduleObject.items,
       display: (
-      <div>
-        <SchedulePicker
-        enabled={!this.state.scheduleModified}
-          sid={this.state.service.sid}
-          scheduleDate={this.state.scheduleDate}
-          onDateChange={this.handleDateChange}
-        />
-        <ScheduleView 
-        onRowSelected={this.handleScheduleRowSelect}
-          onDelete={this.handleScheduleDelete} 
-          data={this.state.schedule} lastUpdated=""
-        />
-        <ScheduleToolbar
-        saveEnabled={this.state.scheduleModified && this.state.user.auth}
-          onSaveClicked={this.savePlaylist}
-        />
-      </div>
+        <div>
+          <SchedulePicker
+            enabled={!this.state.scheduleModified}
+            sid={this.state.service.sid}
+            scheduleDate={this.state.scheduleDate}
+            onDateChange={this.handleDateChange}
+          />
+          <ScheduleView
+            onRowSelected={this.handleScheduleRowSelect}
+            onDelete={this.handleScheduleDelete}
+            data={this.state.schedule}
+            lastUpdated=""
+          />
+          <ScheduleToolbar
+            saveEnabled={this.state.scheduleModified && this.state.user.auth}
+            onSaveClicked={this.savePlaylist}
+          />
+        </div>
       )
     });
   }
@@ -419,18 +428,18 @@ class Editor extends React.Component {
     console.log("ITEM", item);
     const version = item.available_versions.version[0]; // TODO pick a version
     const newItem = {
-      title: item.title?item.title:item.presentation_title,
+      title: item.title ? item.title : item.presentation_title,
       duration: moment.duration(version.duration).toISOString(),
       live: false,
-      insertionType: ''
+      insertionType: ""
     };
     this.pasteIntoSchedule(newItem);
   }
 
-  handleScheduleRowSelect = (index) => {
-    console.log('handleScheduleDelete', index);
-    this.setState({scheduleInsertionPoint: index});
-  }
+  handleScheduleRowSelect = index => {
+    console.log("handleScheduleDelete", index);
+    this.setState({ scheduleInsertionPoint: index });
+  };
 
   handleAddClip(item) {
     console.log("ITEM", item);
@@ -439,50 +448,54 @@ class Editor extends React.Component {
       title: item.title,
       duration: moment.duration(version.duration).toISOString(),
       live: false,
-      insertionType: ''
+      insertionType: ""
     };
     this.pasteIntoSchedule(newItem);
   }
 
   pasteIntoSchedule(items, copies) {
-    if(!Array.isArray(items))
-      items = [items];
-    if(copies === undefined) copies = 1;
-    console.log('pasteIntoSchedule', items, copies);
+    if (!Array.isArray(items)) items = [items];
+    if (copies === undefined) copies = 1;
+    console.log("pasteIntoSchedule", items, copies);
     let n = [...items];
-    while(copies>1) {
+    while (copies > 1) {
       n = n.concat(items);
       copies--;
     }
-    console.log("insert %d items at index %d", n.length, this.state.scheduleInsertionPoint);
+    console.log(
+      "insert %d items at index %d",
+      n.length,
+      this.state.scheduleInsertionPoint
+    );
     let index = this.state.scheduleInsertionPoint;
     let scheduleObject = new ScheduleObject(
       this.state.service.sid,
       this.state.scheduleDate,
       this.state.schedule
     );
-    scheduleObject.addFloating(index, n);    
+    scheduleObject.addFloating(index, n);
     this.setState({
       schedule: scheduleObject.items,
       display: (
         <div>
           <SchedulePicker
-          enabled={!this.state.scheduleModified}
+            enabled={!this.state.scheduleModified}
             sid={this.state.service.sid}
             scheduleDate={this.state.scheduleDate}
             onDateChange={this.handleDateChange}
           />
-          <ScheduleView 
-          onRowSelected={this.handleScheduleRowSelect}
-            onDelete={this.handleScheduleDelete} 
-            data={scheduleObject.items} lastUpdated=""
+          <ScheduleView
+            onRowSelected={this.handleScheduleRowSelect}
+            onDelete={this.handleScheduleDelete}
+            data={scheduleObject.items}
+            lastUpdated=""
           />
           <ScheduleToolbar
-          saveEnabled={this.state.scheduleModified && this.state.user.auth}
+            saveEnabled={this.state.scheduleModified && this.state.user.auth}
             onSaveClicked={this.savePlaylist}
           />
         </div>
-        )
+      )
     });
   }
 
@@ -521,7 +534,7 @@ class Editor extends React.Component {
             case "version":
               newItem2.versionPid = item.window_of[i].pid;
               //newItem2.versionCrid = newItem2.versionCrid;
-              console.log('window version', newItem2, item);
+              console.log("window version", newItem2, item);
               break;
             case "episode":
               // do we want anything from the episode level?
@@ -544,70 +557,75 @@ class Editor extends React.Component {
 
     switch (menuText) {
       case "Scratchpad":
-      scratchPadItems.push(newItem2);
-      this.setState({
-        display: (
-          <Scratchpad
-            data={scratchPadItems}
-            deleteItem={this.deleteItemFromScratchpad}
-            copyContent={this.copyContent}
-            clearContent={this.clearContent}
-          />
-        )
-      });
-      break
-    case "Schedule":
-      scheduleItems.push(newItem2);
-      this.setState({
-        display: (
-      <div>
-        <SchedulePicker
-        enabled={!this.state.scheduleModified}
-          sid={this.state.service.sid}
-          scheduleDate={this.state.scheduleDate}
-          onDateChange={this.handleDateChange}
-        />
-        <ScheduleView 
-          onDelete={this.handleScheduleDelete} 
-          onRowSelected={this.handleScheduleRowSelect}
-          data={this.state.schedule} lastUpdated=""
-        />
-        <ScheduleToolbar
-        saveEnabled={this.state.scheduleModified && this.state.user.auth}
-          onSaveClicked={this.savePlaylist}
-        />
-      </div>
-      )
-      });
-      break;
-    case "Loop":
-      newItem2.durationAsString = moment.duration(newItem2.duration).format("HH:mm:ss");
-      newItem2.index = this.state.loop.length;
-      console.log('add item to loop', newItem2);
-      const n = this.state.loop.concat(newItem2);
-      this.setState({
-        loop: n,
-        loopDuration: this.state.loopDuration.add(newItem2.duration),
-        display: (
-          <Loop
-            data={n}
-            duration={this.state.loopDuration.valueOf()}
-            deleteItem={this.deleteItemFromLoop}
-            loopContent={this.loopContent}
-            clearContent={this.clearContent}
-            scheduleTime={this.state.scheduleTime}
-          />
-        )
-      });
-      break;
-    default:
+        scratchPadItems.push(newItem2);
+        this.setState({
+          display: (
+            <Scratchpad
+              data={scratchPadItems}
+              deleteItem={this.deleteItemFromScratchpad}
+              copyContent={this.copyContent}
+              clearContent={this.clearContent}
+            />
+          )
+        });
+        break;
+      case "Schedule":
+        scheduleItems.push(newItem2);
+        this.setState({
+          display: (
+            <div>
+              <SchedulePicker
+                enabled={!this.state.scheduleModified}
+                sid={this.state.service.sid}
+                scheduleDate={this.state.scheduleDate}
+                onDateChange={this.handleDateChange}
+              />
+              <ScheduleView
+                onDelete={this.handleScheduleDelete}
+                onRowSelected={this.handleScheduleRowSelect}
+                data={this.state.schedule}
+                lastUpdated=""
+              />
+              <ScheduleToolbar
+                saveEnabled={
+                  this.state.scheduleModified && this.state.user.auth
+                }
+                onSaveClicked={this.savePlaylist}
+              />
+            </div>
+          )
+        });
+        break;
+      case "Loop":
+        newItem2.durationAsString = moment
+          .duration(newItem2.duration)
+          .format("HH:mm:ss");
+        newItem2.index = this.state.loop.length;
+        console.log("add item to loop", newItem2);
+        const n = this.state.loop.concat(newItem2);
+        this.setState({
+          loop: n,
+          loopDuration: this.state.loopDuration.add(newItem2.duration),
+          display: (
+            <Loop
+              data={n}
+              duration={this.state.loopDuration.valueOf()}
+              deleteItem={this.deleteItemFromLoop}
+              loopContent={this.loopContent}
+              clearContent={this.clearContent}
+              scheduleTime={this.state.scheduleTime}
+            />
+          )
+        });
+        break;
+      default:
     }
   };
 
   iHandleClick = text => {
     switch (text) {
       case "Web Clips":
-        this.setState({ 
+        this.setState({
           isPaneOpen: true,
           title: "Web Clips",
           itemType: "web",
@@ -620,13 +638,13 @@ class Editor extends React.Component {
           )
         });
         break;
-        case "Jupiter Clips":
-        this.setState({ 
+      case "Jupiter Clips":
+        this.setState({
           isPaneOpen: true,
           title: "Jupiter Clips",
           panelShow: (
             <Clips
-            type="jupiter"
+              type="jupiter"
               sid={this.state.service.sid}
               handleClick={this.handleAddClip}
             />
@@ -634,16 +652,16 @@ class Editor extends React.Component {
         });
         break;
       case "Live":
-        console.log('show live', this.state.scheduleDate);
-        this.setState({ 
+        console.log("show live", this.state.scheduleDate);
+        this.setState({
           isPaneOpen: true,
           title: "Upcoming Live Broadcasts",
           panelShow: (
             <Live
               date={this.state.scheduleDate}
-	            sid={this.state.service.sid}
-	            handleClick={this.handleAddLive}
-	          />
+              sid={this.state.service.sid}
+              handleClick={this.handleAddLive}
+            />
           )
         });
         break;
@@ -679,23 +697,26 @@ class Editor extends React.Component {
         menuText = text;
         this.setState({
           display: (
-      <div>
-        <SchedulePicker
-        enabled={!this.state.scheduleModified}
-          sid={this.state.service.sid}
-          scheduleDate={this.state.scheduleDate}
-          onDateChange={this.handleDateChange}
-        />
-        <ScheduleView 
-          onRowSelected={this.handleScheduleRowSelect}
-          onDelete={this.handleScheduleDelete} 
-          data={this.state.schedule} lastUpdated=""
-        />
-        <ScheduleToolbar
-        saveEnabled={this.state.scheduleModified && this.state.user.auth}
-          onSaveClicked={this.savePlaylist}
-        />
-      </div>
+            <div>
+              <SchedulePicker
+                enabled={!this.state.scheduleModified}
+                sid={this.state.service.sid}
+                scheduleDate={this.state.scheduleDate}
+                onDateChange={this.handleDateChange}
+              />
+              <ScheduleView
+                onRowSelected={this.handleScheduleRowSelect}
+                onDelete={this.handleScheduleDelete}
+                data={this.state.schedule}
+                lastUpdated=""
+              />
+              <ScheduleToolbar
+                saveEnabled={
+                  this.state.scheduleModified && this.state.user.auth
+                }
+                onSaveClicked={this.savePlaylist}
+              />
+            </div>
           )
         });
         break;
@@ -773,7 +794,12 @@ class Editor extends React.Component {
             <Typography variant="h6" color="inherit" noWrap>
               <center>{this.state.service.name}</center>
             </Typography>
-            <Typography className={classes.appBarName} variant="h6" color="inherit" noWrap>
+            <Typography
+              className={classes.appBarName}
+              variant="h6"
+              color="inherit"
+              noWrap
+            >
               <center>{this.state.user.name}</center>
             </Typography>
           </Toolbar>
