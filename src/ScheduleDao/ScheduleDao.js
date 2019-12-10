@@ -139,40 +139,7 @@ class ScheduleDao {
       `;
   }
 
-static deleteItemClosingGap(s, index) {
-    let schedule = [...s];
-    const duration = moment.duration(schedule[index].duration);
-    schedule.splice(index, 1);
-    for(let i = index; i<schedule.length; i++) {
-      let done = false;
-      switch(schedule[i].insertionType) {
-        case "gap":
-          schedule[i].startTime.subtract(duration);
-          schedule[i].duration = moment.duration(schedule[i].duration).add(duration).format();
-          done = true;
-          break;
-        case "sentinel":
-        case "live":
-            done = true;
-            schedule.splice(i, 0, {
-              title: 'gap',
-              startTime:moment(schedule[i].startTime).subtract(duration),
-              duration: duration.format(),
-              live: false,
-              insertionType: 'gap'
-            });
-            break;
-        default:
-          schedule[i].startTime.subtract(duration);
-      }
-      if(done) break;
-    }
-    console.log('delete', schedule);
-    return schedule;
-  }
-
 }
 export const fetchSchedule = ScheduleDao.fetchSchedule;
 export const saveSchedule = ScheduleDao.saveSchedule;
-export const deleteItemClosingGap = ScheduleDao.deleteItemClosingGap;
 export default ScheduleDao;

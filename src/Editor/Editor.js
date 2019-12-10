@@ -39,7 +39,6 @@ import SchedulePicker from "../SchedulePicker/SchedulePicker";
 import ScheduleToolbar from "../ScheduleToolbar/ScheduleToolbar";
 import ScheduleView from "../ScheduleView/ScheduleView";
 import Loop from "../Loop/Loop";
-import {deleteItemClosingGap} from "../ScheduleDao/ScheduleDao";
 import ScheduleObject from "../ScheduleObject";
 
 const drawerWidth = 240;
@@ -227,21 +226,25 @@ class Editor extends React.Component {
   };
 
   handleScheduleDelete(index) {
-    const schedule = deleteItemClosingGap(this.state.schedule, index);
-    const date = this.state.scheduleDate;
+    let scheduleObject = new ScheduleObject(
+      this.state.sid,
+      this.state.scheduleDate,
+      this.state.schedule
+    );
+    scheduleObject.deleteItemClosingGap(index);
     this.setState({
-      schedule: schedule,
+      schedule: scheduleObject.items,
       display: (
         <div>
           <SchedulePicker
             sid={this.state.service.sid}
-            scheduleDate={date}
+            scheduleDate={this.state.scheduleDate}
             onDateChange={this.handleDateChange}
           />
           <ScheduleView 
           onRowSelected={this.handleScheduleRowSelect}
             onDelete={this.handleScheduleDelete} 
-            data={schedule} lastUpdated=""
+            data={scheduleObject.items} lastUpdated=""
           />
           <ScheduleToolbar
             saveAllowed={this.state.user.auth} 
@@ -406,8 +409,11 @@ class Editor extends React.Component {
       }
     }
     console.log(newItem);
-    let scheduleObject = new ScheduleObject();
-    scheduleObject.items = this.state.schedule;
+    let scheduleObject = new ScheduleObject(
+      this.state.serviceIDRef.sid,
+      this.state.scheduleDate,
+      this.state.schedule
+    );
     scheduleObject.addLive(newItem);
     console.log(scheduleObject.items);
     this.setState({
@@ -474,9 +480,33 @@ class Editor extends React.Component {
     }
     console.log("insert %d items at index %d", n.length, this.state.scheduleInsertionPoint);
     let index = this.state.scheduleInsertionPoint;
-    let sched = new ScheduleObject();
-    sched.items = this.state.schedule;
-    sched.addFloating(index, n);    
+    let scheduleObject = new ScheduleObject(
+      this.state.service.sid,
+      this.state.scheduleDate,
+      this.state.schedule
+    );
+    scheduleObject.addFloating(index, n);    
+    this.setState({
+      schedule: scheduleObject.items,
+      display: (
+        <div>
+          <SchedulePicker
+            sid={this.state.service.sid}
+            scheduleDate={this.state.scheduleDate}
+            onDateChange={this.handleDateChange}
+          />
+          <ScheduleView 
+          onRowSelected={this.handleScheduleRowSelect}
+            onDelete={this.handleScheduleDelete} 
+            data={scheduleObject.items} lastUpdated=""
+          />
+          <ScheduleToolbar
+            saveAllowed={this.state.user.auth} 
+            onSaveClicked={this.savePlaylist}
+          />
+        </div>
+        )
+    });
   }
 
   handleClick = (item, isLive) => {

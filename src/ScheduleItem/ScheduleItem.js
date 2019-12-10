@@ -22,21 +22,21 @@ class ScheduleItem extends React.Component {
     render() {
     let rowStyle = this.props.insertionType;
     if(this.props.live === "true") rowStyle = 'live';
-
+    let arrowStyle = "bottomarrow";
+    if(rowStyle === 'gap') arrowStyle = "midarrow";
     return (
       <Fragment>
         <tr className={rowStyle}>
           <td onClick={() => this.props.onClick(this.props.index)}>
-            {" "}
-            <div className="current">
               {this.props.selected? (
-                <Arrow className="arrow" fontSize="large" />
+                <Arrow className={arrowStyle}/>
               ) : (
                 ""
               )}
-            </div>
           </td>
-          <td onClick={() => this.props.onClick(this.props.index)}>{this.props.startTime}</td>
+          <td onClick={() => this.props.onClick(this.props.index)}>
+            {this.props.startTime}
+          </td>
           <td>{this.props.title}</td>
           <td onClick={() => this.props.onClick(this.props.index)}>
             {moment.duration(this.props.duration).format('HH:mm:ss')}

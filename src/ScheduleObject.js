@@ -1,63 +1,72 @@
 import moment from "moment";
 
 class ScheduleObject {
-    constructor(sid, date) {
+    constructor(sid, date, items) {
         this.date = date;
         this.sid = sid;
-        this.items = [
-            {
-                title: 'Dummy start',
-                duration: 'PT0S',
-                startTime: moment(date),
-                live: false,
-                insertionType: 'sentinel'
-            },
-            {
-                title: 'gap',
-                startTime: moment(date),
-                duration: "P1D",
-                live: false,
-                insertionType: 'gap'
-            },
-            {
-                title: 'Dummy end',
-                duration: 'PT0S',
-                startTime: moment(date).add(1, 'days'),
-                live: false,
-                insertionType: 'sentinel'
-            }
-        ];
+        if(items === undefined) {
+            this.items = [
+                {
+                    title: 'Dummy start',
+                    duration: 'PT0S',
+                    startTime: moment(date),
+                    live: false,
+                    insertionType: 'sentinel'
+                },
+                {
+                    title: 'gap',
+                    startTime: moment(date),
+                    duration: "P1D",
+                    live: false,
+                    insertionType: 'gap'
+                },
+                {
+                    title: 'Dummy end',
+                    duration: 'PT0S',
+                    startTime: moment(date).add(1, 'days'),
+                    live: false,
+                    insertionType: 'sentinel'
+                }
+            ];
+        }
+        else {
+            this.items = items;
+        }
     }
 
     addFloating(index, items) {
         // keep the schedule unchanged up to the insertion point
-        if (this.state.schedule[index].insertionType === 'gap') {
+        if (this.items[index].insertionType === 'gap') {
             index = index - 1; // ignore the gap;
         }
         let newSchedule = this.items.slice(0, index + 1);
-        let nonLiveItemsAfter = [];
-        let liveItemsAfter = [];
-        let sentinel = this.items.pop();
+        // eslint-disable-next-line no-unused-vars
+        let indexOfFixed = 0;
+        // keep the schedule unchanged after the next fixed event
         for (let i = index; i < this.items.length; i++) {
             if (this.items[i].isLive) {
-                liveItemsAfter.push(this.items[i]);
+                indexOfFixed = i;
+                break
             }
-            else {
-                if(this.items[i].insertionType !== 'gap') {
-                    nonLiveItemsAfter.push(this.items[i]);
-                }
+            if(this.items[i].insertionType === 'sentinel') {
+                indexOfFixed = i;
+                break
             }
         }
+        // remove gap before fixed
+        // TODO
+        // calculate available space
+        // TODO
+        // trim insertion to fit
+        // TODO
+        // splice in new items
+        // TODO
+        // add new item total duration to following non-fixed events
+        // TODO
         this.items = newSchedule;
-        this.addSequentially(items);
-        this.addSequentially(nonLiveItemsAfter);
-        this.items.push(sentinel); // TODO extend sentinel if last item ends past midnight
-        this.addGaps();
-        this.sort();
     }
 
-    // TODO skip over live
-    // TODO stop at midnight
+    // TODO stop at fixed event
     addSequentially(items) {
         const item = this.items[this.items.length-1];
         const start = moment(item.startTime);
@@ -96,7 +105,7 @@ class ScheduleObject {
             this.items.splice(index + 1, 0, {
                 title: 'gap',
                 startTime: endTime,
-                duration: moment.duration(next.diff(endTime)).format(),
+                duration: moment.duration(next.diff(endTime)).toISOString(),
                 live: false,
                 insertionType: 'gap'
             });
@@ -123,13 +132,12 @@ class ScheduleObject {
         let gaps = [];
         for (let i = 0; i < s.length - 1; i++) {
             const end = moment(s[i].startTime).add(moment.duration(s[i].duration));
-            console.log('g', end.format(), s[i].startTime.format(), s[i].duration);
             const next = s[i + 1].startTime;
             if (end.isBefore(next)) {
                 gaps.push({
                     title: 'gap',
                     startTime: end,
-                    duration: moment.duration(next.diff(end)).format(),
+                    duration: moment.duration(next.diff(end)).toISOString(),
                     live: false,
                     insertionType: 'gap'
                 });
@@ -137,6 +145,41 @@ class ScheduleObject {
         }
         this.items = s.concat(gaps);
     }
+
+    // delete the item. subtract its duration from following items
+    // until we get to a fixed event
+    // add a gap before the fixed event
+    deleteItemClosingGap(index) {
+        let schedule = [...this.items];
+        const duration = moment.duration(schedule[index].duration);
+        schedule.splice(index, 1);
+        for(let i = index; i<schedule.length; i++) {
+          let done = false;
+          switch(schedule[i].insertionType) {
+            case "gap":
+              schedule[i].startTime.subtract(duration);
+              schedule[i].duration = moment.duration(schedule[i].duration).add(duration).toIsoString();
+              done = true;
+              break;
+            case "sentinel":
+            case "live":
+                done = true;
+                schedule.splice(i, 0, {
+                  title: 'gap',
+                  startTime:moment(schedule[i].startTime).subtract(duration),
+                  duration: duration.toISOString(),
+                  live: false,
+                  insertionType: 'gap'
+                });
+                break;
+            default:
+              schedule[i].startTime.subtract(duration);
+          }
+          if(done) break;
+        }
+        console.log('delete', schedule);
+        this.items = schedule;
+      }
 
     sort() {
         this.items.sort((a, b) => {

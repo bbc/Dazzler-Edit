@@ -68,7 +68,7 @@ class ScheduleView extends React.Component {
       <table className="ui compact celled definition table">
         <thead>
           <tr>
-            <th>Select</th>
+            <th></th>
             <th>Start</th>
             <th>Title</th>
             <th>Duration </th>

@@ -49,8 +49,8 @@
   background-color: #daa520;
 }
 
-.current {
-  background-image: url("arrow.png");
+.sentinel {
+  display: none;
 }
 
 .loopStart {
@@ -63,15 +63,15 @@
   background-color: #8095b5;
 }
 
-.chosen {
-  background-image: url("arrow.png");
-}
-
 .futureEpisode {
   background-color: pink;
 }
 
-.arrow {
+.bottomarrow {
   margin-left: 90%;
-  margin-bottom: -36%;
+  margin-bottom: -1em;
+}
+
+.midarrow {
+  margin-left: 90%;
 }
