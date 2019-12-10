@@ -47,7 +47,6 @@ var time = -2;
 var scheduleItems = [];
 var scratchPadItems = [];
 var copiedContent = [];
-var loopedContent = [];
 var icons = [
   <MailIcon />,
   <Movie />,
@@ -136,7 +135,6 @@ class Editor extends React.Component {
     this.handleClick = this.handleClick.bind(this);
     this.copyContent = this.copyContent.bind(this);
     this.clearContent = this.clearContent.bind(this);
-    this.loopContent = this.loopContent.bind(this);
     this.lastItem = this.lastItem.bind(this);
     this.handleDrawerOpen = this.handleDrawerOpen.bind(this);
     this.handleDrawerClose = this.handleDrawerClose.bind(this);
@@ -147,6 +145,7 @@ class Editor extends React.Component {
       schedule:[],
       scheduleDate: moment().utc().format('YYYY-MM-DD'),
       scheduleInsertionPoint: -1,
+      scheduleModified: false,
       open: false,
       Title: "",
       isPaneOpen: false,
@@ -177,6 +176,7 @@ class Editor extends React.Component {
       display: (
       <div>
         <SchedulePicker
+          enabled={!this.state.scheduleModified}
           sid={this.state.service.sid}
           scheduleDate={this.state.scheduleDate}
           onDateChange={this.handleDateChange}
@@ -187,7 +187,7 @@ class Editor extends React.Component {
           data={this.state.schedule} lastUpdated=""
         />
         <ScheduleToolbar
-          saveAllowed={this.state.user.auth} 
+          saveEnabled={this.state.scheduleModified && this.state.user.auth}
           onSaveClicked={this.savePlaylist}
         />
       </div>
@@ -237,6 +237,7 @@ class Editor extends React.Component {
       display: (
         <div>
           <SchedulePicker
+          enabled={!this.state.scheduleModified}
             sid={this.state.service.sid}
             scheduleDate={this.state.scheduleDate}
             onDateChange={this.handleDateChange}
@@ -247,7 +248,7 @@ class Editor extends React.Component {
             data={scheduleObject.items} lastUpdated=""
           />
           <ScheduleToolbar
-            saveAllowed={this.state.user.auth} 
+          saveEnabled={this.state.scheduleModified && this.state.user.auth}
             onSaveClicked={this.savePlaylist}
           />
         </div>
@@ -262,6 +263,7 @@ class Editor extends React.Component {
       display: (
         <div>
           <SchedulePicker
+          enabled={!this.state.scheduleModified}
             sid={this.state.service.sid}
             scheduleDate={date}
             onDateChange={this.handleDateChange}
@@ -272,7 +274,7 @@ class Editor extends React.Component {
             data={schedule} lastUpdated=""
           />
           <ScheduleToolbar
-            saveAllowed={this.state.user.auth} 
+          saveEnabled={this.state.scheduleModified && this.state.user.auth}
             onSaveClicked={this.savePlaylist}
           />
         </div>
@@ -280,34 +282,6 @@ class Editor extends React.Component {
     });
   };
 
-  loopContent = (rows, startTime, finishTime) => {
-    loopedContent = [];
-    if (rows.length > 0) {
-      rows.map((row, index) => loopedContent.push(rows[index]));
-    }
-
-    menuText = "Schedule";
-    this.setState({
-      display: (
-      <div>
-        <SchedulePicker
-          sid={this.state.service.sid}
-          scheduleDate={this.state.scheduleDate}
-          onDateChange={this.handleDateChange}
-        />
-        <ScheduleView 
-        onRowSelected={this.handleScheduleRowSelect}
-          onDelete={this.handleScheduleDelete} 
-          data={this.state.schedule} lastUpdated=""
-        />
-        <ScheduleToolbar
-          saveAllowed={this.state.user.auth} 
-          onSaveClicked={this.savePlaylist}
-        />
-      </div>
-      )
-    });
-  };
   copyContent(rows) {
     copiedContent = [];
     if (rows.length > 0) {
@@ -370,6 +344,7 @@ class Editor extends React.Component {
       display: (
       <div>
         <SchedulePicker
+        enabled={!this.state.scheduleModified}
           sid={this.state.service.sid}
           scheduleDate={this.state.scheduleDate}
           onDateChange={this.handleDateChange}
@@ -380,7 +355,7 @@ class Editor extends React.Component {
           data={this.state.schedule} lastUpdated=""
         />
         <ScheduleToolbar
-          saveAllowed={this.state.user.auth} 
+        saveEnabled={this.state.scheduleModified && this.state.user.auth}
           onSaveClicked={this.savePlaylist}
         />
       </div>
@@ -421,6 +396,7 @@ class Editor extends React.Component {
       display: (
       <div>
         <SchedulePicker
+        enabled={!this.state.scheduleModified}
           sid={this.state.service.sid}
           scheduleDate={this.state.scheduleDate}
           onDateChange={this.handleDateChange}
@@ -431,7 +407,7 @@ class Editor extends React.Component {
           data={this.state.schedule} lastUpdated=""
         />
         <ScheduleToolbar
-          saveAllowed={this.state.user.auth} 
+        saveEnabled={this.state.scheduleModified && this.state.user.auth}
           onSaveClicked={this.savePlaylist}
         />
       </div>
@@ -491,6 +467,7 @@ class Editor extends React.Component {
       display: (
         <div>
           <SchedulePicker
+          enabled={!this.state.scheduleModified}
             sid={this.state.service.sid}
             scheduleDate={this.state.scheduleDate}
             onDateChange={this.handleDateChange}
@@ -501,7 +478,7 @@ class Editor extends React.Component {
             data={scheduleObject.items} lastUpdated=""
           />
           <ScheduleToolbar
-            saveAllowed={this.state.user.auth} 
+          saveEnabled={this.state.scheduleModified && this.state.user.auth}
             onSaveClicked={this.savePlaylist}
           />
         </div>
@@ -585,6 +562,7 @@ class Editor extends React.Component {
         display: (
       <div>
         <SchedulePicker
+        enabled={!this.state.scheduleModified}
           sid={this.state.service.sid}
           scheduleDate={this.state.scheduleDate}
           onDateChange={this.handleDateChange}
@@ -595,7 +573,7 @@ class Editor extends React.Component {
           data={this.state.schedule} lastUpdated=""
         />
         <ScheduleToolbar
-          saveAllowed={this.state.user.auth} 
+        saveEnabled={this.state.scheduleModified && this.state.user.auth}
           onSaveClicked={this.savePlaylist}
         />
       </div>
@@ -703,6 +681,7 @@ class Editor extends React.Component {
           display: (
       <div>
         <SchedulePicker
+        enabled={!this.state.scheduleModified}
           sid={this.state.service.sid}
           scheduleDate={this.state.scheduleDate}
           onDateChange={this.handleDateChange}
@@ -713,7 +692,7 @@ class Editor extends React.Component {
           data={this.state.schedule} lastUpdated=""
         />
         <ScheduleToolbar
-          saveAllowed={this.state.user.auth} 
+        saveEnabled={this.state.scheduleModified && this.state.user.auth}
           onSaveClicked={this.savePlaylist}
         />
       </div>

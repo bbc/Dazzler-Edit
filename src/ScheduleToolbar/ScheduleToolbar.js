@@ -1,7 +1,7 @@
 import React from "react";
 
 /*
-  <ScheduleToolbar saveAllowed=true|false onSaveClicked={function}
+  <ScheduleToolbar saveEnabled=true|false onSaveClicked={function}
   />
 */
 class ScheduleToolbar extends React.Component {
@@ -22,7 +22,7 @@ class ScheduleToolbar extends React.Component {
     render() {
     
         let saveButtonAppearance = "ui right floated small primary labeled icon button disabled";
-        if(this.state.dirty && this.props.saveAllowed) {
+        if(this.props.saveEnabled) {
           saveButtonAppearance = "ui right floated small primary labeled icon button";
         }
         /*

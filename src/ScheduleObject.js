@@ -35,15 +35,17 @@ class ScheduleObject {
     }
 
     addFloating(index, items) {
+        console.log('addFloating', index, items, this.items);
         // keep the schedule unchanged up to the insertion point
         if (this.items[index].insertionType === 'gap') {
-            index = index - 1; // ignore the gap;
+            // remove the gap;
+            this.items.splice(index, 1);
+            index = index - 1; // and insert after the previous item
         }
-        let newSchedule = this.items.slice(0, index + 1);
-        // eslint-disable-next-line no-unused-vars
+        console.log('gap removed', this.items, index);
         let indexOfFixed = 0;
         // keep the schedule unchanged after the next fixed event
-        for (let i = index; i < this.items.length; i++) {
+        for (let i = index+1; i < this.items.length; i++) {
             if (this.items[i].isLive) {
                 indexOfFixed = i;
                 break
@@ -53,29 +55,82 @@ class ScheduleObject {
                 break
             }
         }
+        console.log('indexOfFixed', indexOfFixed);
         // remove gap before fixed
-        // TODO
-        // calculate available space
-        // TODO
-        // trim insertion to fit
-        // TODO
-        // splice in new items
-        // TODO
-        // add new item total duration to following non-fixed events
-        // TODO
-        this.items = newSchedule;
-    }
-
-    // TODO stop at fixed event
-    addSequentially(items) {
-        const item = this.items[this.items.length-1];
-        const start = moment(item.startTime);
-        let next = moment(start).add(moment.duration(item.duration));
-        for(let i=0; i<items.length; i++) {
-            items[i].startTime = moment(next);
-            next.add(moment.duration(items[i].duration));
+        if(this.items[indexOfFixed-1].insertionType === 'gap') {
+            this.items.splice(indexOfFixed-1, 1);
+            indexOfFixed--;
         }
-        this.items = this.items.concat(items);
+        // calculate available space start and end
+        const startOfNew = moment(this.items[index].startTime).add(moment.duration(this.items.duration));
+        const end = moment(this.items[indexOfFixed].startTime);
+        console.log('gap', startOfNew.utc().format(), end.utc().format());
+        // add times and trim insertion to fit
+        let indexPastEnd = 0;
+        let start = moment(startOfNew);
+        for(let i=0; i<items.length; i++) {
+            const next = moment(start).add(moment.duration(items[i].duration));
+            if(next.isAfter(end)) {
+                indexPastEnd = i;
+                break;
+            }
+            items[i].startTime = start;
+            start = next;
+        }
+        let itemsThatFit = [];
+        if(indexPastEnd === 0) {
+            itemsThatFit = items;
+        }
+        else {
+            itemsThatFit = items.slice(0, indexPastEnd);
+        }
+        // splice in new items
+        this.items.splice(indexOfFixed, 0, itemsThatFit);
+        indexOfFixed += itemsThatFit.length;
+        // calculate new item total duration
+        const lastNew = itemsThatFit[itemsThatFit.length-1];
+        const endOfNew = moment(lastNew.startTime).add(moment.duration(lastNew.duration));
+        const lengthOfNew = moment.duration(endOfNew.diff(startOfNew));
+        console.log('length of new', lengthOfNew);
+        // add new item total duration to following non-fixed events
+        for(let i=indexOfFixed; i<this.items.length; i++) {
+            if(this.items[i].isLive) {
+                break;
+            }
+            if(this.items[i].insertionType === 'sentinel') {
+                break;
+            }
+            this.items[i].startTime.add(lengthOfNew);
+        }
+        console.log(this.items);
+        // calculate end times
+        const lastIndex = this.items.length-1;
+        const penultimateStart = this.items[lastIndex-1].startTime;
+        const penultimateEnd = moment(penultimateStart).add(moment.duration(this.items[lastIndex-1].duration));
+        const sentinelStart = this.items[lastIndex].startTime;
+        // amend sentinel if needed or add gap if needed
+        if(penultimateEnd.isAfter(sentinelStart)) {
+            // we have an event past midnight - this may be impossible at the moment
+            this.items[lastIndex].startTime = penultimateEnd;
+        }
+        else if(penultimateEnd.isBefore(sentinelStart)) {
+            const defaultEnd = moment(this.date).add(1, 'days');
+            if(penultimateEnd.isAfter(defaultEnd)) {
+                // old end was even later, move it back to new end
+                this.items[lastIndex].startTime = penultimateEnd;
+            }
+            else {
+                // new end is before midnight. Reset sentinel and insert gap
+                this.items[lastIndex].startTime = defaultEnd;
+                this.items.splice(lastIndex-1, 0, {
+                    title: 'gap',
+                    startTime: penultimateEnd,
+                    duration: moment.duration(defaultEnd.diff(penultimateEnd)).toISOString(),
+                    live: false,
+                    insertionType: 'gap'    
+                });
+            }
+        }
     }
 
     addLive(item) {

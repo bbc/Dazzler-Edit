@@ -4,7 +4,7 @@ import Date from "../Date/Date";
 import {fetchSchedule} from "../ScheduleDao/ScheduleDao";
 
 /*
-<SchedulePicker sid="" scheduleDate="" onDateChange=""
+<SchedulePicker enabled=true|false sid="" scheduleDate="" onDateChange=""
 */
 
 class SchedulePicker extends React.Component {
@@ -38,7 +38,7 @@ class SchedulePicker extends React.Component {
   
     loadSchedule(scheduleDate) {
       const date = scheduleDate.format("YYYY-MM-DD");
-      if(this.state.dirty) {
+      if(this.props.enabled === false) {
         console.log('save or discard changes before leaving');
         return;
       }
