@@ -28,13 +28,13 @@ class ScheduleView extends React.Component {
     this.handleClick = this.handleClick.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
     this.state = {
-      selectedItem: 0
+      //selectedItem: 0
     };
   }
 
   handleClick = (index) => {
     console.log('handleClick', index);
-    this.setState({selectedItem: index});
+    //this.setState({selectedItem: index});
     if(this.props.onRowSelected) this.props.onRowSelected(index);
   }
 
@@ -49,12 +49,12 @@ class ScheduleView extends React.Component {
 
   componentDidUpdate(prevProps) {
     if(this.props.lastUpdated !== prevProps.lastUpdated) {
-      this.setState({selectedItem: this.props.data.length-1 });
+      //this.setState({selectedItem: this.props.data.length-1 });
     }
   }
 
   render() {
-    let selectedItem = this.state.selectedItem;
+    let selectedItem = this.props.row;
     if(selectedItem === -1) {
       // put at first gap
        for(let i=0; i<this.props.data.length; i++) {

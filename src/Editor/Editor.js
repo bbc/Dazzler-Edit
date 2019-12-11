@@ -728,6 +728,7 @@ class Editor extends React.Component {
             onRowSelected={this.handleScheduleRowSelect}
             onDelete={this.handleScheduleDelete}
             data={this.state.schedule}
+            row={this.state.scheduleInsertionPoint}
             lastUpdated=""
           />
           <ScheduleToolbar
