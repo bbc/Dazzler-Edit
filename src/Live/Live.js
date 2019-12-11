@@ -2,6 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
+import TableHead from "@material-ui/core/TableHead";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 import TableFooter from "@material-ui/core/TableFooter";
@@ -236,10 +237,12 @@ export class Live extends React.Component {
         <Paper className={classes.root}>
           <div className={classes.tableWrapper}>
             <Table className={classes.table}>
-              <TableBody>
+              <TableHead>
                 <th>Title</th>
                 <th>Duration</th>
                 <th>Add</th>
+              </TableHead>
+              <TableBody>
 
                 {rows.map(row => (
                   <TableRow key={row.pid}>
