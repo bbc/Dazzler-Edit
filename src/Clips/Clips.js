@@ -11,7 +11,7 @@ import Paper from "@material-ui/core/Paper";
 import moment from "moment";
 // import Spinner from "../Spinner/Spinner";
 import {TablePaginationActionsWrapped} from "../TablePaginationActions/TablePaginationActions";
-import axios from "axios";
+import AssetDao from "../AssetDao/AssetDao";
 
 export const styles = theme => ({
   root: {
@@ -69,9 +69,11 @@ export class Clips extends React.Component {
     if(this.state.page !== this.state.previousPage) reload = true;
     if (reload) {
       console.log("have page %d want page %d", this.state.previousPage, this.state.page);
-      axios
-        .get(`${URLPrefix}/api/v1/clip?sid=${this.props.sid}&type=${this.props.type}&page=${this.state.page+1}&page_size=${this.state.rowsPerPage}`)
-        .then(response => {
+      AssetDao.getClips(
+        this.props.sid,
+        this.props.type,
+        this.state.page, this.state.rowsPerPage,
+        response => {
           let new_page = 0;
           if(response.data.hasOwnProperty('page')) {
             new_page = response.data.page - 1;
@@ -82,9 +84,6 @@ export class Clips extends React.Component {
             rows: response.data.items,
             totalRows: response.data.total
           });
-        })
-        .catch(e => {
-          console.log(e);
         });
     }
   }

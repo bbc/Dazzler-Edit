@@ -145,18 +145,13 @@ export class Live extends React.Component {
 
   componentDidUpdate(prevProps) {
     //get request for webcasts
-    const today = moment().millisecond(0).second(0).minute(0).hour(0).utc();
-    const date = moment(this.state.date).millisecond(0).second(0).minute(0).hour(0).utc();
-    let start = moment();
-    if (date.isSame(today)) {
-      start.add(5, 'minutes');
-    }
-    else {
-      start = moment(date);
-    }
-    const end = moment(start).add(1, "days").utc().format();
-    start = start.utc().format();
-    if (this.state.page !== this.state.previousPage) {
+    console.log('LiveDidUpdate', this.props.date);
+    const start = moment(this.props.date).utc().format();
+    const end = moment(this.props.date).add(1, 'days').utc().format();
+    if ((this.state.page !== this.state.previousPage)
+      ||
+      (this.props.date !== prevProps.date)
+    ) {
       console.log("have page %d want page %d", this.state.page, this.state.previousPage);
       axios
         .get(`${URLPrefix}/api/v1/webcast?sid=${this.props.sid}&start=${start}&end=${end}`)

@@ -9,7 +9,6 @@ import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { withStyles } from "@material-ui/core/styles";
 import Drawer from "@material-ui/core/Drawer";
-import CssBaseline from "@material-ui/core/CssBaseline";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import List from "@material-ui/core/List";
@@ -29,8 +28,6 @@ import SlowMotionVideoIcon from "@material-ui/icons/SlowMotionVideo";
 import Movie from "@material-ui/icons/Movie";
 import Opacity from "@material-ui/icons/Opacity";
 import Picture from "@material-ui/icons/PictureInPicture";
-import SlidingPane from "react-sliding-pane";
-import "react-sliding-pane/dist/react-sliding-pane.css";
 import axios from "axios";
 import moment from "moment";
 import 'moment-duration-format';
@@ -38,8 +35,6 @@ import Episode from "../Episode/Episode";
 import Live from "../Live/Live";
 import Clips from "../Clips/Clips";
 import Specials from "../Specials/Specials";
-// import Scratchpad from "../Scratchpad/Scratchpad";
-import Date from "../Date/Date";
 import SchedulePicker from "../SchedulePicker/SchedulePicker";
 import ScheduleToolbar from "../ScheduleToolbar/ScheduleToolbar";
 import ScheduleView from "../ScheduleView/ScheduleView";
@@ -47,7 +42,6 @@ import ScheduleObject from "../ScheduleObject";
 import Loop from "../Loop/Loop";
 
 const drawerWidth = 240;
-var menuText = "Schedule";
 var time = -2;
 var scheduleItems = [];
 var scratchPadItems = [];
@@ -139,7 +133,6 @@ class Editor extends React.Component {
     this.handleAddLive = this.handleAddLive.bind(this);
     this.handleAddClip = this.handleAddClip.bind(this);
     this.handleAddEpisode = this.handleAddEpisode.bind(this);
-    this.handleClick = this.handleClick.bind(this);
     this.copyContent = this.copyContent.bind(this);
     this.clearContent = this.clearContent.bind(this);
     this.lastItem = this.lastItem.bind(this);
@@ -148,6 +141,7 @@ class Editor extends React.Component {
     this.handleDateChange = this.handleDateChange.bind(this);
 
     this.state = {
+      mode: "writeToLoop",
       schedule: [],
       scheduleDate: moment().utc().format("YYYY-MM-DD"),
       scheduleInsertionPoint: -1,
@@ -181,7 +175,7 @@ class Editor extends React.Component {
       .then(response => {
         console.log("user", JSON.stringify(response.data));
         console.log("RESPONSE", response);
-        //this.setState({user: response.data});
+        this.setState({user: response.data});
       })
       .catch(e => {
         console.log(e);
@@ -200,39 +194,39 @@ class Editor extends React.Component {
     //this.setState({ open: false });
   };
 
-  handleAddLive(item) {
-    console.log("LIVE ITEM", item);
-    const startTime = moment(item.scheduled_time.start);
+  handleAddLive(window) {
+    console.log("LIVE ITEM", window);
+    const startTime = moment(window.scheduled_time.start);
     const newItem = {
-      captureChannel: item.service.sid, // TODO make use of this
+      captureChannel: window.service.sid, // TODO make use of this
       title: "Live broadcast segment",
-      duration: item.duration.toISOString(),
+      duration: window.duration.toISOString(),
       startTime: startTime,
       live: true,
       insertionType: ""
     };
-    for (let i = 0; i < item.window_of.length; i++) {
-      switch (item.window_of[i].result_type) {
+    for (let i = 0; i < window.window_of.length; i++) {
+      switch (window.window_of[i].result_type) {
         case "version":
-          newItem.versionPid = item.window_of[i].pid;
-          newItem.versionCrid = item.window_of[i].crid;
+          newItem.versionPid = window.window_of[i].pid;
+          newItem.versionCrid = window.window_of[i].crid;
           break;
         default: // DO Nothing
       }
     }
     console.log(newItem);
     let scheduleObject = new ScheduleObject(
-      this.state.serviceIDRef.sid,
+      this.state.service.sid,
       this.state.scheduleDate,
       this.state.schedule
     );
     scheduleObject.addLive(newItem);
     console.log(scheduleObject.items);
-    //this.setState({schedule: scheduleObject.items});
+    this.setState({schedule: scheduleObject.items});
   }
 
   handleAddEpisode(item) {
-    console.log("ITEM", item);
+    console.log("handleAddEpisode ITEM", item);
     const version = item.available_versions.version[0]; // TODO pick a version
     const newItem = {
       title: item.title ? item.title : item.presentation_title,
@@ -244,7 +238,7 @@ class Editor extends React.Component {
   }
 
   handleAddClip(item) {
-    console.log("ITEM", item);
+    console.log("handleAddClip ITEM", item);
     const version = item.available_versions.version[0]; // TODO pick a version
     const newItem = {
       title: item.title,
@@ -272,7 +266,6 @@ class Editor extends React.Component {
   
   handleDateChange = (date, schedule) => {
     console.log('handleDateChange', date);
-    console.log(schedule);
     this.setState({ scheduleDate: date, schedule: schedule });
   };
 
@@ -297,7 +290,7 @@ class Editor extends React.Component {
       this.state.scheduleDate,
       this.state.schedule
     );
-    scheduleObject.addFloating(index, n);
+    //scheduleObject.addFloating(index, n);
     //this.setState({ schedule: scheduleObject.items });
   }
 
@@ -335,205 +328,15 @@ class Editor extends React.Component {
   }
 
   deleteItem(id) {
+    console.log('delete item', id);
   }
-
-  handleClick = (item, isLive) => {
-    console.log("ITEM", item);
-    //count++;
-    const newItem2 = { ...item };
-
-    switch (item.item_type) {
-      case "episode":
-        {
-          const version = 0; // TODO pick a version
-          newItem2.duration = item.available_versions.version[version].duration;
-          newItem2.versionPid = item.available_versions.version[version].pid;
-          newItem2.versionCrid = item.available_versions.version[version].crid;
-          // newItem2.id = count;
-          newItem2.isLive = false;
-          if (newItem2.title == null) {
-            newItem2.title = newItem2.presentation_title;
-          }
-        }
-        break;
-      case "clip":
-        {
-          const version = 0; // TODO pick a version
-          newItem2.duration = item.available_versions.version[version].duration;
-          newItem2.versionPid = item.available_versions.version[version].pid;
-          newItem2.versionCrid = item.available_versions.version[version].crid;
-          newItem2.isLive = false;
-          // newItem2.id = count;
-        }
-        break;
-      case "window":
-        for (let i = 0; i < item.window_of.length; i++) {
-          switch (item.window_of[i].result_type) {
-            case "version":
-              newItem2.versionPid = item.window_of[i].pid;
-              //newItem2.versionCrid = newItem2.versionCrid;
-              console.log('window version', newItem2, item);
-              break;
-            case "episode":
-              // do we want anything from the episode level?
-              break;
-            default: // DO Nothing
-          }
-        }
-        newItem2.captureChannel = item.service.sid; // TODO make use of this
-        newItem2.isLive = true;
-
-        // newItem2.startTime = moment(item.scheduled_time.start);
-        // newItem2.scheduled_time = item.scheduled_time.start;
-        // newItem2.id = count;
-        break;
-      default:
-        console.log(item.item_type, isLive);
-    }
-
-    console.log(newItem2);
-
-    switch (menuText) {
-      case "Scratchpad":
-      scratchPadItems.push(newItem2);
-      break
-    case "Schedule":
-      scheduleItems.push(newItem2);
-      break;
-    case "Loop":
-      newItem2.durationAsString = moment.duration(newItem2.duration).format("HH:mm:ss");
-      newItem2.index = this.state.loop.length;
-      console.log('add item to loop', newItem2);
-      const n = this.state.loop.concat(newItem2);
-      /*
-      this.setState({
-        loop: n,
-        loopDuration: this.state.loopDuration.add(newItem2.duration)
-      });
-      */
-      break;
-    default:
-    }
-  };
-
-  iHandleClick = text => {
-    switch (text) {
-      case "Web Clips":
-        /*
-        this.setState({ 
-          isPaneOpen: true,
-          title: "Web Clips",
-          itemType: "web",
-          panelShow: (
-            <Clips
-              type="web"
-              sid={this.state.service.sid}
-              handleClick={this.handleClick}
-            />
-          )
-        });
-        */
-        break;
-        case "Jupiter Clips":
-          /*
-        this.setState({ 
-          isPaneOpen: true,
-          title: "Jupiter Clips",
-          panelShow: (
-            <Clips
-              type="jupiter"
-              sid={this.state.service.sid}
-              handleClick={this.handleClick}
-            />
-          )
-        });
-        */
-        break;
-      case "Live":
-        console.log('show live', this.state.scheduleDate);
-        /*
-        this.setState({ 
-          isPaneOpen: true,
-          title: "Upcoming Live Broadcasts",
-          panelShow: (
-            <Live
-              date={this.state.scheduleDate}
-	            sid={this.state.service.sid}
-	            handleClick={this.handleClick}
-	          />
-          )
-        });
-        */
-        break;
-      case "a":
-        //this.setState({ show: <Date /> });
-        break;
-      case "Episodes":
-        /*
-        this.setState({
-          isPaneOpen: true,
-          title: "Episodes",
-          panelShow: (
-            <Episode
-              date={this.state.scheduleDate}
-              sid={this.state.service.sid}
-              handleClick={this.handleClick}
-            />
-          )
-        });
-        */
-        break;
-      case "Specials":
-        /*
-        this.setState({
-          isPaneOpen: true,
-          title: "Specials",
-          panelShow: (
-            <Specials
-              sid={this.state.service.sid}
-              handleClick={this.handleClick}
-            />
-          )
-        });
-        */
-        break;
-      case "Schedule":
-        menuText = text;
-        break;
-      case "Scratchpad":
-        menuText = text;
-        break;
-      case "Loop":
-        menuText = text;
-        break;
-      default: // DO NOTHING
-    }
-  };
-
+ 
   render() {
     const { classes, theme } = this.props;
     const { open } = this.state;
     console.log('Editor.render');
     return (
       <div className={classes.root}>
-        <SlidingPane
-          closeIcon={<div>Some div containing custom close icon.</div>}
-          className="some-custom-class"
-          overlayClassName="some-custom-overlay-class"
-          isOpen={this.state.isPaneOpen}
-          width="36%"
-          onRequestClose={() => {
-            // triggered on "<" on left top click or on outside click
-            //this.setState({ isPaneOpen: false });
-          }}
-        >
-          <h1>{this.state.title}</h1>
-          {this.state.panelShow}
-          <div></div>
-          <br />
-        </SlidingPane>
-
-        <CssBaseline />
         <AppBar
           position="fixed"
           className={classNames(classes.appBar, {
@@ -642,7 +445,7 @@ class Editor extends React.Component {
         <Live
               date={this.state.scheduleDate}
 	            sid={this.state.service.sid}
-	            handleClick={this.handleClick}
+	            handleClick={this.handleAddLive}
 	          />
         </ExpansionPanelDetails>
           </ExpansionPanel>
@@ -656,9 +459,8 @@ class Editor extends React.Component {
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
         <Episode
-              date={this.state.scheduleDate}
               sid={this.state.service.sid}
-              handleClick={this.handleClick}
+              handleClick={this.handleAddEpisode}
             />
         </ExpansionPanelDetails>
       </ExpansionPanel>

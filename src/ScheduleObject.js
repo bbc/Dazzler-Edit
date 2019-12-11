@@ -143,12 +143,13 @@ class ScheduleObject {
             }
         }
     }
+
     addLive(item) {
         const startTime = moment(item.startTime);
         const endTime = moment(startTime).add(moment.duration(item.duration));
-        console.log(item.duration, startTime.format(), endTime.format());
         this.items.push(item);
         this.sort();
+        console.log('after', this.items);
         let index = 0;
         for (let i = 0; i < this.items.length; i++) {
             if (this.items[i].startTime.isSame(startTime)) {
