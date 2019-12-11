@@ -32,13 +32,12 @@ import Picture from "@material-ui/icons/PictureInPicture";
 import SlidingPane from "react-sliding-pane";
 import "react-sliding-pane/dist/react-sliding-pane.css";
 import axios from "axios";
-import Specials from "../Specials/Specials";
 import moment from "moment";
 import 'moment-duration-format';
 import Episode from "../Episode/Episode";
 import Live from "../Live/Live";
 import Clips from "../Clips/Clips";
-import Jupiter from "../Jupiter/Jupiter";
+import Specials from "../Specials/Specials";
 import Scratchpad from "../Scratchpad/Scratchpad";
 import Date from "../Date/Date";
 import SchedulePicker from "../SchedulePicker/SchedulePicker";
@@ -133,25 +132,33 @@ const styles = theme => ({
 });
 
 class Editor extends React.Component {
+
   constructor(props) {
     super(props);
+
+    this.handleScheduleDelete = this.handleScheduleDelete.bind(this);
+    this.handleAddLive = this.handleAddLive.bind(this);
+    this.handleAddClip = this.handleAddClip.bind(this);
+    this.handleAddEpisode = this.handleAddEpisode.bind(this);
     this.handleClick = this.handleClick.bind(this);
-    this.deleteItem = this.deleteItem.bind(this);
     this.copyContent = this.copyContent.bind(this);
     this.clearContent = this.clearContent.bind(this);
-    this.loopContent = this.loopContent.bind(this);
     this.lastItem = this.lastItem.bind(this);
     this.handleDrawerOpen = this.handleDrawerOpen.bind(this);
     this.handleDrawerClose = this.handleDrawerClose.bind(this);
     this.handleDateChange = this.handleDateChange.bind(this);
+    this.handleScheduleDelete = this.handleScheduleDelete.bind(this);
 
     this.state = {
+      schedule: [],
+      scheduleDate: moment().utc().format("YYYY-MM-DD"),
+      scheduleInsertionPoint: -1,
+      scheduleModified: false,
       open: false,
       Title: "",
       isPaneOpen: false,
-      isLoopOpen: true,
       panelShow: null,
-      itemType: '',
+      itemType: "",
       count: 0,
       clips: [],
       jupiter: [],
@@ -161,40 +168,62 @@ class Editor extends React.Component {
       loop: [],
       loopDuration: moment.duration(),
       schedules: {}, // state store for loaded and/or edited schedules
-      scheduleDate: moment().utc().format(),
-      display: "",
-      user: { name: "anonymous" },
-      service: {
-        sid: "bbc_marathi_tv",
-        name: "Marathi",
-        serviceIDRef: "TVMAR01"
-      }
+      user: { name: "anonymous", auth: true },
+      service: { sid: "bbc_marathi_tv", name: "Marathi", serviceIDRef: "TVMAR01" }
     };
+  }
+
+  handleDrawerOpen = () => {
+    this.setState({ open: true });
+  };
+
+  handleDrawerClose = () => {
+    this.setState({ open: false });
+  };
+
+  handleScheduleDelete(index) {
+    let scheduleObject = new ScheduleObject(
+      this.state.sid,
+      this.state.scheduleDate,
+      this.state.schedule
+    );
+    scheduleObject.deleteItemClosingGap(index);
+    this.setState({ schedule: scheduleObject.items, });
+  }
+
+  handleDateChange = (date, schedule) => {
+    this.setState({ scheduleDate: date, schedule: schedule });
+  };
+
+  handleScheduleRowSelect = index => {
+    console.log("handleScheduleDelete", index);
+    this.setState({ scheduleInsertionPoint: index });
+  };
+
+  pasteIntoSchedule(items, copies) {
+    if (!Array.isArray(items)) items = [items];
+    if (copies === undefined) copies = 1;
+    console.log("pasteIntoSchedule", items, copies);
+    let n = [...items];
+    while (copies > 1) {
+      n = n.concat(items);
+      copies--;
+    }
+    console.log( "insert %d items at index %d", n.length, this.state.scheduleInsertionPoint);
+    let index = this.state.scheduleInsertionPoint;
+    let scheduleObject = new ScheduleObject(
+      this.state.service.sid,
+      this.state.scheduleDate,
+      this.state.schedule
+    );
+    scheduleObject.addFloating(index, n);
+    this.setState({ schedule: scheduleObject.items });
   }
 
   componentDidMount() {
     console.log("DidMount", time);
     console.log(scheduleItems);
     console.log(copiedContent);
-    this.setState({
-      display: (
-        <Schedule
-          onDateChange={this.handleDateChange}
-          service={this.state.service}
-          lastItem={this.lastItem}
-          clipTime={time}
-          length={scheduleItems.length}
-          pasted={copiedContent}
-          loopedContent={""}
-          deleteItem={this.deleteItem}
-          text="Today's "
-          loadPlaylist={this.loadPlaylist}
-          nextSchedule={this.nextDay}
-          scheduleDate={this.state.scheduleDate}
-          user={this.state.user}
-        />
-      )
-    });
 
     // get user
     axios
@@ -213,7 +242,6 @@ class Editor extends React.Component {
 
   componentDidUpdate(prevProps) {
     console.log('editor componentDidUpdate');
-    this.render();
   }
 
   lastItem = scheduleTime => {
@@ -240,29 +268,6 @@ class Editor extends React.Component {
     }
 
     menuText = "Schedule";
-    this.setState({
-      display: (
-        <Schedule
-          onDateChange={this.handleDateChange}
-          service={this.state.service}
-          lastItem={this.lastItem}
-          clipTime={time}
-          length={scheduleItems.length}
-          loopedContent={loopedContent}
-          addedLoop={true}
-          startLoop={startTime}
-          finishTime={finishTime}
-          deleteItem={this.deleteItem}
-          added={false}
-          text={text}
-          loadPlaylist={this.loadPlaylist}
-          nextSchedule={this.nextDay}
-          scheduleDate={this.state.scheduleDate}
-          user={this.state.user}
-       />
-      )
-    });
-  };
   copyContent(rows) {
     copiedContent = [];
     if (rows.length > 0) {
@@ -273,30 +278,10 @@ class Editor extends React.Component {
     if (loop) {
       this.setState({
         loop: [],
-        loopDuration: moment.duration(),
-        display: (
-          <Loop
-            data={this.state.loop}
-            duration={this.state.loopDuration.valueOf()}
-            deleteItem={this.deleteItemFromLoop}
-            loopContent={this.loopContent}
-            clearContent={this.clearContent}
-            scheduleTime={this.state.scheduleTime}
-          />
-        )
+        loopDuration: moment.duration()
       });
     } else {
       scratchPadItems = [];
-      this.setState({
-        display: (
-          <Scratchpad
-            data={scratchPadItems}
-            deleteItem={this.deleteItem}
-            copyContent={this.copyContent}
-            clearContent={this.clearContent}
-          />
-        )
-      });
     }
   }
 
@@ -306,42 +291,11 @@ class Editor extends React.Component {
     loop.splice(index, 1);
     this.setState({
       loop:loop,
-      loopDuration: this.state.loopDuration.subtract(moment.duration(r.duration)),
-      display: (
-          <Loop
-            data={this.state.loop}
-            duration={this.state.loopDuration.valueOf()}
-            deleteItem={this.deleteItemFromLoop}
-            loopContent={this.loopContent}
-            clearContent={this.clearContent}
-            scheduleTime={this.state.scheduleTime}
-          />
-        )
+      loopDuration: this.state.loopDuration.subtract(moment.duration(r.duration))
     });
   }
 
   deleteItem(id) {
-    this.setState({
-      display: (
-        <Schedule
-          onDateChange={this.handleDateChange}
-          service={this.state.service}
-          lastItem={this.lastItem}
-          loopedContent={""}
-          clipTime={time}
-          deleteId={id}
-          length={scheduleItems.length}
-          pasted={copiedContent}
-          deleteItem={this.deleteItem}
-          added={false}
-          text={text}
-          loadPlaylist={this.loadPlaylist}
-          nextSchedule={this.nextDay}
-          scheduleDate={this.state.scheduleDate}
-          user={this.state.user}
-        />
-      )
-    });
   }
 
   handleClick = (item, isLive) => {
@@ -403,39 +357,9 @@ class Editor extends React.Component {
     switch (menuText) {
       case "Scratchpad":
       scratchPadItems.push(newItem2);
-      this.setState({
-        display: (
-          <Scratchpad
-            data={scratchPadItems}
-            deleteItem={this.deleteItem}
-            copyContent={this.copyContent}
-            clearContent={this.clearContent}
-          />
-        )
-      });
       break
     case "Schedule":
       scheduleItems.push(newItem2);
-      this.setState({
-        display: (
-          <Schedule
-            onDateChange={this.handleDateChange}
-            service={this.state.service}
-            lastItem={this.lastItem}
-            clipTime={time}
-            item={newItem2}
-            length={scheduleItems.length}
-            pasted={copiedContent}
-            loopedContent={""}
-            text="Today's "
-            added={true}
-            deleteItem={this.deleteItem}
-            nextSchedule={this.nextDay}
-            scheduleDate={this.state.scheduleDate}
-            user={this.state.user}
-          />
-        )
-      });
       break;
     case "Loop":
       newItem2.durationAsString = moment.duration(newItem2.duration).format("HH:mm:ss");
@@ -445,17 +369,6 @@ class Editor extends React.Component {
       this.setState({
         loop: n,
         loopDuration: this.state.loopDuration.add(newItem2.duration),
-        display: (
-          <Loop
-            data={n}
-            duration={this.state.loopDuration.valueOf()}
-            deleteItem={this.deleteItemFromLoop}
-            loopContent={this.loopContent}
-            clearContent={this.clearContent}
-            scheduleTime={this.state.scheduleTime}
-          />
-        )
-      });
       break;
     default:
     }
@@ -533,52 +446,12 @@ class Editor extends React.Component {
         break;
       case "Schedule":
         menuText = text;
-        this.setState({
-          display: (
-            <Schedule
-              onDateChange={this.handleDateChange}
-              service={this.state.service}
-              lastItem={this.lastItem}
-              clipTime={time}
-              nextSchedule={this.nextDay}
-              loopedContent={""}
-              length={scheduleItems.length}
-              pasted={copiedContent}
-              text="Today's "
-              deleteItem={this.deleteItem}
-              scheduleDate={this.state.scheduleDate}
-              user={this.state.user}
-            />
-          )
-        });
         break;
       case "Scratchpad":
         menuText = text;
-        this.setState({
-          display: (
-            <Scratchpad
-              data={scratchPadItems}
-              deleteItem={this.deleteItem}
-              clearContent={this.clearContent}
-              copyContent={this.copyContent}
-            />
-          )
-        });
         break;
       case "Loop":
         menuText = text;
-        this.setState({
-          display: (
-            <Loop
-              data={this.state.loop}
-              duration={this.state.loopDuration.valueOf()}
-              deleteItem={this.deleteItemFromLoop}
-              clearContent={this.clearContent}
-              loopContent={this.loopContent}
-              scheduleTime={this.state.scheduleTime}
-            />
-          )
-        });
         break;
       default: // DO NOTHING
     }
