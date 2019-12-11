@@ -795,20 +795,22 @@ class Editor extends React.Component {
           />
           </Box>
           <Box flexGrow={1}>
-          <Schedule
-          onDateChange={this.handleDateChange}
-          service={this.state.service}
-          clipTime={time}
-          length={scheduleItems.length}
-          pasted={copiedContent}
-          loopedContent={""}
-          deleteItem={this.deleteItem}
-          text="Today's "
-          loadPlaylist={this.loadPlaylist}
-          nextSchedule={this.nextDay}
-          scheduleDate={this.state.scheduleDate}
-          user={this.state.user}
-        />
+          <SchedulePicker
+            enabled={!this.state.scheduleModified}
+            sid={this.state.service.sid}
+            scheduleDate={this.state.scheduleDate}
+            onDateChange={this.handleDateChange}
+          />
+          <ScheduleView
+            onRowSelected={this.handleScheduleRowSelect}
+            onDelete={this.handleScheduleDelete}
+            data={this.state.schedule}
+            lastUpdated=""
+          />
+          <ScheduleToolbar
+            saveEnabled={this.state.scheduleModified && this.state.user.auth}
+            onSaveClicked={this.savePlaylist}
+          />
           </Box>
         </Box>
         </main>
