@@ -59,12 +59,7 @@ class SchedulePicker extends React.Component {
     }
   
     render() {
-      const date = moment(this.props.scheduleDate);
-      const today = moment(moment.utc().format("YYYY-MM-DD"));
-      let text = "Today's Schedule";
-      if(date.isAfter(today)) text = 'Future Schedule';
-      if(date.isBefore(today)) text = 'Previous Schedule';
-  
+      const date = moment(this.props.scheduleDate);  
       return (
       <div>
           <Date
@@ -72,9 +67,6 @@ class SchedulePicker extends React.Component {
             previousDay={this.previousDay}
             nextDay={this.nextDay}
           />
-          <div className="dateContainer">
-            <h2>{text}</h2>
-          </div>
       </div>
       );
     }

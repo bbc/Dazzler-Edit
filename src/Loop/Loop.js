@@ -8,7 +8,7 @@ import "flatpickr/dist/themes/material_green.css";
 
 const columns = [
   //{ key: "pid", name: "pid" },
-  { key: "title", name: "Title" },
+  { key: "title", name: "Title", width: 200 },
   { key: "durationAsString", name: "Duration", width: 80 },
   { key: "action", name: "Action", width: 80 }
 ];
@@ -65,10 +65,6 @@ class Loop extends React.Component {
   render() {
     return (
       <Box>
-        <center>
-          {" "}
-          <h1> Loop</h1>
-        </center>
         <button class="ui left floated button">
           {" "}
           Duration:{" "}

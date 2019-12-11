@@ -260,7 +260,7 @@ class Editor extends React.Component {
       this.state.schedule
     );
     scheduleObject.deleteItemClosingGap(index);
-    //this.setState({ schedule: scheduleObject.items, });
+    this.setState({ schedule: scheduleObject.items, });
   }
   
   handleDateChange = (date, schedule) => {
@@ -366,7 +366,8 @@ class Editor extends React.Component {
         >
           <div className={classes.drawerHeader} />
         <Box display="flex" flexDirection="row" p={1} m={1} bgcolor="background.paper">
-          <Box>
+          <Box width="25%" display="flex" flexDirection="column">
+          <Typography variant="h4" align="center">Picklists</Typography>
           <ExpansionPanel>
           <ExpansionPanelSummary
           expandIcon={<ExpandMoreIcon />}
@@ -463,7 +464,9 @@ class Editor extends React.Component {
         </ExpansionPanelDetails>
       </ExpansionPanel>
       </Box>
-      <Box flexGrow={1}>
+      <Box width="3%"/>
+      <Box width="25%" flexGrow={1} flexDirection="column">
+          <Typography variant="h4" align="center">Loop</Typography>
           <Loop
             data={this.state.loop}
             duration={this.state.loopDuration.valueOf()}
@@ -473,7 +476,9 @@ class Editor extends React.Component {
             scheduleTime={this.state.scheduleTime}
           />
           </Box>
-          <Box flexGrow={1}>
+          <Box width="3%"/>
+          <Box width="44%" flexGrow={1} flexDirection="column">
+          <Typography variant="h4" align="center">Schedule</Typography>
           <SchedulePicker
             enabled={!this.state.scheduleModified}
             sid={this.state.service.sid}
