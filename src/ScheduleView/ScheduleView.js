@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import ScheduleItem from "../ScheduleItem/ScheduleItem";
 import moment from "moment";
 
@@ -33,7 +34,7 @@ class ScheduleView extends React.Component {
 
   handleClick = (index) => {
     console.log('handleClick', index);
-    this.setState({ selectedItem: index});
+    this.setState({selectedItem: index});
     if(this.props.onRowSelected) this.props.onRowSelected(index);
   }
 
@@ -43,12 +44,12 @@ class ScheduleView extends React.Component {
   }
 
   componentDidMount() {
-    this.setState({ selectedItem: this.props.data.length-1 });
+    //this.setState({selectedItem: this.props.data.length-1 });
   }
 
   componentDidUpdate(prevProps) {
     if(this.props.lastUpdated !== prevProps.lastUpdated) {
-      this.setState({ selectedItem: this.props.data.length-1 });
+      this.setState({selectedItem: this.props.data.length-1 });
     }
   }
 
@@ -94,4 +95,11 @@ class ScheduleView extends React.Component {
     );
   }
 }
+
+ScheduleView.propTypes = {
+  data: PropTypes.object.isRequired,
+  onDelete: PropTypes.object.isRequired,
+  onRowSelected: PropTypes.object.isRequired
+};
+
 export default ScheduleView;

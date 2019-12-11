@@ -1,4 +1,5 @@
 import React /*, { Fragment }*/ from "react";
+import Box from '@material-ui/core/Box';
 import ReactDataGrid from "react-data-grid";
 import moment from "moment";
 import 'moment-duration-format';
@@ -6,10 +7,10 @@ import Flatpickr from "react-flatpickr";
 import "flatpickr/dist/themes/material_green.css";
 
 const columns = [
-  { key: "pid", name: "pid" },
+  //{ key: "pid", name: "pid" },
   { key: "title", name: "Title" },
-  { key: "durationAsString", name: "duration" },
-  { key: "action", name: "Action" }
+  { key: "durationAsString", name: "Duration", width: 80 },
+  { key: "action", name: "Action", width: 80 }
 ];
 
 class Loop extends React.Component {
@@ -57,7 +58,7 @@ class Loop extends React.Component {
 
   render() {
     return (
-      <div>
+      <Box>
         <center>
           {" "}
           <h1> Loop</h1>
@@ -119,7 +120,7 @@ class Loop extends React.Component {
             Go{" "}
           </button>
         </div>
-      </div>
+      </Box>
     );
   }
 

@@ -38,7 +38,7 @@ import Episode from "../Episode/Episode";
 import Live from "../Live/Live";
 import Clips from "../Clips/Clips";
 import Specials from "../Specials/Specials";
-import Scratchpad from "../Scratchpad/Scratchpad";
+// import Scratchpad from "../Scratchpad/Scratchpad";
 import Date from "../Date/Date";
 import SchedulePicker from "../SchedulePicker/SchedulePicker";
 import ScheduleToolbar from "../ScheduleToolbar/ScheduleToolbar";
@@ -48,7 +48,6 @@ import Loop from "../Loop/Loop";
 
 const drawerWidth = 240;
 var menuText = "Schedule";
-var text = "Today's ";
 var time = -2;
 var scheduleItems = [];
 var scratchPadItems = [];
@@ -166,10 +165,31 @@ class Editor extends React.Component {
       live: [],
       loop: [],
       loopDuration: moment.duration(),
-      schedules: {}, // state store for loaded and/or edited schedules
       user: { name: "anonymous", auth: true },
       service: { sid: "bbc_marathi_tv", name: "Marathi", serviceIDRef: "TVMAR01" }
     };
+  }
+
+  componentDidMount() {
+    console.log("DidMount", time);
+    console.log(scheduleItems);
+    console.log(copiedContent);
+
+    // get user
+    axios
+      .get(`${URLPrefix}/api/v1/user`)
+      .then(response => {
+        console.log("user", JSON.stringify(response.data));
+        console.log("RESPONSE", response);
+        this.setState({user: response.data});
+      })
+      .catch(e => {
+        console.log(e);
+      });
+  }
+
+  componentDidUpdate(prevProps) {
+    console.log('editor componentDidUpdate');
   }
 
   handleDrawerOpen = () => {
@@ -208,29 +228,7 @@ class Editor extends React.Component {
     );
     scheduleObject.addLive(newItem);
     console.log(scheduleObject.items);
-    this.setState({
-      schedule: scheduleObject.items,
-      display: (
-        <div>
-          <SchedulePicker
-            enabled={!this.state.scheduleModified}
-            sid={this.state.service.sid}
-            scheduleDate={this.state.scheduleDate}
-            onDateChange={this.handleDateChange}
-          />
-          <ScheduleView
-            onRowSelected={this.handleScheduleRowSelect}
-            onDelete={this.handleScheduleDelete}
-            data={this.state.schedule}
-            lastUpdated=""
-          />
-          <ScheduleToolbar
-            saveEnabled={this.state.scheduleModified && this.state.user.auth}
-            onSaveClicked={this.savePlaylist}
-          />
-        </div>
-      )
-    });
+    this.setState({schedule: scheduleObject.items});
   }
 
   handleAddEpisode(item) {
@@ -301,40 +299,8 @@ class Editor extends React.Component {
     this.setState({ schedule: scheduleObject.items });
   }
 
-  componentDidMount() {
-    console.log("DidMount", time);
-    console.log(scheduleItems);
-    console.log(copiedContent);
-
-    // get user
-    axios
-      .get(`${URLPrefix}/api/v1/user`)
-      .then(response => {
-        console.log("user", JSON.stringify(response.data));
-        console.log("RESPONSE", response);
-        this.setState({
-          user: response.data
-        });
-      })
-      .catch(e => {
-        console.log(e);
-      });
-  }
-
-  componentDidUpdate(prevProps) {
-    console.log('editor componentDidUpdate');
-  }
-
   lastItem = scheduleTime => {
     this.setState({ scheduleTime: scheduleTime });
-  };
-
-  handleDrawerOpen = () => {
-    this.setState({ open: true });
-  };
-
-  handleDrawerClose = () => {
-    this.setState({ open: false });
   };
 
   handleDateChange = (d) => {
@@ -466,7 +432,7 @@ class Editor extends React.Component {
           itemType: "web",
           panelShow: (
             <Clips
-              type={this.state.itemType}
+              type="web"
               sid={this.state.service.sid}
               handleClick={this.handleClick}
             />
@@ -478,7 +444,8 @@ class Editor extends React.Component {
           isPaneOpen: true,
           title: "Jupiter Clips",
           panelShow: (
-            <Jupiter
+            <Clips
+              type="jupiter"
               sid={this.state.service.sid}
               handleClick={this.handleClick}
             />
