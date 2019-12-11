@@ -147,7 +147,6 @@ class Editor extends React.Component {
     this.handleDrawerOpen = this.handleDrawerOpen.bind(this);
     this.handleDrawerClose = this.handleDrawerClose.bind(this);
     this.handleDateChange = this.handleDateChange.bind(this);
-    this.handleScheduleDelete = this.handleScheduleDelete.bind(this);
 
     this.state = {
       schedule: [],
@@ -179,6 +178,76 @@ class Editor extends React.Component {
 
   handleDrawerClose = () => {
     this.setState({ open: false });
+  };
+
+  handleAddLive(item) {
+    console.log("LIVE ITEM", item);
+    const startTime = moment(item.scheduled_time.start);
+    const newItem = {
+      captureChannel: item.service.sid, // TODO make use of this
+      title: "Live broadcast segment",
+      duration: item.duration.toISOString(),
+      startTime: startTime,
+      live: true,
+      insertionType: ""
+    };
+    for (let i = 0; i < item.window_of.length; i++) {
+      switch (item.window_of[i].result_type) {
+        case "version":
+          newItem.versionPid = item.window_of[i].pid;
+          newItem.versionCrid = item.window_of[i].crid;
+          break;
+        default: // DO Nothing
+      }
+    }
+    console.log(newItem);
+    let scheduleObject = new ScheduleObject(
+      this.state.serviceIDRef.sid,
+      this.state.scheduleDate,
+      this.state.schedule
+    );
+    scheduleObject.addLive(newItem);
+    console.log(scheduleObject.items);
+    this.setState({
+      schedule: scheduleObject.items,
+      display: (
+        <div>
+          <SchedulePicker
+            enabled={!this.state.scheduleModified}
+            sid={this.state.service.sid}
+            scheduleDate={this.state.scheduleDate}
+            onDateChange={this.handleDateChange}
+          />
+          <ScheduleView
+            onRowSelected={this.handleScheduleRowSelect}
+            onDelete={this.handleScheduleDelete}
+            data={this.state.schedule}
+            lastUpdated=""
+          />
+          <ScheduleToolbar
+            saveEnabled={this.state.scheduleModified && this.state.user.auth}
+            onSaveClicked={this.savePlaylist}
+          />
+        </div>
+      )
+    });
+  }
+
+  handleAddEpisode(item) {
+    console.log("ITEM", item);
+    const version = item.available_versions.version[0]; // TODO pick a version
+    const newItem = {
+      title: item.title ? item.title : item.presentation_title,
+      duration: moment.duration(version.duration).toISOString(),
+      live: false,
+      insertionType: ""
+    };
+    this.pasteIntoSchedule(newItem);
+  }
+
+  handleScheduleRowSelect = index => {
+    console.log("handleScheduleDelete", index);
+    this.setState({ scheduleInsertionPoint: index });
   };
 
   handleScheduleDelete(index) {
