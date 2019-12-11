@@ -245,6 +245,18 @@ class Editor extends React.Component {
     this.pasteIntoSchedule(newItem);
   }
 
+  handleAddClip(item) {
+    console.log("ITEM", item);
+    const version = item.available_versions.version[0]; // TODO pick a version
+    const newItem = {
+      title: item.title,
+      duration: moment.duration(version.duration).toISOString(),
+      live: false,
+      insertionType: ""
+    };
+    this.pasteIntoSchedule(newItem);
+  }
+
   handleScheduleRowSelect = index => {
     console.log("handleScheduleDelete", index);
     this.setState({ scheduleInsertionPoint: index });
