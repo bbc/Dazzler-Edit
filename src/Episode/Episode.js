@@ -10,7 +10,7 @@ import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import moment from "moment";
 import {TablePaginationActionsWrapped} from "../TablePaginationActions/TablePaginationActions";
-import axios from "axios";
+import AssetDao from "../AssetDao/AssetDao";
 
 export const styles = theme => ({
   root: {
@@ -59,62 +59,32 @@ export class Episode extends React.Component {
     console.log("Episode update", this.state.page);
     if (this.state.page !== this.state.previousPage) {
       console.log("have page %d want page %d", this.state.page, this.state.previousPage);
-      axios
-        .get(`${URLPrefix}/api/v1/episode?sid=${this.props.sid}&page=${this.state.page+1}&page_size=${this.state.rowsPerPage}&availability=available`)
-        .then(response => {
-          console.log("available EPISODES", response.data.items);
+      AssetDao.getEpisodes(
+        this.props.sid, this.props.availability,
+        this.state.page+1, this.state.rowsPerPage,
+        response => {
+          console.log("EPISODES", response.data.items);
           let new_page = 0;
           if(response.data.hasOwnProperty('page')) {
             new_page = response.data.page - 1;
           }
-          if(response.data.items.length === this.state.rowsPerPage) {
-            this.setState({ 
-              previousPage: new_page,
-              page: new_page,
-              totalRows: response.data.total,
-              rows: response.data.items 
-            });
-          }
-          else {
-            let items = [];
-            let total = response.data.total;
-            if(response.data.items !== undefined && response.data.items.length>0) {
-              items = response.data.items;
-            }
-            const ahead = 'P7D';
-            axios
-            .get(`${URLPrefix}/api/v1/episode?sid=${this.props.sid}&page=${this.state.page+1}&page_size=${this.state.rowsPerPage}&availability=${ahead}`)
-            .then(response => {
-                console.log("upcoming EPISODES", response.data.items);
-                response.data.items.forEach(item => {
-                  item.insertionType = "futureEpisode";
-                  items.push(item);
-                });
-                this.setState({ 
-                  previousPage: new_page,
-                  page: new_page,
-                  totalRows: total + response.data.total,
-                  rows: items 
-                });
-            })
-            .catch(e => {
-              console.log(e);
-            });
-          }
+          this.setState({ 
+            previousPage: new_page,
+            page: new_page,
+            totalRows: response.data.total,
+            rows: response.data.items 
+          });
         })
-        .catch(e => {
-          console.log(e);
-        });
     }
   }
 
   handleChangePage = (event, page) => {
     console.log("Episode handleChangePage", this.state.page, page);
-    this.setState({ page });
+    this.setState({ page: parseInt(page) });
   };
 
   handleChangeRowsPerPage = event => {
-    this.setState({ page: 0, rowsPerPage: event.target.value });
+    this.setState({ page: 0, rowsPerPage: parseInt(event.target.value) });
   };
 
   formattedDuration(clip) {

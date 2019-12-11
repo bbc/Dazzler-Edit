@@ -135,7 +135,6 @@ class Editor extends React.Component {
     this.handleAddEpisode = this.handleAddEpisode.bind(this);
     this.copyContent = this.copyContent.bind(this);
     this.clearContent = this.clearContent.bind(this);
-    this.lastItem = this.lastItem.bind(this);
     this.handleDrawerOpen = this.handleDrawerOpen.bind(this);
     this.handleDrawerClose = this.handleDrawerClose.bind(this);
     this.handleDateChange = this.handleDateChange.bind(this);
@@ -144,7 +143,7 @@ class Editor extends React.Component {
       mode: "writeToLoop",
       schedule: [],
       scheduleDate: moment().utc().format("YYYY-MM-DD"),
-      scheduleInsertionPoint: -1,
+      scheduleInsertionPoint: 1,
       scheduleModified: false,
       open: false,
       Title: "",
@@ -251,7 +250,7 @@ class Editor extends React.Component {
 
   handleScheduleRowSelect = index => {
     console.log("handleScheduleDelete", index);
-    //this.setState({ scheduleInsertionPoint: index });
+    this.setState({ scheduleInsertionPoint: index });
   };
 
   handleScheduleDelete(index) {
@@ -267,11 +266,6 @@ class Editor extends React.Component {
   handleDateChange = (date, schedule) => {
     console.log('handleDateChange', date);
     this.setState({ scheduleDate: date, schedule: schedule });
-  };
-
-  handleScheduleRowSelect = index => {
-    console.log("handleScheduleDelete", index);
-    //this.setState({ scheduleInsertionPoint: index });
   };
 
   pasteIntoSchedule(items, copies) {
@@ -290,13 +284,10 @@ class Editor extends React.Component {
       this.state.scheduleDate,
       this.state.schedule
     );
-    //scheduleObject.addFloating(index, n);
-    //this.setState({ schedule: scheduleObject.items });
+    console.log('pasteIntoSchedule', this.state.schedule);
+    scheduleObject.addFloating(index, n);
+    this.setState({ schedule: scheduleObject.items, scheduleInsertionPoint: index+1 });
   }
-
-  lastItem = scheduleTime => {
-    //this.setState({ scheduleTime: scheduleTime });
-  };
 
   loopContent = (rows, startTime, finishTime) => {
     loopedContent = [];
@@ -365,66 +356,9 @@ class Editor extends React.Component {
           variant="persistent"
           anchor="left"
           open={open}
-          classes={{
-            paper: classes.drawerPaper
-          }}
+          classes={{paper: classes.drawerPaper}}
         >
-          <div className={classes.drawerHeader}>
-            <IconButton onClick={this.handleDrawerClose}>
-              {theme.direction === "ltr" ? (
-                <ChevronLeftIcon />
-              ) : (
-                <ChevronRightIcon />
-              )}
-            </IconButton>
-          </div>
-          <center>
-            {" "}
-            <h3> View </h3>{" "}
-          </center>
-          <Divider />
-          <List>
-            {/* {["Schedule", "Scratchpad", "Loop"].map((text, index) => ( */}
-            {["Schedule", "Loop"].map((text, index) => (
-              <ListItem
-                button
-                key={text}
-                onClick={() => {
-                  this.iHandleClick(text);
-                }}
-              >
-                <ListItemIcon>{viewIcons[index]}</ListItemIcon>
-
-                <ListItemText primary={text} />
-              </ListItem>
-            ))}
-          </List>
-
-          <center>
-            {" "}
-            <h3>Menu </h3>{" "}
-          </center>
-          <Divider />
-          <List>
-            {["Live", "Episodes", "Jupiter Clips", "Web Clips", "Specials"].map(
-              (text, index) => (
-                <ListItem
-                  button
-                  key={text}
-                  onClick={() => {
-                    this.iHandleClick(text);
-                  }}
-                >
-                  <ListItemIcon>{icons[index]}</ListItemIcon>
-
-                  <ListItemText primary={text} />
-                </ListItem>
-              )
-            )}
-          </List>
-          <Divider />
         </Drawer>
-
         <main
           className={classNames(classes.content, {
             [classes.contentShift]: open
@@ -455,13 +389,30 @@ class Editor extends React.Component {
           aria-controls="panel2bh-content"
           id="panel2bh-header"
         >
-          <Typography className={classes.heading}>Episodes</Typography>
+          <Typography className={classes.heading}>Availabile Episodes</Typography>
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
         <Episode
-              sid={this.state.service.sid}
-              handleClick={this.handleAddEpisode}
-            />
+          availability="available"
+          sid={this.state.service.sid}
+          handleClick={this.handleAddEpisode}
+        />
+        </ExpansionPanelDetails>
+      </ExpansionPanel>
+      <ExpansionPanel>
+        <ExpansionPanelSummary
+          expandIcon={<ExpandMoreIcon />}
+          aria-controls="panel2bh-content"
+          id="panel2bh-header"
+        >
+          <Typography className={classes.heading}>Upcoming Episodes</Typography>
+        </ExpansionPanelSummary>
+        <ExpansionPanelDetails>
+        <Episode
+          availability="P2D"
+          sid={this.state.service.sid}
+          handleClick={this.handleAddEpisode}
+        />
         </ExpansionPanelDetails>
       </ExpansionPanel>
       <ExpansionPanel>
@@ -473,11 +424,11 @@ class Editor extends React.Component {
           <Typography className={classes.heading}>Jupiter Clips</Typography>
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
-        <Clips
+          <Clips
               type="jupiter"
               sid={this.state.service.sid}
-              handleClick={this.handleClick}
-            />
+              handleClick={this.handleAddClip}
+           />
         </ExpansionPanelDetails>
       </ExpansionPanel>
       <ExpansionPanel>
@@ -489,11 +440,11 @@ class Editor extends React.Component {
           <Typography className={classes.heading}>Web Clips</Typography>
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
-        <Clips
+          <Clips
               type="web"
               sid={this.state.service.sid}
-              handleClick={this.handleClick}
-            />
+              handleClick={this.handleAddClip}
+          />
         </ExpansionPanelDetails>
       </ExpansionPanel>
       <ExpansionPanel>
@@ -505,14 +456,14 @@ class Editor extends React.Component {
           <Typography className={classes.heading}>Specials</Typography>
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
-        <Specials
+          <Specials
               sid={this.state.service.sid}
-              handleClick={this.handleClick}
-            />
+              handleClick={this.handleAddClip}
+          />
         </ExpansionPanelDetails>
       </ExpansionPanel>
-          </Box>
-          <Box flexGrow={1}>
+      </Box>
+      <Box flexGrow={1}>
           <Loop
             data={this.state.loop}
             duration={this.state.loopDuration.valueOf()}
