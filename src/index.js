@@ -6,5 +6,5 @@ import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(<Editor />, document.querySelector("#root"));
 
-//serviceWorker.unregister();
-serviceWorker.register();
+serviceWorker.unregister();
+//serviceWorker.register();

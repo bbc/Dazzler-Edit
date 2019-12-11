@@ -181,7 +181,7 @@ class Editor extends React.Component {
       .then(response => {
         console.log("user", JSON.stringify(response.data));
         console.log("RESPONSE", response);
-        this.setState({user: response.data});
+        //this.setState({user: response.data});
       })
       .catch(e => {
         console.log(e);
@@ -193,11 +193,11 @@ class Editor extends React.Component {
   }
 
   handleDrawerOpen = () => {
-    this.setState({ open: true });
+    //this.setState({ open: true });
   };
 
   handleDrawerClose = () => {
-    this.setState({ open: false });
+    //this.setState({ open: false });
   };
 
   handleAddLive(item) {
@@ -228,7 +228,7 @@ class Editor extends React.Component {
     );
     scheduleObject.addLive(newItem);
     console.log(scheduleObject.items);
-    this.setState({schedule: scheduleObject.items});
+    //this.setState({schedule: scheduleObject.items});
   }
 
   handleAddEpisode(item) {
@@ -257,7 +257,7 @@ class Editor extends React.Component {
 
   handleScheduleRowSelect = index => {
     console.log("handleScheduleDelete", index);
-    this.setState({ scheduleInsertionPoint: index });
+    //this.setState({ scheduleInsertionPoint: index });
   };
 
   handleScheduleDelete(index) {
@@ -267,16 +267,18 @@ class Editor extends React.Component {
       this.state.schedule
     );
     scheduleObject.deleteItemClosingGap(index);
-    this.setState({ schedule: scheduleObject.items, });
+    //this.setState({ schedule: scheduleObject.items, });
   }
-
+  
   handleDateChange = (date, schedule) => {
+    console.log('handleDateChange', date);
+    console.log(schedule);
     this.setState({ scheduleDate: date, schedule: schedule });
   };
 
   handleScheduleRowSelect = index => {
     console.log("handleScheduleDelete", index);
-    this.setState({ scheduleInsertionPoint: index });
+    //this.setState({ scheduleInsertionPoint: index });
   };
 
   pasteIntoSchedule(items, copies) {
@@ -296,16 +298,11 @@ class Editor extends React.Component {
       this.state.schedule
     );
     scheduleObject.addFloating(index, n);
-    this.setState({ schedule: scheduleObject.items });
+    //this.setState({ schedule: scheduleObject.items });
   }
 
   lastItem = scheduleTime => {
-    this.setState({ scheduleTime: scheduleTime });
-  };
-
-  handleDateChange = (d) => {
-    console.log('handleDateChange', d.toString() );
-    this.setState({ scheduleDate: d });
+    //this.setState({ scheduleTime: scheduleTime });
   };
 
   loopContent = (rows, startTime, finishTime) => {
@@ -324,10 +321,7 @@ class Editor extends React.Component {
 
   clearContent(loop) {
     if (loop) {
-      this.setState({
-        loop: [],
-        loopDuration: moment.duration()
-      });
+      //this.setState({loop: [], loopDuration: moment.duration()});
     } else {
       scratchPadItems = [];
     }
@@ -337,10 +331,7 @@ class Editor extends React.Component {
     const r = this.state.loop[index];
     let loop = [...this.state.loop];
     loop.splice(index, 1);
-    this.setState({
-      loop:loop,
-      loopDuration: this.state.loopDuration.subtract(moment.duration(r.duration))
-    });
+    //this.setState({loop:loop, loopDuration: this.state.loopDuration.subtract(moment.duration(r.duration))});
   }
 
   deleteItem(id) {
@@ -414,10 +405,12 @@ class Editor extends React.Component {
       newItem2.index = this.state.loop.length;
       console.log('add item to loop', newItem2);
       const n = this.state.loop.concat(newItem2);
+      /*
       this.setState({
         loop: n,
         loopDuration: this.state.loopDuration.add(newItem2.duration)
       });
+      */
       break;
     default:
     }
@@ -426,6 +419,7 @@ class Editor extends React.Component {
   iHandleClick = text => {
     switch (text) {
       case "Web Clips":
+        /*
         this.setState({ 
           isPaneOpen: true,
           title: "Web Clips",
@@ -438,8 +432,10 @@ class Editor extends React.Component {
             />
           )
         });
+        */
         break;
         case "Jupiter Clips":
+          /*
         this.setState({ 
           isPaneOpen: true,
           title: "Jupiter Clips",
@@ -451,9 +447,11 @@ class Editor extends React.Component {
             />
           )
         });
+        */
         break;
       case "Live":
         console.log('show live', this.state.scheduleDate);
+        /*
         this.setState({ 
           isPaneOpen: true,
           title: "Upcoming Live Broadcasts",
@@ -465,11 +463,13 @@ class Editor extends React.Component {
 	          />
           )
         });
+        */
         break;
       case "a":
-        this.setState({ show: <Date /> });
+        //this.setState({ show: <Date /> });
         break;
       case "Episodes":
+        /*
         this.setState({
           isPaneOpen: true,
           title: "Episodes",
@@ -481,8 +481,10 @@ class Editor extends React.Component {
             />
           )
         });
+        */
         break;
       case "Specials":
+        /*
         this.setState({
           isPaneOpen: true,
           title: "Specials",
@@ -493,6 +495,7 @@ class Editor extends React.Component {
             />
           )
         });
+        */
         break;
       case "Schedule":
         menuText = text;
@@ -510,7 +513,7 @@ class Editor extends React.Component {
   render() {
     const { classes, theme } = this.props;
     const { open } = this.state;
-
+    console.log('Editor.render');
     return (
       <div className={classes.root}>
         <SlidingPane
@@ -521,7 +524,7 @@ class Editor extends React.Component {
           width="36%"
           onRequestClose={() => {
             // triggered on "<" on left top click or on outside click
-            this.setState({ isPaneOpen: false });
+            //this.setState({ isPaneOpen: false });
           }}
         >
           <h1>{this.state.title}</h1>

@@ -27,12 +27,12 @@ class ScheduleDao {
     return title;
   }
 
-  static fetchSchedule1(sid, date, cb) {    
+  static fetchSchedule(sid, date, cb) {    
     const sched = new ScheduleObject(sid, date);
     cb(sched.items);
   }
 
-  static fetchSchedule(sid, date, cb) {
+  static fetchSchedule1(sid, date, cb) {
   axios
     .get(
       `${URLPrefix}/api/v1/schedule?sid=${sid}&date=${date}`

@@ -27,6 +27,7 @@ class Loop extends React.Component {
   }
 
   componentDidMount() {
+    /*
     this.setState({
       data: this.props.data,
       duration: this.props.duration,
@@ -35,23 +36,28 @@ class Loop extends React.Component {
       startDate: moment(),
       finishDate:  moment().add(2, 'hours')
     });
+    */
   }
 
   componentDidUpdate(prevProps) {
     console.log('update loop', this.props);
     if (prevProps.data.length !== this.props.data.length) {
       if (this.props.data.length === 0) {
+        /*
         this.setState({ 
           current: "Clear", 
           data: [],
           duration: 0
         });
+        */
       }
       else {
+        /*
         this.setState({ 
           data: this.props.data,
           duration: this.props.duration
         });
+        */
       }
     }
   }
@@ -92,7 +98,7 @@ class Loop extends React.Component {
             data-enable-time
             value={this.state.startDate}
             onChange={startDate => {
-              this.setState({ startDate });
+              //this.setState({ startDate });
             }}
           />
           <br/>
@@ -103,7 +109,7 @@ class Loop extends React.Component {
             data-enable-time
             value={this.state.finishDate}
             onChange={finishDate => {
-              this.setState({ finishDate });
+              //this.setState({ finishDate });
             }}
           />
           <br />
@@ -135,10 +141,12 @@ class Loop extends React.Component {
           const rows = [...this.state.data];
           rows.splice(row.index, 1);
           // do the following until round trip from the editor works
+          /*
           this.setState({ 
             data: rows,
             duration: this.state.duration - d
           });
+          */
         }
       }
     ];

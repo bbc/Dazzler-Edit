@@ -64,8 +64,8 @@ class TablePaginationActions extends React.Component {
           {theme.direction === "rtl" ? (
             <KeyboardArrowRight />
           ) : (
-            <KeyboardArrowLeft />
-          )}
+              <KeyboardArrowLeft />
+            )}
         </IconButton>
         <IconButton
           onClick={this.handleNextButtonClick}
@@ -75,8 +75,8 @@ class TablePaginationActions extends React.Component {
           {theme.direction === "rtl" ? (
             <KeyboardArrowLeft />
           ) : (
-            <KeyboardArrowRight />
-          )}
+              <KeyboardArrowRight />
+            )}
         </IconButton>
         <IconButton
           onClick={this.handleLastPageButtonClick}
@@ -140,8 +140,7 @@ export class Live extends React.Component {
   }
 
   componentDidMount = () => {
-    this.setState({ sid: this.props.sid });
-    this.setState({ date: this.props.date });
+    this.setState({ sid: this.props.sid, date: this.props.date });
   };
 
   componentDidUpdate(prevProps) {
@@ -149,11 +148,11 @@ export class Live extends React.Component {
     const today = moment().millisecond(0).second(0).minute(0).hour(0).utc();
     const date = moment(this.state.date).millisecond(0).second(0).minute(0).hour(0).utc();
     let start = moment();
-    if(date.isSame(today)) {
-        start.add(5, 'minutes');
+    if (date.isSame(today)) {
+      start.add(5, 'minutes');
     }
     else {
-        start = moment(date);
+      start = moment(date);
     }
     const end = moment(start).add(1, "days").utc().format();
     start = start.utc().format();
@@ -163,29 +162,30 @@ export class Live extends React.Component {
         .get(`${URLPrefix}/api/v1/webcast?sid=${this.props.sid}&start=${start}&end=${end}`)
         .then(response => {
           console.log("Live RESPONSE", response.data);
-	  if(response.data.total>0) {
-		  response.data.items.forEach(item => {
-		    var durationTime =
-		      moment(item.scheduled_time.end) -
-		      moment(item.scheduled_time.start);
+          let rows = [];
+          if (response.data.total > 0) {
+            response.data.items.forEach(item => {
+              var durationTime =
+                moment(item.scheduled_time.end) -
+                moment(item.scheduled_time.start);
 
-		    item.isLive = true;
-		    item.startTime = moment(item.scheduled_time.start).format( "HH:mm:ss");
-		    item.title = "Live programme at " + item.scheduled_time.start;
-		    item.duration = moment.duration(durationTime, "milliseconds");
-		  });
-		  this.setState({ rows: response.data.items });
-	  }
-	  else {
-		  this.setState({ rows: [] });
-	  }
-          let new_page = 0;
-          if(response.data.hasOwnProperty('page')) {
-            new_page = response.data.page - 1;
+              item.isLive = true;
+              item.startTime = moment(item.scheduled_time.start).format("HH:mm:ss");
+              item.title = "Live programme at " + item.scheduled_time.start;
+              item.duration = moment.duration(durationTime, "milliseconds");
+            });
+            rows = response.data.items;
+            let new_page = 0;
+            if (response.data.hasOwnProperty('page')) {
+              new_page = response.data.page - 1;
+            }
+            this.setState({
+              rows: rows,
+              previousPage: new_page,
+              page: new_page,
+              totalRows: response.data.total
+            });
           }
-          this.setState({ previousPage: new_page });
-          this.setState({ page: new_page });
-          this.setState({ totalRows: response.data.total });
         })
         .catch(e => {
           console.log(e);

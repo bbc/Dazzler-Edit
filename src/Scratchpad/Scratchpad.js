@@ -25,7 +25,7 @@ class Scratchpad extends React.Component {
   componentDidUpdate(prevProps) {
     if (prevProps.data.length !== this.props.data.length) {
       if (this.props.data.length === 0) {
-        this.setState({ current: "Clear" });
+        //this.setState({ current: "Clear" });
       }
     }
   }

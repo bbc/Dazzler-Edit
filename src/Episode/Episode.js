@@ -15,6 +15,7 @@ import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import LastPageIcon from "@material-ui/icons/LastPage";
 import moment from "moment";
 // import Spinner from "../Spinner/Spinner";
+//import {TablePaginationActionsWrapped} from "../TablePaginationActions/TablePaginationActions";
 import axios from "axios";
 const actionsStyles = theme => ({
   root: {
@@ -23,6 +24,7 @@ const actionsStyles = theme => ({
     marginLeft: theme.spacing.unit * 2.5
   }
 });
+
 class TablePaginationActions extends React.Component {
   handleFirstPageButtonClick = event => {
     this.props.onChangePage(event, 0);
@@ -139,8 +141,10 @@ export class Episode extends React.Component {
   }
 
   componentDidMount = () => {
-    this.setState({ sid: this.props.sid });
-    this.setState({ date: this.props.date });
+    this.setState({ 
+      sid: this.props.sid,
+      date: this.props.date
+    });
   };
 
   componentDidUpdate(prevProps) {

@@ -5,7 +5,7 @@ class Button extends React.Component {
   };
 
   handleClick = () => {
-    this.setState({ disabled: !this.state.disabled });
+    //this.setState({ disabled: !this.state.disabled });
   };
 
   render() {
