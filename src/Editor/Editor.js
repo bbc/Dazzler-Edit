@@ -369,7 +369,8 @@ class Editor extends React.Component {
       const n = this.state.loop.concat(newItem2);
       this.setState({
         loop: n,
-        loopDuration: this.state.loopDuration.add(newItem2.duration),
+        loopDuration: this.state.loopDuration.add(newItem2.duration)
+      });
       break;
     default:
     }
