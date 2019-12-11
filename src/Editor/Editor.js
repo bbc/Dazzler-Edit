@@ -5,29 +5,19 @@ import Box from '@material-ui/core/Box';
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
+import Radio from '@material-ui/core/Radio';
+import RadioGroup from '@material-ui/core/RadioGroup';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import FormControl from '@material-ui/core/FormControl';
+import FormLabel from '@material-ui/core/FormLabel';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { withStyles } from "@material-ui/core/styles";
 import Drawer from "@material-ui/core/Drawer";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
-import List from "@material-ui/core/List";
-import Divider from "@material-ui/core/Divider";
 import IconButton from "@material-ui/core/IconButton";
 import MenuIcon from "@material-ui/icons/Menu";
-import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
-import ChevronRightIcon from "@material-ui/icons/ChevronRight";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
-import LiveTv from "@material-ui/icons/LiveTv";
-import MailIcon from "@material-ui/icons/Schedule";
-import LoopIcon from "@material-ui/icons/Loop";
-import Payment from "@material-ui/icons/VideoLibrary";
-import SlowMotionVideoIcon from "@material-ui/icons/SlowMotionVideo";
-import Movie from "@material-ui/icons/Movie";
-import Opacity from "@material-ui/icons/Opacity";
-import Picture from "@material-ui/icons/PictureInPicture";
 import axios from "axios";
 import moment from "moment";
 import 'moment-duration-format';
@@ -44,19 +34,8 @@ import Loop from "../Loop/Loop";
 const drawerWidth = 240;
 var time = -2;
 var scheduleItems = [];
-var scratchPadItems = [];
 var copiedContent = [];
-var loopedContent = [];
-var icons = [
-  <MailIcon />,
-  <Movie />,
-  <Payment />,
-  <Picture />,
-  <SlowMotionVideoIcon />,
-  <Opacity />
-];
-// var viewIcons = [<LiveTv />, <Assignment />, <LoopIcon />];
-var viewIcons = [<LiveTv />, <LoopIcon />];
+
 var URLPrefix = "";
 //checking if running locally
 
@@ -133,18 +112,19 @@ class Editor extends React.Component {
     this.handleAddLive = this.handleAddLive.bind(this);
     this.handleAddClip = this.handleAddClip.bind(this);
     this.handleAddEpisode = this.handleAddEpisode.bind(this);
-    this.copyContent = this.copyContent.bind(this);
-    this.clearContent = this.clearContent.bind(this);
+    this.clearLoop = this.clearLoop.bind(this);
     this.handleDrawerOpen = this.handleDrawerOpen.bind(this);
     this.handleDrawerClose = this.handleDrawerClose.bind(this);
     this.handleDateChange = this.handleDateChange.bind(this);
+    this.handleChangeMode = this.handleChangeMode.bind(this);
 
     this.state = {
-      mode: "writeToLoop",
+      mode: "loop",
       schedule: [],
       scheduleDate: moment().utc().format("YYYY-MM-DD"),
       scheduleInsertionPoint: 1,
       scheduleModified: false,
+      timeToFill: moment.duration(),
       open: false,
       Title: "",
       isPaneOpen: false,
@@ -183,6 +163,11 @@ class Editor extends React.Component {
 
   componentDidUpdate(prevProps) {
     console.log('editor componentDidUpdate');
+  }
+
+  handleChangeMode = (event) => {
+    console.log('change mode', event.target.value);
+    this.setState({mode: event.target.value});
   }
 
   handleDrawerOpen = () => {
@@ -231,9 +216,17 @@ class Editor extends React.Component {
       title: item.title ? item.title : item.presentation_title,
       duration: moment.duration(version.duration).toISOString(),
       live: false,
-      insertionType: ""
+      insertionType: "",
+      versionCrid: item.version[0].crid[0].$.uri,
+      pid: '',
+      vpid: ''
     };
-    this.pasteIntoSchedule(newItem);
+    if(this.state.mode === 'schedule') {
+      this.pasteIntoSchedule(newItem);
+    }
+    else {
+      this.pasteIntoLoop(newItem);
+    }
   }
 
   handleAddClip(item) {
@@ -245,7 +238,12 @@ class Editor extends React.Component {
       live: false,
       insertionType: ""
     };
-    this.pasteIntoSchedule(newItem);
+    if(this.state.mode === 'schedule') {
+      this.pasteIntoSchedule(newItem);
+    }
+    else {
+      this.pasteIntoLoop(newItem);
+    }
   }
 
   handleScheduleRowSelect = index => {
@@ -268,6 +266,10 @@ class Editor extends React.Component {
     this.setState({ scheduleDate: date, schedule: schedule });
   };
 
+  pasteIntoLoop(item) {
+    console.log('pasteIntoLoop', item);
+  }
+
   pasteIntoSchedule(items, copies) {
     if (!Array.isArray(items)) items = [items];
     if (copies === undefined) copies = 1;
@@ -289,37 +291,15 @@ class Editor extends React.Component {
     this.setState({ schedule: scheduleObject.items, scheduleInsertionPoint: index+1 });
   }
 
-  loopContent = (rows, startTime, finishTime) => {
-    loopedContent = [];
-    if (rows.length > 0) {
-      rows.map((row, index) => loopedContent.push(rows[index]));
-    }
-  };
-
-  copyContent(rows) {
-    copiedContent = [];
-    if (rows.length > 0) {
-      rows.map((row, index) => copiedContent.push(rows[index]));
-    }
-  }
-
-  clearContent(loop) {
-    if (loop) {
-      //this.setState({loop: [], loopDuration: moment.duration()});
-    } else {
-      scratchPadItems = [];
-    }
+  clearLoop() {
+    this.setState({loop: [], loopDuration: moment.duration()});
   }
 
   deleteItemFromLoop = (index) => {
     const r = this.state.loop[index];
     let loop = [...this.state.loop];
     loop.splice(index, 1);
-    //this.setState({loop:loop, loopDuration: this.state.loopDuration.subtract(moment.duration(r.duration))});
-  }
-
-  deleteItem(id) {
-    console.log('delete item', id);
+    this.setState({loop:loop, loopDuration: this.state.loopDuration.subtract(moment.duration(r.duration))});
   }
  
   render() {
@@ -368,7 +348,15 @@ class Editor extends React.Component {
         <Box display="flex" flexDirection="row" p={1} m={1} bgcolor="background.paper">
           <Box width="25%" display="flex" flexDirection="column">
           <Typography variant="h4" align="center">Picklists</Typography>
-          <ExpansionPanel>
+
+          <FormControl component="fieldset" className={classes.formControl}>
+          <FormLabel component="legend">Add To</FormLabel>
+          <RadioGroup aria-label="mode" name="mode" value={this.state.mode} onChange={this.handleChangeMode} row>
+            <FormControlLabel value="loop" control={<Radio color="primary"/>} label="Loop" />
+            <FormControlLabel value="schedule" control={<Radio color="primary"/>} label="Schedule" />
+          </RadioGroup>
+        </FormControl>
+        <ExpansionPanel>
           <ExpansionPanelSummary
           expandIcon={<ExpandMoreIcon />}
           aria-controls="panel1bh-content"
@@ -463,21 +451,19 @@ class Editor extends React.Component {
           />
         </ExpansionPanelDetails>
       </ExpansionPanel>
-      </Box>
-      <Box width="3%"/>
-      <Box width="25%" flexGrow={1} flexDirection="column">
+      </Box>      
+      <Box mx="1rem" width="25%" flexGrow={1} flexDirection="column">
           <Typography variant="h4" align="center">Loop</Typography>
           <Loop
             data={this.state.loop}
-            duration={this.state.loopDuration.valueOf()}
-            deleteItem={this.deleteItemFromLoop}
-            loopContent={this.loopContent}
-            clearContent={this.clearContent}
-            scheduleTime={this.state.scheduleTime}
+            duration={this.state.loopDuration}
+            timeToFill={this.state.timeToFill}
+            onDelete={this.deleteItemFromLoop}
+            onPaste={this.loopContent}
+            onClear={this.clearLoop}
           />
           </Box>
-          <Box width="3%"/>
-          <Box width="44%" flexGrow={1} flexDirection="column">
+          <Box width="50%" flexGrow={1} flexDirection="column">
           <Typography variant="h4" align="center">Schedule</Typography>
           <SchedulePicker
             enabled={!this.state.scheduleModified}

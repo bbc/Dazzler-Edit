@@ -5,6 +5,7 @@ import moment from "moment";
 import 'moment-duration-format';
 import Flatpickr from "react-flatpickr";
 import "flatpickr/dist/themes/material_green.css";
+import { Typography } from "@material-ui/core";
 
 const columns = [
   //{ key: "pid", name: "pid" },
@@ -62,14 +63,52 @@ class Loop extends React.Component {
     }
   }
 
+  getCellActions = (column, row) => {
+    const cellActions = [
+      {
+        icon: <i className="trash icon" />,
+        callback: () => {
+          console.log('delete row', row.index);
+          const d = moment.duration(row.duration).valueOf();
+          this.props.onDelete(row.index);
+          const rows = [...this.state.data];
+          rows.splice(row.index, 1);
+          // do the following until round trip from the editor works
+          /*
+          this.setState({ 
+            data: rows,
+            duration: this.state.duration - d
+          });
+          */
+        }
+      }
+    ];
+    return column.key === "action" ? cellActions : null;
+  }
+
+  onGridRowsUpdated = ({ fromRow, toRow, updated }) => {
+    this.setState(state => {
+      const rows = state.data.slice();
+      for (let i = fromRow; i <= toRow; i++) {
+        rows[i] = { ...rows[i], ...updated };
+      }
+      return { data: rows };
+    });
+  }
+
   render() {
     return (
       <Box>
-        <button class="ui left floated button">
-          {" "}
-          Duration:{" "}
-          {moment.duration(this.state.duration).format("HH:mm:ss")}{" "}
-        </button>
+        <Box display="flex" flexDirection="row">
+          <Typography>
+          Duration:
+          {moment.duration(this.state.duration).format("HH:mm:ss")}
+          </Typography>
+          <Typography>
+            Time to fill:
+          {moment.duration(this.props.timeToFill).format("HH:mm:ss")}
+          </Typography>
+        </Box>
         <ReactDataGrid
           columns={columns}
           rowGetter={i => this.state.data[i]}
@@ -82,7 +121,7 @@ class Loop extends React.Component {
         <button
           class="ui button active"
           onClick={() => {
-            this.props.clearContent(true);
+            this.props.onClear();
           }}
         >
           <i class="trash icon"></i> {this.state.current}
@@ -115,7 +154,7 @@ class Loop extends React.Component {
           </div>
           <button
             onClick={() => {
-              this.props.loopContent(this.state.data, this.state.startDate, this.state.finishDate);
+              this.props.onPaste(this.state.data, this.state.startDate, this.state.finishDate);
             }}
           >
             {" "}
@@ -125,41 +164,5 @@ class Loop extends React.Component {
       </Box>
     );
   }
-
-  getCellActions = (column, row) => {
-    const cellActions = [
-      {
-        icon: <i className="trash icon" />,
-        callback: () => {
-          console.log('delete row', row.index);
-          const d = moment.duration(row.duration).valueOf();
-          this.props.deleteItem(row.index);
-          const rows = [...this.state.data];
-          rows.splice(row.index, 1);
-          // do the following until round trip from the editor works
-          /*
-          this.setState({ 
-            data: rows,
-            duration: this.state.duration - d
-          });
-          */
-        }
-      }
-    ];
-    return column.key === "action" ? cellActions : null;
-  }
-
-  onGridRowsUpdated = ({ fromRow, toRow, updated }) => {
-    this.setState(state => {
-      const rows = state.data.slice();
-      for (let i = fromRow; i <= toRow; i++) {
-        rows[i] = { ...rows[i], ...updated };
-      }
-      return { data: rows };
-    });
-  }
-
 }
-
- 
 export default Loop;

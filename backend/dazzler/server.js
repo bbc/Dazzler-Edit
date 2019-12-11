@@ -51,7 +51,7 @@ app.get("/api/v1/user", function(req, res) {
     }
     res.json(r);
   } else {
-    res.json({ auth: false });
+    res.json({ name: "anonymous", auth: false });
   }
 });
 
