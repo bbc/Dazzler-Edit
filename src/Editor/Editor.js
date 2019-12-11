@@ -266,14 +266,15 @@ class Editor extends React.Component {
     if (rows.length > 0) {
       rows.map((row, index) => loopedContent.push(rows[index]));
     }
+  };
 
-    menuText = "Schedule";
   copyContent(rows) {
     copiedContent = [];
     if (rows.length > 0) {
       rows.map((row, index) => copiedContent.push(rows[index]));
     }
   }
+
   clearContent(loop) {
     if (loop) {
       this.setState({
