@@ -129,13 +129,6 @@ class Editor extends React.Component {
       Title: "",
       isPaneOpen: false,
       panelShow: null,
-      itemType: "",
-      count: 0,
-      clips: [],
-      jupiter: [],
-      specials: [],
-      episodes: [],
-      live: [],
       loop: [],
       loopDuration: moment.duration(),
       user: { name: "anonymous", auth: true },
@@ -198,7 +191,6 @@ class Editor extends React.Component {
         default: // DO Nothing
       }
     }
-    console.log(newItem);
     let scheduleObject = new ScheduleObject(
       this.state.service.sid,
       this.state.scheduleDate,
@@ -217,9 +209,9 @@ class Editor extends React.Component {
       duration: moment.duration(version.duration).toISOString(),
       live: false,
       insertionType: "",
-      versionCrid: item.version[0].crid[0].$.uri,
-      pid: '',
-      vpid: ''
+      versionCrid: version.crid,
+      pid: item.pid,
+      vpid: version.pid
     };
     if(this.state.mode === 'schedule') {
       this.pasteIntoSchedule(newItem);
@@ -236,7 +228,10 @@ class Editor extends React.Component {
       title: item.title,
       duration: moment.duration(version.duration).toISOString(),
       live: false,
-      insertionType: ""
+      insertionType: "",
+      versionCrid: version.crid,
+      pid: item.pid,
+      vpid: version.pid
     };
     if(this.state.mode === 'schedule') {
       this.pasteIntoSchedule(newItem);

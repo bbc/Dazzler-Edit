@@ -3,8 +3,6 @@ import Box from '@material-ui/core/Box';
 import ReactDataGrid from "react-data-grid";
 import moment from "moment";
 import 'moment-duration-format';
-import Flatpickr from "react-flatpickr";
-import "flatpickr/dist/themes/material_green.css";
 import { Typography } from "@material-ui/core";
 
 const columns = [
@@ -98,16 +96,21 @@ class Loop extends React.Component {
 
   render() {
     return (
+      <div style={{ width: '100%' }}>
       <Box>
         <Box display="flex" flexDirection="row">
+          <Box width="50%">
           <Typography>
-          Duration:
+          Duration:&nbsp;
           {moment.duration(this.state.duration).format("HH:mm:ss")}
           </Typography>
+          </Box>
+          <Box width="50%">
           <Typography>
-            Time to fill:
+            Time to fill:&nbsp;
           {moment.duration(this.props.timeToFill).format("HH:mm:ss")}
           </Typography>
+          </Box>
         </Box>
         <ReactDataGrid
           columns={columns}
@@ -118,50 +121,18 @@ class Loop extends React.Component {
           getCellActions={this.getCellActions}
           minHeight={300}
         />
-        <button
-          class="ui button active"
-          onClick={() => {
-            this.props.onClear();
-          }}
-        >
-          <i class="trash icon"></i> {this.state.current}
-        </button>
-
-        <div class="ui text container">
-          Start:{" "}
-          <Flatpickr
-            data-enable-time
-            value={this.state.startDate}
-            onChange={startDate => {
-              //this.setState({ startDate });
-            }}
-          />
-          <br/>
-          <br/>
-          <br/>
-          Finish by:{" "}
-          <Flatpickr
-            data-enable-time
-            value={this.state.finishDate}
-            onChange={finishDate => {
-              //this.setState({ finishDate });
-            }}
-          />
-          <br />
-          <br />
-          <div class="ui form">
-            <div class="inline field"></div>
-          </div>
-          <button
-            onClick={() => {
-              this.props.onPaste(this.state.data, this.state.startDate, this.state.finishDate);
-            }}
-          >
-            {" "}
-            Go{" "}
+        <Box display="flex" flexDirection="row" flexGrow={1}>
+          <button className="ui button active" onClick={this.props.onClear}>
+            <i class="trash icon"></i><Typography>Clear</Typography>
           </button>
-        </div>
+          <button className="ui button active" onClick={() => {
+                this.props.onPaste(this.state.data, this.state.startDate, this.state.finishDate);
+              }}
+          ><Typography>Paste</Typography>
+          </button>
+        </Box>
       </Box>
+      </div>
     );
   }
 }
