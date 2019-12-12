@@ -113,10 +113,12 @@ class Editor extends React.Component {
     this.handleAddClip = this.handleAddClip.bind(this);
     this.handleAddEpisode = this.handleAddEpisode.bind(this);
     this.clearLoop = this.clearLoop.bind(this);
+    this.pasteIntoSchedule = this.pasteIntoSchedule.bind(this);
     this.handleDrawerOpen = this.handleDrawerOpen.bind(this);
     this.handleDrawerClose = this.handleDrawerClose.bind(this);
     this.handleDateChange = this.handleDateChange.bind(this);
     this.handleChangeMode = this.handleChangeMode.bind(this);
+    this.testLoop = this.testLoop.bind(this);
 
     this.state = {
       mode: "loop",
@@ -260,10 +262,21 @@ class Editor extends React.Component {
     this.setState({ scheduleDate: date, schedule: schedule });
   };
 
+  testLoop() {
+    console.log("testLoop");
+    this.pasteIntoLoop({
+      duration: "PT1M",
+      title: "A test item"
+    });
+  }
+
   pasteIntoLoop(item) {
     console.log('pasteIntoLoop', item);
+    item.action='';
+    const newLoop = this.state.loop;
+    newLoop.push(item);
     this.setState({
-      loop: this.state.loop.push(item),
+      loop: newLoop,
       loopDuration: this.state.loopDuration.add(moment.duration(item.duration))
     });
   }
@@ -348,7 +361,7 @@ class Editor extends React.Component {
           <Typography variant="h4" align="center">Picklists</Typography>
 
           <FormControl component="fieldset" className={classes.formControl}>
-          <FormLabel component="legend">Add To</FormLabel>
+          <FormLabel component="legend">Add non-live to</FormLabel>
           <RadioGroup aria-label="mode" name="mode" value={this.state.mode} onChange={this.handleChangeMode} row>
             <FormControlLabel value="loop" control={<Radio color="primary"/>} label="Loop" />
             <FormControlLabel value="schedule" control={<Radio color="primary"/>} label="Schedule" />
@@ -450,18 +463,19 @@ class Editor extends React.Component {
         </ExpansionPanelDetails>
       </ExpansionPanel>
       </Box>      
-      <Box mx="1rem" width="25%" flexGrow={1} flexDirection="column">
+      <Box mx="1rem" width="30%" flexGrow={1} flexDirection="column">
           <Typography variant="h4" align="center">Loop</Typography>
           <Loop
+            onTest={this.testLoop}
             data={this.state.loop}
             duration={this.state.loopDuration}
             timeToFill={this.state.timeToFill}
             onDelete={this.deleteItemFromLoop}
-            onPaste={this.loopContent}
+            onPaste={this.pasteIntoSchedule}
             onClear={this.clearLoop}
           />
           </Box>
-          <Box width="50%" flexGrow={1} flexDirection="column">
+          <Box width="45%" flexGrow={1} flexDirection="column">
           <Typography variant="h4" align="center">Schedule</Typography>
           <SchedulePicker
             enabled={!this.state.scheduleModified}
