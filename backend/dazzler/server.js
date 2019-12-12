@@ -315,7 +315,7 @@ async function get_episodes(q) {
       // test for status you want, etc
       console.log(res.status);
     }
-    return res.data.nitro.results;
+    return add_crids_to_episodes(res.data.nitro.results);
 }
 
 app.put("/api/v1/loop", async (req, res, next) => {
@@ -528,18 +528,18 @@ function add_crids_to_webcast(results) {
   return results;
 }
 
-function add_crids_to_episodes(items) {
-  if (items != null) {
-    for (let i = 0; i < items.length; i++) {
-      if (items[i].available_versions.hasOwnProperty("version")) {
-        for (let j = 0; j < items[i].available_versions.version.length; j++) {
-          let version = items[i].available_versions.version[j];
+function add_crids_to_episodes(results) {
+  if (results != null) {
+    for (let i = 0; i < results.items.length; i++) {
+      if (results.items[i].available_versions.hasOwnProperty("version")) {
+        for (let j = 0; j < results.items[i].available_versions.version.length; j++) {
+          let version = results.items[i].available_versions.version[j];
           version.crid = pid2crid(version.pid);
         }
       }
     }
   }
-  return items;
+  return results;
 }
 
 function parseSSLsubject(req) {
