@@ -125,7 +125,6 @@ export class Specials extends React.Component {
                 <th>Add</th>
               </TableHead>
               <TableBody>
-
                 {rows.map(row => (
                   <TableRow key={row.pid}>
                     <TableCell component="th" scope="row">
