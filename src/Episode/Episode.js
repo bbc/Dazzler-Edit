@@ -10,7 +10,7 @@ import TablePagination from "@material-ui/core/TablePagination";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import moment from "moment";
-import {TablePaginationActionsWrapped} from "../TablePaginationActions/TablePaginationActions";
+import { TablePaginationActionsWrapped } from "../TablePaginationActions/TablePaginationActions";
 import AssetDao from "../AssetDao/AssetDao";
 
 export const styles = theme => ({
@@ -44,28 +44,32 @@ export class Episode extends React.Component {
   }
 
   componentDidMount = () => {
-    this.setState({ 
+    this.setState({
       sid: this.props.sid,
       date: this.props.date
     });
   };
 
   componentDidUpdate(prevProps) {
-    if (this.state.page !== this.state.previousPage) {
+    console.log('episodeDidUpdate');
+    if (
+      (this.state.page !== this.state.previousPage)
+      || (this.props.availability !== prevProps.availability)
+    ) {
       //console.log("have page %d want page %d", this.state.page, this.state.previousPage);
       AssetDao.getEpisodes(
         this.props.sid, this.props.availability,
-        this.state.page+1, this.state.rowsPerPage,
+        this.state.page + 1, this.state.rowsPerPage,
         response => {
           let new_page = 0;
-          if(response.data.hasOwnProperty('page')) {
+          if (response.data.hasOwnProperty('page')) {
             new_page = response.data.page - 1;
           }
-          this.setState({ 
+          this.setState({
             previousPage: new_page,
             page: new_page,
             totalRows: response.data.total,
-            rows: response.data.items 
+            rows: response.data.items
           });
         })
     }
@@ -116,7 +120,7 @@ export class Episode extends React.Component {
         <Paper className={classes.root}>
           <div className={classes.tableWrapper}>
             <Table className={classes.table}>
-            <TableHead>
+              <TableHead>
                 <th>Title</th>
                 <th>Duration</th>
                 <th>Add</th>

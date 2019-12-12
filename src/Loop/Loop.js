@@ -31,7 +31,6 @@ class Loop extends React.Component {
   }
 
   render() {
-    console.log('ttf', this.props.timeToFill);
     const active = (this.props.data.length>0)?"ui button active":"ui button"
     return (
       <div style={{ width: '100%' }}>

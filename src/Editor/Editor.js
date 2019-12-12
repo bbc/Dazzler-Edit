@@ -123,6 +123,7 @@ class Editor extends React.Component {
       scheduleInsertionPoint: 1,
       scheduleModified: false,
       timeToFill: moment.duration(),
+      upcomingAvailability: moment.duration('P1D'),
       open: false,
       isPaneOpen: false,
       panelShow: null,
@@ -251,6 +252,13 @@ class Editor extends React.Component {
   }
   
   handleDateChange = (date, schedule) => {
+    const now = moment().startOf('hour');
+    const endOfSchedule = moment(this.state.scheduleDate).add(1, 'day');
+    let upcomingAvailability = moment.duration(endOfSchedule.diff(now));
+    if(upcomingAvailability.valueOf()<0) {
+      upcomingAvailability = moment.duration('P1D');
+    }
+    this.setState({upcomingAvailability: upcomingAvailability});
     let scheduleObject = new ScheduleObject(
       this.state.service.sid,
       date,
@@ -414,7 +422,7 @@ class Editor extends React.Component {
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
         <Episode
-          availability="P2D"
+          availability={this.state.upcomingAvailability.toISOString()}
           sid={this.state.service.sid}
           handleClick={this.handleAddEpisode}
         />
