@@ -79,6 +79,7 @@ class ScheduleView extends React.Component {
         <tbody>
         {this.props.data.map((item, index) =>
           <ScheduleItem
+            key={item.insertionType+item.startTime.utc().format()}
             index={index}
             live={item.live}
             insertionType={item.insertionType}

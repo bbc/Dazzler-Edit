@@ -6,7 +6,6 @@ import 'moment-duration-format';
 import { Typography } from "@material-ui/core";
 
 const columns = [
-  //{ key: "pid", name: "pid" },
   { key: "title", name: "Title", width: 200 },
   { key: "durationAsString", name: "Duration", width: 80 },
   { key: "action", name: "Action", width: 80 }
@@ -123,7 +122,7 @@ class Loop extends React.Component {
         />
         <Box display="flex" flexDirection="row" flexGrow={1}>
           <button className="ui button active" onClick={this.props.onClear}>
-            <i class="trash icon"></i><Typography>Clear</Typography>
+            <i className="trash icon"></i><Typography>Clear</Typography>
           </button>
           <button className="ui button active" onClick={() => {
                 this.props.onPaste(this.state.data, this.state.startDate, this.state.finishDate);

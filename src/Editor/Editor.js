@@ -126,7 +126,6 @@ class Editor extends React.Component {
       scheduleModified: false,
       timeToFill: moment.duration(),
       open: false,
-      Title: "",
       isPaneOpen: false,
       panelShow: null,
       loop: [],
@@ -263,6 +262,10 @@ class Editor extends React.Component {
 
   pasteIntoLoop(item) {
     console.log('pasteIntoLoop', item);
+    this.setState({
+      loop: this.state.loop.push(item),
+      loopDuration: this.state.loopDuration.add(moment.duration(item.duration))
+    });
   }
 
   pasteIntoSchedule(items, copies) {
