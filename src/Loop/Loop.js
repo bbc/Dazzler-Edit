@@ -27,7 +27,9 @@ class Loop extends React.Component {
   }
 
   pasteToFill() {
-    console.log('pasteToFill');
+    const count = this.props.timeToFill / this.props.duration;
+    console.log('pasteToFill', count, Math.ceil(count));
+    this.props.onPaste(this.props.data, Math.ceil(count));
   }
 
   render() {

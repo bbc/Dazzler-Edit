@@ -227,17 +227,17 @@ class Editor extends React.Component {
     }
   }
 
-  calculateTimeToFill(index) {
-    for(let i=index; i<this.state.schedule.length; i++) {
-      if(this.state.schedule[i].insertionType === 'gap') {
-        return moment.duration(this.state.schedule[i].duration);
+  calculateTimeToFill(schedule, index) {
+    for(let i=index; i<schedule.length; i++) {
+      if(schedule[i].insertionType === 'gap') {
+        return moment.duration(schedule[i].duration);
       }
     }
     return moment.duration();
   }
 
   handleScheduleRowSelect = index => {
-    const ttf = this.calculateTimeToFill(index);
+    const ttf = this.calculateTimeToFill(this.state.schedule, index);
     this.setState({ scheduleInsertionPoint: index, timeToFill: ttf });
   };
 
@@ -287,7 +287,7 @@ class Editor extends React.Component {
   }
 
   updateSchedule(scheduleObject, scheduleInsertionPoint) {
-    const ttf = this.calculateTimeToFill(scheduleInsertionPoint);
+    const ttf = this.calculateTimeToFill(scheduleObject.items, scheduleInsertionPoint);
     this.setState({
       scheduleDate: scheduleObject.date,
       schedule: scheduleObject.items, 
