@@ -32,10 +32,6 @@ import ScheduleObject from "../ScheduleObject";
 import Loop from "../Loop/Loop";
 
 const drawerWidth = 240;
-var time = -2;
-var scheduleItems = [];
-var copiedContent = [];
-
 var URLPrefix = "";
 //checking if running locally
 
@@ -138,16 +134,10 @@ class Editor extends React.Component {
   }
 
   componentDidMount() {
-    console.log("DidMount", time);
-    console.log(scheduleItems);
-    console.log(copiedContent);
-
     // get user
     axios
       .get(`${URLPrefix}/api/v1/user`)
       .then(response => {
-        console.log("user", JSON.stringify(response.data));
-        console.log("RESPONSE", response);
         this.setState({user: response.data});
       })
       .catch(e => {
@@ -156,11 +146,9 @@ class Editor extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    console.log('editor componentDidUpdate');
   }
 
   handleChangeMode = (event) => {
-    console.log('change mode', event.target.value);
     this.setState({mode: event.target.value});
   }
 
@@ -173,7 +161,6 @@ class Editor extends React.Component {
   };
 
   handleAddLive(window) {
-    console.log("LIVE ITEM", window);
     const startTime = moment(window.scheduled_time.start);
     const newItem = {
       captureChannel: window.service.sid, // TODO make use of this
@@ -198,12 +185,10 @@ class Editor extends React.Component {
       this.state.schedule
     );
     scheduleObject.addLive(newItem);
-    console.log(scheduleObject.items);
     this.setState({schedule: scheduleObject.items});
   }
 
   handleAddEpisode(item) {
-    console.log("handleAddEpisode ITEM", item);
     const version = item.available_versions.version[0]; // TODO pick a version
     const newItem = {
       title: item.title ? item.title : item.presentation_title,
@@ -223,7 +208,6 @@ class Editor extends React.Component {
   }
 
   handleAddClip(item) {
-    console.log("handleAddClip ITEM", item);
     const version = item.available_versions.version[0]; // TODO pick a version
     const newItem = {
       title: item.title,
@@ -242,9 +226,18 @@ class Editor extends React.Component {
     }
   }
 
+  calculateTimeToFill(index) {
+    for(let i=index; i<this.state.schedule.length; i++) {
+      if(this.state.schedule[i].insertionType === 'gap') {
+        return moment.duration(this.state.schedule[i].duration);
+      }
+    }
+    return moment.duration();
+  }
+
   handleScheduleRowSelect = index => {
-    console.log("handleScheduleDelete", index);
-    this.setState({ scheduleInsertionPoint: index });
+    const ttf = this.calculateTimeToFill(index);
+    this.setState({ scheduleInsertionPoint: index, timeToFill: ttf });
   };
 
   handleScheduleDelete(index) {
@@ -254,37 +247,21 @@ class Editor extends React.Component {
       this.state.schedule
     );
     scheduleObject.deleteItemClosingGap(index);
-    this.setState({ schedule: scheduleObject.items, });
+    this.updateSchedule(scheduleObject, index);
   }
   
   handleDateChange = (date, schedule) => {
-    console.log('handleDateChange', date);
-    this.setState({ scheduleDate: date, schedule: schedule });
+    let scheduleObject = new ScheduleObject(
+      this.state.service.sid,
+      date,
+      schedule
+    );
+    this.updateSchedule(scheduleObject, 1);
   };
-
-  testLoop() {
-    console.log("testLoop");
-    this.pasteIntoLoop({
-      duration: "PT1M",
-      title: "A test item"
-    });
-  }
-
-  pasteIntoLoop(item) {
-    console.log('pasteIntoLoop', item);
-    item.action='';
-    const newLoop = this.state.loop;
-    newLoop.push(item);
-    this.setState({
-      loop: newLoop,
-      loopDuration: this.state.loopDuration.add(moment.duration(item.duration))
-    });
-  }
 
   pasteIntoSchedule(items, copies) {
     if (!Array.isArray(items)) items = [items];
     if (copies === undefined) copies = 1;
-    console.log("pasteIntoSchedule", items, copies);
     let n = [...items];
     while (copies > 1) {
       n = n.concat(items);
@@ -297,9 +274,35 @@ class Editor extends React.Component {
       this.state.scheduleDate,
       this.state.schedule
     );
-    console.log('pasteIntoSchedule', this.state.schedule);
     scheduleObject.addFloating(index, n);
-    this.setState({ schedule: scheduleObject.items, scheduleInsertionPoint: index+1 });
+    this.updateSchedule(scheduleObject, index+1);
+  }
+
+  updateSchedule(scheduleObject, scheduleInsertionPoint) {
+    const ttf = this.calculateTimeToFill(scheduleInsertionPoint);
+    this.setState({
+      scheduleDate: scheduleObject.date,
+      schedule: scheduleObject.items, 
+      scheduleInsertionPoint: scheduleInsertionPoint,
+      timeToFill: ttf
+    });
+  }
+
+  testLoop() {
+    this.pasteIntoLoop({
+      duration: "PT1M",
+      title: "A test item"
+    });
+  }
+
+  pasteIntoLoop(item) {
+    item.action='';
+    let loop = [...this.state.loop];
+    loop.push({...item, insertionType: ""});
+    this.setState({
+      loop: loop,
+      loopDuration: this.state.loopDuration.add(moment.duration(item.duration))
+    });
   }
 
   clearLoop() {
@@ -310,11 +313,13 @@ class Editor extends React.Component {
     const r = this.state.loop[index];
     let loop = [...this.state.loop];
     loop.splice(index, 1);
-    this.setState({loop:loop, loopDuration: this.state.loopDuration.subtract(moment.duration(r.duration))});
+    this.setState({
+      loop:loop,
+      loopDuration: this.state.loopDuration.subtract(moment.duration(r.duration))});
   }
  
   render() {
-    const { classes, theme } = this.props;
+    const { classes } = this.props;
     const { open } = this.state;
     console.log('Editor.render');
     return (

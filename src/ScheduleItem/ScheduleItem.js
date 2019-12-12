@@ -48,7 +48,7 @@ class ScheduleItem extends React.Component {
             className="mini ui button"
             onClick={() => {this.props.onDelete(this.props.index)}}
             >
-            <i class="trash alternate outline icon"></i>
+            <i className="trash alternate outline icon"></i>
             </button>
           }
         </td>

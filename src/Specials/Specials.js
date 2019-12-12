@@ -53,14 +53,11 @@ export class Specials extends React.Component {
   };
 
   componentDidUpdate(prevProps) {
-    console.log("Specials update", this.state.page);
-    console.log(prevProps);
     if (this.state.page !== this.state.previousPage) {
-      console.log("have page %d want page %d", this.state.previousPage, this.state.page);
+      //console.log("have page %d want page %d", this.state.previousPage, this.state.page);
       axios
         .get(`${URLPrefix}/api/v1/special?sid=${this.state.sid}&page=${this.state.page+1}&page_size=${this.state.rowsPerPage}`)
         .then(response => {
-          console.log("Specials", response.data.items);
           let new_page = 0;
           if(response.data.hasOwnProperty('page')) {
             new_page = response.data.page - 1;
@@ -79,7 +76,6 @@ export class Specials extends React.Component {
   }
 
   handleChangePage = (event, page) => {
-    console.log("Specials handleChangePage", this.state.page, page);
     this.setState({ page });
   };
 

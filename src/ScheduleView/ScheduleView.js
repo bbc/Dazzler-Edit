@@ -28,28 +28,22 @@ class ScheduleView extends React.Component {
     this.handleClick = this.handleClick.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
     this.state = {
-      //selectedItem: 0
     };
   }
 
   handleClick = (index) => {
-    console.log('handleClick', index);
-    //this.setState({selectedItem: index});
     if(this.props.onRowSelected) this.props.onRowSelected(index);
   }
 
   handleDelete = (index) => {
-    console.log('handleDelete', index);
     this.props.onDelete(index); // TODO can we use this directly?
   }
 
   componentDidMount() {
-    //this.setState({selectedItem: this.props.data.length-1 });
   }
 
   componentDidUpdate(prevProps) {
     if(this.props.lastUpdated !== prevProps.lastUpdated) {
-      //this.setState({selectedItem: this.props.data.length-1 });
     }
   }
 

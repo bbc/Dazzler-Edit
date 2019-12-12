@@ -18,13 +18,11 @@ class SchedulePicker extends React.Component {
     }
     
     componentDidMount() {
-      console.log('SchedulePickerDidMount', this.props.scheduleDate);
       this.setState({scheduleDate:this.props.scheduleDate});
       this.loadSchedule(moment(this.state.scheduleDate));
     }
 
     componentDidUpdate(prevProps) {
-      console.log('SchedulePickerDidUpdate', this.props.scheduleDate);
       if(this.state.scheduleDate !== prevProps.scheduleDate) {
         this.setState({scheduleDate:this.props.scheduleDate});
       }

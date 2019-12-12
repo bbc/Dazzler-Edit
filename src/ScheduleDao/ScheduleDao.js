@@ -33,6 +33,7 @@ class ScheduleDao {
   }
 
   static fetchSchedule(sid, date, cb) {
+    console.log('fetchSchedule', sid, date);
   axios
     .get(
       `${URLPrefix}/api/v1/schedule?sid=${sid}&date=${date}`
@@ -83,6 +84,8 @@ class ScheduleDao {
         "    <ProgramLocationTable>\n" +
         `      <Schedule start="${start.utc().format()}" end="${end.utc().format()}" serviceIDRef="${serviceIDRef}">`;
       for (let i = 0; i < data.length; i++) {
+        if(data.insertionType === 'gap') continue;
+        if(data.insertionType === 'sentinel') continue;
         tva += this.makeScheduleEvent( serviceIDRef, data, i, data.length);
       }
       tva += "\n      </Schedule>\n    </ProgramLocationTable>\n" + tvaEnd;

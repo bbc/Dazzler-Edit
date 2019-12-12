@@ -34,14 +34,13 @@ class ScheduleObject {
     }
 
     addFloating(index, itemsToAdd) {
-        console.log("addFloating", index, itemsToAdd, this.items);
+        //console.log("addFloating", index, itemsToAdd, this.items);
         // keep the schedule unchanged up to the insertion point
         if (this.items[index].insertionType === "gap") {
             // remove the gap;
             this.items.splice(index, 1);
             index = index - 1; // and insert after the previous item
         }
-        console.log("gap removed", this.items, index);
         let indexOfFixed = 0;
         let floating = [];
         let floating_duration = moment.duration();
@@ -63,8 +62,6 @@ class ScheduleObject {
                 floating_duration.add(moment.duration(this.items[i].duration));
             }
         }
-        console.log('floating', floating);
-        console.log("indexOfFixed", indexOfFixed);
         // remove gap before fixed
         if (this.items[indexOfFixed - 1].insertionType === "gap") {
             this.items.splice(indexOfFixed - 1, 1);
@@ -76,7 +73,6 @@ class ScheduleObject {
         );
         const end = moment(this.items[indexOfFixed].startTime);
         const availableDuration = moment.duration(end.diff(startOfNew)).subtract(floating_duration);
-        console.log('available', availableDuration.toISOString());
         let indexOfInsert = indexOfFixed;
         if (floating.length !== 0) {
             indexOfInsert = floating[0];
@@ -96,12 +92,10 @@ class ScheduleObject {
         indexOfFixed += numItemsToAdd;
         // set the start times of the added and floating items
         let s = moment(startOfNew);
-        console.log('set start to %s for %d to %d', s.utc().format(), indexOfInsert, indexOfFixed-1);
         for (let i = indexOfInsert; i < indexOfFixed; i++) {
             this.items[i].startTime = moment(s);
             s.add(moment.duration(this.items[i].duration));
         }
-        console.log(this.items);
         if (this.items[indexOfFixed].insertionType === 'sentinel') {
             this.fixEndTime();
         }
@@ -149,7 +143,6 @@ class ScheduleObject {
         const endTime = moment(startTime).add(moment.duration(item.duration));
         this.items.push(item);
         this.sort();
-        console.log('after', this.items);
         let index = 0;
         for (let i = 0; i < this.items.length; i++) {
             if (this.items[i].startTime.isSame(startTime)) {
@@ -244,7 +237,6 @@ class ScheduleObject {
             }
             if (done) break;
         }
-        console.log("delete", schedule);
         this.items = schedule;
     }
 

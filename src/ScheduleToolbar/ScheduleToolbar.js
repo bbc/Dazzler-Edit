@@ -12,12 +12,6 @@ class ScheduleToolbar extends React.Component {
             status: 'Save Playlist'
         };
     }
-    
-    componentDidMount() {
-    }
-
-    componentDidUpdate(prevProps) {
-    }
 
     render() {
     

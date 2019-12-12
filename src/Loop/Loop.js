@@ -31,6 +31,7 @@ class Loop extends React.Component {
   }
 
   render() {
+    console.log('ttf', this.props.timeToFill);
     const active = (this.props.data.length>0)?"ui button active":"ui button"
     return (
       <div style={{ width: '100%' }}>
@@ -38,20 +39,19 @@ class Loop extends React.Component {
         <Box display="flex" flexDirection="row">
           <Box width="50%">
           <Typography>
-          Duration:&nbsp;{durationFormatter(this.props.duration)}
+          Duration:&nbsp;{this.props.duration.format('HH:mm:ss')}
           </Typography>
           </Box>
           <Box width="50%">
           <Typography>
-            Time to fill:&nbsp;{durationFormatter(this.props.timeToFill)}
+            Time to fill:&nbsp;{this.props.timeToFill.format('HH:mm:ss')}
           </Typography>
           </Box>
         </Box>
         <ReactDataGrid
           columns={columns}
-          rowGetter={i => this.props.data[i]}
+          rowGetter={i => {const item = {...this.props.data[i], index:i}; return item;}}
           rowsCount={this.props.data.length}
-          onGridRowsUpdated={this.onGridRowsUpdated}
           enableCellSelect={true}
           getCellActions={this.getCellActions}
           minHeight={300}
@@ -75,6 +75,16 @@ class Loop extends React.Component {
       </Box>
       </div>
     );
+  }
+
+  getCellActions = (column, row) => {
+    const cellActions = [
+      {
+        icon: <i className="trash icon" />,
+        callback: () => {this.props.onDelete(row.index);}
+      }
+    ];
+    return column.key === "action" ? cellActions : null;
   }
 }
 export default Loop;

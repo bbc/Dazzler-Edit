@@ -52,8 +52,7 @@ export class Clips extends React.Component {
   };
 
   componentDidUpdate(prevProps) {
-    console.log("update %s page %d -> %d", this.state.type, this.state.previousPage, this.state.page);
-    console.log(prevProps);
+    //console.log("update %s page %d -> %d", this.state.type, this.state.previousPage, this.state.page);
     let reload = false;
     if(this.state.sid !== prevProps.sid) {
       reload = true;
@@ -63,7 +62,7 @@ export class Clips extends React.Component {
     }
     if(this.state.page !== this.state.previousPage) reload = true;
     if (reload) {
-      console.log("have page %d want page %d", this.state.previousPage, this.state.page);
+      //console.log("have page %d want page %d", this.state.previousPage, this.state.page);
       AssetDao.getClips(
         this.props.sid,
         this.props.type,
@@ -84,7 +83,6 @@ export class Clips extends React.Component {
   }
 
   handleChangePage = (event, page) => {
-    console.log(this.state.type, "handleChangePage", this.state.page, page);
     this.setState({ page });
   };
 
