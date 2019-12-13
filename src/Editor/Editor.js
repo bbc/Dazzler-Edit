@@ -160,11 +160,17 @@ class Editor extends React.Component {
     const startTime = moment(window.scheduled_time.start);
     let versionPid = null;
     let versionCrid = null;
+    let pid = null;
+    let crid = null;
     for (let i = 0; i < window.window_of.length; i++) {
       switch (window.window_of[i].result_type) {
         case "version":
           versionPid = window.window_of[i].pid;
           versionCrid = window.window_of[i].crid;
+          break;
+        case "episode":
+          pid = window.window_of[i].pid;
+          crid = window.window_of[i].crid;
           break;
         default: // DO Nothing
       }
@@ -180,7 +186,9 @@ class Editor extends React.Component {
       duration: window.duration.toISOString(),
       startTime: startTime,
       live: true,
-      insertionType: "",
+      insertionType: "live",
+      pid: pid,
+      crid: crid,
       versionPid: versionPid,
       versionCrid: versionCrid
     });
@@ -196,7 +204,7 @@ class Editor extends React.Component {
       insertionType: "",
       versionCrid: version.crid,
       pid: item.pid,
-      vpid: version.pid
+      versionPid: version.pid
     };
     if(this.state.mode === 'schedule') {
       this.pasteIntoSchedule(newItem);

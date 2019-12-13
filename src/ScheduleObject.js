@@ -9,25 +9,22 @@ class ScheduleObject {
         if (items === undefined) {
             this.items = [
                 {
-                    title: "Dummy start",
-                    duration: "PT0S",
                     startTime: start,
-                    live: false,
-                    insertionType: "sentinel"
+                    duration: "PT0S",
+                    insertionType: "sentinel",
+                    title: "Dummy Start"
                 },
                 {
-                    title: "gap",
                     startTime: moment(start),
                     duration: "P1D",
-                    live: false,
-                    insertionType: "gap"
+                    insertionType: "gap",
+                    title: "gap"
                 },
                 {
-                    title: "Dummy end",
-                    duration: "PT0S",
                     startTime: moment(start).add(1, "days"),
-                    live: false,
-                    insertionType: "sentinel"
+                    duration: "PT0S",
+                    insertionType: "sentinel",
+                    title: "Dummy End"
                 }
             ];
         } else {
@@ -35,8 +32,8 @@ class ScheduleObject {
         }
     }
 
-    addFloating(index, itemsToAdd) {
-        if (!Array.isArray(itemsToAdd)) itemsToAdd = [itemsToAdd];
+    addFloating(index, assetsToAdd) {
+        if (!Array.isArray(assetsToAdd)) assetsToAdd = [assetsToAdd];
         //console.log("addFloating", index, itemsToAdd, this.items);
         // keep the schedule unchanged up to the insertion point
         if (this.items[index].insertionType === "gap") {
@@ -56,7 +53,7 @@ class ScheduleObject {
                 indexOfFixed = i;
                 break;
             }
-            if (this.items[i].live) {
+            if (this.items[i].insertionType === "live") {
                 indexOfFixed = i;
                 break;
             }
@@ -83,15 +80,24 @@ class ScheduleObject {
         // see what we have room for
         let numItemsToAdd = 0;
         let itemsToAddDuration = moment.duration();
-        for (let i = 0; i < itemsToAdd.length; i++) {
-            itemsToAddDuration.add(moment.duration(itemsToAdd[i].duration));
+        for (let i = 0; i < assetsToAdd.length; i++) {
+            itemsToAddDuration.add(moment.duration(assetsToAdd[i].duration));
             if (itemsToAddDuration.asMilliseconds() > availableDuration.asMilliseconds()) {
                 break;
             }
             numItemsToAdd++;
         }
         // splice in new items
-        this.items.splice(indexOfInsert, 0, ...itemsToAdd.slice(0, numItemsToAdd));
+        const newItems = [];
+        for (let i = 0; i < numItemsToAdd; i++) {
+            newItems.push({
+                duration: assetsToAdd[i].duration,
+                insertionType: assetsToAdd[i].insertionType,
+                title: assetsToAdd[i].title,
+                asset: assetsToAdd[i]
+            });
+        }
+        this.items.splice(indexOfInsert, 0, ...newItems);
         indexOfFixed += numItemsToAdd;
         // set the start times of the added and floating items
         let s = moment(startOfNew);
@@ -114,7 +120,6 @@ class ScheduleObject {
             duration: moment
                 .duration(this.items[index].startTime.diff(gapStart))
                 .toISOString(),
-            live: false,
             insertionType: "gap"
         });
     }
@@ -145,7 +150,13 @@ class ScheduleObject {
     addLive(item) {
         const startTime = moment(item.startTime);
         const endTime = moment(startTime).add(moment.duration(item.duration));
-        this.items.push(item);
+        this.items.push({
+            title: item.title,
+            startTime: item.startTime,
+            duration: item.duration,
+            insertionType: "live",
+            asset: item
+        });
         this.sort();
         let index = 0;
         for (let i = 0; i < this.items.length; i++) {
@@ -168,7 +179,6 @@ class ScheduleObject {
                 title: "gap",
                 startTime: endTime,
                 duration: moment.duration(next.diff(endTime)).toISOString(),
-                live: false,
                 insertionType: "gap"
             });
         } else {
@@ -177,7 +187,7 @@ class ScheduleObject {
     }
 
     addFixed(items) {
-        this.items = this.items.concat(items);
+        this.items = this.items.concat([...items]);
         this.sort();
     }
 
@@ -199,7 +209,6 @@ class ScheduleObject {
                     title: "gap",
                     startTime: end,
                     duration: moment.duration(next.diff(end)).toISOString(),
-                    live: false,
                     insertionType: "gap"
                 });
             }
@@ -232,7 +241,6 @@ class ScheduleObject {
                         title: "gap",
                         startTime: moment(schedule[i].startTime).subtract(duration),
                         duration: duration.toISOString(),
-                        live: false,
                         insertionType: "gap"
                     });
                     break;

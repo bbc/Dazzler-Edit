@@ -44,15 +44,21 @@ class ScheduleDao {
         response.data.item.forEach((item, index) => {
           const broadcast = item.broadcast[0];
           const published_time = broadcast.published_time[0].$;
-          const obj = {
+          const live = broadcast.live[0].$.value==="true";
+          const asset = {
             title: ScheduleDao.getTitle(item, index),
-            startTime: moment(published_time.start),
             duration: moment.duration(published_time.duration).toISOString(),
-            live: broadcast.live[0].$.value==="true",
+            versionPid: item.version[0].pid,
             versionCrid: item.version[0].crid[0].$.uri,
-            insertionType: '' // blank when loaded from PIPS
+            insertionType: live?"live":""
           };
-          schedule.push(obj);
+          schedule.push({
+            title: asset.title,
+            startTime: moment(published_time.start),
+            duration: asset.duration,
+            insertionType: asset.insertionType,
+            asset: asset
+          });
         });
       }
       const sched = new ScheduleObject(sid, date);
