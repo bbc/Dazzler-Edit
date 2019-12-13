@@ -299,15 +299,7 @@ class Editor extends React.Component {
   }
 
   clearSchedule() {
-    this.setState({
-      schedule: new ScheduleObject(
-        this.state.schedule.sid, 
-        this.state.schedule.date
-        ), 
-      scheduleInsertionPoint: 1,
-      scheduleModified: true,
-      timeToFill: moment.duration('PT1D')
-    });
+    console.log('TODO clear schedule');
   }
 
   testLoop() {
