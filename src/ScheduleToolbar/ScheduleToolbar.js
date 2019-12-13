@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { Typography } from "@material-ui/core";
 
 /*
@@ -43,5 +44,12 @@ class ScheduleToolbar extends React.Component {
         );
     }
 }
+ScheduleToolbar.propTypes = {
+  saveEnabled: PropTypes.bool.isRequired,
+  resetEnabled: PropTypes.bool.isRequired,
+  onSave: PropTypes.func.isRequired,
+  onClear: PropTypes.func.isRequired,
+  onReload: PropTypes.func.isRequired
+};
 export default ScheduleToolbar;
     

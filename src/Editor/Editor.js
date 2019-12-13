@@ -115,6 +115,8 @@ class Editor extends React.Component {
     this.handleDateChange = this.handleDateChange.bind(this);
     this.handleChangeMode = this.handleChangeMode.bind(this);
     this.savePlaylist = this.savePlaylist.bind(this);
+    this.clearSchedule = this.clearSchedule.bind(this);
+    this.reloadSchedule = this.reloadSchedule.bind(this);
     this.testLoop = this.testLoop.bind(this);
     
     this.state = {
@@ -289,6 +291,22 @@ class Editor extends React.Component {
       scheduleInsertionPoint: scheduleInsertionPoint,
       scheduleModified: true,
       timeToFill: ttf
+    });
+  }
+
+  reloadSchedule() {
+    console.log('TODO reload schedule from PIPS');
+  }
+
+  clearSchedule() {
+    this.setState({
+      schedule: new ScheduleObject(
+        this.state.schedule.sid, 
+        this.state.schedule.date
+        ), 
+      scheduleInsertionPoint: 1,
+      scheduleModified: true,
+      timeToFill: moment.duration('PT1D')
     });
   }
 
@@ -516,7 +534,9 @@ class Editor extends React.Component {
           <ScheduleToolbar
             saveEnabled={this.state.scheduleModified && this.state.user.auth}
             resetEnabled={this.state.scheduleModified}
-            onSaveClicked={this.savePlaylist}
+            onSave={this.savePlaylist}
+            onClear={this.clearSchedule}
+            onReload={this.reloadSchedule}
           />
           </Box>
         </Box>
