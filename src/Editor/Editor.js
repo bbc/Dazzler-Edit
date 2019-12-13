@@ -233,9 +233,13 @@ class Editor extends React.Component {
   
   updateSchedule(scheduleObject, scheduleInsertionPoint, modified) {
     const ttf = this.calculateTimeToFill(scheduleObject.items, scheduleInsertionPoint);
+    let sip = scheduleInsertionPoint;
+    if(sip === scheduleObject.items.length-1) {
+      sip--; // don't point at the end sentinel
+    }
     this.setState({
       schedule: scheduleObject, 
-      scheduleInsertionPoint: scheduleInsertionPoint,
+      scheduleInsertionPoint: sip,
       scheduleModified: modified,
       timeToFill: ttf
     });
