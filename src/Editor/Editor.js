@@ -31,6 +31,7 @@ import ScheduleObject from "../ScheduleObject";
 import Loop from "../Loop/Loop";
 import PlatformDao from "../PlatformDao/PlatformDao";
 import {saveSchedule} from "../ScheduleDao/ScheduleDao";
+import {cloneDeep} from 'lodash-es';
 
 const drawerWidth = 240;
 
@@ -265,9 +266,9 @@ class Editor extends React.Component {
   pasteIntoSchedule(items, copies) {
     if (!Array.isArray(items)) items = [items];
     if (copies === undefined) copies = 1;
-    let n = [...items];
+    let n = cloneDeep(items);
     while (copies > 1) {
-      n = n.concat(items);
+      n = n.concat(cloneDeep(items));
       copies--;
     }
     console.log( "insert %d items at index %d", n.length, this.state.scheduleInsertionPoint);
@@ -286,6 +287,7 @@ class Editor extends React.Component {
     this.setState({
       schedule: scheduleObject, 
       scheduleInsertionPoint: scheduleInsertionPoint,
+      scheduleModified: true,
       timeToFill: ttf
     });
   }
@@ -337,8 +339,7 @@ class Editor extends React.Component {
   render() {
     const { classes } = this.props;
     const { open } = this.state;
-    console.log('Editor.render', this.state.schedule.sid);
-    console.log(services[this.state.schedule.sid]);
+    console.log('Editor.render', this.state.schedule.items);
     return (
       <div className={classes.root}>
         <AppBar
@@ -514,6 +515,7 @@ class Editor extends React.Component {
           />
           <ScheduleToolbar
             saveEnabled={this.state.scheduleModified && this.state.user.auth}
+            resetEnabled={this.state.scheduleModified}
             onSaveClicked={this.savePlaylist}
           />
           </Box>
