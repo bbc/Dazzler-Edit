@@ -33,7 +33,7 @@ class Loop extends React.Component {
   }
 
   render() {
-    const active = (this.props.data.length>0)?"ui button active":"ui button"
+    const active = (this.props.data.length>0)?"ui primary button active":"ui primary button"
     return (
       <div style={{ width: '100%' }}>
       <Box>
@@ -81,7 +81,7 @@ class Loop extends React.Component {
   getCellActions = (column, row) => {
     const cellActions = [
       {
-        icon: <i className="trash icon" />,
+        icon: <i className="trash alternate outline icon"></i>,
         callback: () => {this.props.onDelete(row.index);}
       }
     ];

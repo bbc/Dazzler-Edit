@@ -36,7 +36,7 @@ class Date extends React.Component {
         </button> */}
 
         <button
-          className="ui icon button"
+          className="ui primary icon button"
           onClick={() => {
             this.props.previousDay(this.handleOtherClick(1));
           }}
@@ -45,7 +45,7 @@ class Date extends React.Component {
         </button>
         {this.props.scheduleDate}
         <button
-          className="ui icon button"
+          className="ui primary icon button"
           onClick={() => {
             this.props.nextDay(this.handleClick(1));
           }}

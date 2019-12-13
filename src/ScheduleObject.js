@@ -5,18 +5,19 @@ class ScheduleObject {
         console.log('new ScheduleObject', sid, date);
         this.date = date;
         this.sid = sid;
+        const start = moment(date+'T00:00:00Z');
         if (items === undefined) {
             this.items = [
                 {
                     title: "Dummy start",
                     duration: "PT0S",
-                    startTime: moment(date),
+                    startTime: start,
                     live: false,
                     insertionType: "sentinel"
                 },
                 {
                     title: "gap",
-                    startTime: moment(date),
+                    startTime: moment(start),
                     duration: "P1D",
                     live: false,
                     insertionType: "gap"
@@ -24,7 +25,7 @@ class ScheduleObject {
                 {
                     title: "Dummy end",
                     duration: "PT0S",
-                    startTime: moment(date).add(1, "days"),
+                    startTime: moment(start).add(1, "days"),
                     live: false,
                     insertionType: "sentinel"
                 }
@@ -35,6 +36,7 @@ class ScheduleObject {
     }
 
     addFloating(index, itemsToAdd) {
+        if (!Array.isArray(itemsToAdd)) itemsToAdd = [itemsToAdd];
         //console.log("addFloating", index, itemsToAdd, this.items);
         // keep the schedule unchanged up to the insertion point
         if (this.items[index].insertionType === "gap") {
@@ -95,6 +97,7 @@ class ScheduleObject {
         let s = moment(startOfNew);
         for (let i = indexOfInsert; i < indexOfFixed; i++) {
             this.items[i].startTime = moment(s);
+            console.log(i, this.items[i].title, this.items[i].startTime.utc().format());
             s.add(moment.duration(this.items[i].duration));
         }
         if (this.items[indexOfFixed].insertionType === 'sentinel') {
