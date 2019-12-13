@@ -2,6 +2,7 @@ import React, { Fragment } from "react";
 import moment from "moment";
 import 'moment-duration-format';
 import Arrow from "@material-ui/icons/ArrowRight";
+import { Typography } from "@material-ui/core";
 
 /*
 <ScheduleItem
@@ -37,7 +38,18 @@ class ScheduleItem extends React.Component {
           <td onClick={() => this.props.onClick(this.props.index)}>
             {this.props.startTime}
           </td>
-          <td>{this.props.title}</td>
+          <td>
+            {this.props.title}
+            {(this.props.insertionType === 'overlap')
+            ?
+            <Typography fontStyle="italic">
+              (asset duration is &nbsp;
+              {moment.duration(this.props.asset_duration).format('HH:mm:ss')}
+              )
+            </Typography>
+            :<Typography></Typography>
+            }
+          </td>
           <td onClick={() => this.props.onClick(this.props.index)}>
             {moment.duration(this.props.duration).format('HH:mm:ss')}
           </td>

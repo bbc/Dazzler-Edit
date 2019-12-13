@@ -62,6 +62,9 @@
 .loopEnd {
   background-color: #8095b5;
 }
+.overlap {
+  background-color: pink;
+}
 
 .futureEpisode {
   background-color: pink;

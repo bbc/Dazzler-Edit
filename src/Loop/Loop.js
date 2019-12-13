@@ -3,6 +3,7 @@ import Box from '@material-ui/core/Box';
 import ReactDataGrid from "react-data-grid";
 import moment from "moment";
 import 'moment-duration-format';
+import {cloneDeep} from 'lodash-es';
 import { Typography } from "@material-ui/core";
 
 const durationFormatter = ({ value }) => {
@@ -27,9 +28,47 @@ class Loop extends React.Component {
   }
 
   pasteToFill() {
-    const count = this.props.timeToFill / this.props.duration;
-    console.log('pasteToFill', count, Math.ceil(count));
-    this.props.onPaste(this.props.data, Math.ceil(count));
+    if(this.props.length === 0) return;
+    const repetitions = Math.floor(this.props.timeToFill / this.props.duration);
+    console.log('pasteToFill', repetitions);
+    let n = cloneDeep(this.props.data);
+    switch(n.length) {
+      case 1:
+        n[0].insertionType = '';
+        break;
+      case 2:
+        n[0].insertionType = 'loopStart';
+        n[n.length-1].insertionType = 'loopEnd';
+        break;
+      default:
+        n[0].insertionType = 'loopStart';
+        n[n.length-1].insertionType = 'loopEnd';
+        for(let i=1; i<n.length-1; i++)
+          n[i].insertionType = 'midLoop';
+    }
+    let m = n;
+    let count = repetitions;
+    while (count > 1) {
+      m = m.concat(cloneDeep(n));
+      count--;
+    }
+    // now we want to eliminate the gap. Overlap is OK
+    const loopDuration = this.props.duration.asMilliseconds();
+    const ttf = this.props.timeToFill.asMilliseconds();
+    let remaining = ttf - repetitions*loopDuration;
+    console.log("loop %d ttf %d loop*n %d", loopDuration, ttf, loopDuration*repetitions)
+    console.log('remaining milliseconds', remaining);
+    let i = 0;
+    while(remaining > 0) {
+      m.push(n[i]);
+      const d = moment.duration(n[i].duration).asMilliseconds();
+      console.log('loop', remaining, d);
+      remaining -= d;
+      i++;
+      if(i>=n.length) i=0;
+    }
+    console.log('remaining milliseconds after', remaining);
+    this.props.onPaste(m);
   }
 
   render() {

@@ -81,6 +81,7 @@ class ScheduleView extends React.Component {
             startTime={moment(item.startTime).format("HH:mm:ss")}
             title={item.title}
             duration={item.duration}
+            asset_duration={item.asset?item.asset.duration:''}
             onClick={this.handleClick}
             onDelete={this.handleDelete}
           />

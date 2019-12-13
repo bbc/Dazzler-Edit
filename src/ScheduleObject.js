@@ -97,7 +97,7 @@ class ScheduleObject {
                 asset: assetsToAdd[i]
             });
         }
-        this.items.splice(indexOfInsert, 0, ...newItems);
+        this.items.splice(indexOfInsert, 0, ...newItems);        
         indexOfFixed += numItemsToAdd;
         // set the start times of the added and floating items
         let s = moment(startOfNew);
@@ -109,19 +109,39 @@ class ScheduleObject {
         if (this.items[indexOfFixed].insertionType === 'sentinel') {
             this.fixEndTime();
         }
-        this.insertGap(indexOfFixed);
+        if(assetsToAdd.length > numItemsToAdd) {
+            this.insertOverlap(indexOfFixed, assetsToAdd[numItemsToAdd]);
+        }
+        else {
+            this.insertGap(indexOfFixed);
+        }
     }
 
     insertGap(index) {
         const gapStart = moment(this.items[index - 1].startTime).add(moment.duration(this.items[index - 1].duration));
-        this.items.splice(index, 0, {
-            title: "gap",
-            startTime: gapStart,
-            duration: moment
-                .duration(this.items[index].startTime.diff(gapStart))
-                .toISOString(),
-            insertionType: "gap"
-        });
+        const duration = moment.duration(this.items[index].startTime.diff(gapStart));
+        if(duration.asMilliseconds()>=0) {
+            this.items.splice(index, 0, {
+                title: "gap",
+                startTime: gapStart,
+                duration: duration.toISOString(),
+                insertionType: "gap"
+            });
+        }
+    }
+
+    insertOverlap(index, asset) {
+        const gapStart = moment(this.items[index - 1].startTime).add(moment.duration(this.items[index - 1].duration));
+        const duration = moment.duration(this.items[index].startTime.diff(gapStart));
+        if(duration.asMilliseconds()>=0) {
+            this.items.splice(index, 0, {
+                title: asset.title, 
+                startTime: gapStart,
+                duration: duration.toISOString(),
+                insertionType: "overlap",
+                asset: asset
+            });
+        }
     }
 
     fixEndTime() {

@@ -31,7 +31,6 @@ import ScheduleObject from "../ScheduleObject";
 import Loop from "../Loop/Loop";
 import PlatformDao from "../PlatformDao/PlatformDao";
 import {saveSchedule} from "../ScheduleDao/ScheduleDao";
-import {cloneDeep} from 'lodash-es';
 
 const drawerWidth = 240;
 
@@ -273,25 +272,17 @@ class Editor extends React.Component {
     this.updateSchedule(scheduleObject, 1);
   };
 
-  pasteIntoSchedule(items, copies) {
-    if (!Array.isArray(items)) items = [items];
-    if (copies === undefined) copies = 1;
-    let n = cloneDeep(items);
-    while (copies > 1) {
-      n = n.concat(cloneDeep(items));
-      copies--;
-    }
-    console.log( "insert %d items at index %d", n.length, this.state.scheduleInsertionPoint);
+  pasteIntoSchedule(items) {
     let index = this.state.scheduleInsertionPoint;
     let scheduleObject = new ScheduleObject(
       this.state.schedule.sid,
       this.state.schedule.date,
       this.state.schedule.items
     );
-    scheduleObject.addFloating(index, n);
+    scheduleObject.addFloating(index, items);
     this.updateSchedule(scheduleObject, index+1);
   }
-
+  
   updateSchedule(scheduleObject, scheduleInsertionPoint) {
     const ttf = this.calculateTimeToFill(scheduleObject.items, scheduleInsertionPoint);
     this.setState({
