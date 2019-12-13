@@ -239,9 +239,29 @@ class ScheduleObject {
     // delete the item. subtract its duration from following items
     // until we get to a fixed event
     // add a gap before the fixed event
+    // if deleting a live item, also look at the preceding item
+    //    if a gap, delete it too
+    //    if an overlap, turn it into a normal item
     deleteItemClosingGap(index) {
         let schedule = [...this.items];
-        const duration = moment.duration(schedule[index].duration);
+        let duration = moment.duration(schedule[index].duration);
+        if(schedule[index].insertionType === 'live') {
+            switch(schedule[index-1].insertionType) {
+                case "gap":
+                    duration.add(moment.duration(schedule[index-1].duration));
+                    schedule.splice(index-1, 1);
+                    index--;
+                    break;
+                case "overlap":
+                    schedule[index-1].insertionType = ""
+                    duration.add(moment.duration(schedule[index-1].duration));
+                    schedule[index-1].duration = schedule[index-1].asset.duration;
+                    duration.subtract(moment.duration(schedule[index-1].duration));
+                    break;
+                default:
+                    // do nothing
+            }
+        }
         schedule.splice(index, 1);
         for (let i = index; i < schedule.length; i++) {
             let done = false;
