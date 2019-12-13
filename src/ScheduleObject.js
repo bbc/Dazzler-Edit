@@ -2,6 +2,7 @@ import moment from "moment";
 
 class ScheduleObject {
     constructor(sid, date, items) {
+        console.log('new ScheduleObject', sid, date);
         this.date = date;
         this.sid = sid;
         if (items === undefined) {

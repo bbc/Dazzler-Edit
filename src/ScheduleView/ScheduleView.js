@@ -92,9 +92,9 @@ class ScheduleView extends React.Component {
 }
 
 ScheduleView.propTypes = {
-  data: PropTypes.object.isRequired,
-  onDelete: PropTypes.object.isRequired,
-  onRowSelected: PropTypes.object.isRequired
+  data: PropTypes.array.isRequired,
+  onDelete: PropTypes.func.isRequired,
+  onRowSelected: PropTypes.func.isRequired
 };
 
 export default ScheduleView;

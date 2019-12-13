@@ -97,10 +97,10 @@ class ScheduleDao {
         data: tva
       })
         .then(response => {
-          cb();
+          cb(response);
         })
         .catch(error => {
-          err();
+          err(error);
         });
     } catch (error) {
       err();

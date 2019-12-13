@@ -18,7 +18,6 @@ import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import IconButton from "@material-ui/core/IconButton";
 import MenuIcon from "@material-ui/icons/Menu";
-import axios from "axios";
 import moment from "moment";
 import 'moment-duration-format';
 import Episode from "../Episode/Episode";
@@ -30,14 +29,10 @@ import ScheduleToolbar from "../ScheduleToolbar/ScheduleToolbar";
 import ScheduleView from "../ScheduleView/ScheduleView";
 import ScheduleObject from "../ScheduleObject";
 import Loop from "../Loop/Loop";
+import PlatformDao from "../PlatformDao/PlatformDao";
+import {saveSchedule} from "../ScheduleDao/ScheduleDao";
 
 const drawerWidth = 240;
-var URLPrefix = "";
-//checking if running locally
-
-if (process.env.NODE_ENV === "development") {
-  URLPrefix = "http://localhost:8080";
-}
 
 const styles = theme => ({
   root: {
@@ -99,6 +94,10 @@ const styles = theme => ({
   }
 });
 
+const services = { 
+  "bbc_marathi_tv" : { sid: "bbc_marathi_tv", name: "Marathi", serviceIDRef: "TVMAR01" }
+};
+
 class Editor extends React.Component {
 
   constructor(props) {
@@ -114,12 +113,12 @@ class Editor extends React.Component {
     this.handleDrawerClose = this.handleDrawerClose.bind(this);
     this.handleDateChange = this.handleDateChange.bind(this);
     this.handleChangeMode = this.handleChangeMode.bind(this);
+    this.savePlaylist = this.savePlaylist.bind(this);
     this.testLoop = this.testLoop.bind(this);
-
+    
     this.state = {
+      schedule: new ScheduleObject('bbc_marathi_tv', moment().format('YYYY-MM-DD')),
       mode: "loop",
-      schedule: [],
-      scheduleDate: moment().utc().format("YYYY-MM-DD"),
       scheduleInsertionPoint: 1,
       scheduleModified: false,
       timeToFill: moment.duration(),
@@ -129,21 +128,14 @@ class Editor extends React.Component {
       panelShow: null,
       loop: [],
       loopDuration: moment.duration(),
-      user: { name: "anonymous", auth: true },
-      service: { sid: "bbc_marathi_tv", name: "Marathi", serviceIDRef: "TVMAR01" }
+      user: { name: "anonymous", auth: true }
     };
   }
 
   componentDidMount() {
-    // get user
-    axios
-      .get(`${URLPrefix}/api/v1/user`)
-      .then(response => {
-        this.setState({user: response.data});
-      })
-      .catch(e => {
-        console.log(e);
-      });
+    PlatformDao.getUser((user) => {
+      this.setState({user: user});
+    });
   }
 
   componentDidUpdate(prevProps) {
@@ -163,30 +155,33 @@ class Editor extends React.Component {
 
   handleAddLive(window) {
     const startTime = moment(window.scheduled_time.start);
-    const newItem = {
-      captureChannel: window.service.sid, // TODO make use of this
-      title: "Live broadcast segment",
-      duration: window.duration.toISOString(),
-      startTime: startTime,
-      live: true,
-      insertionType: ""
-    };
+    let versionPid = null;
+    let versionCrid = null;
     for (let i = 0; i < window.window_of.length; i++) {
       switch (window.window_of[i].result_type) {
         case "version":
-          newItem.versionPid = window.window_of[i].pid;
-          newItem.versionCrid = window.window_of[i].crid;
+          versionPid = window.window_of[i].pid;
+          versionCrid = window.window_of[i].crid;
           break;
         default: // DO Nothing
       }
     }
     let scheduleObject = new ScheduleObject(
-      this.state.service.sid,
-      this.state.scheduleDate,
-      this.state.schedule
+      this.state.schedule.sid,
+      this.state.schedule.date,
+      this.state.schedule.items
     );
-    scheduleObject.addLive(newItem);
-    this.setState({schedule: scheduleObject.items});
+    scheduleObject.addLive({
+      captureChannel: window.service.sid, // TODO make use of this
+      title: "Live broadcast segment",
+      duration: window.duration.toISOString(),
+      startTime: startTime,
+      live: true,
+      insertionType: "",
+      versionPid: versionPid,
+      versionCrid: versionCrid
+    });
+    this.setState({schedule: scheduleObject});
   }
 
   handleAddEpisode(item) {
@@ -237,15 +232,15 @@ class Editor extends React.Component {
   }
 
   handleScheduleRowSelect = index => {
-    const ttf = this.calculateTimeToFill(this.state.schedule, index);
+    const ttf = this.calculateTimeToFill(this.state.schedule.items, index);
     this.setState({ scheduleInsertionPoint: index, timeToFill: ttf });
   };
 
   handleScheduleDelete(index) {
     let scheduleObject = new ScheduleObject(
-      this.state.sid,
-      this.state.scheduleDate,
-      this.state.schedule
+      this.state.schedule.sid,
+      this.state.schedule.date,
+      this.state.schedule.items
     );
     scheduleObject.deleteItemClosingGap(index);
     this.updateSchedule(scheduleObject, index);
@@ -253,14 +248,14 @@ class Editor extends React.Component {
   
   handleDateChange = (date, schedule) => {
     const now = moment().startOf('hour');
-    const endOfSchedule = moment(this.state.scheduleDate).add(1, 'day');
+    const endOfSchedule = moment(this.state.schedule.date).add(1, 'day');
     let upcomingAvailability = moment.duration(endOfSchedule.diff(now));
     if(upcomingAvailability.valueOf()<0) {
       upcomingAvailability = moment.duration('P1D');
     }
     this.setState({upcomingAvailability: upcomingAvailability});
     let scheduleObject = new ScheduleObject(
-      this.state.service.sid,
+      this.state.schedule.sid,
       date,
       schedule
     );
@@ -278,9 +273,9 @@ class Editor extends React.Component {
     console.log( "insert %d items at index %d", n.length, this.state.scheduleInsertionPoint);
     let index = this.state.scheduleInsertionPoint;
     let scheduleObject = new ScheduleObject(
-      this.state.service.sid,
-      this.state.scheduleDate,
-      this.state.schedule
+      this.state.schedule.sid,
+      this.state.schedule.date,
+      this.state.schedule.items
     );
     scheduleObject.addFloating(index, n);
     this.updateSchedule(scheduleObject, index+1);
@@ -289,8 +284,7 @@ class Editor extends React.Component {
   updateSchedule(scheduleObject, scheduleInsertionPoint) {
     const ttf = this.calculateTimeToFill(scheduleObject.items, scheduleInsertionPoint);
     this.setState({
-      scheduleDate: scheduleObject.date,
-      schedule: scheduleObject.items, 
+      schedule: scheduleObject, 
       scheduleInsertionPoint: scheduleInsertionPoint,
       timeToFill: ttf
     });
@@ -325,11 +319,26 @@ class Editor extends React.Component {
       loop:loop,
       loopDuration: this.state.loopDuration.subtract(moment.duration(r.duration))});
   }
+
+  savePlaylist() {
+    saveSchedule(
+      services[this.state.schedule.sid].serviceIDRef,
+      this.state.schedule.items,
+      function() {
+        this.setState({ scheduleModified: false });
+      },
+      function(e) {
+        console.log(e);
+      }
+    );
+
+  }
  
   render() {
     const { classes } = this.props;
     const { open } = this.state;
-    console.log('Editor.render');
+    console.log('Editor.render', this.state.schedule.sid);
+    console.log(services[this.state.schedule.sid]);
     return (
       <div className={classes.root}>
         <AppBar
@@ -348,7 +357,7 @@ class Editor extends React.Component {
               <MenuIcon />
             </IconButton>
             <Typography variant="h6" color="inherit" noWrap>
-              <center>{this.state.service.name}</center>
+              <center>{services[this.state.schedule.sid].name}</center>
             </Typography>
             <Typography className={classes.appBarName} variant="h6" color="inherit" noWrap>
               <center>{this.state.user.name}</center>
@@ -390,8 +399,8 @@ class Editor extends React.Component {
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
         <Live
-              date={this.state.scheduleDate}
-	            sid={this.state.service.sid}
+              date={this.state.schedule.date}
+	            sid={this.state.schedule.sid}
 	            handleClick={this.handleAddLive}
 	          />
         </ExpansionPanelDetails>
@@ -407,7 +416,7 @@ class Editor extends React.Component {
         <ExpansionPanelDetails>
         <Episode
           availability="available"
-          sid={this.state.service.sid}
+          sid={this.state.schedule.sid}
           handleClick={this.handleAddEpisode}
         />
         </ExpansionPanelDetails>
@@ -423,7 +432,7 @@ class Editor extends React.Component {
         <ExpansionPanelDetails>
         <Episode
           availability={this.state.upcomingAvailability.toISOString()}
-          sid={this.state.service.sid}
+          sid={this.state.schedule.sid}
           handleClick={this.handleAddEpisode}
         />
         </ExpansionPanelDetails>
@@ -439,7 +448,7 @@ class Editor extends React.Component {
         <ExpansionPanelDetails>
           <Clips
               type="jupiter"
-              sid={this.state.service.sid}
+              sid={this.state.schedule.sid}
               handleClick={this.handleAddClip}
            />
         </ExpansionPanelDetails>
@@ -455,7 +464,7 @@ class Editor extends React.Component {
         <ExpansionPanelDetails>
           <Clips
               type="web"
-              sid={this.state.service.sid}
+              sid={this.state.schedule.sid}
               handleClick={this.handleAddClip}
           />
         </ExpansionPanelDetails>
@@ -470,7 +479,7 @@ class Editor extends React.Component {
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
           <Specials
-              sid={this.state.service.sid}
+              sid={this.state.schedule.sid}
               handleClick={this.handleAddClip}
           />
         </ExpansionPanelDetails>
@@ -492,14 +501,14 @@ class Editor extends React.Component {
           <Typography variant="h4" align="center">Schedule</Typography>
           <SchedulePicker
             enabled={!this.state.scheduleModified}
-            sid={this.state.service.sid}
-            scheduleDate={this.state.scheduleDate}
+            sid={this.state.schedule.sid}
+            scheduleDate={this.state.schedule.date}
             onDateChange={this.handleDateChange}
           />
           <ScheduleView
             onRowSelected={this.handleScheduleRowSelect}
             onDelete={this.handleScheduleDelete}
-            data={this.state.schedule}
+            data={this.state.schedule.items}
             row={this.state.scheduleInsertionPoint}
             lastUpdated=""
           />
