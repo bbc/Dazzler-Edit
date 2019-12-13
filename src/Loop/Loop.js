@@ -28,7 +28,7 @@ class Loop extends React.Component {
   }
 
   pasteToFill() {
-    if(this.props.length === 0) return;
+    if(this.props.data.length === 0) return;
     const repetitions = Math.floor(this.props.timeToFill / this.props.duration);
     console.log('pasteToFill', repetitions);
     let n = cloneDeep(this.props.data);
