@@ -24,9 +24,7 @@
     //expect new item to have the insertion type of midloop
     expect(myScheduleObject.items[1].insertionType).toBe("midLoop");
     //expect new item to have a start time of 00:05:00
-    expect(moment(myScheduleObject.items[1].startTime).toISOString()).toBe(
-      moment().format("YYYY-MM-DD") + "T00:00:00.000Z"
-    );
+    expect(moment(myScheduleObject.items[1].startTime).toISOString()).toBe("2019-12-08T00:00:00.000Z");
     //expect the two sentinels to be at the beginning and end
     expect(myScheduleObject.items[0].insertionType).toBe("sentinel");
     expect(
@@ -43,42 +41,36 @@
           title: "Dummy start",
           duration: "PT0S",
           startTime: moment("2019-12-08T00:00:00Z"),
-          live: false,
           insertionType: "sentinel"
         },
         {
           title: "gap",
           startTime: moment("2019-12-08T00:00:00Z"),
           duration: "PT20H32M15S",
-          live: false,
           insertionType: "gap"
         },
         {
           title: "BBC विश्व",
           startTime: moment("2019-12-08T20:32:15Z"),
           duration: "PT20M",
-          live: true,
-          insertionType: ""
+          insertionType: "live"
         },
         {
           title: "प्राचीन बॉक्सिंग जोरात",
           startTime: moment("2019-12-08T20:52:15Z"),
           duration: "PT2M11S",
-          live: false,
           insertionType: ""
         },
         {
           title: "gap",
           startTime: moment("2019-12-08T20:54:26Z"),
           duration: "PT3H5M34S",
-          live: false,
           insertionType: "gap"
         },
         {
           title: "Dummy end",
           duration: "PT0S",
           startTime: moment("2019-12-09T00:00:00Z"),
-          live: false,
           insertionType: "sentinel"
         }
       ]
@@ -97,49 +89,42 @@
         title: "Dummy start",
         duration: "PT0S",
         //startTime: moment("2019-12-08T00:00:00Z"),
-        live: false,
         insertionType: "sentinel"
       },
       {
         title: "test",
         //startTime: moment("2019-12-08T00:00:00Z"),
         duration: "PT5M",
-        live: false,
         insertionType: "midLoop"
       },
       {
         title: "gap",
         //startTime: moment("2019-12-08T00:05:00Z"),
         duration: "PT20H27M15S",
-        live: false,
         insertionType: "gap"
       },
       {
         title: "BBC विश्व",
         //startTime: moment("2019-12-08T20:32:15Z"),
         duration: "PT20M",
-        live: true,
-        insertionType: ""
+        insertionType: "live"
       },
       {
         title: "प्राचीन बॉक्सिंग जोरात",
         //startTime: moment("2019-12-08T20:52:15Z"),
         duration: "PT2M11S",
-        live: false,
         insertionType: ""
       },
       {
         title: "gap",
         //startTime: moment("2019-12-08T20:54:26Z"),
         duration: "PT3H5M34S",
-        live: false,
         insertionType: "gap"
       },
       {
         title: "Dummy end",
         duration: "PT0S",
         //startTime: moment("2019-12-09T00:00:00Z"),
-        live: false,
         insertionType: "sentinel"
       }
     ];
@@ -149,7 +134,7 @@
     expect(myScheduleObject.items[0].insertionType).toBe('sentinel');
     expect(myScheduleObject.items[1].insertionType).toBe('midLoop');
     expect(myScheduleObject.items[2].insertionType).toBe('gap');
-    expect(myScheduleObject.items[3].insertionType).toBe('');
+    expect(myScheduleObject.items[3].insertionType).toBe('live');
     expect(myScheduleObject.items[4].insertionType).toBe('');
     expect(myScheduleObject.items[5].insertionType).toBe('gap');
     expect(myScheduleObject.items[6].insertionType).toBe('sentinel');
@@ -162,19 +147,16 @@
     myScheduleObject.addFloating(1, [
       { 
         title: "test",
-        live: false,
         duration: "PT5M", 
         insertionType: "loopStart" 
       },
       { 
         title: "test",
-        live: false,
         duration: "PT5M", 
         insertionType: "midLoop" 
       },
       { 
         title: "test",
-        live: false,
         duration: "PT5M", 
         insertionType: "loopEnd" 
       }
@@ -182,45 +164,39 @@
 
     const expected = [
       {
-        title: "Dummy start",
+        title: "Dummy Start",
         duration: "PT0S",
         //startTime: moment("2019-12-08T00:00:00Z"),
-        live: false,
         insertionType: "sentinel"
       },
       {
         title: "test",
         //startTime: moment("2019-12-08T00:00:00Z"),
         duration: "PT5M",
-        live: false,
         insertionType: "loopStart"
       },
       {
         title: "test",
         //startTime: moment("2019-12-08T00:05:00Z"),
         duration: "PT5M",
-        live: false,
         insertionType: "midLoop"
       },
       {
         title: "test",
         //startTime: moment("2019-12-08T00:10:00Z"),
         duration: "PT5M",
-        live: false,
         insertionType: "loopEnd"
       },
       {
         title: "gap",
         //startTime: moment("2019-12-08T00:15:00Z"),
         duration: "PT23H45M",
-        live: false,
         insertionType: "gap"
       },
       {
-        title: "Dummy end",
+        title: "Dummy End",
         duration: "PT0S",
         //startTime: moment("2019-12-09T00:00:00Z"),
-        live: false,
         insertionType: "sentinel"
       }
     ];
@@ -249,14 +225,12 @@
     let myScheduleObject = new ScheduleObject("bbc_marathi_tv", "2019-12-08");
     const test_item = {
       title: "test",
-      live: false,
       duration: "PT1M", 
       insertionType: ""
     };
     myScheduleObject.addFloating(1, test_item);
     const test_item2 = {
       title: "test 2",
-      live: false,
       duration: "PT1M", 
       insertionType: ""
     };
@@ -264,38 +238,33 @@
 
     const expected = [
       {
-        title: "Dummy start",
+        title: "Dummy Start",
         duration: "PT0S",
         //startTime: moment("2019-12-08T00:00:00Z"),
-        live: false,
         insertionType: "sentinel"
       },
       {
         title: "test",
         //startTime: moment("2019-12-08T00:00:00Z"),
         duration: "PT1M",
-        live: false,
         insertionType: ""
       },
       {
         title: "test 2",
         //startTime: moment("2019-12-08T00:01:00Z"),
         duration: "PT1M",
-        live: false,
         insertionType: ""
       },
       {
         title: "gap",
         //startTime: moment("2019-12-08T00:02:00Z"),
         duration: "PT23H58M",
-        live: false,
         insertionType: "gap"
       },
       {
-        title: "Dummy end",
+        title: "Dummy End",
         duration: "PT0S",
         //startTime: moment("2019-12-09T00:00:00Z"),
-        live: false,
         insertionType: "sentinel"
       }
     ];
