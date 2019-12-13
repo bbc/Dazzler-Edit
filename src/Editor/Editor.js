@@ -105,8 +105,7 @@ class Editor extends React.Component {
 
     this.handleScheduleDelete = this.handleScheduleDelete.bind(this);
     this.handleAddLive = this.handleAddLive.bind(this);
-    this.handleAddClip = this.handleAddClip.bind(this);
-    this.handleAddEpisode = this.handleAddEpisode.bind(this);
+    this.handleAddClipOrEpisode = this.handleAddClipOrEpisode.bind(this);
     this.clearLoop = this.clearLoop.bind(this);
     this.pasteIntoSchedule = this.pasteIntoSchedule.bind(this);
     this.handleDrawerOpen = this.handleDrawerOpen.bind(this);
@@ -155,85 +154,43 @@ class Editor extends React.Component {
     //this.setState({ open: false });
   };
 
-  handleAddLive(window) {
-    const startTime = moment(window.scheduled_time.start);
-    for(let i=0; i<this.state.schedule.items.length; i++) {
-      if(startTime.isSame(this.state.schedule.items[i].startTime)) {
+  handleAddLive(item) {
+    const items = this.state.schedule.items;
+    for(let i=0; i<items.length; i++) {
+      if(item.startTime.isSame(items[i].startTime)) {
         return; // don't allow adding at same point twice
       }
     }
-    let versionPid = null;
-    let versionCrid = null;
-    let pid = null;
-    let crid = null;
-    for (let i = 0; i < window.window_of.length; i++) {
-      switch (window.window_of[i].result_type) {
-        case "version":
-          versionPid = window.window_of[i].pid;
-          versionCrid = window.window_of[i].crid;
-          break;
-        case "episode":
-          pid = window.window_of[i].pid;
-          crid = window.window_of[i].crid;
-          break;
-        default: // DO Nothing
+    for(let i=0; i<items.length; i++) {
+      if(item.startTime.isBefore(items[i].startTime)) {
       }
+
+      /*
+      if(i > 0) {
+        const end = moment(items[i-1].startTime)
+          .add(moment.duration(items[i-1].duration))
+        if(end.isAfter(startTime)) {
+
+        }
+      }
+      */
     }
     let scheduleObject = new ScheduleObject(
       this.state.schedule.sid,
       this.state.schedule.date,
       this.state.schedule.items
     );
-    scheduleObject.addLive({
-      captureChannel: window.service.sid, // TODO make use of this
-      title: "Live broadcast segment",
-      duration: window.duration.toISOString(),
-      startTime: startTime,
-      live: true,
-      insertionType: "live",
-      pid: pid,
-      crid: crid,
-      versionPid: versionPid,
-      versionCrid: versionCrid
-    });
+    scheduleObject.addLive(item);
     this.setState({schedule: scheduleObject});
   }
 
-  handleAddEpisode(item) {
-    const version = item.available_versions.version[0]; // TODO pick a version
-    const newItem = {
-      title: item.title ? item.title : item.presentation_title,
-      duration: moment.duration(version.duration).toISOString(),
-      live: false,
-      insertionType: "",
-      versionCrid: version.crid,
-      pid: item.pid,
-      versionPid: version.pid
-    };
+  handleAddClipOrEpisode(item) {
+    console.log('handleAddClipOrEpisode', item);
     if(this.state.mode === 'schedule') {
-      this.pasteIntoSchedule(newItem);
+      this.pasteIntoSchedule(item);
     }
     else {
-      this.pasteIntoLoop(newItem);
-    }
-  }
-
-  handleAddClip(item) {
-    const version = item.available_versions.version[0]; // TODO pick a version
-    const newItem = {
-      title: item.title,
-      duration: moment.duration(version.duration).toISOString(),
-      live: false,
-      insertionType: "",
-      versionCrid: version.crid,
-      pid: item.pid,
-      vpid: version.pid
-    };
-    if(this.state.mode === 'schedule') {
-      this.pasteIntoSchedule(newItem);
-    }
-    else {
-      this.pasteIntoLoop(newItem);
+      this.pasteIntoLoop(item);
     }
   }
 
@@ -353,7 +310,7 @@ class Editor extends React.Component {
   render() {
     const { classes } = this.props;
     const { open } = this.state;
-    console.log('Editor.render', this.state.schedule.items);
+    console.log('Editor.render');
     return (
       <div className={classes.root}>
         <AppBar
@@ -432,7 +389,7 @@ class Editor extends React.Component {
         <Episode
           availability="available"
           sid={this.state.schedule.sid}
-          handleClick={this.handleAddEpisode}
+          handleClick={this.handleAddClipOrEpisode}
         />
         </ExpansionPanelDetails>
       </ExpansionPanel>
@@ -448,7 +405,7 @@ class Editor extends React.Component {
         <Episode
           availability={this.state.upcomingAvailability.toISOString()}
           sid={this.state.schedule.sid}
-          handleClick={this.handleAddEpisode}
+          handleClick={this.handleAddClipOrEpisode}
         />
         </ExpansionPanelDetails>
       </ExpansionPanel>
@@ -464,7 +421,7 @@ class Editor extends React.Component {
           <Clips
               type="jupiter"
               sid={this.state.schedule.sid}
-              handleClick={this.handleAddClip}
+              handleClick={this.handleAddClipOrEpisode}
            />
         </ExpansionPanelDetails>
       </ExpansionPanel>
@@ -480,7 +437,7 @@ class Editor extends React.Component {
           <Clips
               type="web"
               sid={this.state.schedule.sid}
-              handleClick={this.handleAddClip}
+              handleClick={this.handleAddClipOrEpisode}
           />
         </ExpansionPanelDetails>
       </ExpansionPanel>
@@ -495,7 +452,7 @@ class Editor extends React.Component {
         <ExpansionPanelDetails>
           <Specials
               sid={this.state.schedule.sid}
-              handleClick={this.handleAddClip}
+              handleClick={this.handleAddClipOrEpisode}
           />
         </ExpansionPanelDetails>
       </ExpansionPanel>

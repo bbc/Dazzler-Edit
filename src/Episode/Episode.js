@@ -87,16 +87,15 @@ export class Episode extends React.Component {
     const duration = moment.duration(
       clip.available_versions.version[0].duration
     );
-    const formatted = moment.utc(duration.asMilliseconds()).format("HH:mm:ss");
-    return formatted;
+    return duration.format('hh:mm:ss', {trim:false});
   }
 
-  addButton(clip) {
+  addButton(episode) {
     return (
       <button
         className="ui compact icon button"
         onClick={() => {
-          this.props.handleClick(clip);
+          this.props.handleClick(AssetDao.episode2Item(episode));
         }}
       >
         <i className="plus icon"></i>

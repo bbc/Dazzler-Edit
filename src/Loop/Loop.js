@@ -7,7 +7,7 @@ import {cloneDeep} from 'lodash-es';
 import { Typography } from "@material-ui/core";
 
 const durationFormatter = ({ value }) => {
-  return moment.duration(value).format('HH:mm:ss');
+  return moment.duration(value).format('hh:mm:ss', {trim:false});
 };
 
 const columns = [
@@ -79,12 +79,12 @@ class Loop extends React.Component {
         <Box display="flex" flexDirection="row">
           <Box width="50%">
           <Typography>
-          Duration:&nbsp;{this.props.duration.format('HH:mm:ss')}
+          Duration:&nbsp;{this.props.duration.format('HH:mm:ss', {trim:false})}
           </Typography>
           </Box>
           <Box width="50%">
           <Typography>
-            Time to fill:&nbsp;{this.props.timeToFill.format('HH:mm:ss')}
+            Time to fill:&nbsp;{this.props.timeToFill.format('HH:mm:ss', {trim:false})}
           </Typography>
           </Box>
         </Box>

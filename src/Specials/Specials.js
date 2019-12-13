@@ -11,7 +11,8 @@ import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import {TablePaginationActionsWrapped} from "../TablePaginationActions/TablePaginationActions";
 import moment from "moment";
-import axios from "axios";
+import 'moment-duration-format';
+import AssetDao from "../AssetDao/AssetDao";
 
 export const styles = theme => ({
   root: {
@@ -25,12 +26,6 @@ export const styles = theme => ({
     overflowX: "hidden"
   }
 });
-
-//checking if we are running locally
-var URLPrefix = "";
-if (process.env.NODE_ENV === "development") {
-  URLPrefix = "http://localhost:8080";
-}
 
 export class Specials extends React.Component {
   constructor(props) {
@@ -55,9 +50,11 @@ export class Specials extends React.Component {
   componentDidUpdate(prevProps) {
     if (this.state.page !== this.state.previousPage) {
       //console.log("have page %d want page %d", this.state.previousPage, this.state.page);
-      axios
-        .get(`${URLPrefix}/api/v1/special?sid=${this.state.sid}&page=${this.state.page+1}&page_size=${this.state.rowsPerPage}`)
-        .then(response => {
+      AssetDao.getSpecials(
+        this.state.sid,
+        this.state.page,
+        this.state.rowsPerPage,
+        response => {
           let new_page = 0;
           if(response.data.hasOwnProperty('page')) {
             new_page = response.data.page - 1;
@@ -68,10 +65,7 @@ export class Specials extends React.Component {
             rows: response.data.items,
             totalRows: response.data.total
           });
-        })
-        .catch(e => {
-          console.log(e);
-        });
+      });
     }
   }
 
@@ -87,8 +81,7 @@ export class Specials extends React.Component {
     const duration = moment.duration(
       clip.available_versions.version[0].duration
     );
-    const formatted = moment.utc(duration.asMilliseconds()).format("HH:mm:ss");
-    return formatted;
+    return duration.format('hh:mm:ss', {trim:false});
   }
 
   addButton(clip) {
@@ -96,7 +89,7 @@ export class Specials extends React.Component {
       <button
         className="ui compact icon button"
         onClick={() => {
-          this.props.handleClick(clip);
+          this.props.handleClick(AssetDao.clip2Item(clip));
         }}
       >
         <i className="plus icon"></i>
