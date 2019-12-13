@@ -101,8 +101,10 @@ class Loop extends React.Component {
             <i className="trash icon"><Typography>Clear</Typography></i>
           </button>
           <button className={active} onClick={() => {
+              if(this.props.data.length>0) {
                 this.props.onPaste(this.props.data);
-              }}
+              }
+            }}
           ><Typography>Paste</Typography>
           </button>
           <button className={active} onClick={this.pasteToFill}
