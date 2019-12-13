@@ -161,20 +161,6 @@ class Editor extends React.Component {
         return; // don't allow adding at same point twice
       }
     }
-    for(let i=0; i<items.length; i++) {
-      if(item.startTime.isBefore(items[i].startTime)) {
-      }
-
-      /*
-      if(i > 0) {
-        const end = moment(items[i-1].startTime)
-          .add(moment.duration(items[i-1].duration))
-        if(end.isAfter(startTime)) {
-
-        }
-      }
-      */
-    }
     let scheduleObject = new ScheduleObject(
       this.state.schedule.sid,
       this.state.schedule.date,
