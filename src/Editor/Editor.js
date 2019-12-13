@@ -157,6 +157,11 @@ class Editor extends React.Component {
 
   handleAddLive(window) {
     const startTime = moment(window.scheduled_time.start);
+    for(let i=0; i<this.schedule.items.length; i++) {
+      if(startTime.isSame(this.state.schedule.items[i].startTime)) {
+        return; // don't allow adding at same point twice
+      }
+    }
     let versionPid = null;
     let versionCrid = null;
     let pid = null;
@@ -253,7 +258,7 @@ class Editor extends React.Component {
       this.state.schedule.items
     );
     scheduleObject.deleteItemClosingGap(index);
-    this.updateSchedule(scheduleObject, index);
+    this.updateSchedule(scheduleObject, index, true);
   }
   
   handleDateChange = (date, schedule) => {
@@ -269,7 +274,7 @@ class Editor extends React.Component {
       date,
       schedule
     );
-    this.updateSchedule(scheduleObject, 1);
+    this.updateSchedule(scheduleObject, 1, false);
   };
 
   pasteIntoSchedule(items) {
@@ -280,15 +285,15 @@ class Editor extends React.Component {
       this.state.schedule.items
     );
     scheduleObject.addFloating(index, items);
-    this.updateSchedule(scheduleObject, index+1);
+    this.updateSchedule(scheduleObject, index+1, true);
   }
   
-  updateSchedule(scheduleObject, scheduleInsertionPoint) {
+  updateSchedule(scheduleObject, scheduleInsertionPoint, modified) {
     const ttf = this.calculateTimeToFill(scheduleObject.items, scheduleInsertionPoint);
     this.setState({
       schedule: scheduleObject, 
       scheduleInsertionPoint: scheduleInsertionPoint,
-      scheduleModified: true,
+      scheduleModified: modified,
       timeToFill: ttf
     });
   }
@@ -510,7 +515,7 @@ class Editor extends React.Component {
           <Box width="45%" flexGrow={1} flexDirection="column">
           <Typography variant="h4" align="center">Schedule</Typography>
           <SchedulePicker
-            enabled={!this.state.scheduleModified}
+            enabled={this.state.scheduleModified?false:true}
             sid={this.state.schedule.sid}
             scheduleDate={this.state.schedule.date}
             onDateChange={this.handleDateChange}
