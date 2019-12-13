@@ -157,7 +157,7 @@ class Editor extends React.Component {
 
   handleAddLive(window) {
     const startTime = moment(window.scheduled_time.start);
-    for(let i=0; i<this.schedule.items.length; i++) {
+    for(let i=0; i<this.state.schedule.items.length; i++) {
       if(startTime.isSame(this.state.schedule.items[i].startTime)) {
         return; // don't allow adding at same point twice
       }
