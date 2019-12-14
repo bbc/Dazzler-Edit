@@ -62,9 +62,13 @@ export class Episode extends React.Component {
         this.state.page + 1, this.state.rowsPerPage,
         response => {
           let items = response.data.items;
+          let total = response.data.total;
           //console.log('episodeDidUpdate', this.props.availability, this.props.resultsFilter);
           if(this.props.resultsFilter) {
             items = this.props.resultsFilter(items);
+            if(response.data.items.length>items.length) {
+              total = items.length;
+            }
           }
           let new_page = 0;
           if (response.data.hasOwnProperty('page')) {
