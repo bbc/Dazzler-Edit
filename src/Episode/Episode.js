@@ -77,7 +77,7 @@ export class Episode extends React.Component {
           this.setState({
             previousPage: new_page,
             page: new_page,
-            totalRows: response.data.total,
+            totalRows: total,
             rows: items
           });
         })
