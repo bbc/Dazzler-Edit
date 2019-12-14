@@ -273,7 +273,7 @@ app.get("/api/v1/episode", async (req, res, next) => {
         items: items
       });
     } catch (e) {
-      console.log(JSON.stringify(e));
+      console.log(e);
       res.status(404).send("error");
     }
   }
@@ -297,7 +297,7 @@ app.get("/api/v1/episode", async (req, res, next) => {
         items: items
       });
     } catch (e) {
-      console.log(JSON.stringify(e));
+      console.log(e);
       res.status(404).send("error");
     }
   }
