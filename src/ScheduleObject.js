@@ -192,6 +192,7 @@ class ScheduleObject {
                     break;
                 }
             }
+            console.log('sorted', index, this.items);
             // is there an item before it we need to turn into
             // an overlap or a gap?
             const prev = this.items[index - 1];

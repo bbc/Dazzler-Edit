@@ -376,7 +376,7 @@ class Editor extends React.Component {
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
         <Live
-              date={this.state.schedule.date}
+              date={this.state.schedule.date.utc().format('YYYY-MM-DD')}
 	            sid={this.state.schedule.sid}
 	            handleClick={this.handleAddLive}
 	          />

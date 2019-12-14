@@ -10,8 +10,9 @@ import TablePagination from "@material-ui/core/TablePagination";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import moment from "moment";
-import axios from "axios";
+import 'moment-duration-format';
 import { TablePaginationActionsWrapped } from "../TablePaginationActions/TablePaginationActions";
+import {fetchWebcasts} from "../ScheduleDao/ScheduleDao";
 
 export const styles = theme => ({
   root: {
@@ -26,31 +27,24 @@ export const styles = theme => ({
   }
 });
 
-//checking if we are running locally
-var URLPrefix = "";
-if (process.env.NODE_ENV === "development") {
-  URLPrefix = "http://localhost:8080";
-}
-
 export class Live extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
       spinner: false,
-      totalRows: 0,
       rows: [],
       page: 0,
       previousPage: -1,
       rowsPerPage: 5,
-      data: [],
+      totalRows: 0,
       sid: "",
-      date: moment().utc().format()
+      date: moment().utc().startOf('day')
     };
   }
 
   componentDidMount = () => {
-    this.setState({ sid: this.props.sid, date: this.props.date });
+    this.setState({ sid: this.props.sid, date: moment(this.props.date) });
   };
 
   componentDidUpdate(prevProps) {
@@ -61,85 +55,41 @@ export class Live extends React.Component {
       ||
       (this.props.date !== prevProps.date)
     ) {
-      //console.log("have page %d want page %d", this.state.page, this.state.previousPage);
-      axios
-        .get(`${URLPrefix}/api/v1/webcast?sid=${this.props.sid}&start=${start}&end=${end}`)
-        .then(response => {
-          let rows = [];
-          if (response.data.total > 0) {
-            response.data.items.forEach(item => {
-              var durationTime =
-                moment(item.scheduled_time.end) -
-                moment(item.scheduled_time.start);
-
-              item.isLive = true;
-              item.startTime = moment(item.scheduled_time.start).format("HH:mm:ss");
-              item.title = "Live programme at " + item.scheduled_time.start;
-              item.duration = moment.duration(durationTime, "milliseconds");
-            });
-            rows = response.data.items;
-            let new_page = 0;
-            if (response.data.hasOwnProperty('page')) {
-              new_page = response.data.page - 1;
-            }
-            this.setState({
-              rows: rows,
-              previousPage: new_page,
-              page: new_page,
-              totalRows: response.data.total
-            });
-          }
-        })
-        .catch(e => {
-          console.log(e);
-        });
+      //console.log("have page %d want page %d", this.state.previousPage, this.state.page);
+      fetchWebcasts(this.props.sid, start, end, this.state.page, this.state.rowsPerPage,
+        (schedule, totalRows) => {
+          this.setState({
+            sid: this.props.sid,
+            date: moment(this.props.date),
+            rows: schedule,
+            totalRows: totalRows,
+            page: this.state.page,
+            previousPage: this.state.page
+          });
+        }
+      );
     }
   }
 
   handleChangePage = (event, page) => {
-    this.setState({ page });
+    console.log('live:handleChangePage', page);
+    this.setState({ page: page });
   };
 
   handleChangeRowsPerPage = event => {
     this.setState({ page: 0, rowsPerPage: event.target.value });
   };
 
-  formattedDuration(clip) {
-    const duration = clip.duration;
-    const formatted = moment.utc(duration.asMilliseconds()).format("HH:mm:ss");
-    return formatted;
+  formattedDuration(item) {
+    return moment.duration(item.duration).format('hh:mm:ss', {trim:false});
   }
 
-  window2Item(window) {
-    const r = {};
-    r.startTime = moment(window.scheduled_time.start);
-    for (let i = 0; i < window.window_of.length; i++) {
-      switch (window.window_of[i].result_type) {
-        case "version":
-          r.versionPid = window.window_of[i].pid;
-          r.versionCrid = window.window_of[i].crid;
-          break;
-        case "episode":
-          r.pid = window.window_of[i].pid;
-          r.crid = window.window_of[i].crid;
-          break;
-        default: // DO Nothing
-      }
-    }
-    r.captureChannel= window.service.sid; // TODO make use of this
-    r.title = "Live broadcast segment";
-    r.duration = window.duration.toISOString();
-    r.live = true;
-    r.insertionType = "live";
-    return r;
-  }
-
-  addButton(window) {
+  addButton(item) {
     return (
       <button
         className="ui compact icon button"
         onClick={() => {
-          this.props.handleClick(this.window2Item(window));
+          this.props.handleClick(item);
         }}
       >
         <i className="plus icon"></i>
@@ -149,10 +99,9 @@ export class Live extends React.Component {
 
   render() {
     const { classes } = this.props;
-    const { rows, rowsPerPage, page, totalRows } = this.state;
+    const { date, rows, rowsPerPage, page, totalRows } = this.state;
     const emptyRows =
       rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
-
     //if(rows.length === 0){
     //  this.setState({spinner : true})
     //  return <Spinner />
@@ -160,6 +109,7 @@ export class Live extends React.Component {
 
     return (
       <div>
+      {date.format("YYYY-MM-DD")}
         <Paper className={classes.root}>
           <div className={classes.tableWrapper}>
             <Table className={classes.table}>
