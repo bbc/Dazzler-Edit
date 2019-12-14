@@ -167,31 +167,48 @@ class ScheduleObject {
         }
     }
 
-    addLive(item) {
+    addLive(live) {
+        const item = {
+            title: live.title,
+            startTime: live.startTime,
+            duration: live.duration,
+            insertionType: "live",
+            asset: live
+        };
         const startTime = moment(item.startTime);
         const endTime = moment(startTime).add(moment.duration(item.duration));
-        this.items.push({
-            title: item.title,
-            startTime: item.startTime,
-            duration: item.duration,
-            insertionType: "live",
-            asset: item
-        });
-        this.sort();
+        // is this a live at midnight?
         let index = 0;
-        for (let i = 0; i < this.items.length; i++) {
-            if (this.items[i].startTime.isSame(startTime)) {
-                index = i;
-                break;
+        if(startTime.isSame(this.items[0].startTime)) {
+            index=1;
+            this.items.splice(index, 0, item);
+        }
+        else {
+            this.items.push(item);
+            this.sort();
+            for (let i = 0; i < this.items.length; i++) {
+                if (this.items[i].startTime.isSame(startTime)) {
+                    index = i;
+                    break;
+                }
+            }
+            // is there an item before it we need to turn into
+            // an overlap or a gap?
+            const prev = this.items[index - 1];
+            const slotDuration = moment.duration(startTime.diff(prev.startTime)).toISOString()
+            switch(prev.insertionType) {
+                case 'gap':
+                    prev.duration = slotDuration;
+                    break;
+                case 'sentinel':
+                    // do nothing
+                    break;
+                default:
+                    prev.insertionType = 'overlap';
+                    prev.duration = slotDuration;
             }
         }
-        if (this.items[index - 1].insertionType === "gap") {
-            this.items[index - 1].duration = moment
-                .duration(startTime.diff(this.items[index - 1].startTime))
-                .toISOString();
-        } else {
-            // TODO
-        }
+        // are there items after it we need to move?
         if (this.items[index + 1].insertionType === "sentinel") {
             // add new gap
             const next = this.items[index + 1].startTime;
@@ -202,8 +219,33 @@ class ScheduleObject {
                 insertionType: "gap"
             });
         } else {
-            // TODO
+            // find the next fixed item
+            const next = this.findNextFixed(index+1);
+            // remove everything in-between
+            const cut = this.cut(index+1, next-1);
+            console.log('cut assets', cut);
+            this.addGaps();
+            // put them back in again using addFloating
+            this.addFloating(index, cut);
         }
+    }
+
+    findNextFixed(index) {
+        for(let i=index; i<this.items.length; i++) {
+            if("sentinel,live".includes(this.items[i].insertionType)) {
+                return i;
+            }
+        }
+        return this.items.length-1; // should never happen
+    }
+
+    cut(from, to) {
+        const assets = [];
+        for(let i=from; i<to; i++) {
+            assets.push(this.items[i].asset);
+        }
+        this.items.splice(from, to-from);
+        return assets;
     }
 
     addFixed(items) {
@@ -290,6 +332,7 @@ class ScheduleObject {
             if (done) break;
         }
         this.items = schedule;
+        console.log('delete end', schedule);
     }
 
     sort() {
