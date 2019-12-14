@@ -1,7 +1,6 @@
 import React from "react";
 import moment from "moment";
 import Date from "../Date/Date";
-import {fetchSchedule} from "../ScheduleDao/ScheduleDao";
 
 /*
 <SchedulePicker enabled=true|false sid="" scheduleDate="" onDateChange=""
@@ -19,7 +18,7 @@ class SchedulePicker extends React.Component {
     
     componentDidMount() {
       this.setState({scheduleDate:this.props.scheduleDate});
-      this.loadSchedule(moment(this.state.scheduleDate));
+      this.props.onDateChange(this.props.scheduleDate);
     }
 
     componentDidUpdate(prevProps) {
@@ -29,31 +28,11 @@ class SchedulePicker extends React.Component {
     }
 
     previousDay() {
-      this.loadSchedule(moment(this.props.scheduleDate).subtract(1, 'days'));
+      this.props.onDateChange(moment(this.props.scheduleDate).subtract(1, 'days'));
     }
   
     nextDay() {
-      this.loadSchedule(moment(this.props.scheduleDate).add(1, 'days'));
-    }
-  
-    loadSchedule(scheduleDate) {
-      const date = scheduleDate.format("YYYY-MM-DD");
-      if(this.props.enabled === false) {
-        console.log('save or discard changes before leaving');
-        return;
-      }
-      const This = this;
-        try {
-          fetchSchedule(
-            this.props.sid,
-            date,
-            function(schedule) {
-              This.props.onDateChange(date, schedule);
-            }
-          );
-        } catch (error) {
-          console.log(error);
-        }
+      this.props.onDateChange(moment(this.props.scheduleDate).add(1, 'days'));
     }
   
     render() {
@@ -64,6 +43,7 @@ class SchedulePicker extends React.Component {
             scheduleDate={moment(date).format('LL')}
             previousDay={this.previousDay}
             nextDay={this.nextDay}
+            enabled={this.props.enabled}
           />
       </div>
       );

@@ -30,7 +30,7 @@ import ScheduleView from "../ScheduleView/ScheduleView";
 import ScheduleObject from "../ScheduleObject";
 import Loop from "../Loop/Loop";
 import PlatformDao from "../PlatformDao/PlatformDao";
-import {saveSchedule} from "../ScheduleDao/ScheduleDao";
+import {fetchSchedule, saveSchedule} from "../ScheduleDao/ScheduleDao";
 
 const drawerWidth = 240;
 
@@ -115,10 +115,11 @@ class Editor extends React.Component {
     this.savePlaylist = this.savePlaylist.bind(this);
     this.clearSchedule = this.clearSchedule.bind(this);
     this.reloadSchedule = this.reloadSchedule.bind(this);
+    this.handleNewSchedule = this.handleNewSchedule.bind(this);
     this.testLoop = this.testLoop.bind(this);
     
     this.state = {
-      schedule: new ScheduleObject('bbc_marathi_tv', moment().format('YYYY-MM-DD')),
+      schedule: new ScheduleObject('bbc_marathi_tv', moment().utc().startOf('day')),
       mode: "loop",
       scheduleInsertionPoint: 1,
       scheduleModified: false,
@@ -203,21 +204,32 @@ class Editor extends React.Component {
     scheduleObject.deleteItemClosingGap(index);
     this.updateSchedule(scheduleObject, index, true);
   }
-  
-  handleDateChange = (date, schedule) => {
+
+  handleNewSchedule(scheduleObject) {
+    console.log('handleNewSchedule', scheduleObject);
+    //scheduleObject.sid, scheduleObject.date.format(), scheduleObject.items);
     const now = moment().startOf('hour');
-    const endOfSchedule = moment(this.state.schedule.date).add(1, 'day');
+    const endOfSchedule = moment(scheduleObject.date).add(1, 'day');
     let upcomingAvailability = moment.duration(endOfSchedule.diff(now));
     if(upcomingAvailability.valueOf()<0) {
       upcomingAvailability = moment.duration('P1D');
     }
     this.setState({upcomingAvailability: upcomingAvailability});
-    let scheduleObject = new ScheduleObject(
-      this.state.schedule.sid,
-      date,
-      schedule
-    );
     this.updateSchedule(scheduleObject, 1, false);
+  }
+
+  handleDateChange = (date) => {
+    console.log('handleDateChange', date);
+    try {
+      const sid = this.state.schedule.sid;
+      fetchSchedule(
+        sid,
+        moment(date),
+        schedule => this.handleNewSchedule(schedule)
+      );
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   pasteIntoSchedule(items) {
@@ -246,7 +258,7 @@ class Editor extends React.Component {
   }
 
   reloadSchedule() {
-    console.log('TODO reload schedule from PIPS');
+    this.handleDateChange(this.state.schedule.date);
   }
 
   clearSchedule() {
@@ -466,7 +478,6 @@ class Editor extends React.Component {
           <Typography variant="h4" align="center">Schedule</Typography>
           <SchedulePicker
             enabled={this.state.scheduleModified?false:true}
-            sid={this.state.schedule.sid}
             scheduleDate={this.state.schedule.date}
             onDateChange={this.handleDateChange}
           />

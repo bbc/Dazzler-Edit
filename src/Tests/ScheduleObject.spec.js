@@ -7,7 +7,7 @@
   test("Should add item at the chosen index", () => {
     let myScheduleObject = new ScheduleObject(
       "bbc_marathi_tv",
-      "2019-12-08",
+      moment("2019-12-08"),
     );
     myScheduleObject.addFloating(1, [
       { duration: "PT5M", insertionType: "midLoop" }
@@ -35,7 +35,7 @@
   test("Should add item with a gap before live", () => {
     let myScheduleObject = new ScheduleObject(
       "bbc_marathi_tv",
-      "2019-12-08",
+      moment("2019-12-08"),
       [
         {
           title: "Dummy start",
@@ -143,7 +143,7 @@
   });
 
   test("Should add items to empty schedule with unique start times", () => {
-    let myScheduleObject = new ScheduleObject("bbc_marathi_tv", "2019-12-08");
+    let myScheduleObject = new ScheduleObject("bbc_marathi_tv", moment("2019-12-08"));
     myScheduleObject.addFloating(1, [
       { 
         title: "test",
@@ -222,7 +222,7 @@
   });
 
   test("Should add items to non-empty schedule with unique start times", () => {
-    let myScheduleObject = new ScheduleObject("bbc_marathi_tv", "2019-12-08");
+    let myScheduleObject = new ScheduleObject("bbc_marathi_tv", moment("2019-12-08"));
     const test_item = {
       title: "test",
       duration: "PT1M", 

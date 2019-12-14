@@ -24,42 +24,25 @@ class Date extends React.Component {
   }
 
   render() {
+    let arrow = "ui icon button primary disabled";
+    if(this.props.enabled) {
+      arrow = "ui icon button primary";
+    }
     return (
       <div className="dateContainer">
-        {/* <button
-          className="ui icon button"
-          onClick={() => {
-            this.props.previousDay(this.handleOtherClick(7));
-          }}
-        >
-          <i className="angle double left icon"></i>
-        </button> */}
-
-        <button
-          className="ui primary icon button"
-          onClick={() => {
+        <button className={arrow} onClick={() => {
             this.props.previousDay(this.handleOtherClick(1));
           }}
         >
           <i className="left arrow icon"></i>
         </button>
         {this.props.scheduleDate}
-        <button
-          className="ui primary icon button"
-          onClick={() => {
+        <button className={arrow} onClick={() => {
             this.props.nextDay(this.handleClick(1));
           }}
         >
           <i className="right arrow icon"></i>
         </button>
-        {/* <button
-          className="ui icon button"
-          onClick={() => {
-            this.props.nextDay(this.handleClick(7));
-          }}
-        >
-          <i className="angle double right icon"></i>
-        </button> */}
       </div>
     );
   }

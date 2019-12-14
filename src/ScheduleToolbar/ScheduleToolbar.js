@@ -34,7 +34,7 @@ class ScheduleToolbar extends React.Component {
             <button className={clearButtonAppearance} onClick={this.props.onClear}>
           <Typography>Clear</Typography>
           </button>
-          <button className={clearButtonAppearance} onClick={this.props.onReload}>
+          <button className="ui small primary button" onClick={this.props.onReload}>
           <Typography>Reload</Typography>
           </button>
             <button className={saveButtonAppearance} onClick={this.props.onSaveClicked}>

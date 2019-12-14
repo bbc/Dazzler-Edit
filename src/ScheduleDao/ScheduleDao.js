@@ -28,15 +28,14 @@ class ScheduleDao {
   }
 
   static fetchSchedule1(sid, date, cb) {    
-    const sched = new ScheduleObject(sid, date);
-    cb(sched.items);
+    cb(new ScheduleObject(sid, date));
   }
 
   static fetchSchedule(sid, date, cb) {
-    console.log('fetchSchedule', sid, date);
+    console.log('fetchSchedule', sid, date.format());
   axios
     .get(
-      `${URLPrefix}/api/v1/schedule?sid=${sid}&date=${date}`
+      `${URLPrefix}/api/v1/schedule?sid=${sid}&date=${date.utc().format('YYYY-MM-DD')}`
     )
     .then(response => {
       let schedule = [];
@@ -65,7 +64,7 @@ class ScheduleDao {
       sched.addFixed(schedule);
       sched.addGaps();
       sched.sort();
-      cb(sched.items);
+      cb(sched);
     })
     .catch(e => {
       console.log(e);

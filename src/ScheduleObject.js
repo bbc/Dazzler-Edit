@@ -2,10 +2,10 @@ import moment from "moment";
 
 class ScheduleObject {
     constructor(sid, date, items) {
-        console.log('new ScheduleObject', sid, date);
+        console.log('new ScheduleObject', sid, date.format());
         this.date = date;
         this.sid = sid;
-        const start = moment(date+'T00:00:00Z');
+        const start = moment(date);
         if (items === undefined) {
             this.items = [
                 {
