@@ -36,7 +36,7 @@ class Date extends React.Component {
         >
           <i className="left arrow icon"></i>
         </button>
-        {this.props.scheduleDate}
+        {this.props.scheduleDate} &nbsp;
         <button className={arrow} onClick={() => {
             this.props.nextDay(this.handleClick(1));
           }}
