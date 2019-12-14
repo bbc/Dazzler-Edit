@@ -172,7 +172,7 @@ class Editor extends React.Component {
   }
 
   handleAddClipOrEpisode(item) {
-    console.log('handleAddClipOrEpisode', item);
+    //console.log('handleAddClipOrEpisode', item);
     if(this.state.mode === 'schedule') {
       this.pasteIntoSchedule(item);
     }
@@ -206,7 +206,7 @@ class Editor extends React.Component {
   }
 
   handleNewSchedule(scheduleObject) {
-    console.log('handleNewSchedule', scheduleObject);
+    //console.log('handleNewSchedule', scheduleObject);
     //scheduleObject.sid, scheduleObject.date.format(), scheduleObject.items);
     const now = moment().startOf('hour');
     const endOfSchedule = moment(scheduleObject.date).add(1, 'day');
@@ -219,7 +219,7 @@ class Editor extends React.Component {
   }
 
   handleDateChange = (date) => {
-    console.log('handleDateChange', date);
+    //console.log('handleDateChange', date);
     try {
       const sid = this.state.schedule.sid;
       fetchSchedule(
@@ -315,7 +315,7 @@ class Editor extends React.Component {
   render() {
     const { classes } = this.props;
     const { open } = this.state;
-    console.log('Editor.render');
+    //console.log('Editor.render');
     return (
       <div className={classes.root}>
         <AppBar

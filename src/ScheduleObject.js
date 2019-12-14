@@ -270,7 +270,7 @@ class ScheduleObject {
             const next = s[i + 1].startTime;
             if (end.isBefore(next)) {
                 gaps.push({
-                    title: `gap 272 ${end.format()} ${next.format()}`,
+                    title: "gap",
                     startTime: end,
                     duration: moment.duration(next.diff(end)).toISOString(),
                     insertionType: "gap"
