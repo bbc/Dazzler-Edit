@@ -2,7 +2,7 @@ import moment from "moment";
 
 class ScheduleObject {
     constructor(sid, date, items) {
-        console.log('new ScheduleObject', sid, date.format());
+        //console.log('new ScheduleObject', sid, date.format());
         this.date = date;
         this.sid = sid;
         const start = moment(date);
@@ -103,7 +103,6 @@ class ScheduleObject {
         let s = moment(startOfNew);
         for (let i = indexOfInsert; i < indexOfFixed; i++) {
             this.items[i].startTime = moment(s);
-            console.log(i, this.items[i].title, this.items[i].startTime.utc().format());
             s.add(moment.duration(this.items[i].duration));
         }
         if (this.items[indexOfFixed].insertionType === 'sentinel') {
@@ -192,7 +191,6 @@ class ScheduleObject {
                     break;
                 }
             }
-            console.log('sorted', index, this.items);
             // is there an item before it we need to turn into
             // an overlap or a gap?
             const prev = this.items[index - 1];
@@ -223,9 +221,9 @@ class ScheduleObject {
             // find the next fixed item
             const next = this.findNextFixed(index+1);
             // remove everything in-between
-            const cut = this.cut(index+1, next-1);
-            console.log('cut assets', cut);
+            const cut = this.cut(index+1, next);
             this.addGaps();
+            this.sort();
             // put them back in again using addFloating
             this.addFloating(index, cut);
         }
@@ -233,7 +231,10 @@ class ScheduleObject {
 
     findNextFixed(index) {
         for(let i=index; i<this.items.length; i++) {
-            if("sentinel,live".includes(this.items[i].insertionType)) {
+            if("live" === this.items[i].insertionType) {
+                return i;
+            }
+            if("sentinel" === this.items[i].insertionType) {
                 return i;
             }
         }
@@ -269,7 +270,7 @@ class ScheduleObject {
             const next = s[i + 1].startTime;
             if (end.isBefore(next)) {
                 gaps.push({
-                    title: "gap",
+                    title: `gap 272 ${end.format()} ${next.format()}`,
                     startTime: end,
                     duration: moment.duration(next.diff(end)).toISOString(),
                     insertionType: "gap"
@@ -320,9 +321,10 @@ class ScheduleObject {
                 case "sentinel":
                 case "live":
                     done = true;
+                    const start = moment(schedule[i].startTime).subtract(duration);
                     schedule.splice(i, 0, {
                         title: "gap",
-                        startTime: moment(schedule[i].startTime).subtract(duration),
+                        startTime: start,
                         duration: duration.toISOString(),
                         insertionType: "gap"
                     });
