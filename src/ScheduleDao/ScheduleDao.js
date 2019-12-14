@@ -133,8 +133,8 @@ class ScheduleDao {
       "    <ProgramLocationTable>\n" +
       `      <Schedule start="${start.utc().format()}" end="${end.utc().format()}" serviceIDRef="${serviceIDRef}">`;
     for (let i = 0; i < data.length; i++) {
-      if (data.insertionType === 'gap') continue;
-      if (data.insertionType === 'sentinel') continue;
+      if (data[i].insertionType === 'gap') continue;
+      if (data[i].insertionType === 'sentinel') continue;
       tva += this.makeScheduleEvent(serviceIDRef, data, i, data.length);
     }
     tva += "\n      </Schedule>\n    </ProgramLocationTable>\n" + tvaEnd;
@@ -156,17 +156,8 @@ class ScheduleDao {
   }
 }
 
-  static makeScheduleEvent(serviceIDRef, data, index, length) {
-  const broadcast = data[index];
-  let duration = null;
-  if (index === length - 1) {
-    duration = broadcast.duration;
-  } else {
-    const start = broadcast.startTime;
-    const nextStart = moment(data[index + 1].startTime);
-    var calculatedDuration = moment.duration(nextStart.diff(start));
-    duration = calculatedDuration.toISOString();
-  }
+  static makeScheduleEvent(serviceIDRef, broadcast) {
+  const duration = broadcast.duration;
   const startDateTime = moment.utc(broadcast.startTime);
   let imi = "imi:dazzler:" + serviceIDRef + "/" + startDateTime.unix();
 
@@ -184,8 +175,8 @@ class ScheduleDao {
             </InstanceDescription>
             <PublishedStartTime>${startDateTime.utc().format()}</PublishedStartTime>
             <PublishedDuration>${duration}</PublishedDuration>
-            <Live value="${broadcast.asset.live === "live" ? true : false}"/>
-            <Repeat value="${false}"/>
+            <Live value="${broadcast.asset.live?'true':'false'}"/>
+            <Repeat value="false"/>
             <Free value="true"/>
         </ScheduleEvent>
       `;
