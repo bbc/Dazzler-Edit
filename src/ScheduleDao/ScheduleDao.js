@@ -135,7 +135,7 @@ class ScheduleDao {
     for (let i = 0; i < data.length; i++) {
       if (data[i].insertionType === 'gap') continue;
       if (data[i].insertionType === 'sentinel') continue;
-      tva += ScheduleDao.makeScheduleEvent(serviceIDRef, data, i, data.length);
+      tva += ScheduleDao.makeScheduleEvent(serviceIDRef, data[i]);
     }
     tva += "\n      </Schedule>\n    </ProgramLocationTable>\n" + tvaEnd;
     console.log(tva);
