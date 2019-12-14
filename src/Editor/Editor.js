@@ -324,6 +324,7 @@ class Editor extends React.Component {
   }
 
   savePlaylist() {
+    console.log('savePlaylist');
     saveSchedule(
       services[this.state.schedule.sid].serviceIDRef,
       this.state.schedule.items,
