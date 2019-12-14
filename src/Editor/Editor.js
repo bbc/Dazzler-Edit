@@ -250,12 +250,15 @@ class Editor extends React.Component {
   }
 
   clearSchedule() {
-    console.log('TODO clear schedule');
+    this.updateSchedule(new ScheduleObject(
+      this.state.schedule.sid,
+      this.state.schedule.date
+    ), 1, false);
   }
 
   testLoop() {
     this.pasteIntoLoop({
-      duration: "PT1M",
+      duration: "PT55M",
       title: "A test item"
     });
   }
