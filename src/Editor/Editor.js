@@ -78,7 +78,7 @@ const styles = theme => ({
   },
   content: {
     flexGrow: 1,
-    padding: theme.spacing.unit * 3,
+    padding: theme.spacing(3),
     transition: theme.transitions.create("margin", {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen
@@ -116,6 +116,7 @@ class Editor extends React.Component {
     this.clearSchedule = this.clearSchedule.bind(this);
     this.reloadSchedule = this.reloadSchedule.bind(this);
     this.handleNewSchedule = this.handleNewSchedule.bind(this);
+    this.filterUpcomingEpisodes = this.filterUpcomingEpisodes.bind(this);
     this.testLoop = this.testLoop.bind(this);
     
     this.state = {
@@ -179,6 +180,30 @@ class Editor extends React.Component {
     else {
       this.pasteIntoLoop(item);
     }
+  }
+
+  filterUpcomingEpisodes(items) {
+    console.log('filterUpcomingEpisodes');
+    let filtered = [];
+    for(let i=0; i<items.length; i++) {
+      let wanted = false;
+      for(let j=0; j<items[i].available_versions.available; j++) {
+        const version = items[i].available_versions.version[j];
+        console.log(version);
+        for(let k=0; k<version.availabilities.availability.length; k++) {
+          const availability = version.availabilities.availability[k];
+          const start = moment(availability.scheduled_start);
+          const end = moment(availability.scheduled_end);
+          const sip = this.state.schedule.items[this.state.scheduleInsertionPoint].startTime
+          console.log(start.format(), end.format(), sip.format());
+          wanted |= (sip.isBetween(start, end));      
+        }
+      }
+      if(wanted) {
+        filtered.push(items[i]);
+      }
+    }
+    return filtered;
   }
 
   calculateTimeToFill(schedule, index) {
@@ -411,6 +436,7 @@ class Editor extends React.Component {
           availability={this.state.upcomingAvailability.toISOString()}
           sid={this.state.schedule.sid}
           handleClick={this.handleAddClipOrEpisode}
+          resultsFilter={this.filterUpcomingEpisodes}
         />
         </ExpansionPanelDetails>
       </ExpansionPanel>

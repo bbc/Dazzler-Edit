@@ -17,7 +17,7 @@ import AssetDao from "../AssetDao/AssetDao";
 export const styles = theme => ({
   root: {
     width: "100%",
-    marginTop: theme.spacing.unit * 3
+    marginTop: theme.spacing(3)
   },
   table: {
     minWidth: 250
@@ -52,7 +52,6 @@ export class Episode extends React.Component {
   };
 
   componentDidUpdate(prevProps) {
-    console.log('episodeDidUpdate');
     if (
       (this.state.page !== this.state.previousPage)
       || (this.props.availability !== prevProps.availability)
@@ -62,6 +61,11 @@ export class Episode extends React.Component {
         this.props.sid, this.props.availability,
         this.state.page + 1, this.state.rowsPerPage,
         response => {
+          let items = response.data.items;
+          //console.log('episodeDidUpdate', this.props.availability, this.props.resultsFilter);
+          if(this.props.resultsFilter) {
+            items = this.props.resultsFilter(items);
+          }
           let new_page = 0;
           if (response.data.hasOwnProperty('page')) {
             new_page = response.data.page - 1;
@@ -70,7 +74,7 @@ export class Episode extends React.Component {
             previousPage: new_page,
             page: new_page,
             totalRows: response.data.total,
-            rows: response.data.items
+            rows: items
           });
         })
     }
@@ -121,9 +125,11 @@ export class Episode extends React.Component {
           <div className={classes.tableWrapper}>
             <Table className={classes.table}>
               <TableHead>
-                <th>Title</th>
-                <th>Duration</th>
-                <th>Add</th>
+              <TableRow>
+                  <TableCell>Title</TableCell>
+                  <TableCell>Duration</TableCell>
+                  <TableCell>Add</TableCell>
+                </TableRow>
               </TableHead>
               <TableBody>
                 {rows.map(row => (

@@ -17,7 +17,7 @@ import {fetchWebcasts} from "../ScheduleDao/ScheduleDao";
 export const styles = theme => ({
   root: {
     width: "100%",
-    marginTop: theme.spacing.unit * 3
+    marginTop: theme.spacing(3)
   },
   table: {
     minWidth: 250
@@ -114,9 +114,11 @@ export class Live extends React.Component {
           <div className={classes.tableWrapper}>
             <Table className={classes.table}>
               <TableHead>
-                <th>Title</th>
-                <th>Duration</th>
-                <th>Add</th>
+                <TableRow>
+                  <TableCell>Title</TableCell>
+                  <TableCell>Duration</TableCell>
+                  <TableCell>Add</TableCell>
+                </TableRow>
               </TableHead>
               <TableBody>
 
