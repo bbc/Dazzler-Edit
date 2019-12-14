@@ -2,111 +2,23 @@ import React from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
+import TableHead from "@material-ui/core/TableHead";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 import TableFooter from "@material-ui/core/TableFooter";
 import TablePagination from "@material-ui/core/TablePagination";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
-import IconButton from "@material-ui/core/IconButton";
-import FirstPageIcon from "@material-ui/icons/FirstPage";
-import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
-import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
-import LastPageIcon from "@material-ui/icons/LastPage";
 import moment from "moment";
+import 'moment-duration-format';
 // import Spinner from "../Spinner/Spinner";
-import axios from "axios";
-
-const actionsStyles = theme => ({
-  root: {
-    flexShrink: 0,
-    color: theme.palette.text.secondary,
-    marginLeft: theme.spacing.unit * 2.5
-  }
-});
-class TablePaginationActions extends React.Component {
-  handleFirstPageButtonClick = event => {
-    this.props.onChangePage(event, 0);
-  };
-
-  handleBackButtonClick = event => {
-    this.props.onChangePage(event, this.props.page - 1);
-  };
-
-  handleNextButtonClick = event => {
-    this.props.onChangePage(event, this.props.page + 1);
-  };
-
-  handleLastPageButtonClick = event => {
-    this.props.onChangePage(
-      event,
-      Math.max(0, Math.ceil(this.props.count / this.props.rowsPerPage) - 1)
-    );
-  };
-
-  render() {
-    const { classes, count, page, rowsPerPage, theme } = this.props;
-
-    return (
-      <div className={classes.root}>
-        <IconButton
-          onClick={this.handleFirstPageButtonClick}
-          disabled={page === 0}
-          aria-label="First Page"
-        >
-          {theme.direction === "rtl" ? <LastPageIcon /> : <FirstPageIcon />}
-        </IconButton>
-        <IconButton
-          onClick={this.handleBackButtonClick}
-          disabled={page === 0}
-          aria-label="Previous Page"
-        >
-          {theme.direction === "rtl" ? (
-            <KeyboardArrowRight />
-          ) : (
-            <KeyboardArrowLeft />
-          )}
-        </IconButton>
-        <IconButton
-          onClick={this.handleNextButtonClick}
-          disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-          aria-label="Next Page"
-        >
-          {theme.direction === "rtl" ? (
-            <KeyboardArrowLeft />
-          ) : (
-            <KeyboardArrowRight />
-          )}
-        </IconButton>
-        <IconButton
-          onClick={this.handleLastPageButtonClick}
-          disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-          aria-label="Last Page"
-        >
-          {theme.direction === "rtl" ? <FirstPageIcon /> : <LastPageIcon />}
-        </IconButton>
-      </div>
-    );
-  }
-}
-
-TablePaginationActions.propTypes = {
-  classes: PropTypes.object.isRequired,
-  count: PropTypes.number.isRequired,
-  onChangePage: PropTypes.func.isRequired,
-  page: PropTypes.number.isRequired,
-  rowsPerPage: PropTypes.number.isRequired,
-  theme: PropTypes.object.isRequired
-};
-
-export const TablePaginationActionsWrapped = withStyles(actionsStyles, {
-  withTheme: true
-})(TablePaginationActions);
+import {TablePaginationActionsWrapped} from "../TablePaginationActions/TablePaginationActions";
+import AssetDao from "../AssetDao/AssetDao";
 
 export const styles = theme => ({
   root: {
     width: "100%",
-    marginTop: theme.spacing.unit * 3
+    marginTop: theme.spacing(3)
   },
   table: {
     minWidth: 250
@@ -115,12 +27,6 @@ export const styles = theme => ({
     overflowX: "hidden"
   }
 });
-
-//checking if we are running locally
-var URLPrefix = "";
-if (process.env.NODE_ENV === "development") {
-  URLPrefix = "http://localhost:8080";
-}
 
 export class Clips extends React.Component {
   constructor(props) {
@@ -140,13 +46,14 @@ export class Clips extends React.Component {
   }
 
   componentDidMount = () => {
-    this.setState({ sid: this.props.sid });
-    this.setState({ type: this.props.type });
+    this.setState({
+      sid: this.props.sid,
+      type: this.props.type
+    });
   };
 
   componentDidUpdate(prevProps) {
-    console.log("update %s page %d -> %d", this.state.type, this.state.previousPage, this.state.page);
-    console.log(prevProps);
+    //console.log("update %s page %d -> %d", this.state.type, this.state.previousPage, this.state.page);
     let reload = false;
     if(this.state.sid !== prevProps.sid) {
       reload = true;
@@ -156,10 +63,12 @@ export class Clips extends React.Component {
     }
     if(this.state.page !== this.state.previousPage) reload = true;
     if (reload) {
-      console.log("have page %d want page %d", this.state.previousPage, this.state.page);
-      axios
-        .get(`${URLPrefix}/api/v1/clip?sid=${this.props.sid}&type=${this.props.type}&page=${this.state.page+1}&page_size=${this.state.rowsPerPage}`)
-        .then(response => {
+      //console.log("have page %d want page %d", this.state.previousPage, this.state.page);
+      AssetDao.getClips(
+        this.props.sid,
+        this.props.type,
+        this.state.page, this.state.rowsPerPage,
+        response => {
           let new_page = 0;
           if(response.data.hasOwnProperty('page')) {
             new_page = response.data.page - 1;
@@ -170,15 +79,11 @@ export class Clips extends React.Component {
             rows: response.data.items,
             totalRows: response.data.total
           });
-        })
-        .catch(e => {
-          console.log(e);
         });
     }
   }
 
   handleChangePage = (event, page) => {
-    console.log(this.state.type, "handleChangePage", this.state.page, page);
     this.setState({ page });
   };
 
@@ -190,15 +95,15 @@ export class Clips extends React.Component {
     const duration = moment.duration(
       clip.available_versions.version[0].duration
     );
-    const formatted = moment.utc(duration.asMilliseconds()).format("HH:mm:ss");
-    return formatted;
+    return duration.format('hh:mm:ss', {trim:false});
   }
+  
   addButton(clip) {
     return (
       <button
         className="ui compact icon button"
         onClick={() => {
-          this.props.handleClick(clip);
+          this.props.handleClick(AssetDao.clip2Item(clip));
         }}
       >
         <i className="plus icon"></i>
@@ -222,11 +127,14 @@ export class Clips extends React.Component {
         <Paper className={classes.root}>
           <div className={classes.tableWrapper}>
             <Table className={classes.table}>
-              <TableBody>
-                <th>Title</th>
-                <th>Duration</th>
-                <th>Add</th>
-
+              <TableHead>
+              <TableRow>
+                  <TableCell>Title</TableCell>
+                  <TableCell>Duration</TableCell>
+                  <TableCell>Add</TableCell>
+                </TableRow>
+              </TableHead>
+                <TableBody>
                 {rows.map(row => (
                   <TableRow key={row.pid}>
                     <TableCell component="th" scope="row">

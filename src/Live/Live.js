@@ -2,110 +2,22 @@ import React from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
+import TableHead from "@material-ui/core/TableHead";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 import TableFooter from "@material-ui/core/TableFooter";
 import TablePagination from "@material-ui/core/TablePagination";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
-import IconButton from "@material-ui/core/IconButton";
-import FirstPageIcon from "@material-ui/icons/FirstPage";
-import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
-import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
-import LastPageIcon from "@material-ui/icons/LastPage";
 import moment from "moment";
-// import Spinner from "../Spinner/Spinner";
-import axios from "axios";
-const actionsStyles = theme => ({
-  root: {
-    flexShrink: 0,
-    color: theme.palette.text.secondary,
-    marginLeft: theme.spacing.unit * 2.5
-  }
-});
-class TablePaginationActions extends React.Component {
-  handleFirstPageButtonClick = event => {
-    this.props.onChangePage(event, 0);
-  };
-
-  handleBackButtonClick = event => {
-    this.props.onChangePage(event, this.props.page - 1);
-  };
-
-  handleNextButtonClick = event => {
-    this.props.onChangePage(event, this.props.page + 1);
-  };
-
-  handleLastPageButtonClick = event => {
-    this.props.onChangePage(
-      event,
-      Math.max(0, Math.ceil(this.props.count / this.props.rowsPerPage) - 1)
-    );
-  };
-
-  render() {
-    const { classes, count, page, rowsPerPage, theme } = this.props;
-
-    return (
-      <div className={classes.root}>
-        <IconButton
-          onClick={this.handleFirstPageButtonClick}
-          disabled={page === 0}
-          aria-label="First Page"
-        >
-          {theme.direction === "rtl" ? <LastPageIcon /> : <FirstPageIcon />}
-        </IconButton>
-        <IconButton
-          onClick={this.handleBackButtonClick}
-          disabled={page === 0}
-          aria-label="Previous Page"
-        >
-          {theme.direction === "rtl" ? (
-            <KeyboardArrowRight />
-          ) : (
-            <KeyboardArrowLeft />
-          )}
-        </IconButton>
-        <IconButton
-          onClick={this.handleNextButtonClick}
-          disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-          aria-label="Next Page"
-        >
-          {theme.direction === "rtl" ? (
-            <KeyboardArrowLeft />
-          ) : (
-            <KeyboardArrowRight />
-          )}
-        </IconButton>
-        <IconButton
-          onClick={this.handleLastPageButtonClick}
-          disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-          aria-label="Last Page"
-        >
-          {theme.direction === "rtl" ? <FirstPageIcon /> : <LastPageIcon />}
-        </IconButton>
-      </div>
-    );
-  }
-}
-
-TablePaginationActions.propTypes = {
-  classes: PropTypes.object.isRequired,
-  count: PropTypes.number.isRequired,
-  onChangePage: PropTypes.func.isRequired,
-  page: PropTypes.number.isRequired,
-  rowsPerPage: PropTypes.number.isRequired,
-  theme: PropTypes.object.isRequired
-};
-
-export const TablePaginationActionsWrapped = withStyles(actionsStyles, {
-  withTheme: true
-})(TablePaginationActions);
+import 'moment-duration-format';
+import { TablePaginationActionsWrapped } from "../TablePaginationActions/TablePaginationActions";
+import {fetchWebcasts} from "../ScheduleDao/ScheduleDao";
 
 export const styles = theme => ({
   root: {
     width: "100%",
-    marginTop: theme.spacing.unit * 3
+    marginTop: theme.spacing(3)
   },
   table: {
     minWidth: 250
@@ -115,104 +27,69 @@ export const styles = theme => ({
   }
 });
 
-//checking if we are running locally
-var URLPrefix = "";
-if (process.env.NODE_ENV === "development") {
-  URLPrefix = "http://localhost:8080";
-}
-
 export class Live extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
       spinner: false,
-      totalRows: 0,
       rows: [],
       page: 0,
       previousPage: -1,
       rowsPerPage: 5,
-      data: [],
+      totalRows: 0,
       sid: "",
-      date: moment().utc().format()
+      date: moment().utc().startOf('day')
     };
   }
 
   componentDidMount = () => {
-    this.setState({ sid: this.props.sid });
-    this.setState({ date: this.props.date });
+    this.setState({ sid: this.props.sid, date: moment(this.props.date) });
   };
 
   componentDidUpdate(prevProps) {
     //get request for webcasts
-    const today = moment().millisecond(0).second(0).minute(0).hour(0).utc();
-    const date = moment(this.state.date).millisecond(0).second(0).minute(0).hour(0).utc();
-    let start = moment();
-    if(date.isSame(today)) {
-        start.add(5, 'minutes');
-    }
-    else {
-        start = moment(date);
-    }
-    const end = moment(start).add(1, "days").utc().format();
-    start = start.utc().format();
-    if (this.state.page !== this.state.previousPage) {
-      console.log("have page %d want page %d", this.state.page, this.state.previousPage);
-      axios
-        .get(`${URLPrefix}/api/v1/webcast?sid=${this.props.sid}&start=${start}&end=${end}`)
-        .then(response => {
-          console.log("Live RESPONSE", response.data);
-	  if(response.data.total>0) {
-		  response.data.items.forEach(item => {
-		    var durationTime =
-		      moment(item.scheduled_time.end) -
-		      moment(item.scheduled_time.start);
-
-		    item.isLive = true;
-		    item.startTime = moment(item.scheduled_time.start).format( "HH:mm:ss");
-		    item.title = "Live programme at " + item.scheduled_time.start;
-		    item.duration = moment.duration(durationTime, "milliseconds");
-		  });
-		  this.setState({ rows: response.data.items });
-	  }
-	  else {
-		  this.setState({ rows: [] });
-	  }
-          let new_page = 0;
-          if(response.data.hasOwnProperty('page')) {
-            new_page = response.data.page - 1;
-          }
-          this.setState({ previousPage: new_page });
-          this.setState({ page: new_page });
-          this.setState({ totalRows: response.data.total });
-        })
-        .catch(e => {
-          console.log(e);
-        });
+    const start = moment(this.props.date).utc().format();
+    const end = moment(this.props.date).add(1, 'days').utc().format();
+    if ((this.state.page !== this.state.previousPage)
+      ||
+      (this.props.date !== prevProps.date)
+    ) {
+      //console.log("have page %d want page %d", this.state.previousPage, this.state.page);
+      fetchWebcasts(this.props.sid, start, end, this.state.page, this.state.rowsPerPage,
+        (schedule, totalRows) => {
+          this.setState({
+            sid: this.props.sid,
+            date: moment(this.props.date),
+            rows: schedule,
+            totalRows: totalRows,
+            page: this.state.page,
+            previousPage: this.state.page
+          });
+        }
+      );
     }
   }
 
   handleChangePage = (event, page) => {
-    console.log("Live handleChangePage", this.state.page, page);
-    this.setState({ page });
+    console.log('live:handleChangePage', page);
+    this.setState({ page: page });
   };
 
   handleChangeRowsPerPage = event => {
     this.setState({ page: 0, rowsPerPage: event.target.value });
   };
 
-  formattedDuration(clip) {
-    const duration = clip.duration;
-    const formatted = moment.utc(duration.asMilliseconds()).format("HH:mm:ss");
-    return formatted;
+  formattedDuration(item) {
+    return moment.duration(item.duration).format('hh:mm:ss', {trim:false});
   }
 
-  addButton(clip) {
+  addButton(item) {
     return (
       <button
         className="ui compact icon button"
         onClick={() => {
-          this.props.handleClick(clip);
+          this.props.handleClick(item);
         }}
       >
         <i className="plus icon"></i>
@@ -222,10 +99,9 @@ export class Live extends React.Component {
 
   render() {
     const { classes } = this.props;
-    const { rows, rowsPerPage, page, totalRows } = this.state;
+    const { date, rows, rowsPerPage, page, totalRows } = this.state;
     const emptyRows =
       rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
-
     //if(rows.length === 0){
     //  this.setState({spinner : true})
     //  return <Spinner />
@@ -233,13 +109,18 @@ export class Live extends React.Component {
 
     return (
       <div>
+      {date.format("YYYY-MM-DD")}
         <Paper className={classes.root}>
           <div className={classes.tableWrapper}>
             <Table className={classes.table}>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Title</TableCell>
+                  <TableCell>Duration</TableCell>
+                  <TableCell>Add</TableCell>
+                </TableRow>
+              </TableHead>
               <TableBody>
-                <th>Title</th>
-                <th>Duration</th>
-                <th>Add</th>
 
                 {rows.map(row => (
                   <TableRow key={row.pid}>

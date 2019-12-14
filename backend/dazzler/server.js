@@ -236,6 +236,7 @@ async function clip(q, query, res) {
     }
     res.json(clips);
   } catch(e) {
+    console.log(e);
     res.status(404).send("Not found") // TODO use proper error message
   } 
 }
@@ -272,7 +273,7 @@ app.get("/api/v1/episode", async (req, res, next) => {
         items: items
       });
     } catch (e) {
-      console.log(JSON.stringify(e));
+      console.log(e);
       res.status(404).send("error");
     }
   }
@@ -296,7 +297,7 @@ app.get("/api/v1/episode", async (req, res, next) => {
         items: items
       });
     } catch (e) {
-      console.log(JSON.stringify(e));
+      console.log(e);
       res.status(404).send("error");
     }
   }
@@ -519,7 +520,7 @@ function pid2crid(pid) {
 }
 
 function add_crids_to_webcast(results) {
-  if (results != null && results.total > 0) {
+  if (results && results.total > 0) {
     for (let i = 0; i < results.items.length; i++) {
       const pid = results.items[i].window_of[0].pid;
       results.items[i].window_of[0].crid = pid2crid(pid);
@@ -529,7 +530,7 @@ function add_crids_to_webcast(results) {
 }
 
 function add_crids_to_episodes(results) {
-  if (results != null) {
+  if (results && results.total>0) {
     for (let i = 0; i < results.items.length; i++) {
       if (results.items[i].available_versions.hasOwnProperty("version")) {
         for (let j = 0; j < results.items[i].available_versions.version.length; j++) {

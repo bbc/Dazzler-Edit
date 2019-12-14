@@ -1,11 +1,10 @@
 import React from "react";
 import * as enzyme from "enzyme";
 import Adapter from "enzyme-adapter-react-16";
-enzyme.configure({ adapter: new Adapter() });
-import { shallow, mount, render } from "enzyme";
+import { shallow, mount } from "enzyme";
 import Editor from "../Editor/Editor";
-import moment from "moment";
 import Button from "../Button";
+enzyme.configure({ adapter: new Adapter() });
 
 describe("< Editor />", () => {
   test("Testing that the <Editor /> component is rendered", () => {
