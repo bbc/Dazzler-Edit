@@ -135,7 +135,7 @@ class ScheduleDao {
     for (let i = 0; i < data.length; i++) {
       if (data[i].insertionType === 'gap') continue;
       if (data[i].insertionType === 'sentinel') continue;
-      tva += this.makeScheduleEvent(serviceIDRef, data, i, data.length);
+      tva += ScheduleDao.makeScheduleEvent(serviceIDRef, data, i, data.length);
     }
     tva += "\n      </Schedule>\n    </ProgramLocationTable>\n" + tvaEnd;
     console.log(tva);
@@ -166,12 +166,14 @@ class ScheduleDao {
   return ` 
         <ScheduleEvent>
           <Program crid="${broadcast.asset.versionCrid}"/>
+            <BroadcasterRawData>${broadcast.captureChannel}</BroadcasterRawData>
             <InstanceMetadataId>${imi}</InstanceMetadataId>
             <InstanceDescription>
               <AVAttributes>
                 <AudioAttributes><MixType href="urn:mpeg:mpeg7:cs:AudioPresentationCS:2001:3"><Name>Stereo</Name></MixType></AudioAttributes>
                 <VideoAttributes><AspectRatio>16:9</AspectRatio><Color type="color"/></VideoAttributes>
               </AVAttributes>
+              <Title>${broadcast.title}</Title>
             </InstanceDescription>
             <PublishedStartTime>${startDateTime.utc().format()}</PublishedStartTime>
             <PublishedDuration>${duration}</PublishedDuration>
