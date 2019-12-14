@@ -166,7 +166,7 @@ class ScheduleDao {
   return ` 
         <ScheduleEvent>
           <Program crid="${broadcast.asset.versionCrid}"/>
-            <BroadcasterRawData>${broadcast.captureChannel}</BroadcasterRawData>
+            <BroadcasterRawData>${broadcast.captureChannel?broadcast.captureChannel:''}</BroadcasterRawData>
             <InstanceMetadataId>${imi}</InstanceMetadataId>
             <InstanceDescription>
               <AVAttributes>

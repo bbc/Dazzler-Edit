@@ -110,9 +110,9 @@ class Loop extends React.Component {
           <button className={active} onClick={this.pasteToFill}
           ><Typography>Paste to Fill</Typography>
           </button>
-          <button className="ui button" onClick={this.props.onTest}
+          {/*<button className="ui button" onClick={this.props.onTest}
           ><Typography>Test</Typography>
-          </button>
+          </button>*/}
         </Box>
       </Box>
       </div>
