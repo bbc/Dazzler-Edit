@@ -183,7 +183,7 @@ class Editor extends React.Component {
   }
 
   filterUpcomingEpisodes(items) {
-    console.log('filterUpcomingEpisodes');
+    //console.log('filterUpcomingEpisodes');
     let filtered = [];
     for(let i=0; i<items.length; i++) {
       let wanted = false;

@@ -32,7 +32,7 @@ class ScheduleDao {
   }
 
   static fetchSchedule(sid, date, cb) {
-    console.log('fetchSchedule', sid, date.format());
+    //console.log('fetchSchedule', sid, date.format());
     axios
       .get(
         `${URLPrefix}/api/v1/schedule?sid=${sid}&date=${date.utc().format('YYYY-MM-DD')}`
