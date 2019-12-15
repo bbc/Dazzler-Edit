@@ -72,7 +72,7 @@ class Loop extends React.Component {
   }
 
   render() {
-    const active = (this.props.data.length>0)?"ui primary button active":"ui primary button"
+    const d = this.props.data.length===0;
     return (
       <div style={{ width: '100%' }}>
       <Box>
@@ -97,17 +97,17 @@ class Loop extends React.Component {
           minHeight={300}
         />
         <Box display="flex" flexDirection="row" flexGrow={1}>
-          <button className={active} onClick={this.props.onClear}>
+          <button disabled={d} className="ui primary button" onClick={this.props.onClear}>
             <i className="trash icon"><Typography>Clear</Typography></i>
           </button>
-          <button className={active} onClick={() => {
+          <button  disabled={d} className="ui primary button" onClick={() => {
               if(this.props.data.length>0) {
                 this.props.onPaste(this.props.data);
               }
             }}
           ><Typography>Paste</Typography>
           </button>
-          <button className={active} onClick={this.pasteToFill}
+          <button disabled={d} className="ui primary button" onClick={this.pasteToFill}
           ><Typography>Paste to Fill</Typography>
           </button>
           {/*<button className="ui button" onClick={this.props.onTest}
