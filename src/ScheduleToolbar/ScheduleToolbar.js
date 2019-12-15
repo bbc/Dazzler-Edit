@@ -15,9 +15,6 @@ const useStyles = makeStyles(theme => ({
   button: {
     margin: theme.spacing(2),
   },
-  savebutton: {
-    margin: theme.spacing(2),
-  },
   placeholder: {
     height: 40,
   },
@@ -97,7 +94,7 @@ export default function ScheduleToolbar(
           </Fade>
         )}
       </div>
-      <Button disabled={(!contentModified)||(!saveEnabled)} color='primary' variant='contained' onClick={handleClickSave} className={classes.savebutton}>
+      <Button disabled={(!contentModified)||(!saveEnabled)} color='primary' variant='contained' onClick={handleClickSave} className={classes.button}>
         {saving !== 'idle' ? 'Saving' : 'Save'}
       </Button>
     </div>
