@@ -7,22 +7,28 @@ const URLPrefix = (process.env.NODE_ENV === "development") ? "http://localhost:8
 class ScheduleDao {
 
   static getTitle(item, index) {
-    console.log(item);
-    let title = null;
+    //console.log(item);
+    let title = '';
     if (item.hasOwnProperty("clip")) {
       const clip = item.clip[0];
-      title = clip.title;
-      if (title == null) {
-        title = clip.presentation_title;
+      console.log(clip);
+      if (clip.title) {
+        title = clip.title;
       }
     } else if (item.hasOwnProperty("episode")) {
       const episode = item.episode[0];
-      title = episode.title;
-      if (title == null) {
-        title = episode.presentation_title;
+      console.log(episode);
+      if (episode.title[0]) {
+        title = episode.title[0];
+      }
+      else {
+        if (item.hasOwnProperty("brand")) {
+          title = item.brand[0].title[0]+' ';
+        }
+        title += episode.presentation_title[0];
       }
     }
-    if (title == null) {
+    if (title === '') {
       title = "Loaded From Schedule " + index;
     }
     return title;
