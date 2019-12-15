@@ -102,10 +102,6 @@ export class Live extends React.Component {
     const { date, rows, rowsPerPage, page, totalRows } = this.state;
     const emptyRows =
       rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
-    //if(rows.length === 0){
-    //  this.setState({spinner : true})
-    //  return <Spinner />
-    // }
 
     return (
       <div>

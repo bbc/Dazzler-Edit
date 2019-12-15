@@ -118,11 +118,6 @@ export class Episode extends React.Component {
     const emptyRows =
       rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
 
-    //if(rows.length === 0){
-    //  this.setState({spinner : true})
-    //  return <Spinner />
-    // }
-
     return (
       <div>
         <Paper className={classes.root}>
