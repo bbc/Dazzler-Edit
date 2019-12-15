@@ -9,10 +9,13 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 const useStyles = makeStyles(theme => ({
   root: {
     display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
+    flexDirection: 'row',
+    alignItems: 'stretch',
   },
   button: {
+    margin: theme.spacing(2),
+  },
+  savebutton: {
     margin: theme.spacing(2),
   },
   placeholder: {
@@ -20,61 +23,73 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function DelayingAppearance() {
+export default function ScheduleToolbar(
+  { 
+    saveEnabled=false, contentModified=false, 
+    onSave=function(){console.log('save pressed');}, 
+    onClear=function(){console.log('clear pressed');}, 
+    onReload=function(){console.log('reload pressed');}
+  }
+) {
   const classes = useStyles();
-  const [loading, setLoading] = React.useState(false);
-  const [query, setQuery] = React.useState('idle');
-  const timerRef = React.useRef();
+  const [clear, setClear] = React.useState(false);
+  const [reload, setReload] = React.useState('idle');
+  const [saving, setSaving] = React.useState('idle');
 
-  React.useEffect(
-    () => () => {
-      clearTimeout(timerRef.current);
-    },
-    [],
-  );
+  const handleClickClear = () => {
+    setClear(true);
+    onClear();
+    setClear(false);
+  }
 
-  const handleClickLoading = () => {
-    setLoading(prevLoading => !prevLoading);
+  const handleClickReload = () => {
+    setReload('progress')
+    onReload();
+  }
+
+  const handleClickSave = () => {
+    setSaving('progress');
+    onSave();
   };
 
-  const handleClickQuery = () => {
-    clearTimeout(timerRef.current);
+  // statements in the body of the function are called on rendering!!!
+  if(reload !== 'idle' && !contentModified ) {
+    setReload('idle');
+  }
 
-    if (query !== 'idle') {
-      setQuery('idle');
-      return;
-    }
-
-    setQuery('progress');
-    timerRef.current = setTimeout(() => {
-      setQuery('success');
-    }, 2000);
-  };
+  if(saving !== 'idle' && !contentModified ) {
+    setSaving('idle');
+  }
 
   return (
     <div className={classes.root}>
       <div className={classes.placeholder}>
+        <Button disabled={!contentModified} variant='outlined' onClick={handleClickClear} className={classes.button}>
+          {clear?'Clearing':'Clear'}
+        </Button>
+      </div>
+      <div className={classes.placeholder}>
         <Fade
-          in={loading}
+          in={reload === 'progress'}
           style={{
-            transitionDelay: loading ? '800ms' : '0ms',
+            transitionDelay: reload === 'progress' ? '800ms' : '0ms',
           }}
           unmountOnExit
         >
           <CircularProgress />
         </Fade>
+        <Button variant='outlined' onClick={handleClickReload} className={classes.button}>
+          {reload !== 'idle' ? 'Loading' : 'Reload'}
+        </Button>
       </div>
-      <Button onClick={handleClickLoading} className={classes.button}>
-        {loading ? 'Stop loading' : 'Loading'}
-      </Button>
       <div className={classes.placeholder}>
-        {query === 'success' ? (
-          <Typography>Success!</Typography>
+        {saving === 'success' ? (
+          <Typography>Saved!</Typography>
         ) : (
           <Fade
-            in={query === 'progress'}
+            in={saving === 'progress'}
             style={{
-              transitionDelay: query === 'progress' ? '800ms' : '0ms',
+              transitionDelay: saving === 'progress' ? '800ms' : '0ms',
             }}
             unmountOnExit
           >
@@ -82,69 +97,17 @@ export default function DelayingAppearance() {
           </Fade>
         )}
       </div>
-      <Button onClick={handleClickQuery} className={classes.button}>
-        {query !== 'idle' ? 'Reset' : 'Simulate a load'}
+      <Button disabled={(!contentModified)||(!saveEnabled)} color='primary' variant='contained' onClick={handleClickSave} className={classes.savebutton}>
+        {saving !== 'idle' ? 'Saving' : 'Save'}
       </Button>
     </div>
   );
 }
 
-
-
-
-
-
-
-
-
-/*
-  <ScheduleToolbar saveEnabled=true|false onSaveClicked={function}
-  />
-*/
-class ScheduleToolbar extends React.Component {
-    constructor(props) {
-        super(props);
-    
-        this.state = {
-        };
-    }
-
-    render() {
-        let clearButtonAppearance = "ui small primary button disabled"
-        let saveButtonAppearance = "ui right floated small primary button disabled";
-        if(this.props.saveEnabled) {
-          saveButtonAppearance = "ui right floated small primary button";
-        }
-        if(this.props.resetEnabled) {
-          clearButtonAppearance = "ui small primary button"
-        }
-        /*
-        savePlaylist: "ui right floated small primary labeled icon button",
-            savePlaylist: "ui right floated primary loading button"
-                savePlaylist: "ui right floated positive button active"
-        */
-    
-        return (
-            <div>
-            <button className={clearButtonAppearance} onClick={this.props.onClear}>
-          <Typography>Clear</Typography>
-          </button>
-          <button className="ui small primary button" onClick={this.props.onReload}>
-          <Typography>Reload</Typography>
-          </button>
-            <button className={saveButtonAppearance} onClick={this.props.onSave}>
-            <Typography>Save</Typography>
-            </button>
-            </div>
-        );
-    }
-}
 ScheduleToolbar.propTypes = {
   saveEnabled: PropTypes.bool.isRequired,
-  resetEnabled: PropTypes.bool.isRequired,
+  contentModified: PropTypes.bool.isRequired,
   onSave: PropTypes.func.isRequired,
   onClear: PropTypes.func.isRequired,
   onReload: PropTypes.func.isRequired
 };
-export default ScheduleToolbar;
-    

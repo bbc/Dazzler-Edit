@@ -189,13 +189,13 @@ class Editor extends React.Component {
       let wanted = false;
       for(let j=0; j<items[i].available_versions.available; j++) {
         const version = items[i].available_versions.version[j];
-        console.log(version);
+        //console.log(version);
         for(let k=0; k<version.availabilities.availability.length; k++) {
           const availability = version.availabilities.availability[k];
           const start = moment(availability.scheduled_start);
           const end = moment(availability.scheduled_end);
           const sip = this.state.schedule.items[this.state.scheduleInsertionPoint].startTime
-          console.log(start.format(), end.format(), sip.format());
+          //console.log(start.format(), end.format(), sip.format());
           wanted |= (sip.isBetween(start, end));      
         }
       }
@@ -323,13 +323,14 @@ class Editor extends React.Component {
       loopDuration: this.state.loopDuration.subtract(moment.duration(r.duration))});
   }
 
-  savePlaylist() {
-    console.log('savePlaylist');
+  savePlaylist = () => {
+    //console.log('savePlaylist');
+    const This = this; // closure for callback
     saveSchedule(
       services[this.state.schedule.sid].serviceIDRef,
       this.state.schedule.items,
       function() {
-        this.setState({ scheduleModified: false });
+        This.setState({ scheduleModified: false });
       },
       function(e) {
         console.log(e);
@@ -516,8 +517,8 @@ class Editor extends React.Component {
             lastUpdated=""
           />
           <ScheduleToolbar
-            saveEnabled={this.state.scheduleModified && this.state.user.auth}
-            resetEnabled={this.state.scheduleModified}
+            saveEnabled={this.state.user.auth||true}
+            contentModified={this.state.scheduleModified}
             onSave={this.savePlaylist}
             onClear={this.clearSchedule}
             onReload={this.reloadSchedule}
