@@ -39,11 +39,6 @@
 .tooltip:hover .tooltiptext {
   visibility: visible;
 }
-.dateContainer {
-  margin: auto;
-  text-align: center;
-  width: 50%;
-}
 
 .live {
   background-color: #daa520;

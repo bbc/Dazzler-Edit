@@ -52,8 +52,13 @@ const styles = theme => ({
       duration: theme.transitions.duration.enteringScreen
     })
   },
+  appBarTitle: {
+    margin: theme.spacing(2),
+    flexGrow: 1
+  },
   appBarName: {
-    marginLeft: "auto"
+    margin: theme.spacing(2),
+    marginLeft: "auto",
   },
   menuButton: {
     marginLeft: 12,
@@ -361,10 +366,13 @@ class Editor extends React.Component {
               <MenuIcon />
             </IconButton>
             <Typography variant="h6" color="inherit" noWrap>
-              <center>{services[this.state.schedule.sid].name}</center>
+              {services[this.state.schedule.sid].name}
+            </Typography>
+            <Typography className={classes.appBarTitle} variant="h5" color="inherit" noWrap>
+              <center>This is Dazzler!</center>
             </Typography>
             <Typography className={classes.appBarName} variant="h6" color="inherit" noWrap>
-              <center>{this.state.user.name}</center>
+              {this.state.user.name}
             </Typography>
           </Toolbar>
         </AppBar>
