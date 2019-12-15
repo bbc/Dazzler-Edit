@@ -32,6 +32,14 @@ export default function ScheduleToolbar(
   const [clear, setClear] = React.useState(false);
   const [reload, setReload] = React.useState('idle');
   const [saving, setSaving] = React.useState('idle');
+  const timerRef = React.useRef();
+
+  React.useEffect(
+    () => () => {
+      clearTimeout(timerRef.current);
+    },
+    [],
+  );
 
   const handleClickClear = () => {
     setClear(true);
@@ -50,12 +58,18 @@ export default function ScheduleToolbar(
   };
 
   // statements in the body of the function are called on rendering!!!
+  console.log('saving', contentModified, saving, typeof saving);
+
   if(reload !== 'idle' && !contentModified ) {
     setReload('idle');
   }
 
-  if(saving !== 'idle' && !contentModified ) {
-    setSaving('idle');
+  if((saving === 'progress' && !contentModified)) {
+    console.log('success - setting timer');
+    setSaving('success');
+    timerRef.current = setTimeout(() => {
+      setSaving('idle');
+    }, 2000);
   }
 
   return (
@@ -81,7 +95,7 @@ export default function ScheduleToolbar(
       </div>
       <div className={classes.placeholder}>
         {saving === 'success' ? (
-          <Typography>Saved!</Typography>
+          ''
         ) : (
           <Fade
             in={saving === 'progress'}
@@ -95,7 +109,7 @@ export default function ScheduleToolbar(
         )}
       </div>
       <Button disabled={(!contentModified)||(!saveEnabled)} color='primary' variant='contained' onClick={handleClickSave} className={classes.button}>
-        {saving !== 'idle' ? 'Saving' : 'Save'}
+        {(saving === 'idle')? 'Save':(saving==='progress')?'Saving':'Saved'}
       </Button>
     </div>
   );

@@ -33,7 +33,6 @@ export class Clips extends React.Component {
     super(props);
 
     this.state = {
-      spinner: false,
       totalRows: 0,
       rows: [],
       page: 0,
@@ -114,14 +113,7 @@ export class Clips extends React.Component {
   render() {
     const { classes } = this.props;
     const { rows, rowsPerPage, page, totalRows } = this.state;
-    const emptyRows =
-      rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
-
-    //if(rows.length === 0){
-    //  this.setState({spinner : true})
-    //  return <Spinner />
-    // }
-
+    const emptyRows = Math.min(rowsPerPage, rowsPerPage-rows.length);
     return (
       <div>
         <Paper className={classes.root}>
@@ -151,12 +143,14 @@ export class Clips extends React.Component {
                     <TableCell align="right">{this.addButton(row)}</TableCell>
                   </TableRow>
                 ))}
-
-                {emptyRows > 0 && (
-                  <TableRow style={{ height: 48 * emptyRows }}>
+                {/*Array.from(Array(emptyRows)).map((val, index) =>(
+                <TableRow key={index+rows.length}>
                     <TableCell colSpan={6} />
                   </TableRow>
-                )}
+                ))*/}
+                <TableRow height={48*emptyRows} key={rows.length}>
+                    <TableCell colSpan={6} />
+                  </TableRow>
               </TableBody>
               <TableFooter>
                 <TableRow>
@@ -182,7 +176,10 @@ export class Clips extends React.Component {
 }
 
 Clips.propTypes = {
-  classes: PropTypes.object.isRequired
+  classes: PropTypes.object.isRequired,
+  type: PropTypes.string.isRequired,
+  sid:  PropTypes.string.isRequired,
+  handleClick: PropTypes.func.isRequired
 };
 
 export default withStyles(styles)(Clips);

@@ -391,7 +391,7 @@ class Editor extends React.Component {
         >
           <div className={classes.drawerHeader} />
         <Box display="flex" flexDirection="row" p={1} m={1} bgcolor="background.paper">
-          <Box width="25%" display="flex" flexDirection="column">
+          <Box width="28%" display="flex" flexDirection="column">
           <Typography variant="h4" align="center">Picklists</Typography>
 
           <FormControl component="fieldset" className={classes.formControl}>
@@ -498,7 +498,7 @@ class Editor extends React.Component {
         </ExpansionPanelDetails>
       </ExpansionPanel>
       </Box>      
-      <Box mx="1rem" width="30%" flexGrow={1} flexDirection="column">
+      <Box mx="1rem" width="28%" flexGrow={1} flexDirection="column">
           <Typography variant="h4" align="center">Loop</Typography>
           <Loop
             onTest={this.testLoop}
@@ -510,7 +510,7 @@ class Editor extends React.Component {
             onClear={this.clearLoop}
           />
           </Box>
-          <Box width="45%" flexGrow={1} flexDirection="column">
+          <Box width="44%" flexGrow={1} flexDirection="column">
           <Typography variant="h4" align="center">Schedule</Typography>
           <SchedulePicker
             enabled={this.state.scheduleModified?false:true}
