@@ -7,6 +7,7 @@ const URLPrefix = (process.env.NODE_ENV === "development") ? "http://localhost:8
 class ScheduleDao {
 
   static getTitle(item, index) {
+    console.log(item);
     let title = null;
     if (item.hasOwnProperty("clip")) {
       const clip = item.clip[0];
