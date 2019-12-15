@@ -335,7 +335,7 @@ class ScheduleObject {
             if (done) break;
         }
         this.items = schedule;
-        console.log('delete end', schedule);
+        //console.log('delete end', schedule);
     }
 
     sort() {
