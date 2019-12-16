@@ -233,7 +233,7 @@ class ScheduleObject {
         // brute force for now TODO make more elegant
         let newIndex = 1;
         for(let i=0; i<this.items.length; i++) {
-            if(this.items.index[i].startTime.isSame(startTime)) {
+            if(this.items[i].startTime.isSame(startTime)) {
                 newIndex = i;
                 break;
             }
@@ -298,6 +298,7 @@ class ScheduleObject {
     // if deleting a live item, also look at the preceding item
     //    if a gap, delete it too
     //    if an overlap, turn it into a normal item
+    // Return the index of the item just be
     deleteItemClosingGap(index) {
         let schedule = [...this.items];
         let duration = moment.duration(schedule[index].duration);
@@ -308,7 +309,7 @@ class ScheduleObject {
                     schedule.splice(index-1, 1);
                     index--;
                     break;
-                case "overlap":
+                case "overlap": // change to ordinary item
                     schedule[index-1].insertionType = ""
                     duration.add(moment.duration(schedule[index-1].duration));
                     schedule[index-1].duration = schedule[index-1].asset.duration;
@@ -348,6 +349,10 @@ class ScheduleObject {
         }
         this.items = schedule;
         //console.log('delete end', schedule);
+        if(this.items[index].insertionType === 'sentinel') {
+            return index-1;
+        }
+        return index;
     }
 
     sort() {

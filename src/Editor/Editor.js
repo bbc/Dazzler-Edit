@@ -231,8 +231,8 @@ class Editor extends React.Component {
       this.state.schedule.date,
       this.state.schedule.items
     );
-    scheduleObject.deleteItemClosingGap(index);
-    this.updateSchedule(scheduleObject, index, true);
+    const newIndex = scheduleObject.deleteItemClosingGap(index);
+    this.updateSchedule(scheduleObject, newIndex, true);
   }
 
   handleNewSchedule(scheduleObject) {
