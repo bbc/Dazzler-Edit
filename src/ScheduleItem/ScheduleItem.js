@@ -25,6 +25,11 @@ class ScheduleItem extends React.Component {
     if(this.props.live === "true") rowStyle = 'live';
     let arrowStyle = "bottomarrow";
     if(rowStyle === 'gap') arrowStyle = "midarrow";
+    let overlap = moment.duration();
+    if(this.props.insertionType === 'overlap') {
+      overlap = moment.duration(this.props.asset_duration)
+                .subtract(moment.duration(this.props.duration))
+    }
     return (
       <Fragment>
         <tr className={rowStyle}>
@@ -44,14 +49,16 @@ class ScheduleItem extends React.Component {
             ?
             <Typography fontStyle="italic">
               (asset duration is &nbsp;
-              {moment.duration(this.props.asset_duration).format('HH:mm:ss')}
+              {moment.duration(this.props.asset_duration).format('HH:mm:ss', {trim:false})}
+              (overlap is &nbsp;
+              {moment.duration(overlap).format('HH:mm:ss', {trim:false})}
               )
             </Typography>
             :<Typography></Typography>
             }
           </td>
           <td onClick={() => this.props.onClick(this.props.index)}>
-            {moment.duration(this.props.duration).format('HH:mm:ss')}
+            {moment.duration(this.props.duration).format('HH:mm:ss', {trim:false})}
           </td>
         <td>
           {
