@@ -12,5 +12,17 @@ class PlatformDao {
             console.log(e);
         });
     }
+
+    static subscribe(userSubscription, cb, err) {
+        axios
+        .post(`${URLPrefix}/api/v1/subscribe`, userSubscription)
+        .then(response => cb(response))
+        .catch(err => err(err)
+        );
+    }
+
+    static async sendTestNotification(pushServerSubscriptionId) {
+        await axios.get(`${URLPrefix}/api/v1/subscribe/${pushServerSubscriptionId}`);
+    }
 }
 export default PlatformDao;

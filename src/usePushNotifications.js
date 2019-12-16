@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import http from "./utils/http";
+import PlatformDao from "./PlatformDao/PlatformDao";
 //the function to call the push server: https://github.com/Spyna/push-notification-demo/blob/master/front-end-react/src/utils/http.js
 
 import {
@@ -100,16 +100,13 @@ export default function usePushNotifications() {
   const onClickSendSubscriptionToPushServer = () => {
     setLoading(true);
     setError(false);
-    http
-      .post("/subscription", userSubscription)
-      .then(function(response) {
+    PlatformDao.subscribe(userSubscription, function(response){    
         setPushServerSubscriptionId(response.id);
         setLoading(false);
-      })
-      .catch(err => {
+    }, function(err){
         setLoading(false);
         setError(err);
-      });
+    });
   };
 
   /**
@@ -118,11 +115,13 @@ export default function usePushNotifications() {
   const onClickSendNotification = async () => {
     setLoading(true);
     setError(false);
-    await http.get(`/subscription/${pushServerSubscriptionId}`).catch(err => {
-      setLoading(false);
-      setError(err);
-    });
-    setLoading(false);
+    try {
+        await PlatformDao.sendTestNotification(pushServerSubscriptionId);
+        setLoading(false);
+    } catch(err) {
+        setLoading(false);
+        setError(err);
+    }
   };
 
   /**
