@@ -230,6 +230,15 @@ class ScheduleObject {
             // put them back in again using addFloating
             this.addFloating(index, cut);
         }
+        // brute force for now TODO make more elegant
+        let newIndex = 1;
+        for(let i=0; i<this.items.length; i++) {
+            if(this.items.index[i].startTime.isSame(startTime)) {
+                newIndex = i;
+                break;
+            }
+        }
+        return newIndex;
     }
 
     findNextFixed(index) {

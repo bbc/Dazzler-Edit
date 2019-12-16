@@ -173,8 +173,8 @@ class Editor extends React.Component {
       this.state.schedule.date,
       this.state.schedule.items
     );
-    scheduleObject.addLive(item);
-    this.setState({schedule: scheduleObject});
+    const indexOfLive = scheduleObject.addLive(item);
+    this.updateSchedule(scheduleObject, indexOfLive-1, true);
   }
 
   handleAddClipOrEpisode(item) {
