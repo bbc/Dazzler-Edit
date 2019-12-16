@@ -269,8 +269,8 @@ class Editor extends React.Component {
       this.state.schedule.date,
       this.state.schedule.items
     );
-    scheduleObject.addFloating(index, items);
-    this.updateSchedule(scheduleObject, index+1, true);
+    const newIndex = scheduleObject.addFloating(index, items);
+    this.updateSchedule(scheduleObject, newIndex, true);
   }
   
   updateSchedule(scheduleObject, scheduleInsertionPoint, modified) {

@@ -105,15 +105,18 @@ class ScheduleObject {
             this.items[i].startTime = moment(s);
             s.add(moment.duration(this.items[i].duration));
         }
+        let newCursor = indexOfFixed;
         if (this.items[indexOfFixed].insertionType === 'sentinel') {
             this.fixEndTime();
         }
         if(assetsToAdd.length > numItemsToAdd) {
             this.insertOverlap(indexOfFixed, assetsToAdd[numItemsToAdd]);
+            newCursor++;
         }
         else {
             this.insertGap(indexOfFixed);
         }
+        return newCursor;
     }
 
     insertGap(index) {
