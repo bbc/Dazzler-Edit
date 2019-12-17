@@ -50,8 +50,8 @@ class ScheduleItem extends React.Component {
             <Typography fontStyle="italic">
               (asset duration is &nbsp;
               {moment.duration(this.props.asset_duration).format('HH:mm:ss', {trim:false})}
-              (overlap is &nbsp;
-              {moment.duration(overlap).format('HH:mm:ss', {trim:false})}
+              ,
+              {moment.duration(overlap).format('HH:mm:ss', {trim:false})} will be lost
               )
             </Typography>
             :<Typography></Typography>
