@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import classNames from "classnames";
-import Box from '@material-ui/core/Box';
+import { Box, Grid } from '@material-ui/core';
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
@@ -31,6 +31,7 @@ import ScheduleObject from "../ScheduleObject";
 import Loop from "../Loop/Loop";
 import PlatformDao from "../PlatformDao/PlatformDao";
 import {fetchSchedule, saveSchedule} from "../ScheduleDao/ScheduleDao";
+import { Container } from "@material-ui/core";
 
 const drawerWidth = 240;
 
@@ -365,15 +366,29 @@ class Editor extends React.Component {
             >
               <MenuIcon />
             </IconButton>
-            <Typography variant="h6" color="inherit" noWrap>
+            <Grid container>
+              <Grid item>
+              <Typography variant="h6" color="inherit" noWrap>
               {services[this.state.schedule.sid].name}
             </Typography>
-            <Typography className={classes.appBarTitle} variant="h5" color="inherit" noWrap>
-              <center>This is Dazzler!</center>
+              </Grid>
+              <Grid item>
+              <Typography variant="h6" align="center" color="inherit">
+              all times in GMT  
+            </Typography>              
+              </Grid>
+              <Grid item>
+
+              <Typography align="center" className={classes.appBarTitle} variant="h5" color="inherit" noWrap>
+              This is Dazzler!
             </Typography>
-            <Typography className={classes.appBarName} variant="h6" color="inherit" noWrap>
+              </Grid>
+              <Grid item>
+              <Typography className={classes.appBarName} variant="h6" color="inherit" noWrap>
               {this.state.user.name}
             </Typography>
+              </Grid>
+            </Grid>
           </Toolbar>
         </AppBar>
         <Drawer
