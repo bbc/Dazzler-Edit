@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import classNames from "classnames";
-import { Box, Grid } from '@material-ui/core';
+import { Box } from '@material-ui/core';
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
@@ -31,7 +31,6 @@ import ScheduleObject from "../ScheduleObject";
 import Loop from "../Loop/Loop";
 import PlatformDao from "../PlatformDao/PlatformDao";
 import {fetchSchedule, saveSchedule} from "../ScheduleDao/ScheduleDao";
-import { Container } from "@material-ui/core";
 
 const drawerWidth = 240;
 
@@ -349,6 +348,17 @@ class Editor extends React.Component {
     const { classes } = this.props;
     const { open } = this.state;
     //console.log('Editor.render');
+    let gmt_message = "All Times are in GMT. The current time in GMT is "+moment.utc().format('HH:mm');
+    const offset = moment().format().substring(19);
+    if(offset !== '+00:00') {
+      const local = moment().format('HH:mm');
+      gmt_message += `, your local time is ${local} which is `;
+      if(offset.substring(0,1) === '+') {
+        gmt_message += offset.substring(1)+" ahead of GMT.";
+      } else {
+        gmt_message += offset.substring(1)+" behind GMT.";
+      }
+    }
     return (
       <div className={classes.root}>
         <AppBar
@@ -366,30 +376,17 @@ class Editor extends React.Component {
             >
               <MenuIcon />
             </IconButton>
-            <Grid container>
-              <Grid item>
               <Typography variant="h6" color="inherit" noWrap>
               {services[this.state.schedule.sid].name}
             </Typography>
-              </Grid>
-              <Grid item>
-              <Typography variant="h6" align="center" color="inherit">
-              all times in GMT  
-            </Typography>              
-              </Grid>
-              <Grid item>
-
               <Typography align="center" className={classes.appBarTitle} variant="h5" color="inherit" noWrap>
               This is Dazzler!
             </Typography>
-              </Grid>
-              <Grid item>
               <Typography className={classes.appBarName} variant="h6" color="inherit" noWrap>
               {this.state.user.name}
             </Typography>
-              </Grid>
-            </Grid>
           </Toolbar>
+          <Typography variant="h6">{gmt_message}</Typography>
         </AppBar>
         <Drawer
           className={classes.drawer}
