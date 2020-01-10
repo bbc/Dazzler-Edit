@@ -241,10 +241,13 @@ class ScheduleObject {
             const next = this.findNextFixed(index+1);
             // remove everything in-between
             const cut = this.cut(index+1, next);
-            this.addGaps();
-            this.sort();
-            // put them back in again using addFloating
-            this.addFloating(index, cut);
+            // DAZZLER-90
+            if(cut.length>1 || (cut.length===1 && moment.duration(cut[0].duration).asSeconds()>0)) {
+                this.addGaps();
+                this.sort();
+                // put them back in again using addFloating
+                this.addFloating(index, cut);    
+            }
         }
         // brute force for now TODO make more elegant
         let newIndex = 1;
