@@ -531,7 +531,7 @@ class Editor extends React.Component {
             lastUpdated=""
           />
           <ScheduleToolbar
-            saveEnabled={this.state.user.auth||true}
+            saveEnabled={this.state.user.auth}
             contentModified={this.state.scheduleModified}
             onSave={this.savePlaylist}
             onClear={this.clearSchedule}
