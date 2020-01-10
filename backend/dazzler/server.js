@@ -258,7 +258,7 @@ app.get("/api/v1/episode", async (req, res, next) => {
       res.json({
         page_size: q.page_size,
         page: q.page,
-        total: items.length,
+        total: available_episodes.total,
         items: items
       });
     } catch (e) {
