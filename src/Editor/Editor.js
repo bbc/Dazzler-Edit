@@ -164,7 +164,8 @@ class Editor extends React.Component {
   handleAddLive(item) {
     const items = this.state.schedule.items;
     for(let i=0; i<items.length; i++) {
-      if(item.startTime.isSame(items[i].startTime)) {
+      if(item[i].insertionType !== 'gap' && item.startTime.isSame(items[i].startTime)) {
+        console.log('silently ignoring add');
         return; // don't allow adding at same point twice
       }
     }
