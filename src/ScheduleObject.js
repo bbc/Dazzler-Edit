@@ -194,6 +194,10 @@ class ScheduleObject {
                     break;
                 }
             }
+            // if the matched item is a live item do nothing DAZZLER-85
+            if('live' === this.items[index].insertionType) {
+                return;
+            }
             // is there an item before it we need to turn into
             // an overlap or a gap?
             const prev = this.items[index - 1];
@@ -203,7 +207,8 @@ class ScheduleObject {
                     prev.duration = slotDuration;
                     break;
                 case 'sentinel':
-                    // do nothing
+                case 'live': // DAZZLER-86
+                        // do nothing
                     break;
                 default:
                     prev.insertionType = 'overlap';
