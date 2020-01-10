@@ -165,8 +165,6 @@ class ScheduleDao {
   const startDateTime = moment.utc(broadcast.startTime);
   let imi = "imi:dazzler:" + serviceIDRef + "/" + startDateTime.unix();
 
-  // TODO put capture channel into the broadcast somewhere
-
   return ` 
         <ScheduleEvent>
           <Program crid="${broadcast.asset.versionCrid}"/>
