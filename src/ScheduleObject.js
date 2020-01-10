@@ -207,30 +207,35 @@ class ScheduleObject {
             // is there an item before it we need to turn into
             // an overlap or a gap?
             const prev = this.items[index - 1];
-            const slotDuration = moment.duration(startTime.diff(prev.startTime)).toISOString()
+            const slotDuration = moment.duration(startTime.diff(prev.startTime));
+            const slotDurationString = slotDuration.toISOString();
             switch(prev.insertionType) {
                 case 'gap':
-                    prev.duration = slotDuration;
+                    prev.duration = slotDurationString;
+                    break;
+                case 'live': // DAZZLER-86
+                    if(prev.duration !== slotDurationString) { // DAZZLER-88
+                        const prevDuration = moment.duration(prev.duration);
+                        if(slotDuration.asSeconds()>prevDuration.asSeconds()) {
+                            this.addGapAtPoint(index, endTime);
+                        } else { // should never happen
+                            prev.insertionType = 'overlap';
+                            prev.duration = slotDurationString;        
+                        }
+                    }
                     break;
                 case 'sentinel':
-                case 'live': // DAZZLER-86
                         // do nothing
                     break;
                 default:
                     prev.insertionType = 'overlap';
-                    prev.duration = slotDuration;
+                    prev.duration = slotDurationString;
             }
         }
         // are there items after it we need to move?
         if (this.items[index + 1].insertionType === "sentinel") {
             // add new gap
-            const next = this.items[index + 1].startTime;
-            this.items.splice(index + 1, 0, {
-                title: "gap",
-                startTime: endTime,
-                duration: moment.duration(next.diff(endTime)).toISOString(),
-                insertionType: "gap"
-            });
+            this.addGapAtPoint(index, endTime);
         } else {
             // find the next fixed item
             const next = this.findNextFixed(index+1);
@@ -250,6 +255,16 @@ class ScheduleObject {
             }
         }
         return newIndex;
+    }
+
+    addGapAtPoint(index, endTime) {
+        const next = this.items[index + 1].startTime;
+        this.items.splice(index + 1, 0, {
+            title: "gap",
+            startTime: endTime,
+            duration: moment.duration(next.diff(endTime)).toISOString(),
+            insertionType: "gap"
+        });
     }
 
     findNextFixed(index) {
