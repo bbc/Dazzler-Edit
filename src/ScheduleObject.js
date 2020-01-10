@@ -251,6 +251,7 @@ class ScheduleObject {
             }
         }
         this.addGaps();
+        this.sort();
         // return the index of the added item
         // brute force for now TODO make more elegant
         let newIndex = 1;
