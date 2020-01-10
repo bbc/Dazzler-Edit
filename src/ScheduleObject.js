@@ -186,6 +186,16 @@ class ScheduleObject {
             this.items.splice(index, 0, item);
         }
         else {
+            for (let i = 0; i < this.items.length; i++) {
+                if (this.items[i].startTime.isSame(startTime)) {
+                    index = i;
+                    break;
+                }
+            }
+            // if the matched item is a live item do nothing DAZZLER-85, DAZZLER-89
+            if('live' === this.items[index].insertionType) {
+                return;
+            }
             this.items.push(item);
             this.sort();
             for (let i = 0; i < this.items.length; i++) {
@@ -193,10 +203,6 @@ class ScheduleObject {
                     index = i;
                     break;
                 }
-            }
-            // if the matched item is a live item do nothing DAZZLER-85
-            if('live' === this.items[index].insertionType) {
-                return;
             }
             // is there an item before it we need to turn into
             // an overlap or a gap?
