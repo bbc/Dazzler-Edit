@@ -325,7 +325,7 @@ app.put("/api/v1/loop", async (req, res, next) => {
   }
 });
 
-app.post("/api/v1/tva", function(req, res) {
+app.post("/api/v1/tva", async (req, res) =>  {
   if (req.body.includes('serviceIDRef="TVMAR01')) {
     let user = "dazzler"; // assume local
     if (req.header("sslclientcertsubject")) {
@@ -333,7 +333,8 @@ app.post("/api/v1/tva", function(req, res) {
       user = subject.emailAddress;
     }
     if (auth(user)) {
-      pips.postTVA(req.body, res);
+      const r = await pips.postTVA(req.body, res);
+      res.json(r.data);
     } else {
       const message = user + " is not authorised to save schedules";
       console.log(message);
