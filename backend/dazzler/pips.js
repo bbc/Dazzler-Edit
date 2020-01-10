@@ -1,6 +1,6 @@
+const https = require("https");
 const axios = require("axios");
 const fs = require("fs");
-const https = require("https");
 const parseString = require("xml2js").parseString;
 const xml2js = require('xml2js-es6-promise');
 
@@ -84,10 +84,10 @@ async function clearCollection(pid) {
   }
   
   async function postPIPS(object_type, data) {
+    https.globalAgent.options.key = fs.readFileSync(process.env.KEY);
+    https.globalAgent.options.cert = fs.readFileSync(process.env.CERT);
+    https.globalAgent.options.passphrase = process.env.PASSPHRASE;
     var config = {
-      key: fs.readFileSync(process.env.KEY),
-      cert: fs.readFileSync(process.env.CERT),
-      passphrase: process.env.PASSPHRASE,
       headers: { "Content-Type": "text/xml" }
     };
     try {
@@ -104,10 +104,11 @@ async function clearCollection(pid) {
   }
 
   async function postTVA(data) {
+    https.globalAgent.options.key = fs.readFileSync(process.env.KEY);
+    https.globalAgent.options.cert = fs.readFileSync(process.env.CERT);
+    https.globalAgent.options.passphrase = process.env.PASSPHRASE;
+
     var config = {
-      key: fs.readFileSync(process.env.KEY),
-      cert: fs.readFileSync(process.env.CERT),
-      passphrase: process.env.PASSPHRASE,
       headers: { "Content-Type": "text/xml" }
     };
   
