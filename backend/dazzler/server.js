@@ -93,7 +93,6 @@ app.get("/api/v1/broadcast", async (req, res) => {
     q.page_size = req.query.page_size;
   }
   try{
-    console.log('broadcast', q);
     const r = await nitro.request("schedules", q);
     res.json(r.data.nitro.results);
   } catch(e) {
@@ -102,7 +101,6 @@ app.get("/api/v1/broadcast", async (req, res) => {
 });
 
 app.get("/api/v1/webcast", async (req, res) => {
-  console.log('webcast', req.query);
   let q = {};
   if (req.query.hasOwnProperty("start")) {
     q.start_from = req.query.start;
@@ -177,25 +175,11 @@ async function clip(q, query, res) {
     let pids = [];
     let response = await nitro.request("programmes", q);
     let clips = response.data.nitro.results;
-    let wantedClips = [];
     for (let i = 0; i < clips.items.length; i++) {
-      let wanted = false;
-      if(clips.items[i].clip_of) {
-        if(q.master_brand) {
-          wanted = false;
-        } else {
-          wanted = true;
-        }
-      } else {
-        wanted = true;
-      }
-      if(wanted) {
-        wantedClips.push(clips.items[i]);
-        if (clips.items[i].available_versions.hasOwnProperty("version")) {
-          const version = clips.items[i].available_versions.version;
-          for (let j = 0; j < version.length; j++) {
-            pids.push(version[j].pid);
-          }
+      if (clips.items[i].available_versions.hasOwnProperty("version")) {
+        const version = clips.items[i].available_versions.version;
+        for (let j = 0; j < version.length; j++) {
+          pids.push(version[j].pid);
         }
       }
     }
@@ -212,17 +196,14 @@ async function clip(q, query, res) {
         }
       }
     }
-    for (let i = 0; i < wantedClips.length; i++) {
-      if (wantedClips[i].available_versions.hasOwnProperty("version")) {
-        const version = wantedClips[i].available_versions.version;
+    for (let i = 0; i < clips.items.length; i++) {
+      if (clips.items[i].available_versions.hasOwnProperty("version")) {
+        const version = clips.items[i].available_versions.version;
         for (let j = 0; j < version.length; j++) {
           version[j].crid = map.get(version[j].pid);
         }
      }
     }
-    clips.items = wantedClips;
-    clips.total = wantedClips.length;
-    console.log(clips);
     res.json(clips);
   } catch(e) {
     console.log(e);
