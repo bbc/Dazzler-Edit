@@ -84,7 +84,7 @@ class ScheduleDao {
       startTime: start,
       title: "Live programme at " + start.format("HH:mm:ss"),
       duration: duration.toISOString(),
-      captureChannel: window.service.sid, // TODO make use of this
+      captureChannel: window.service.sid,
       insertionType: "live"
     };
     for (let i = 0; i < window.window_of.length; i++) {
@@ -168,7 +168,7 @@ class ScheduleDao {
   return ` 
         <ScheduleEvent>
           <Program crid="${broadcast.asset.versionCrid}"/>
-            <BroadcasterRawData>${broadcast.captureChannel?broadcast.captureChannel:''}</BroadcasterRawData>
+            <BroadcasterRawData>${broadcast.asset.captureChannel?broadcast.captureChannel:''}</BroadcasterRawData>
             <InstanceMetadataId>${imi}</InstanceMetadataId>
             <InstanceDescription>
               <AVAttributes>
