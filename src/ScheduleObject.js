@@ -179,6 +179,7 @@ class ScheduleObject {
         };
         const startTime = moment(item.startTime);
         const endTime = moment(startTime).add(moment.duration(item.duration));
+        this.removeAllGaps(); // start with no gaps
         // is this a live at midnight?
         let index = 0;
         if(startTime.isSame(this.items[0].startTime)) {
@@ -193,10 +194,9 @@ class ScheduleObject {
                 }
             }
             // if the matched item is a live item do nothing DAZZLER-85, DAZZLER-89
-            if('live' === this.items[index].insertionType) {
-                return;
+            if('live' !== this.items[index].insertionType) {
+                this.items.push(item);
             }
-            this.items.push(item);
             this.sort();
             for (let i = 0; i < this.items.length; i++) {
                 if (this.items[i].startTime.isSame(startTime)) {
@@ -217,7 +217,8 @@ class ScheduleObject {
                     if(prev.duration !== slotDurationString) { // DAZZLER-88
                         const prevDuration = moment.duration(prev.duration);
                         if(slotDuration.asSeconds()>prevDuration.asSeconds()) {
-                            this.addGapAtPoint(index, endTime);
+                            // add all gaps back in at end
+                            // this.addGapAtPoint(index, endTime);
                         } else { // should never happen
                             prev.insertionType = 'overlap';
                             prev.duration = slotDurationString;        
@@ -234,8 +235,8 @@ class ScheduleObject {
         }
         // are there items after it we need to move?
         if (this.items[index + 1].insertionType === "sentinel") {
-            // add new gap
-            this.addGapAtPoint(index, endTime);
+            // add all gaps back in at end
+            // this.addGapAtPoint(index, endTime);
         } else {
             // find the next fixed item
             const next = this.findNextFixed(index+1);
@@ -243,12 +244,14 @@ class ScheduleObject {
             const cut = this.cut(index+1, next);
             // DAZZLER-90
             if(cut.length>1 || (cut.length===1 && moment.duration(cut[0].duration).asSeconds()>0)) {
-                this.addGaps();
-                this.sort();
+                // this.addGaps();
+                // this.sort();
                 // put them back in again using addFloating
                 this.addFloating(index, cut);    
             }
         }
+        this.addGaps();
+        // return the index of the added item
         // brute force for now TODO make more elegant
         let newIndex = 1;
         for(let i=0; i<this.items.length; i++) {
@@ -294,6 +297,16 @@ class ScheduleObject {
     addFixed(items) {
         this.items = this.items.concat([...items]);
         this.sort();
+    }
+    
+    removeAllGaps() {
+        let s = [];
+        for (let i = 0; i < this.items.length; i++) {
+            if (this.items[i].insertionType !== "gap") {
+                s.push(this.items[i]);
+            }
+        }
+        this.items = s;
     }
 
     addGaps() {
