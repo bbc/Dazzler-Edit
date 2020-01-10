@@ -97,7 +97,7 @@ async function clearCollection(pid) {
   }
   
   function postTVA(data, res) {
-    var options = {
+    const options = {
       path: "/pips/import/tva/",
       host: "api.live.bbc.co.uk",
       method: "POST",
@@ -110,29 +110,35 @@ async function clearCollection(pid) {
       }
     };
     options.agent = new https.Agent(options);
-    var req = https.request(options, function(post_res) {
-      var body = "";
-      post_res.setEncoding("utf8");
-      post_res.on("data", chunk => {
-        body += chunk;
+    try {
+      const req = https.request(options, function(post_res) {
+        let body = "";
+        post_res.setEncoding("utf8");
+        post_res.on("data", chunk => {
+          body += chunk;
+        });
+        post_res.on("end", () => {
+          try {
+            parseString(body, function(err, result) {
+              if (err) {
+                res.status(404).send(err);
+              } else {
+                res.json(result);
+              }
+            });
+          } catch (e) {
+            res.status(404).send(e);
+          }
+        });
       });
-      post_res.on("end", () => {
-        try {
-          parseString(body, function(err, result) {
-            if (err) {
-              res.status(404).send(err);
-            } else {
-              res.json(result);
-            }
-          });
-        } catch (e) {
-          res.status(404).send(e);
-        }
-      });
-    });
-    // post the data
-    req.write(data);
-    req.end();
+      // post the data
+      req.write(data);
+      req.end();  
+    } catch(e) {
+      console.log(e);
+      // assume cert error
+      res.status(401).send(e);
+    }
   }
 
   module.exports = {
