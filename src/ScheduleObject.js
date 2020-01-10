@@ -110,7 +110,7 @@ class ScheduleObject {
             this.fixEndTime();
         }
         if(assetsToAdd.length > numItemsToAdd) {
-            this.insertOverlap(indexOfFixed, assetsToAdd[numItemsToAdd]);
+            this.insertOverlapIfNeeeded(indexOfFixed, assetsToAdd[numItemsToAdd]);
             newCursor++;
         }
         else {
@@ -132,10 +132,10 @@ class ScheduleObject {
         }
     }
 
-    insertOverlap(index, asset) {
+    insertOverlapIfNeeeded(index, asset) {
         const gapStart = moment(this.items[index - 1].startTime).add(moment.duration(this.items[index - 1].duration));
         const duration = moment.duration(this.items[index].startTime.diff(gapStart));
-        if(duration.asMilliseconds()>=0) {
+        if(duration.asMilliseconds()>0) {
             this.items.splice(index, 0, {
                 title: asset.title, 
                 startTime: gapStart,
