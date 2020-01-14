@@ -178,7 +178,7 @@ class ScheduleObject {
             asset: live
         };
         const startTime = moment(item.startTime);
-        const endTime = moment(startTime).add(moment.duration(item.duration));
+        // const endTime = moment(startTime).add(moment.duration(item.duration));
         this.removeAllGaps(); // start with no gaps
         // is this a live at midnight?
         let index = 0;
