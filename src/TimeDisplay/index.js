@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import moment from "moment";
-import 'moment-duration-format';
 
 function TimeDisplay({format='HH:mm', updateInterval=30000}) {
   const [dateTime, setDateTime] = useState(moment.utc());
