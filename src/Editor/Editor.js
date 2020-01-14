@@ -31,6 +31,7 @@ import ScheduleObject from "../ScheduleObject";
 import Loop from "../Loop/Loop";
 import PlatformDao from "../PlatformDao/PlatformDao";
 import {fetchSchedule, saveSchedule} from "../ScheduleDao/ScheduleDao";
+import TimeDisplay from "../TimeDisplay";
 
 const drawerWidth = 240;
 
@@ -342,17 +343,6 @@ class Editor extends React.Component {
     const { classes } = this.props;
     const { open } = this.state;
     //console.log('Editor.render');
-    let gmt_message = "All Times are in GMT. The current time in GMT is "+moment.utc().format('HH:mm');
-    const offset = moment().format().substring(19);
-    if(offset !== '+00:00') {
-      const local = moment().format('HH:mm');
-      gmt_message += `, your local time is ${local} which is `;
-      if(offset.substring(0,1) === '+') {
-        gmt_message += offset.substring(1)+" ahead of GMT.";
-      } else {
-        gmt_message += offset.substring(1)+" behind GMT.";
-      }
-    }
     return (
       <div className={classes.root}>
         <AppBar
@@ -380,7 +370,7 @@ class Editor extends React.Component {
               {this.state.user.name}
             </Typography>
           </Toolbar>
-          <Typography variant="h6">{gmt_message}</Typography>
+          <Typography variant="h6"><TimeDisplay/></Typography>
         </AppBar>
         <Drawer
           className={classes.drawer}
