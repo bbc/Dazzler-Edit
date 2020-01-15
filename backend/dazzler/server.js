@@ -188,7 +188,7 @@ async function clip(q, query, res) {
       if (clips.items[i].available_versions.hasOwnProperty("version")) {
         const version = clips.items[i].available_versions.version;
         for (let j = 0; j < version.length; j++) {
-          version[j].crid = map.get(version[j].pid);
+          version[j].crid = map[version[j].pid];
         }
      }
     }
@@ -300,7 +300,7 @@ function add_crids_to_webcast(results) {
 }
 
 async function get_version_pid2crid_map(pids) {
-  let map = new Map();
+  let map = {};
   if(pids.length>0) {
     const response = await nitro.request("versions", { pid: pids });
     const items = response.data.nitro.results.items;
@@ -308,7 +308,7 @@ async function get_version_pid2crid_map(pids) {
       const ids = items[i].identifiers.identifier;
       for (let j = 0; j < ids.length; j++) {
         if (ids[j].type === "crid") {
-          map.set(items[i].pid, ids[j].$);
+          map[items[i].pid] = ids[j].$;
         }
       }
     }
