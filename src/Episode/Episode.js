@@ -160,10 +160,8 @@ export class Episode extends React.Component {
                     colSpan={3}
                     count={totalRows}
                     rowsPerPage={rowsPerPage}
-                    page={0}
-                    SelectProps={{
-                      native: true
-                    }}
+                    page={page}
+                    SelectProps={{ native: true }}
                     onChangePage={this.handleChangePage}
                     onChangeRowsPerPage={this.handleChangeRowsPerPage}
                     ActionsComponent={TablePaginationActionsWrapped}
