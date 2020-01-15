@@ -38,7 +38,6 @@ export class Episode extends React.Component {
       page: 0,
       previousPage: -1,
       rowsPerPage: 5,
-      data: [],
       sid: "",
       date: moment().utc().format()
     };
