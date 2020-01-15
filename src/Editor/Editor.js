@@ -442,7 +442,7 @@ class Editor extends React.Component {
           availability={this.state.upcomingAvailability.toISOString()}
           sid={this.state.schedule.sid}
           handleClick={this.handleAddClipOrEpisode}
-          resultsFilter={this.filterUpcomingEpisodes}
+          // resultsFilter={this.filterUpcomingEpisodes}
         />
         </ExpansionPanelDetails>
       </ExpansionPanel>
