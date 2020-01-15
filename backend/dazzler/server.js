@@ -223,11 +223,11 @@ app.get("/api/v1/episode", async (req, res, next) => {
   }
   try {
     let items = [];
-    const res = await nitro.request("programmes", q);
-    if (res.status !== 200) {
-      console.log(res.status);
+    const nres = await nitro.request("programmes", q);
+    if (nres.status !== 200) {
+      console.log(nres.status);
     }
-    const available_episodes = add_version_crids_to_episodes(res.data.nitro.results);
+    const available_episodes = add_version_crids_to_episodes(nres.data.nitro.results);
     if(available_episodes.total>0) {
       items = available_episodes.items;
     }
