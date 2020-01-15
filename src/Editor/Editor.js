@@ -419,7 +419,7 @@ class Editor extends React.Component {
           aria-controls="panel2bh-content"
           id="panel2bh-header"
         >
-          <Typography className={classes.heading}>Availabile Episodes</Typography>
+          <Typography className={classes.heading}>Available Episodes</Typography>
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
         <Episode
