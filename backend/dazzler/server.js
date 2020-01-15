@@ -183,19 +183,7 @@ async function clip(q, query, res) {
         }
       }
     }
-    let map = new Map();
-    if(pids.length>0) {
-      response = await nitro.request("versions", { pid: pids });
-      const items = response.data.nitro.results.items;
-      for (let i = 0; i < items.length; i++) {
-        const ids = items[i].identifiers.identifier;
-        for (let j = 0; j < ids.length; j++) {
-          if (ids[j].type === "crid") {
-            map.set(items[i].pid, ids[j].$);
-          }
-        }
-      }
-    }
+    const map = get_version_pid2crid_map(pids);
     for (let i = 0; i < clips.items.length; i++) {
       if (clips.items[i].available_versions.hasOwnProperty("version")) {
         const version = clips.items[i].available_versions.version;
@@ -229,58 +217,31 @@ app.get("/api/v1/episode", async (req, res, next) => {
     q.page_size = req.query.page_size;
   }
   if (req.query.hasOwnProperty("availability")) {
-    q.availability = req.query.availability;;
-    try {
-      let items = [];
-      const available_episodes = await get_episodes(q);
-      if(available_episodes.total>0) {
-        items = available_episodes.items;
-      }
-      res.json({
-        page_size: q.page_size,
-        page: q.page,
-        total: available_episodes.total,
-        items: items
-      });
-    } catch (e) {
-      console.log(e);
-      res.status(404).send("error");
-    }
+    q.availability = req.query.availability;
+  } else {
+    q.availability = "available";
   }
-  else {
-    try {
-      let items = [];
-      q.availability = "available";
-      const available_episodes = await get_episodes(q);
-      if(available_episodes.total>0) {
-        items = items.concat(available_episodes.items);
-      }
-      q.availability = "PT24H";
-      const future_episodes = await get_episodes(q);
-      if(future_episodes.total>0) {
-        items = items.concat(future_episodes.items);
-      }
-      res.json({
-        page_size: q.page_size,
-        page: q.page,
-        total: items.length,
-        items: items
-      });
-    } catch (e) {
-      console.log(e);
-      res.status(404).send("error");
+  try {
+    let items = [];
+    const res = await nitro.request("programmes", q);
+    if (res.status !== 200) {
+      console.log(res.status);
     }
+    const available_episodes = add_version_crids_to_episodes(res.data.nitro.results);
+    if(available_episodes.total>0) {
+      items = available_episodes.items;
+    }
+    res.json({
+      page_size: q.page_size,
+      page: q.page,
+      total: available_episodes.total,
+      items: items
+    });
+  } catch (e) {
+    console.log(e);
+    res.status(404).send("error");
   }
 });
-
-async function get_episodes(q) {
-  const res = await nitro.request("programmes", q);
-  if (res.status !== 200) {
-    // test for status you want, etc
-    console.log(res.status);
-  }
-  return add_crids_to_episodes(res.data.nitro.results);
-}
 
 app.put("/api/v1/loop", async (req, res, next) => {
   let user = "dazzler"; // assume local
@@ -327,6 +288,7 @@ app.post("/api/v1/tva", async (req, res) =>  {
   }
 });
 
+// we assume only IBMS schedules webcasts so pid2crid can work
 function add_crids_to_webcast(results) {
   if (results && results.total > 0) {
     for (let i = 0; i < results.items.length; i++) {
@@ -337,17 +299,46 @@ function add_crids_to_webcast(results) {
   return results;
 }
 
-function add_crids_to_episodes(results) {
+async function get_version_pid2crid_map(pids) {
+  let map = new Map();
+  if(pids.length>0) {
+    const response = await nitro.request("versions", { pid: pids });
+    const items = response.data.nitro.results.items;
+    for (let i = 0; i < items.length; i++) {
+      const ids = items[i].identifiers.identifier;
+      for (let j = 0; j < ids.length; j++) {
+        if (ids[j].type === "crid") {
+          map.set(items[i].pid, ids[j].$);
+        }
+      }
+    }
+  }
+  return map;
+}
+
+// stand alone episodes created in Jupiter will have pids that pid2crid gets wrong
+function add_version_crids_to_episodes(results) {
+  let pids = [];
+  let versions = [];
   if (results && results.total>0) {
     for (let i = 0; i < results.items.length; i++) {
       if (results.items[i].available_versions.hasOwnProperty("version")) {
         for (let j = 0; j < results.items[i].available_versions.version.length; j++) {
           let version = results.items[i].available_versions.version[j];
-          version.crid = pid2crid.crid(version.pid);
+          if(version.pid.startsWith('w')) {
+            version.crid = pid2crid.crid(version.pid);
+          } else {
+            pids.push(version.pid);
+            versions.push(version);
+          }
         }
       }
     }
   }
+  const map = get_version_pid2crid_map(pids);
+  versions.forEach((version) => {
+    version.crid = map[version.pid];
+  });
   return results;
 }
 
