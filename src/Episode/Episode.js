@@ -73,14 +73,12 @@ export class Episode extends React.Component {
           if (response.data.hasOwnProperty('page')) {
             new_page = response.data.page - 1;
           }
-          const newstate = {
+          this.setState({
             previousPage: new_page,
             page: new_page,
             totalRows: total,
             rows: items
-          };
-          console.log('Episode', newstate);
-          this.setState(newstate);
+          });
         })
     }
   }
