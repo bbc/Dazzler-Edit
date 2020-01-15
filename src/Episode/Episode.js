@@ -56,14 +56,14 @@ export class Episode extends React.Component {
       (this.state.page !== this.state.previousPage)
       || (this.props.availability !== prevProps.availability)
     ) {
-      //console.log("have page %d want page %d", this.state.page, this.state.previousPage);
+      console.log("Episode: %s %s have page %d want page %d", this.props.sid, this.props.availability, this.state.page, this.state.previousPage);
       AssetDao.getEpisodes(
         this.props.sid, this.props.availability,
         this.state.page + 1, this.state.rowsPerPage,
         response => {
           let items = response.data.items;
           let total = response.data.total;
-          //console.log('episodeDidUpdate', this.props.availability, this.props.resultsFilter);
+          console.log('episodeDidUpdate', this.props.availability, this.props.resultsFilter);
           if(this.props.resultsFilter) {
             items = this.props.resultsFilter(items);
             if(response.data.items.length>items.length) {
@@ -74,12 +74,14 @@ export class Episode extends React.Component {
           if (response.data.hasOwnProperty('page')) {
             new_page = response.data.page - 1;
           }
-          this.setState({
+          const newstate = {
             previousPage: new_page,
             page: new_page,
             totalRows: total,
             rows: items
-          });
+          };
+          console.log('Episode', newstate);
+          this.setState(newstate);
         })
     }
   }
