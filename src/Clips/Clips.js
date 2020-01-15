@@ -113,7 +113,10 @@ export class Clips extends React.Component {
   render() {
     const { classes } = this.props;
     const { rows, rowsPerPage, page, totalRows } = this.state;
-    const emptyRows = Math.min(rowsPerPage, rowsPerPage-rows.length);
+    let emptyRows = 0;
+    if(rows.length<rowsPerPage) {
+      emptyRows = rowsPerPage - rows.length;
+    }
     return (
       <div>
         <Paper className={classes.root}>

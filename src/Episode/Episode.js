@@ -114,8 +114,10 @@ export class Episode extends React.Component {
   render() {
     const { classes } = this.props;
     const { rows, rowsPerPage, page, totalRows } = this.state;
-    const emptyRows =
-      rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
+    let emptyRows = 0;
+    if(rows.length<rowsPerPage) {
+      emptyRows = rowsPerPage - rows.length;
+    }
 
     return (
       <div>
