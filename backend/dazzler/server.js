@@ -149,14 +149,18 @@ app.get("/api/v1/special", async (req, res) => {
 
 app.get("/api/v1/clip", async (req, res) => {
   let q = {};
+  let sid = 'bbc_marathi_tv';
+  if(req.query.sid) {
+    sid = eq.query.sid;
+  }
   if (req.query.hasOwnProperty("type")) {
     if (req.query.type === "web") {
-      q.tag_name = config[req.query.sid].clip_language;
+      q.tag_name = config[sid].clip_language;
     } else {
-      q.master_brand = config[req.query.sid].mid;
+      q.master_brand = config[sid].mid;
     }
   } else {
-    q.tag_name = config[req.query.sid].clip_language;
+    q.tag_name = config[sid].clip_language;
   }
   await clip(q, req.query, res);
 });
@@ -183,7 +187,8 @@ async function clip(q, query, res) {
         }
       }
     }
-    const map = get_version_pid2crid_map(pids);
+    const map = await get_version_pid2crid_map(pids);
+    console.log(map);
     for (let i = 0; i < clips.items.length; i++) {
       if (clips.items[i].available_versions.hasOwnProperty("version")) {
         const version = clips.items[i].available_versions.version;
