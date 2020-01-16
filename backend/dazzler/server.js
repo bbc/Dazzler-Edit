@@ -151,7 +151,7 @@ app.get("/api/v1/clip", async (req, res) => {
   let q = {};
   let sid = 'bbc_marathi_tv';
   if(req.query.sid) {
-    sid = eq.query.sid;
+    sid = req.query.sid;
   }
   if (req.query.hasOwnProperty("type")) {
     if (req.query.type === "web") {
