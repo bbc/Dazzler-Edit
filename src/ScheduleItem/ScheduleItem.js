@@ -3,6 +3,8 @@ import moment from "moment";
 import "moment-duration-format";
 import Arrow from "@material-ui/icons/ArrowRight";
 import { Typography } from "@material-ui/core";
+import { confirmAlert } from "react-confirm-alert";
+import "react-confirm-alert/src/react-confirm-alert.css";
 
 /*
 <ScheduleItem
@@ -80,12 +82,23 @@ class ScheduleItem extends React.Component {
                 }}
                 onContextMenu={() => {
                   if (
-                    window.confirm(
-                      "Are you sure you want to delete all occurences of " +
-                        this.props.title
-                    )
+                    confirmAlert({
+                      title: "confirm",
+                      message:
+                        "Are you sure you want to delete all occurences of " +
+                        this.props.title,
+                      buttons: [
+                        {
+                          label: "Yes",
+                          onClick: () =>
+                            this.props.onOccurenceDelete(this.props.index)
+                        },
+                        {
+                          label: "No"
+                        }
+                      ]
+                    })
                   ) {
-                    this.props.onOccurenceDelete(this.props.index);
                   } else {
                   }
                 }}
