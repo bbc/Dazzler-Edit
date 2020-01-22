@@ -30,15 +30,22 @@ class ScheduleItem extends React.Component {
         .duration(this.props.asset_duration)
         .subtract(moment.duration(this.props.duration));
     }
+    const isoString = moment(this.props.startTime).toISOString();
+    const localTime = moment(isoString).format("HH:mm");
+    const utcTime = moment.utc(this.props.startTime).format("HH:mm:ss");
     return (
       <Fragment>
         <tr className={rowStyle}>
           <td onClick={() => this.props.onClick(this.props.index)}>
             {this.props.selected ? <Arrow className={arrowStyle} /> : ""}
           </td>
+
+          <td> {localTime}</td>
+
           <td onClick={() => this.props.onClick(this.props.index)}>
-            {this.props.startTime}
+            {utcTime}
           </td>
+
           <td>
             {this.props.title}
             {this.props.insertionType === "overlap" ? (
@@ -54,11 +61,13 @@ class ScheduleItem extends React.Component {
               <Typography></Typography>
             )}
           </td>
+
           <td onClick={() => this.props.onClick(this.props.index)}>
             {moment
               .duration(this.props.duration)
               .format("HH:mm:ss", { trim: false })}
           </td>
+
           <td>
             {this.props.insertionType !== "" &&
             "gap,sentinel".includes(this.props.insertionType) ? (
@@ -78,7 +87,6 @@ class ScheduleItem extends React.Component {
                   ) {
                     this.props.onOccurenceDelete(this.props.index);
                   } else {
-                    alert("not deleted");
                   }
                 }}
               >

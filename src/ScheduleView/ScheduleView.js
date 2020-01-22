@@ -50,6 +50,9 @@ class ScheduleView extends React.Component {
   }
 
   render() {
+    let offset = moment()
+      .format()
+      .substring(19);
     let selectedItem = this.props.row;
     if (selectedItem === -1) {
       // put at first gap
@@ -66,6 +69,7 @@ class ScheduleView extends React.Component {
         <thead>
           <tr>
             <th></th>
+            <th>Local</th>
             <th>Start</th>
             <th>Title</th>
             <th>Duration </th>
@@ -80,7 +84,7 @@ class ScheduleView extends React.Component {
               live={item.live}
               insertionType={item.insertionType}
               selected={selectedItem === index}
-              startTime={moment(item.startTime).format("HH:mm:ss")}
+              startTime={item.startTime}
               title={item.title}
               duration={item.duration}
               asset_duration={item.asset ? item.asset.duration : ""}
