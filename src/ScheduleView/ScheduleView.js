@@ -27,37 +27,39 @@ class ScheduleView extends React.Component {
     super(props);
     this.handleClick = this.handleClick.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
-    this.state = {
-    };
+    this.state = {};
   }
 
-  handleClick = (index) => {
-    if(this.props.onRowSelected) this.props.onRowSelected(index);
-  }
+  handleClick = index => {
+    if (this.props.onRowSelected) this.props.onRowSelected(index);
+  };
 
-  handleDelete = (index) => {
+  handleDelete = index => {
     this.props.onDelete(index); // TODO can we use this directly?
-  }
+  };
 
-  componentDidMount() {
-  }
+  handleOccurenceDelete = index => {
+    this.props.onOccurenceDelete(index); // TODO can we use this directly?
+  };
+
+  componentDidMount() {}
 
   componentDidUpdate(prevProps) {
-    if(this.props.lastUpdated !== prevProps.lastUpdated) {
+    if (this.props.lastUpdated !== prevProps.lastUpdated) {
     }
   }
 
   render() {
     let selectedItem = this.props.row;
-    if(selectedItem === -1) {
+    if (selectedItem === -1) {
       // put at first gap
-       for(let i=0; i<this.props.data.length; i++) {
-        if( this.props.data[i].insertionType === 'gap') {
+      for (let i = 0; i < this.props.data.length; i++) {
+        if (this.props.data[i].insertionType === "gap") {
           selectedItem = i;
           break;
         }
       }
-      if(this.props.onRowSelected) this.props.onRowSelected(selectedItem);
+      if (this.props.onRowSelected) this.props.onRowSelected(selectedItem);
     }
     return (
       <table className="ui compact celled definition table">
@@ -71,21 +73,22 @@ class ScheduleView extends React.Component {
           </tr>
         </thead>
         <tbody>
-        {this.props.data.map((item, index) =>
-          <ScheduleItem
-            key={item.insertionType+item.startTime.utc().format()}
-            index={index}
-            live={item.live}
-            insertionType={item.insertionType}
-            selected={selectedItem === index}
-            startTime={moment(item.startTime).format("HH:mm:ss")}
-            title={item.title}
-            duration={item.duration}
-            asset_duration={item.asset?item.asset.duration:''}
-            onClick={this.handleClick}
-            onDelete={this.handleDelete}
-          />
-        )}
+          {this.props.data.map((item, index) => (
+            <ScheduleItem
+              key={item.insertionType + item.startTime.utc().format()}
+              index={index}
+              live={item.live}
+              insertionType={item.insertionType}
+              selected={selectedItem === index}
+              startTime={moment(item.startTime).format("HH:mm:ss")}
+              title={item.title}
+              duration={item.duration}
+              asset_duration={item.asset ? item.asset.duration : ""}
+              onClick={this.handleClick}
+              onDelete={this.handleDelete}
+              onOccurenceDelete={this.handleOccurenceDelete}
+            />
+          ))}
         </tbody>
       </table>
     );
