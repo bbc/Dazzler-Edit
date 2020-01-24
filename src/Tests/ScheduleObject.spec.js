@@ -303,7 +303,6 @@ describe("ScheduleObject", () => {
 
     let index = 1;
     let pid = myScheduleObject.items[index].asset.pid;
-
     myScheduleObject.deleteAllOccurencesClosingGap(pid);
 
     //Our new items list should be less than our previous item list
@@ -315,5 +314,23 @@ describe("ScheduleObject", () => {
     );
   });
 
-  test("Should close all gaps after all occurences of item deleted", () => {});
+  test("System should not delete all occurences of live items", () => {
+    let myScheduleObject = new ScheduleObject(
+      "bbc_marathi_tv",
+      moment("2020-01-21"),
+      loopItems
+    );
+
+    let index = 8;
+    let pid = myScheduleObject.items[index].asset.pid;
+    myScheduleObject.deleteAllOccurencesClosingGap(pid);
+
+    //Our new items list should be the same length as our previous item list
+    expect(myScheduleObject.items.length).toEqual(loopItems.length);
+    //The live item pid should appear in the item list
+    expect(JSON.stringify(myScheduleObject.items).includes(pid)).toBeTruthy();
+    expect(JSON.stringify(myScheduleObject.items)).toEqual(
+      expect.stringContaining(pid)
+    );
+  });
 });

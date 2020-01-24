@@ -230,7 +230,6 @@ class Editor extends React.Component {
   };
 
   handleScheduleDelete(index) {
-    alert(index);
     let scheduleObject = new ScheduleObject(
       this.state.schedule.sid,
       this.state.schedule.date,

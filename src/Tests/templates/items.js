@@ -102,6 +102,45 @@ export let loopItems = [
       action: ""
     },
     startTime: moment("2020-01-21T00:09:49.000Z")
+  },
+  {
+    title: "BBC विश्व 21/01/2020 GMT",
+    startTime: "2020-01-21T13:29:32.000Z",
+    duration: "PT5M15S",
+    insertionType: "live",
+    asset: {
+      title: "BBC विश्व 21/01/2020 GMT",
+      duration: "PT5M15S",
+      versionCrid: "crid://bbc.co.uk/w/40005657601579872572",
+      insertionType: "live",
+      pid: "w13xttuvye"
+    }
+  },
+  {
+    title: "BBC विश्व 21/01/2020 GMT",
+    startTime: "2020-01-21T13:34:47.000Z",
+    duration: "PT5M20S",
+    insertionType: "live",
+    asset: {
+      title: "BBC विश्व 21/01/2020 GMT",
+      duration: "PT5M20S",
+      versionCrid: "crid://bbc.co.uk/w/40005657751579872887",
+      insertionType: "live",
+      pid: "w13xttuvye"
+    }
+  },
+  {
+    title: "BBC विश्व 21/01/2020 GMT",
+    startTime: "2020-01-21T13:40:07.000Z",
+    duration: "PT5M30S",
+    insertionType: "live",
+    asset: {
+      title: "BBC विश्व 21/01/2020 GMT",
+      duration: "PT5M30S",
+      versionCrid: "crid://bbc.co.uk/w/40005657901579873207",
+      insertionType: "live",
+      pid: "w13xttuvye"
+    }
   }
 ];
 

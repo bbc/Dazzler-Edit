@@ -80,13 +80,19 @@ class ScheduleItem extends React.Component {
                 onClick={() => {
                   this.props.onDelete(this.props.index);
                 }}
-                onContextMenu={() => {
-                  if (
+                onContextMenu={event => {
+                  event.preventDefault();
+                  if (this.props.insertionType !== "live") {
+                    var tally = 0;
+                    this.props.data.map(item => {
+                      if (item.title === this.props.title) {
+                        tally++;
+                      }
+                    });
                     confirmAlert({
                       title: "confirm",
-                      message:
-                        "Are you sure you want to delete all occurences of " +
-                        this.props.title,
+                      message: `Are you sure you want to delete all ${tally} occurences of
+                         ${this.props.title}`,
                       buttons: [
                         {
                           label: "Yes",
@@ -97,9 +103,7 @@ class ScheduleItem extends React.Component {
                           label: "No"
                         }
                       ]
-                    })
-                  ) {
-                  } else {
+                    });
                   }
                 }}
               >

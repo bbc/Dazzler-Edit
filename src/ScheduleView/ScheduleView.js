@@ -91,6 +91,7 @@ class ScheduleView extends React.Component {
               onClick={this.handleClick}
               onDelete={this.handleDelete}
               onOccurenceDelete={this.handleOccurenceDelete}
+              data={this.props.data}
             />
           ))}
         </tbody>

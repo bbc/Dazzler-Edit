@@ -1,4 +1,5 @@
 import moment from "moment";
+import { FaRegImage } from "react-icons/fa";
 
 class ScheduleObject {
   constructor(sid, date, items) {
@@ -415,10 +416,13 @@ class ScheduleObject {
 
   deleteAllOccurencesClosingGap(pid) {
     let index;
+    //Relying length changing
     for (let i = 0; i < this.items.length; i++) {
       if (
-        this.items[i].asset !== undefined &&
-        this.items[i].asset.pid === pid
+        this.items[i].asset &&
+        this.items[i].asset.pid === pid &&
+        //this is already checked
+        this.items[i].insertionType !== "live"
       ) {
         index = this.deleteItemClosingGap(i);
       }
