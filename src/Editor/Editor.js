@@ -1,17 +1,17 @@
 import React from "react";
 import PropTypes from "prop-types";
 import classNames from "classnames";
-import Box from '@material-ui/core/Box';
-import ExpansionPanel from '@material-ui/core/ExpansionPanel';
-import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
-import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
-import Radio from '@material-ui/core/Radio';
-import RadioGroup from '@material-ui/core/RadioGroup';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import FormControl from '@material-ui/core/FormControl';
-import FormLabel from '@material-ui/core/FormLabel';
-import Typography from '@material-ui/core/Typography';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import { Box } from "@material-ui/core";
+import ExpansionPanel from "@material-ui/core/ExpansionPanel";
+import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
+import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
+import Radio from "@material-ui/core/Radio";
+import RadioGroup from "@material-ui/core/RadioGroup";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import FormControl from "@material-ui/core/FormControl";
+import FormLabel from "@material-ui/core/FormLabel";
+import Typography from "@material-ui/core/Typography";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { withStyles } from "@material-ui/core/styles";
 import Drawer from "@material-ui/core/Drawer";
 import AppBar from "@material-ui/core/AppBar";
@@ -19,7 +19,7 @@ import Toolbar from "@material-ui/core/Toolbar";
 import IconButton from "@material-ui/core/IconButton";
 import MenuIcon from "@material-ui/icons/Menu";
 import moment from "moment";
-import 'moment-duration-format';
+import "moment-duration-format";
 import Episode from "../Episode/Episode";
 import Live from "../Live/Live";
 import Clips from "../Clips/Clips";
@@ -30,7 +30,8 @@ import ScheduleView from "../ScheduleView/ScheduleView";
 import ScheduleObject from "../ScheduleObject";
 import Loop from "../Loop/Loop";
 import PlatformDao from "../PlatformDao/PlatformDao";
-import {fetchSchedule, saveSchedule} from "../ScheduleDao/ScheduleDao";
+import { fetchSchedule, saveSchedule } from "../ScheduleDao/ScheduleDao";
+import TimeDisplay from "../TimeDisplay";
 
 const drawerWidth = 240;
 
@@ -58,7 +59,7 @@ const styles = theme => ({
   },
   appBarName: {
     margin: theme.spacing(2),
-    marginLeft: "auto",
+    marginLeft: "auto"
   },
   menuButton: {
     marginLeft: 12,
@@ -99,16 +100,20 @@ const styles = theme => ({
   }
 });
 
-const services = { 
-  "bbc_marathi_tv" : { sid: "bbc_marathi_tv", name: "Marathi", serviceIDRef: "TVMAR01" }
+const services = {
+  bbc_marathi_tv: {
+    sid: "bbc_marathi_tv",
+    name: "Marathi",
+    serviceIDRef: "TVMAR01"
+  }
 };
 
 class Editor extends React.Component {
-
   constructor(props) {
     super(props);
 
     this.handleScheduleDelete = this.handleScheduleDelete.bind(this);
+    this.handleOccurenceDelete = this.handleOccurenceDelete.bind(this);
     this.handleAddLive = this.handleAddLive.bind(this);
     this.handleAddClipOrEpisode = this.handleAddClipOrEpisode.bind(this);
     this.clearLoop = this.clearLoop.bind(this);
@@ -123,14 +128,19 @@ class Editor extends React.Component {
     this.handleNewSchedule = this.handleNewSchedule.bind(this);
     this.filterUpcomingEpisodes = this.filterUpcomingEpisodes.bind(this);
     this.testLoop = this.testLoop.bind(this);
-    
+
     this.state = {
-      schedule: new ScheduleObject('bbc_marathi_tv', moment().utc().startOf('day')),
+      schedule: new ScheduleObject(
+        "bbc_marathi_tv",
+        moment()
+          .utc()
+          .startOf("day")
+      ),
       mode: "loop",
       scheduleInsertionPoint: 1,
       scheduleModified: false,
       timeToFill: moment.duration(),
-      upcomingAvailability: moment.duration('P1D'),
+      upcomingAvailability: moment.duration("P1D"),
       open: false,
       isPaneOpen: false,
       panelShow: null,
@@ -141,17 +151,16 @@ class Editor extends React.Component {
   }
 
   componentDidMount() {
-    PlatformDao.getUser((user) => {
-      this.setState({user: user});
+    PlatformDao.getUser(user => {
+      this.setState({ user: user });
     });
   }
 
-  componentDidUpdate(prevProps) {
-  }
+  componentDidUpdate(prevProps) {}
 
-  handleChangeMode = (event) => {
-    this.setState({mode: event.target.value});
-  }
+  handleChangeMode = event => {
+    this.setState({ mode: event.target.value });
+  };
 
   handleDrawerOpen = () => {
     //this.setState({ open: true });
@@ -162,27 +171,20 @@ class Editor extends React.Component {
   };
 
   handleAddLive(item) {
-    const items = this.state.schedule.items;
-    for(let i=0; i<items.length; i++) {
-      if(item.startTime.isSame(items[i].startTime)) {
-        return; // don't allow adding at same point twice
-      }
-    }
     let scheduleObject = new ScheduleObject(
       this.state.schedule.sid,
       this.state.schedule.date,
       this.state.schedule.items
     );
-    scheduleObject.addLive(item);
-    this.setState({schedule: scheduleObject});
+    const indexOfLive = scheduleObject.addLive(item);
+    this.updateSchedule(scheduleObject, indexOfLive - 1, true);
   }
 
   handleAddClipOrEpisode(item) {
     //console.log('handleAddClipOrEpisode', item);
-    if(this.state.mode === 'schedule') {
+    if (this.state.mode === "schedule") {
       this.pasteIntoSchedule(item);
-    }
-    else {
+    } else {
       this.pasteIntoLoop(item);
     }
   }
@@ -190,21 +192,23 @@ class Editor extends React.Component {
   filterUpcomingEpisodes(items) {
     //console.log('filterUpcomingEpisodes');
     let filtered = [];
-    for(let i=0; i<items.length; i++) {
+    for (let i = 0; i < items.length; i++) {
       let wanted = false;
-      for(let j=0; j<items[i].available_versions.available; j++) {
+      for (let j = 0; j < items[i].available_versions.available; j++) {
         const version = items[i].available_versions.version[j];
         //console.log(version);
-        for(let k=0; k<version.availabilities.availability.length; k++) {
+        for (let k = 0; k < version.availabilities.availability.length; k++) {
           const availability = version.availabilities.availability[k];
           const start = moment(availability.scheduled_start);
           const end = moment(availability.scheduled_end);
-          const sip = this.state.schedule.items[this.state.scheduleInsertionPoint].startTime
+          const sip = this.state.schedule.items[
+            this.state.scheduleInsertionPoint
+          ].startTime;
           //console.log(start.format(), end.format(), sip.format());
-          wanted |= (sip.isBetween(start, end));      
+          wanted |= sip.isBetween(start, end);
         }
       }
-      if(wanted) {
+      if (wanted) {
         filtered.push(items[i]);
       }
     }
@@ -212,8 +216,8 @@ class Editor extends React.Component {
   }
 
   calculateTimeToFill(schedule, index) {
-    for(let i=index; i<schedule.length; i++) {
-      if(schedule[i].insertionType === 'gap') {
+    for (let i = index; i < schedule.length; i++) {
+      if (schedule[i].insertionType === "gap") {
         return moment.duration(schedule[i].duration);
       }
     }
@@ -231,31 +235,41 @@ class Editor extends React.Component {
       this.state.schedule.date,
       this.state.schedule.items
     );
-    scheduleObject.deleteItemClosingGap(index);
-    this.updateSchedule(scheduleObject, index, true);
+    const newIndex = scheduleObject.deleteItemClosingGap(index);
+    this.updateSchedule(scheduleObject, newIndex, true);
+  }
+
+  handleOccurenceDelete(index) {
+    let scheduleObject = new ScheduleObject(
+      this.state.schedule.sid,
+      this.state.schedule.date,
+      this.state.schedule.items
+    );
+
+    let pid = scheduleObject.items[index].asset.pid;
+    const newIndex = scheduleObject.deleteAllOccurencesClosingGap(pid);
+    this.updateSchedule(scheduleObject, newIndex, true);
   }
 
   handleNewSchedule(scheduleObject) {
     //console.log('handleNewSchedule', scheduleObject);
     //scheduleObject.sid, scheduleObject.date.format(), scheduleObject.items);
-    const now = moment().startOf('hour');
-    const endOfSchedule = moment(scheduleObject.date).add(1, 'day');
+    const now = moment().startOf("hour");
+    const endOfSchedule = moment(scheduleObject.date).add(1, "day");
     let upcomingAvailability = moment.duration(endOfSchedule.diff(now));
-    if(upcomingAvailability.valueOf()<0) {
-      upcomingAvailability = moment.duration('P1D');
+    if (upcomingAvailability.valueOf() < 0) {
+      upcomingAvailability = moment.duration("P1D");
     }
-    this.setState({upcomingAvailability: upcomingAvailability});
+    this.setState({ upcomingAvailability: upcomingAvailability });
     this.updateSchedule(scheduleObject, 1, false);
   }
 
-  handleDateChange = (date) => {
+  handleDateChange = date => {
     //console.log('handleDateChange', date);
     try {
       const sid = this.state.schedule.sid;
-      fetchSchedule(
-        sid,
-        moment(date),
-        schedule => this.handleNewSchedule(schedule)
+      fetchSchedule(sid, moment(date), schedule =>
+        this.handleNewSchedule(schedule)
       );
     } catch (error) {
       console.log(error);
@@ -269,18 +283,21 @@ class Editor extends React.Component {
       this.state.schedule.date,
       this.state.schedule.items
     );
-    scheduleObject.addFloating(index, items);
-    this.updateSchedule(scheduleObject, index+1, true);
+    const newIndex = scheduleObject.addFloating(index, items);
+    this.updateSchedule(scheduleObject, newIndex, true);
   }
-  
+
   updateSchedule(scheduleObject, scheduleInsertionPoint, modified) {
-    const ttf = this.calculateTimeToFill(scheduleObject.items, scheduleInsertionPoint);
+    const ttf = this.calculateTimeToFill(
+      scheduleObject.items,
+      scheduleInsertionPoint
+    );
     let sip = scheduleInsertionPoint;
-    if(sip === scheduleObject.items.length-1) {
+    if (sip === scheduleObject.items.length - 1) {
       sip--; // don't point at the end sentinel
     }
     this.setState({
-      schedule: scheduleObject, 
+      schedule: scheduleObject,
       scheduleInsertionPoint: sip,
       scheduleModified: modified,
       timeToFill: ttf
@@ -292,10 +309,11 @@ class Editor extends React.Component {
   }
 
   clearSchedule() {
-    this.updateSchedule(new ScheduleObject(
-      this.state.schedule.sid,
-      this.state.schedule.date
-    ), 1, false);
+    this.updateSchedule(
+      new ScheduleObject(this.state.schedule.sid, this.state.schedule.date),
+      1,
+      false
+    );
   }
 
   testLoop() {
@@ -306,9 +324,9 @@ class Editor extends React.Component {
   }
 
   pasteIntoLoop(item) {
-    item.action='';
+    item.action = "";
     let loop = [...this.state.loop];
-    loop.push({...item, insertionType: ""});
+    loop.push({ ...item, insertionType: "" });
     this.setState({
       loop: loop,
       loopDuration: this.state.loopDuration.add(moment.duration(item.duration))
@@ -316,17 +334,20 @@ class Editor extends React.Component {
   }
 
   clearLoop() {
-    this.setState({loop: [], loopDuration: moment.duration()});
+    this.setState({ loop: [], loopDuration: moment.duration() });
   }
 
-  deleteItemFromLoop = (index) => {
+  deleteItemFromLoop = index => {
     const r = this.state.loop[index];
     let loop = [...this.state.loop];
     loop.splice(index, 1);
     this.setState({
-      loop:loop,
-      loopDuration: this.state.loopDuration.subtract(moment.duration(r.duration))});
-  }
+      loop: loop,
+      loopDuration: this.state.loopDuration.subtract(
+        moment.duration(r.duration)
+      )
+    });
+  };
 
   savePlaylist = () => {
     //console.log('savePlaylist');
@@ -341,9 +362,8 @@ class Editor extends React.Component {
         console.log(e);
       }
     );
+  };
 
-  }
- 
   render() {
     const { classes } = this.props;
     const { open } = this.state;
@@ -368,171 +388,217 @@ class Editor extends React.Component {
             <Typography variant="h6" color="inherit" noWrap>
               {services[this.state.schedule.sid].name}
             </Typography>
-            <Typography className={classes.appBarTitle} variant="h5" color="inherit" noWrap>
-              <center>This is Dazzler!</center>
+            <Typography
+              align="center"
+              className={classes.appBarTitle}
+              variant="h5"
+              color="inherit"
+              noWrap
+            >
+              This is Dazzler!
             </Typography>
-            <Typography className={classes.appBarName} variant="h6" color="inherit" noWrap>
+            <Typography
+              className={classes.appBarName}
+              variant="h6"
+              color="inherit"
+              noWrap
+            >
               {this.state.user.name}
             </Typography>
           </Toolbar>
+          <Typography variant="h6">
+            <TimeDisplay />
+          </Typography>
         </AppBar>
         <Drawer
           className={classes.drawer}
           variant="persistent"
           anchor="left"
           open={open}
-          classes={{paper: classes.drawerPaper}}
-        >
-        </Drawer>
+          classes={{ paper: classes.drawerPaper }}
+        ></Drawer>
         <main
           className={classNames(classes.content, {
             [classes.contentShift]: open
           })}
         >
           <div className={classes.drawerHeader} />
-        <Box display="flex" flexDirection="row" p={1} m={1} bgcolor="background.paper">
-          <Box width="28%" display="flex" flexDirection="column">
-          <Typography variant="h4" align="center">Picklists</Typography>
+          <Box
+            display="flex"
+            flexDirection="row"
+            p={1}
+            m={1}
+            bgcolor="background.paper"
+          >
+            <Box width="28%" display="flex" flexDirection="column">
+              <Typography variant="h4" align="center">
+                Picklists
+              </Typography>
 
-          <FormControl component="fieldset" className={classes.formControl}>
-          <FormLabel component="legend">Add non-live to</FormLabel>
-          <RadioGroup aria-label="mode" name="mode" value={this.state.mode} onChange={this.handleChangeMode} row>
-            <FormControlLabel value="loop" control={<Radio color="primary"/>} label="Loop" />
-            <FormControlLabel value="schedule" control={<Radio color="primary"/>} label="Schedule" />
-          </RadioGroup>
-        </FormControl>
-        <ExpansionPanel>
-          <ExpansionPanelSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel1bh-content"
-          id="panel1bh-header"
-        >
-          <Typography className={classes.heading}>Live</Typography>
-        </ExpansionPanelSummary>
-        <ExpansionPanelDetails>
-        <Live
-              date={this.state.schedule.date.utc().format('YYYY-MM-DD')}
-	            sid={this.state.schedule.sid}
-	            handleClick={this.handleAddLive}
-	          />
-        </ExpansionPanelDetails>
-          </ExpansionPanel>
-          <ExpansionPanel>
-        <ExpansionPanelSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel2bh-content"
-          id="panel2bh-header"
-        >
-          <Typography className={classes.heading}>Availabile Episodes</Typography>
-        </ExpansionPanelSummary>
-        <ExpansionPanelDetails>
-        <Episode
-          availability="available"
-          sid={this.state.schedule.sid}
-          handleClick={this.handleAddClipOrEpisode}
-        />
-        </ExpansionPanelDetails>
-      </ExpansionPanel>
-      <ExpansionPanel>
-        <ExpansionPanelSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel2bh-content"
-          id="panel2bh-header"
-        >
-          <Typography className={classes.heading}>Upcoming Episodes</Typography>
-        </ExpansionPanelSummary>
-        <ExpansionPanelDetails>
-        <Episode
-          availability={this.state.upcomingAvailability.toISOString()}
-          sid={this.state.schedule.sid}
-          handleClick={this.handleAddClipOrEpisode}
-          resultsFilter={this.filterUpcomingEpisodes}
-        />
-        </ExpansionPanelDetails>
-      </ExpansionPanel>
-      <ExpansionPanel>
-        <ExpansionPanelSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel3bh-content"
-          id="panel2bh-header"
-        >
-          <Typography className={classes.heading}>Jupiter Clips</Typography>
-        </ExpansionPanelSummary>
-        <ExpansionPanelDetails>
-          <Clips
-              type="jupiter"
-              sid={this.state.schedule.sid}
-              handleClick={this.handleAddClipOrEpisode}
-           />
-        </ExpansionPanelDetails>
-      </ExpansionPanel>
-      <ExpansionPanel>
-        <ExpansionPanelSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel4bh-content"
-          id="panel2bh-header"
-        >
-          <Typography className={classes.heading}>Web Clips</Typography>
-        </ExpansionPanelSummary>
-        <ExpansionPanelDetails>
-          <Clips
-              type="web"
-              sid={this.state.schedule.sid}
-              handleClick={this.handleAddClipOrEpisode}
-          />
-        </ExpansionPanelDetails>
-      </ExpansionPanel>
-      <ExpansionPanel>
-        <ExpansionPanelSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel5bh-content"
-          id="panel2bh-header"
-        >
-          <Typography className={classes.heading}>Specials</Typography>
-        </ExpansionPanelSummary>
-        <ExpansionPanelDetails>
-          <Specials
-              sid={this.state.schedule.sid}
-              handleClick={this.handleAddClipOrEpisode}
-          />
-        </ExpansionPanelDetails>
-      </ExpansionPanel>
-      </Box>      
-      <Box mx="1rem" width="28%" flexGrow={1} flexDirection="column">
-          <Typography variant="h4" align="center">Loop</Typography>
-          <Loop
-            onTest={this.testLoop}
-            data={this.state.loop}
-            duration={this.state.loopDuration}
-            timeToFill={this.state.timeToFill}
-            onDelete={this.deleteItemFromLoop}
-            onPaste={this.pasteIntoSchedule}
-            onClear={this.clearLoop}
-          />
+              <FormControl component="fieldset" className={classes.formControl}>
+                <FormLabel component="legend">Add non-live to</FormLabel>
+                <RadioGroup
+                  aria-label="mode"
+                  name="mode"
+                  value={this.state.mode}
+                  onChange={this.handleChangeMode}
+                  row
+                >
+                  <FormControlLabel
+                    value="loop"
+                    control={<Radio color="primary" />}
+                    label="Loop"
+                  />
+                  <FormControlLabel
+                    value="schedule"
+                    control={<Radio color="primary" />}
+                    label="Schedule"
+                  />
+                </RadioGroup>
+              </FormControl>
+              <ExpansionPanel>
+                <ExpansionPanelSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  aria-controls="panel1bh-content"
+                  id="panel1bh-header"
+                >
+                  <Typography className={classes.heading}>Live</Typography>
+                </ExpansionPanelSummary>
+                <ExpansionPanelDetails>
+                  <Live
+                    date={this.state.schedule.date.utc().format("YYYY-MM-DD")}
+                    sid={this.state.schedule.sid}
+                    handleClick={this.handleAddLive}
+                  />
+                </ExpansionPanelDetails>
+              </ExpansionPanel>
+              <ExpansionPanel>
+                <ExpansionPanelSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  aria-controls="panel2bh-content"
+                  id="panel2bh-header"
+                >
+                  <Typography className={classes.heading}>
+                    Available Episodes
+                  </Typography>
+                </ExpansionPanelSummary>
+                <ExpansionPanelDetails>
+                  <Episode
+                    availability="available"
+                    sid={this.state.schedule.sid}
+                    handleClick={this.handleAddClipOrEpisode}
+                  />
+                </ExpansionPanelDetails>
+              </ExpansionPanel>
+              <ExpansionPanel>
+                <ExpansionPanelSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  aria-controls="panel2bh-content"
+                  id="panel2bh-header"
+                >
+                  <Typography className={classes.heading}>
+                    Upcoming Episodes
+                  </Typography>
+                </ExpansionPanelSummary>
+                <ExpansionPanelDetails>
+                  <Episode
+                    availability={this.state.upcomingAvailability.toISOString()}
+                    sid={this.state.schedule.sid}
+                    handleClick={this.handleAddClipOrEpisode}
+                    // resultsFilter={this.filterUpcomingEpisodes}
+                  />
+                </ExpansionPanelDetails>
+              </ExpansionPanel>
+              <ExpansionPanel>
+                <ExpansionPanelSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  aria-controls="panel3bh-content"
+                  id="panel2bh-header"
+                >
+                  <Typography className={classes.heading}>
+                    Jupiter Clips
+                  </Typography>
+                </ExpansionPanelSummary>
+                <ExpansionPanelDetails>
+                  <Clips
+                    type="jupiter"
+                    sid={this.state.schedule.sid}
+                    handleClick={this.handleAddClipOrEpisode}
+                  />
+                </ExpansionPanelDetails>
+              </ExpansionPanel>
+              <ExpansionPanel>
+                <ExpansionPanelSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  aria-controls="panel4bh-content"
+                  id="panel2bh-header"
+                >
+                  <Typography className={classes.heading}>Web Clips</Typography>
+                </ExpansionPanelSummary>
+                <ExpansionPanelDetails>
+                  <Clips
+                    type="web"
+                    sid={this.state.schedule.sid}
+                    handleClick={this.handleAddClipOrEpisode}
+                  />
+                </ExpansionPanelDetails>
+              </ExpansionPanel>
+              <ExpansionPanel>
+                <ExpansionPanelSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  aria-controls="panel5bh-content"
+                  id="panel2bh-header"
+                >
+                  <Typography className={classes.heading}>Specials</Typography>
+                </ExpansionPanelSummary>
+                <ExpansionPanelDetails>
+                  <Specials
+                    sid={this.state.schedule.sid}
+                    handleClick={this.handleAddClipOrEpisode}
+                  />
+                </ExpansionPanelDetails>
+              </ExpansionPanel>
+            </Box>
+            <Box mx="1rem" width="28%" flexGrow={1} flexDirection="column">
+              <Typography variant="h4" align="center">
+                Loop
+              </Typography>
+              <Loop
+                onTest={this.testLoop}
+                data={this.state.loop}
+                duration={this.state.loopDuration}
+                timeToFill={this.state.timeToFill}
+                onDelete={this.deleteItemFromLoop}
+                onPaste={this.pasteIntoSchedule}
+                onClear={this.clearLoop}
+              />
+            </Box>
+            <Box width="44%" flexGrow={1} flexDirection="column">
+              <Typography variant="h4" align="center">
+                Schedule
+              </Typography>
+              <SchedulePicker
+                enabled={this.state.scheduleModified ? false : true}
+                scheduleDate={this.state.schedule.date}
+                onDateChange={this.handleDateChange}
+              />
+              <ScheduleView
+                onRowSelected={this.handleScheduleRowSelect}
+                onDelete={this.handleScheduleDelete}
+                onOccurenceDelete={this.handleOccurenceDelete}
+                data={this.state.schedule.items}
+                row={this.state.scheduleInsertionPoint}
+                lastUpdated=""
+              />
+              <ScheduleToolbar
+                saveEnabled={this.state.user.auth}
+                contentModified={this.state.scheduleModified}
+                onSave={this.savePlaylist}
+                onClear={this.clearSchedule}
+                onReload={this.reloadSchedule}
+              />
+            </Box>
           </Box>
-          <Box width="44%" flexGrow={1} flexDirection="column">
-          <Typography variant="h4" align="center">Schedule</Typography>
-          <SchedulePicker
-            enabled={this.state.scheduleModified?false:true}
-            scheduleDate={this.state.schedule.date}
-            onDateChange={this.handleDateChange}
-          />
-          <ScheduleView
-            onRowSelected={this.handleScheduleRowSelect}
-            onDelete={this.handleScheduleDelete}
-            data={this.state.schedule.items}
-            row={this.state.scheduleInsertionPoint}
-            lastUpdated=""
-          />
-          <ScheduleToolbar
-            saveEnabled={this.state.user.auth||true}
-            contentModified={this.state.scheduleModified}
-            onSave={this.savePlaylist}
-            onClear={this.clearSchedule}
-            onReload={this.reloadSchedule}
-          />
-          </Box>
-        </Box>
         </main>
       </div>
     );

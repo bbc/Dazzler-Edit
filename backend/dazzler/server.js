@@ -1,14 +1,12 @@
 // https://github.com/bbc/sample-cloud-apps/nodejs-helloworld/src/helloworld/server.js
 const auth = require("./auth");
 const express = require("express");
-const axios = require("axios");
-const fs = require("fs");
-const parseString = require("xml2js").parseString;
-const xml2js = require('xml2js-es6-promise');
-const querystring = require("querystring");
-const Big = require("big-integer");
-const https = require("https");
 const bodyParser = require("body-parser");
+const pid2crid = require("./pid2crid");
+const nitro = require("./nitro");
+const spw = require("./spw");
+const pips = require("./pips");
+
 const app = express();
 var configuration;
 
@@ -55,26 +53,11 @@ app.get("/api/v1/user", function(req, res) {
   }
 });
 
-function onlyName(name) {
-  return name.split(':')[1]
-} 
-
 app.get("/api/v1/schedule", async (req, res) => {
   try {
     const sid = req.query.sid;
     const date = req.query.date;
-    let url = `https://programmes.api.bbc.com/schedule?api_key=${process.env.SPW_KEY}&sid=${sid}&date=${date}`
-    console.log(url);
-    let r = await axios({
-      url: url,
-      method: 'get',
-      timeout: 8000,
-      key: fs.readFileSync(process.env.KEY),
-      cert: fs.readFileSync(process.env.CERT),
-      passphrase: process.env.PASSPHRASE,
-      headers: { 'Accept': 'application/xml', }
-    });
-    const schedule = (await xml2js(r.data, {tagNameProcessors:[onlyName]})).schedule;
+    const schedule = await spw.request(sid, date);
     const s = schedule.item;
     let pids = [];
     for (let i = 0; i < s.length; i++) {
@@ -84,7 +67,7 @@ app.get("/api/v1/schedule", async (req, res) => {
       }
     }
     if(pids.length > 0) {
-        await addClips(s, pids);
+        await nitro.addClips(s, pids);
     }
     // work around circular dependencies
     let o = {};
@@ -96,19 +79,6 @@ app.get("/api/v1/schedule", async (req, res) => {
     res.json({"total":0});
   }
 });
-
-async function addClips(schedule_items, clip_pids) {
-  const r = await nitroRequest("programmes", { pid: clip_pids, mixin: "ancestor_titles" })
-  const clips = r.data.nitro.results.items;
-  for (let i = 0; i < schedule_items.length; i++) {
-    const pid = schedule_items[i].version[0].version_of[0].link[0].$.pid;
-    for (let j = 0; j < clips.length; j++) {
-      if (clips[j].pid === pid) {
-        schedule_items[i]["clip"] = [clips[j]];
-      }
-    }
-  }
-}
 
 app.get("/api/v1/broadcast", async (req, res) => {
   let q = {
@@ -123,8 +93,7 @@ app.get("/api/v1/broadcast", async (req, res) => {
     q.page_size = req.query.page_size;
   }
   try{
-    console.log('broadcast', q);
-    const r = await nitroRequest("schedules", q);
+    const r = await nitro.request("schedules", q);
     res.json(r.data.nitro.results);
   } catch(e) {
     res.status(404).send("Not found") // TODO use proper error message
@@ -132,7 +101,6 @@ app.get("/api/v1/broadcast", async (req, res) => {
 });
 
 app.get("/api/v1/webcast", async (req, res) => {
-  console.log('webcast', req.query);
   let q = {};
   if (req.query.hasOwnProperty("start")) {
     q.start_from = req.query.start;
@@ -156,7 +124,7 @@ app.get("/api/v1/webcast", async (req, res) => {
     q.page_size = req.query.page_size;
   }
   try{
-    const r = await nitroRequest("schedules", q);
+    const r = await nitro.request("schedules", q);
     res.json(add_crids_to_webcast(r.data.nitro.results));
   } catch(e) {
     res.status(404).send("Not found") // TODO use proper error message
@@ -181,14 +149,18 @@ app.get("/api/v1/special", async (req, res) => {
 
 app.get("/api/v1/clip", async (req, res) => {
   let q = {};
+  let sid = 'bbc_marathi_tv';
+  if(req.query.sid) {
+    sid = req.query.sid;
+  }
   if (req.query.hasOwnProperty("type")) {
     if (req.query.type === "web") {
-      q.tag_name = config[req.query.sid].clip_language;
+      q.tag_name = config[sid].clip_language;
     } else {
-      q.master_brand = config[req.query.sid].mid;
+      q.master_brand = config[sid].mid;
     }
   } else {
-    q.tag_name = config[req.query.sid].clip_language;
+    q.tag_name = config[sid].clip_language;
   }
   await clip(q, req.query, res);
 });
@@ -205,7 +177,7 @@ async function clip(q, query, res) {
   q.availability = "available";
   try {
     let pids = [];
-    let response = await nitroRequest("programmes", q);
+    let response = await nitro.request("programmes", q);
     let clips = response.data.nitro.results;
     for (let i = 0; i < clips.items.length; i++) {
       if (clips.items[i].available_versions.hasOwnProperty("version")) {
@@ -215,22 +187,13 @@ async function clip(q, query, res) {
         }
       }
     }
-    response = await nitroRequest("versions", { pid: pids });
-    const items = response.data.nitro.results.items;
-    let map = new Map();
-    for (let i = 0; i < items.length; i++) {
-      const ids = items[i].identifiers.identifier;
-      for (let j = 0; j < ids.length; j++) {
-        if (ids[j].type === "crid") {
-          map.set(items[i].pid, ids[j].$);
-        }
-      }
-    }
+    const map = await get_version_pid2crid_map(pids);
+    console.log(map);
     for (let i = 0; i < clips.items.length; i++) {
       if (clips.items[i].available_versions.hasOwnProperty("version")) {
         const version = clips.items[i].available_versions.version;
         for (let j = 0; j < version.length; j++) {
-          version[j].crid = map.get(version[j].pid);
+          version[j].crid = map[version[j].pid];
         }
      }
     }
@@ -259,65 +222,31 @@ app.get("/api/v1/episode", async (req, res, next) => {
     q.page_size = req.query.page_size;
   }
   if (req.query.hasOwnProperty("availability")) {
-    q.availability = req.query.availability;;
-    try {
-      let items = [];
-      const available_episodes = await get_episodes(q);
-      if(available_episodes.total>0) {
-        items = available_episodes.items;
-      }
-      res.json({
-        page_size: q.page_size,
-        page: q.page,
-        total: items.length,
-        items: items
-      });
-    } catch (e) {
-      console.log(e);
-      res.status(404).send("error");
-    }
+    q.availability = req.query.availability;
+  } else {
+    q.availability = "available";
   }
-  else {
-    try {
-      let items = [];
-      q.availability = "available";
-      const available_episodes = await get_episodes(q);
-      if(available_episodes.total>0) {
-        items = items.concat(available_episodes.items);
-      }
-      q.availability = "PT24H";
-      const future_episodes = await get_episodes(q);
-      if(future_episodes.total>0) {
-        items = items.concat(future_episodes.items);
-      }
-      res.json({
-        page_size: q.page_size,
-        page: q.page,
-        total: items.length,
-        items: items
-      });
-    } catch (e) {
-      console.log(e);
-      res.status(404).send("error");
+  try {
+    let items = [];
+    const nres = await nitro.request("programmes", q);
+    if (nres.status !== 200) {
+      console.log(nres.status);
     }
+    const available_episodes = add_version_crids_to_episodes(nres.data.nitro.results);
+    if(available_episodes.total>0) {
+      items = available_episodes.items;
+    }
+    res.json({
+      page_size: q.page_size,
+      page: q.page,
+      total: available_episodes.total,
+      items: items
+    });
+  } catch (e) {
+    console.log(e);
+    res.status(404).send("error");
   }
 });
-
-async function get_episodes(q) {
-    let url = `http://programmes.api.bbc.com/nitro/api/programmes/?api_key=${process.env.NITRO_KEY}&` + querystring.stringify(q);
-    console.log(url);
-    let res = await axios({
-      url: url,
-      method: "get",
-      timeout: 8000,
-      headers: { Accept: "application/json" }
-    });
-    if (res.status !== 200) {
-      // test for status you want, etc
-      console.log(res.status);
-    }
-    return add_crids_to_episodes(res.data.nitro.results);
-}
 
 app.put("/api/v1/loop", async (req, res, next) => {
   let user = "dazzler"; // assume local
@@ -329,8 +258,8 @@ app.put("/api/v1/loop", async (req, res, next) => {
     const collection_pid = config[req.query.sid].loop_collection;
     const members = JSON.parse(req.body);
     try {
-      await clearCollection(collection_pid);
-      await setCollectionMembers(collection_pid, members);
+      await pips.clearCollection(collection_pid);
+      await pips.setCollectionMembers(collection_pid, members);
       res.json({ pid: collection_pid, members: members });
     } catch (e) {
       // this will eventually be handled by our error handling middleware
@@ -343,7 +272,7 @@ app.put("/api/v1/loop", async (req, res, next) => {
   }
 });
 
-app.post("/api/v1/tva", function(req, res) {
+app.post("/api/v1/tva", async (req, res) =>  {
   if (req.body.includes('serviceIDRef="TVMAR01')) {
     let user = "dazzler"; // assume local
     if (req.header("sslclientcertsubject")) {
@@ -351,7 +280,8 @@ app.post("/api/v1/tva", function(req, res) {
       user = subject.emailAddress;
     }
     if (auth(user)) {
-      postTVA(req.body, res);
+      const r = await pips.postTVA(req.body, res);
+      res.json(r.data);
     } else {
       const message = user + " is not authorised to save schedules";
       console.log(message);
@@ -363,183 +293,57 @@ app.post("/api/v1/tva", function(req, res) {
   }
 });
 
-async function clearCollection(pid) {
-  var config = {
-    key: fs.readFileSync(process.env.KEY),
-    cert: fs.readFileSync(process.env.CERT),
-    passphrase: process.env.PASSPHRASE
-  };
-  const members = await getCollectionMembers(pid);
-  for (let i = 0; i < members.length; i++) {
-    await axios.delete(
-      `https://api.live.bbc.co.uk/pips/api/v1/membership/pid.${members[i]}`,
-      config
-    );
-  }
-}
-
-async function getCollectionMembers(pid) {
-  var config = {
-    key: fs.readFileSync(process.env.KEY),
-    cert: fs.readFileSync(process.env.CERT),
-    passphrase: process.env.PASSPHRASE
-  };
-  const membersXml = await axios.get(
-    `https://api.test.bbc.co.uk/pips/api/v1/collection/pid.${pid}/group_of/`,
-    config
-  );
-  const members = await xml2json(membersXml);
-  const membership = members.pips.results[0].membership;
-  /* this is good if we need the positions but we only use the results for delete
-  let r = [];
-  for(let i=0; i<membership.length; i++) {
-          const pid = membership[i].$.pid;
-          const position = membership[i].position[0]
-          r[position] = pid;
-  }
-  return r.filter(function (el) { return el != null; });
-  */
-  return Array.from(membership, x => x.$.pid);
-}
-
-async function setCollectionMembers(pid, data) {
-  for (let i = 0; i < data.length; i++) {
-    await createMembership(pid, data[i], i + 1);
-  }
-}
-
-async function createMembership(collection, member, position) {
-  const xml = `<pips xmlns="http://ns.webservices.bbc.co.uk/2006/02/pips" xmlns:pips-meta="http://ns.webservices.bbc.co.uk/2006/02/pips-meta" xmlns:xsd="http://www.w3.org/2001/XMLSchema-datatypes" release="219">
-  <membership>
-    <partner>
-      <link rel="pips-meta:partner" pid="s0000001"/>
-    </partner>
-    <ids/>
-    <group>
-      <link rel="pips-meta:collection" pid="${collection}"/>
-    </group>
-    <member>
-      <link rel="pips-meta:clip" pid="${member}"/>
-    </member>
-    <position>${position}</position>
-    <title></title>
-    <synopses/>
-    <links/>
-  </membership>
-</pips>`;
-  return await postPIPS(xml);
-}
-
-async function postPIPS(object_type, data) {
-  var config = {
-    key: fs.readFileSync(process.env.KEY),
-    cert: fs.readFileSync(process.env.CERT),
-    passphrase: process.env.PASSPHRASE,
-    headers: { "Content-Type": "text/xml" }
-  };
-
-  return await axios.post(
-    `https://api.live.bbc.co.uk/pips/api/v1/${object_type}/`,
-    data,
-    config
-  );
-}
-
-function postTVA(data, res) {
-  var options = {
-    path: "/pips/import/tva/",
-    host: "api.live.bbc.co.uk",
-    method: "POST",
-    key: fs.readFileSync(process.env.KEY),
-    cert: fs.readFileSync(process.env.CERT),
-    passphrase: process.env.PASSPHRASE,
-    headers: {
-      "Content-Type": "application/xml",
-      "Content-Length": Buffer.byteLength(data)
-    }
-  };
-
-  //checking if we are one the corporate wireless network
-  // defaultGateway.v4().then(result => {
-  //   if (require('../../src/config/env.json') && result.gateway == process.env.DEFAULT_GATEWAY){
-  //     options.path = "https://" + options.host + options.path;
-  //     options.host = process.env.HOST;
-  //     options.port = process.env.PORT;
-  //   }
-  // });
-  options.agent = new https.Agent(options);
-  var req = https.request(options, function(post_res) {
-    var body = "";
-    post_res.setEncoding("utf8");
-    post_res.on("data", chunk => {
-      body += chunk;
-    });
-    post_res.on("end", () => {
-      try {
-        parseString(body, function(err, result) {
-          if (err) {
-            res.status(404).send(err);
-          } else {
-            res.json(result);
-          }
-        });
-      } catch (e) {
-        res.status(404).send(e);
-      }
-    });
-  });
-  // post the data
-  req.write(data);
-  req.end();
-}
-
-function nitroRequest(feed, query) {
-    let url = `http://programmes.api.bbc.com/nitro/api/${feed}/?api_key=${process.env.NITRO_KEY}&`+querystring.stringify(query);
-    console.log(url);
-    return axios({
-      url: url,
-      method: 'get',
-      timeout: 8000,
-      headers: {
-          'Accept': 'application/json',
-      }
-    });
-}
-
-const pidchars = "0123456789bcdfghjklmnpqrstvwxyz";
-const pidbase = pidchars.length;
-
-function pid2crid(pid) {
-  var n = Big(0);
-  for (var i = 1; i < pid.length; i++) {
-    const c = pid.charAt(i);
-    const p = pidchars.indexOf(c);
-    n = n.times(pidbase).plus(p);
-  }
-  return `crid://bbc.co.uk/${pid.substring(0, 1)}/${n}`;
-}
-
+// we assume only IBMS schedules webcasts so pid2crid can work
 function add_crids_to_webcast(results) {
   if (results && results.total > 0) {
     for (let i = 0; i < results.items.length; i++) {
       const pid = results.items[i].window_of[0].pid;
-      results.items[i].window_of[0].crid = pid2crid(pid);
+      results.items[i].window_of[0].crid = pid2crid.crid(pid);
     }
   }
   return results;
 }
 
-function add_crids_to_episodes(results) {
+async function get_version_pid2crid_map(pids) {
+  let map = {};
+  if(pids.length>0) {
+    const response = await nitro.request("versions", { pid: pids });
+    const items = response.data.nitro.results.items;
+    for (let i = 0; i < items.length; i++) {
+      const ids = items[i].identifiers.identifier;
+      for (let j = 0; j < ids.length; j++) {
+        if (ids[j].type === "crid") {
+          map[items[i].pid] = ids[j].$;
+        }
+      }
+    }
+  }
+  return map;
+}
+
+// stand alone episodes created in Jupiter will have pids that pid2crid gets wrong
+function add_version_crids_to_episodes(results) {
+  let pids = [];
+  let versions = [];
   if (results && results.total>0) {
     for (let i = 0; i < results.items.length; i++) {
       if (results.items[i].available_versions.hasOwnProperty("version")) {
         for (let j = 0; j < results.items[i].available_versions.version.length; j++) {
           let version = results.items[i].available_versions.version[j];
-          version.crid = pid2crid(version.pid);
+          if(version.pid.startsWith('w')) {
+            version.crid = pid2crid.crid(version.pid);
+          } else {
+            pids.push(version.pid);
+            versions.push(version);
+          }
         }
       }
     }
   }
+  const map = get_version_pid2crid_map(pids);
+  versions.forEach((version) => {
+    version.crid = map[version.pid];
+  });
   return results;
 }
 
@@ -552,15 +356,6 @@ function parseSSLsubject(req) {
     data[key] = val;
   }
   return data;
-}
-
-async function xml2json(xml) {
-  return new Promise((resolve, reject) => {
-    parseString(xml, function(err, json) {
-      if (err) reject(err);
-      else resolve(json);
-    });
-  });
 }
 
 // We do the "listen" call in index.js - making this module easier to test

@@ -32,7 +32,7 @@ class AssetDao {
       });
   }
 
-    static clip2Item(clip) {
+  static clip2Item(clip) {
     const version = clip.available_versions.version[0]; // TODO pick a version
     return {
       title: clip.title,
