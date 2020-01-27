@@ -378,6 +378,7 @@ class ScheduleObject {
         // do nothing
       }
     }
+
     schedule.splice(index, 1);
     for (let i = index; i < schedule.length; i++) {
       let done = false;
@@ -416,7 +417,7 @@ class ScheduleObject {
 
   deleteAllOccurencesClosingGap(pid) {
     let index;
-    //Relying length changing
+    //Relying on length changing
     for (let i = 0; i < this.items.length; i++) {
       if (
         this.items[i].asset &&

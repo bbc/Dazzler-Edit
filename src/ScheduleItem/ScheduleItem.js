@@ -3,7 +3,11 @@ import moment from "moment";
 import "moment-duration-format";
 import Arrow from "@material-ui/icons/ArrowRight";
 import { Typography } from "@material-ui/core";
-import { confirmAlert } from "react-confirm-alert";
+import Button from "@material-ui/core/Button";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogTitle from "@material-ui/core/DialogTitle";
 import "react-confirm-alert/src/react-confirm-alert.css";
 
 /*
@@ -21,7 +25,27 @@ onDelete="function(index)"
 */
 
 class ScheduleItem extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleClickOpen = this.handleClickOpen.bind(this);
+    this.handleClose = this.handleClose.bind(this);
+
+    this.state = {
+      open: false,
+      count: 0
+    };
+  }
+
+  handleClickOpen = () => {
+    this.setState({ open: true });
+  };
+
+  handleClose = () => {
+    this.setState({ open: false });
+  };
+
   render() {
+    let { open } = this.state;
     let rowStyle = this.props.insertionType;
     if (this.props.live === "true") rowStyle = "live";
     let arrowStyle = "bottomarrow";
@@ -35,6 +59,7 @@ class ScheduleItem extends React.Component {
     const isoString = moment(this.props.startTime).toISOString();
     const localTime = moment(isoString).format("HH:mm");
     const utcTime = moment.utc(this.props.startTime).format("HH:mm:ss");
+
     return (
       <Fragment>
         <tr className={rowStyle}>
@@ -82,6 +107,7 @@ class ScheduleItem extends React.Component {
                 }}
                 onContextMenu={event => {
                   event.preventDefault();
+
                   if (this.props.insertionType !== "live") {
                     var tally = 0;
                     this.props.data.map(item => {
@@ -89,21 +115,7 @@ class ScheduleItem extends React.Component {
                         tally++;
                       }
                     });
-                    confirmAlert({
-                      title: "confirm",
-                      message: `Are you sure you want to delete all ${tally} occurences of
-                         ${this.props.title}`,
-                      buttons: [
-                        {
-                          label: "Yes",
-                          onClick: () =>
-                            this.props.onOccurenceDelete(this.props.index)
-                        },
-                        {
-                          label: "No"
-                        }
-                      ]
-                    });
+                    this.setState({ open: true, count: tally });
                   }
                 }}
               >
@@ -112,6 +124,32 @@ class ScheduleItem extends React.Component {
             )}
           </td>
         </tr>
+        <Dialog
+          open={open}
+          onClose={this.handleClose}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">
+            {`Are you sure you want to delete all ${this.state.count} occurences of
+                         ${this.props.title}`}
+          </DialogTitle>
+          <DialogContent></DialogContent>
+          <DialogActions>
+            <Button onClick={this.handleClose} color="primary">
+              No
+            </Button>
+            <Button
+              onClick={() => {
+                this.props.onOccurenceDelete(this.props.index);
+              }}
+              color="primary"
+              autoFocus
+            >
+              Yes
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Fragment>
     );
   }
