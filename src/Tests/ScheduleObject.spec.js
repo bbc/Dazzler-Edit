@@ -1,5 +1,9 @@
 import ScheduleObject from "../ScheduleObject";
-import { loopItems, removedItemsFromLoop } from "./templates/items";
+import {
+  loopItems,
+  clipsAndLiveItem,
+  endOfScheduleItems
+} from "./templates/items";
 import moment from "moment";
 
 describe("ScheduleObject", () => {
@@ -332,5 +336,97 @@ describe("ScheduleObject", () => {
     expect(JSON.stringify(myScheduleObject.items)).toEqual(
       expect.stringContaining(pid)
     );
+  });
+
+  test("System should correctly add overlap before start of live", () => {
+    let myScheduleObject = new ScheduleObject(
+      "bbc_marathi_tv",
+      moment("2020-01-27"),
+      clipsAndLiveItem
+    );
+
+    const itemToAdd = {
+      title: "ItemToAdd",
+      duration: "PT6M51S",
+      live: false,
+      insertionType: "",
+      versionCrid: "crid://bbc.co.uk/p/229911861",
+      pid: "p080y6c2",
+      vpid: "p080yh9m"
+    };
+
+    let index = 4;
+
+    myScheduleObject.addFloating(index, itemToAdd);
+
+    //Check that we have an insertionType of overlap before the live
+    expect(myScheduleObject.items[index].insertionType).toEqual("overlap");
+    //Check that system truncates the overlap
+    expect(
+      myScheduleObject.items[index].duration <
+        myScheduleObject.items[index].asset.duration
+    ).toBeTruthy(); //Need a better way to compare durations
+  });
+  test("System should correctly calculate overlap before the end of the day's schedule", () => {
+    let myScheduleObject = new ScheduleObject(
+      "bbc_marathi_tv",
+      moment("2020-01-27"),
+      endOfScheduleItems
+    );
+
+    let index = 2;
+
+    const itemToAdd = {
+      title: "ItemToAdd",
+      duration: "PT6M51S",
+      live: false,
+      insertionType: "",
+      versionCrid: "crid://bbc.co.uk/p/229911861",
+      pid: "p080y6c2",
+      vpid: "p080yh9m"
+    };
+
+    myScheduleObject.addFloating(index, itemToAdd);
+
+    expect(myScheduleObject.items[index].insertionType).toEqual("overlap");
+    //Check that system truncates the overlap
+    expect(
+      myScheduleObject.items[index].duration <
+        myScheduleObject.items[index].asset.duration
+    ).toBeTruthy(); //Need a better way to compare durations
+
+    //Check that the system recalculates schedule when overlapping item is deleted.
+  });
+
+  test("System should correctly recalculate schedule when overlapping item is deleted", () => {
+    let myScheduleObject = new ScheduleObject(
+      "bbc_marathi_tv",
+      moment("2020-01-27"),
+      endOfScheduleItems
+    );
+
+    let index = 1;
+
+    const itemToAdd = {
+      title: "ItemToAdd",
+      duration: "PT6M51S",
+      live: false,
+      insertionType: "",
+      versionCrid: "crid://bbc.co.uk/p/229911861",
+      pid: "p080y6c2",
+      vpid: "p080yh9m"
+    };
+    console.log("BEFORE", myScheduleObject.items);
+    myScheduleObject.addFloating(index, itemToAdd);
+    myScheduleObject.deleteItemClosingGap(index);
+    console.log("FINAL", myScheduleObject.items);
+    //There is no overlap so we should have an insertion type of for the clip before the gap ""
+    expect(myScheduleObject.items[index].insertionType).toEqual("");
+    //There is no overlap so the duration should remain the same
+    expect(myScheduleObject.items[index].duration).toEqual(
+      myScheduleObject.items[index].asset.duration
+    );
+
+    expect(myScheduleObject.items[index + 1].insertionType).toEqual("gap");
   });
 });

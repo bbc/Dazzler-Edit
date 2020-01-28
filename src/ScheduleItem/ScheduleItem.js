@@ -136,17 +136,18 @@ class ScheduleItem extends React.Component {
           </DialogTitle>
           <DialogContent></DialogContent>
           <DialogActions>
-            <Button onClick={this.handleClose} color="primary">
-              No
-            </Button>
             <Button
               onClick={() => {
                 this.props.onOccurenceDelete(this.props.index);
+                this.setState({ open: false });
               }}
               color="primary"
               autoFocus
             >
               Yes
+            </Button>
+            <Button onClick={this.handleClose} color="primary">
+              No
             </Button>
           </DialogActions>
         </Dialog>

@@ -1,5 +1,4 @@
 import moment from "moment";
-import { FaRegImage } from "react-icons/fa";
 
 class ScheduleObject {
   constructor(sid, date, items) {
@@ -391,14 +390,28 @@ class ScheduleObject {
             .toIsoString();
           done = true;
           break;
+        case "overlap":
+          schedule[i].startTime.subtract(duration);
+          //condition
+          schedule[i].insertionType = "";
+          schedule[i].duration = schedule[i].asset.duration;
+          break;
+
         case "sentinel":
         case "live":
           done = true;
-          const start = moment(schedule[i].startTime).subtract(duration);
+          const newStart = moment(schedule[i - 1].startTime).add(
+            moment.duration(schedule[i - 1].duration)
+          );
+
+          const newDuration = moment.duration(
+            schedule[i].startTime.diff(newStart)
+          );
+
           schedule.splice(i, 0, {
             title: "gap",
-            startTime: start,
-            duration: duration.toISOString(),
+            startTime: newStart,
+            duration: newDuration.toISOString(),
             insertionType: "gap"
           });
           break;

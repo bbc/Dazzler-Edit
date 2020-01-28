@@ -283,6 +283,7 @@ class Editor extends React.Component {
       this.state.schedule.date,
       this.state.schedule.items
     );
+
     const newIndex = scheduleObject.addFloating(index, items);
     this.updateSchedule(scheduleObject, newIndex, true);
   }
@@ -365,6 +366,7 @@ class Editor extends React.Component {
   };
 
   render() {
+    console.log(JSON.stringify(this.state.schedule.items));
     const { classes } = this.props;
     const { open } = this.state;
     //console.log('Editor.render');
