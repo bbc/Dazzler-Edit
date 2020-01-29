@@ -392,9 +392,21 @@ class ScheduleObject {
           break;
         case "overlap":
           schedule[i].startTime.subtract(duration);
-          //condition
-          schedule[i].insertionType = "";
-          schedule[i].duration = schedule[i].asset.duration;
+          let finishTime = moment(schedule[i].startTime).add(
+            moment.duration(schedule[i].asset.duration)
+          );
+          if (moment(finishTime).isBefore(moment(schedule[i + 1].startTime))) {
+            schedule[i].insertionType = "";
+            schedule[i].duration = schedule[i].asset.duration;
+          } else {
+            let itemDuration = moment(schedule[i + 1].startTime).diff(
+              schedule[i].startTime
+            );
+            // schedule[i].startTime.subtract(duration);
+            schedule[i].duration = moment.duration(itemDuration).toISOString();
+            done = true;
+          }
+
           break;
 
         case "sentinel":
@@ -405,7 +417,7 @@ class ScheduleObject {
           );
 
           const newDuration = moment.duration(
-            schedule[i].startTime.diff(newStart)
+            moment(schedule[i].startTime).diff(newStart)
           );
 
           schedule.splice(i, 0, {

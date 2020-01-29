@@ -416,10 +416,9 @@ describe("ScheduleObject", () => {
       pid: "p080y6c2",
       vpid: "p080yh9m"
     };
-    console.log("BEFORE", myScheduleObject.items);
+
     myScheduleObject.addFloating(index, itemToAdd);
     myScheduleObject.deleteItemClosingGap(index);
-    console.log("FINAL", myScheduleObject.items);
     //There is no overlap so we should have an insertion type of for the clip before the gap ""
     expect(myScheduleObject.items[index].insertionType).toEqual("");
     //There is no overlap so the duration should remain the same

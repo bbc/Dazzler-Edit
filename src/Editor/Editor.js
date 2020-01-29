@@ -366,7 +366,6 @@ class Editor extends React.Component {
   };
 
   render() {
-    console.log(JSON.stringify(this.state.schedule.items));
     const { classes } = this.props;
     const { open } = this.state;
     //console.log('Editor.render');

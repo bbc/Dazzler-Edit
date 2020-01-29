@@ -50,7 +50,6 @@ class ScheduleView extends React.Component {
   }
 
   render() {
-    console.log("DATA", this.props.data);
     let offset = moment()
       .format()
       .substring(19);
