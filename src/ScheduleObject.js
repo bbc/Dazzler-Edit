@@ -451,6 +451,7 @@ class ScheduleObject {
         this.items[i].insertionType !== "live"
       ) {
         index = this.deleteItemClosingGap(i);
+        i--;
       }
     }
     return index;
