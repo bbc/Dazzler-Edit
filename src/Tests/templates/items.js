@@ -278,3 +278,96 @@ export let endOfScheduleItems = [
     title: "Dummy End"
   }
 ];
+
+export let singleItemLoop = [
+  {
+    startTime: "2020-01-31T00:00:00.000Z",
+    duration: "PT0S",
+    insertionType: "sentinel",
+    title: "Dummy Start"
+  },
+  {
+    duration: "PT2M27S",
+    insertionType: "",
+    title:
+      "'या' कारणामुळे चीनमधला कोरोना व्हायरस ठरला जागतिक आरोग्य आणीबाणीचं कारण",
+    asset: {
+      title:
+        "'या' कारणामुळे चीनमधला कोरोना व्हायरस ठरला जागतिक आरोग्य आणीबाणीचं कारण",
+      duration: "PT2M27S",
+      live: false,
+      insertionType: "",
+      versionCrid: "crid://bbc.co.uk/p/230824388",
+      pid: "p081y3vs",
+      vpid: "p081y3vz",
+      action: ""
+    },
+    startTime: "2020-01-31T00:00:00.000Z"
+  },
+  {
+    duration: "PT2M27S",
+    insertionType: "",
+    title:
+      "'या' कारणामुळे चीनमधला कोरोना व्हायरस ठरला जागतिक आरोग्य आणीबाणीचं कारण",
+    asset: {
+      title:
+        "'या' कारणामुळे चीनमधला कोरोना व्हायरस ठरला जागतिक आरोग्य आणीबाणीचं कारण",
+      duration: "PT2M27S",
+      live: false,
+      insertionType: "",
+      versionCrid: "crid://bbc.co.uk/p/230824388",
+      pid: "p081y3vs",
+      vpid: "p081y3vz",
+      action: ""
+    },
+    startTime: "2020-01-31T00:02:27.000Z"
+  },
+  {
+    duration: "PT2M27S",
+    insertionType: "",
+    title:
+      "'या' कारणामुळे चीनमधला कोरोना व्हायरस ठरला जागतिक आरोग्य आणीबाणीचं कारण",
+    asset: {
+      title:
+        "'या' कारणामुळे चीनमधला कोरोना व्हायरस ठरला जागतिक आरोग्य आणीबाणीचं कारण",
+      duration: "PT2M27S",
+      live: false,
+      insertionType: "",
+      versionCrid: "crid://bbc.co.uk/p/230824388",
+      pid: "p081y3vs",
+      vpid: "p081y3vz",
+      action: ""
+    },
+    startTime: "2020-01-31T00:04:54.000Z"
+  },
+  {
+    duration: "PT2M27S",
+    insertionType: "",
+    title:
+      "'या' कारणामुळे चीनमधला कोरोना व्हायरस ठरला जागतिक आरोग्य आणीबाणीचं कारण",
+    asset: {
+      title:
+        "'या' कारणामुळे चीनमधला कोरोना व्हायरस ठरला जागतिक आरोग्य आणीबाणीचं कारण",
+      duration: "PT2M27S",
+      live: false,
+      insertionType: "",
+      versionCrid: "crid://bbc.co.uk/p/230824388",
+      pid: "p081y3vs",
+      vpid: "p081y3vz",
+      action: ""
+    },
+    startTime: "2020-01-31T00:07:21.000Z"
+  },
+  {
+    title: "gap",
+    startTime: "2020-01-31T00:09:48.000Z",
+    duration: "PT23H50M12S",
+    insertionType: "gap"
+  },
+  {
+    startTime: "2020-02-01T00:00:00.000Z",
+    duration: "PT0S",
+    insertionType: "sentinel",
+    title: "Dummy End"
+  }
+];

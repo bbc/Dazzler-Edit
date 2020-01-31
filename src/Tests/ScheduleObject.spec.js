@@ -2,7 +2,8 @@ import ScheduleObject from "../ScheduleObject";
 import {
   loopItems,
   clipsAndLiveItem,
-  endOfScheduleItems
+  endOfScheduleItems,
+  singleItemLoop
 } from "./templates/items";
 import moment from "moment";
 
@@ -398,34 +399,51 @@ describe("ScheduleObject", () => {
     //Check that the system recalculates schedule when overlapping item is deleted.
   });
 
-  test("System should correctly recalculate schedule when overlapping item is deleted", () => {
+  // test("System should correctly recalculate schedule when overlapping item is deleted", () => {
+  //   let myScheduleObject = new ScheduleObject(
+  //     "bbc_marathi_tv",
+  //     moment("2020-01-27"),
+  //     endOfScheduleItems
+  //   );
+
+  //   let index = 1;
+
+  //   const itemToAdd = {
+  //     title: "ItemToAdd",
+  //     duration: "PT6M51S",
+  //     live: false,
+  //     insertionType: "",
+  //     versionCrid: "crid://bbc.co.uk/p/229911861",
+  //     pid: "p080y6c2",
+  //     vpid: "p080yh9m"
+  //   };
+
+  //   myScheduleObject.addFloating(index, itemToAdd);
+  //   myScheduleObject.deleteItemClosingGap(index);
+  //   //There is no overlap so we should have an insertion type of ""
+  //   expect(myScheduleObject.items[index].insertionType).toEqual("");
+  //   //There is no overlap so the duration should remain the same
+  //   expect(myScheduleObject.items[index].duration).toEqual(
+  //     myScheduleObject.items[index].asset.duration
+  //   );
+
+  //   expect(myScheduleObject.items[index + 1].insertionType).toEqual("gap");
+  // });
+  test("System should clear the schedule when all occurences of a single item loop are deleted ", () => {
     let myScheduleObject = new ScheduleObject(
       "bbc_marathi_tv",
       moment("2020-01-27"),
-      endOfScheduleItems
+      singleItemLoop
     );
 
-    let index = 1;
+    let index = 2;
+    let pid = myScheduleObject.items[index].asset.pid;
 
-    const itemToAdd = {
-      title: "ItemToAdd",
-      duration: "PT6M51S",
-      live: false,
-      insertionType: "",
-      versionCrid: "crid://bbc.co.uk/p/229911861",
-      pid: "p080y6c2",
-      vpid: "p080yh9m"
-    };
+    myScheduleObject.deleteAllOccurencesClosingGap(pid);
 
-    myScheduleObject.addFloating(index, itemToAdd);
-    myScheduleObject.deleteItemClosingGap(index);
-    //There is no overlap so we should have an insertion type of for the clip before the gap ""
-    expect(myScheduleObject.items[index].insertionType).toEqual("");
+    //Only the sentinels should remain
+    expect(myScheduleObject.items.length).toEqual(3);
     //There is no overlap so the duration should remain the same
-    expect(myScheduleObject.items[index].duration).toEqual(
-      myScheduleObject.items[index].asset.duration
-    );
-
-    expect(myScheduleObject.items[index + 1].insertionType).toEqual("gap");
+    expect(myScheduleObject.items[0].title).toEqual("sentinel");
   });
 });
