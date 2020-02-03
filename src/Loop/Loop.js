@@ -90,6 +90,8 @@ class Loop extends React.Component {
 
   uploadContent() {}
 
+  backupLoop() {}
+
   render() {
     const d = this.props.data.length === 0;
     return (
