@@ -10,7 +10,7 @@ import TablePagination from "@material-ui/core/TablePagination";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import moment from "moment";
-import 'moment-duration-format';
+import "moment-duration-format";
 import { TablePaginationActionsWrapped } from "../TablePaginationActions/TablePaginationActions";
 import AssetDao from "../AssetDao/AssetDao";
 
@@ -39,7 +39,9 @@ export class Episode extends React.Component {
       previousPage: -1,
       rowsPerPage: 5,
       sid: "",
-      date: moment().utc().format()
+      date: moment()
+        .utc()
+        .format()
     };
   }
 
@@ -52,25 +54,38 @@ export class Episode extends React.Component {
 
   componentDidUpdate(prevProps) {
     if (
-      (this.state.page !== this.state.previousPage)
-      || (this.props.availability !== prevProps.availability)
+      this.state.page !== this.state.previousPage ||
+      this.props.availability !== prevProps.availability
     ) {
-      console.log("Episode: %s %s have page %d want page %d", this.props.sid, this.props.availability, this.state.page, this.state.previousPage);
+      console.log(
+        "Episode: %s %s have page %d want page %d",
+        this.props.sid,
+        this.props.availability,
+        this.state.page,
+        this.state.previousPage
+      );
       AssetDao.getEpisodes(
-        this.props.sid, this.props.availability,
-        this.state.page + 1, this.state.rowsPerPage,
+        this.props.sid,
+        this.props.availability,
+        this.state.page + 1,
+        this.state.rowsPerPage,
         response => {
           let items = response.data.items;
+          console.log("updated", items);
           let total = response.data.total;
-          console.log('episodeDidUpdate', this.props.availability, this.props.resultsFilter);
-          if(this.props.resultsFilter) {
+          console.log(
+            "episodeDidUpdate",
+            this.props.availability,
+            this.props.resultsFilter
+          );
+          if (this.props.resultsFilter) {
             items = this.props.resultsFilter(items);
-            if(response.data.items.length>items.length) {
+            if (response.data.items.length > items.length) {
               total = items.length;
             }
           }
           let new_page = 0;
-          if (response.data.hasOwnProperty('page')) {
+          if (response.data.hasOwnProperty("page")) {
             new_page = response.data.page - 1;
           }
           this.setState({
@@ -79,7 +94,8 @@ export class Episode extends React.Component {
             totalRows: total,
             rows: items
           });
-        })
+        }
+      );
     }
   }
 
@@ -95,7 +111,7 @@ export class Episode extends React.Component {
     const duration = moment.duration(
       clip.available_versions.version[0].duration
     );
-    return duration.format('hh:mm:ss', {trim:false});
+    return duration.format("hh:mm:ss", { trim: false });
   }
 
   addButton(episode) {
@@ -115,7 +131,7 @@ export class Episode extends React.Component {
     const { classes } = this.props;
     const { rows, rowsPerPage, page, totalRows } = this.state;
     let emptyRows = 0;
-    if(rows.length<rowsPerPage) {
+    if (rows.length < rowsPerPage) {
       emptyRows = rowsPerPage - rows.length;
     }
 
@@ -125,7 +141,7 @@ export class Episode extends React.Component {
           <div className={classes.tableWrapper}>
             <Table className={classes.table}>
               <TableHead>
-              <TableRow>
+                <TableRow>
                   <TableCell>Title</TableCell>
                   <TableCell>Duration</TableCell>
                   <TableCell>Add</TableCell>
@@ -137,7 +153,9 @@ export class Episode extends React.Component {
                     <TableCell component="th" scope="row">
                       <div className="tooltip">
                         {" "}
-                        {row.title === undefined ? row.presentation_title : row.title}
+                        {row.title === undefined
+                          ? row.presentation_title
+                          : row.title}
                         <span className="tooltiptext">PID = {row.pid}</span>
                       </div>
                     </TableCell>

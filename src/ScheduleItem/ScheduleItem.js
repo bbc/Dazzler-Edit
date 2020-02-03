@@ -1,8 +1,14 @@
 import React, { Fragment } from "react";
 import moment from "moment";
-import 'moment-duration-format';
+import "moment-duration-format";
 import Arrow from "@material-ui/icons/ArrowRight";
 import { Typography } from "@material-ui/core";
+import Button from "@material-ui/core/Button";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import "react-confirm-alert/src/react-confirm-alert.css";
 
 /*
 <ScheduleItem
@@ -19,62 +25,134 @@ onDelete="function(index)"
 */
 
 class ScheduleItem extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleClickOpen = this.handleClickOpen.bind(this);
+    this.handleClose = this.handleClose.bind(this);
 
-    render() {
+    this.state = {
+      open: false,
+      count: 0
+    };
+  }
+
+  handleClickOpen = () => {
+    this.setState({ open: true });
+  };
+
+  handleClose = () => {
+    this.setState({ open: false });
+  };
+
+  render() {
+    let { open } = this.state;
     let rowStyle = this.props.insertionType;
-    if(this.props.live === "true") rowStyle = 'live';
+    if (this.props.live === "true") rowStyle = "live";
     let arrowStyle = "bottomarrow";
-    if(rowStyle === 'gap') arrowStyle = "midarrow";
+    if (rowStyle === "gap") arrowStyle = "midarrow";
     let overlap = moment.duration();
-    if(this.props.insertionType === 'overlap') {
-      overlap = moment.duration(this.props.asset_duration)
-                .subtract(moment.duration(this.props.duration))
+    if (this.props.insertionType === "overlap") {
+      overlap = moment
+        .duration(this.props.asset_duration)
+        .subtract(moment.duration(this.props.duration));
     }
+    const isoString = moment(this.props.startTime).toISOString();
+    const localTime = moment(isoString).format("HH:mm");
+    const utcTime = moment.utc(this.props.startTime).format("HH:mm:ss");
+
     return (
       <Fragment>
         <tr className={rowStyle}>
           <td onClick={() => this.props.onClick(this.props.index)}>
-              {this.props.selected? (
-                <Arrow className={arrowStyle}/>
-              ) : (
-                ""
-              )}
+            {this.props.selected ? <Arrow className={arrowStyle} /> : ""}
           </td>
+
+          <td> {localTime}</td>
+
           <td onClick={() => this.props.onClick(this.props.index)}>
-            {this.props.startTime}
+            {utcTime}
           </td>
+
           <td>
             {this.props.title}
-            {(this.props.insertionType === 'overlap')
-            ?
-            <Typography fontStyle="italic">
-              (asset duration is &nbsp;
-              {moment.duration(this.props.asset_duration).format('HH:mm:ss', {trim:false})}
-              ,
-              {moment.duration(overlap).format('HH:mm:ss', {trim:false})} will be lost
-              )
-            </Typography>
-            :<Typography></Typography>
-            }
+            {this.props.insertionType === "overlap" ? (
+              <Typography fontStyle="italic">
+                (asset duration is &nbsp;
+                {moment
+                  .duration(this.props.asset_duration)
+                  .format("HH:mm:ss", { trim: false })}
+                ,{moment.duration(overlap).format("HH:mm:ss", { trim: false })}{" "}
+                will be lost )
+              </Typography>
+            ) : (
+              <Typography></Typography>
+            )}
           </td>
+
           <td onClick={() => this.props.onClick(this.props.index)}>
-            {moment.duration(this.props.duration).format('HH:mm:ss', {trim:false})}
+            {moment
+              .duration(this.props.duration)
+              .format("HH:mm:ss", { trim: false })}
           </td>
-        <td>
-          {
-            (this.props.insertionType!=='' && 'gap,sentinel'.includes(this.props.insertionType))?'':
-            <button
-            className="mini ui button"
-            onClick={() => {this.props.onDelete(this.props.index)}}
-            >
-            <i className="trash alternate outline icon"></i>
-            </button>
-          }
-        </td>
+
+          <td>
+            {this.props.insertionType !== "" &&
+            "gap,sentinel".includes(this.props.insertionType) ? (
+              ""
+            ) : (
+              <button
+                className="mini ui button"
+                onClick={() => {
+                  this.props.onDelete(this.props.index);
+                }}
+                onContextMenu={event => {
+                  event.preventDefault();
+
+                  if (this.props.insertionType !== "live") {
+                    var tally = 0;
+                    this.props.data.map(item => {
+                      if (item.title === this.props.title) {
+                        tally++;
+                      }
+                    });
+                    this.setState({ open: true, count: tally });
+                  }
+                }}
+              >
+                <i className="trash alternate outline icon"></i>
+              </button>
+            )}
+          </td>
         </tr>
+        <Dialog
+          open={open}
+          onClose={this.handleClose}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">
+            {`Are you sure you want to delete all ${this.state.count} occurences of
+                         ${this.props.title}`}
+          </DialogTitle>
+          <DialogContent></DialogContent>
+          <DialogActions>
+            <Button
+              onClick={() => {
+                this.props.onOccurenceDelete(this.props.index);
+                this.setState({ open: false });
+              }}
+              color="primary"
+              autoFocus
+            >
+              Yes
+            </Button>
+            <Button onClick={this.handleClose} color="primary">
+              No
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Fragment>
     );
   }
-
 }
 export default ScheduleItem;

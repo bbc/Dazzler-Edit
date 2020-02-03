@@ -10,9 +10,9 @@ import TablePagination from "@material-ui/core/TablePagination";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import moment from "moment";
-import 'moment-duration-format';
+import "moment-duration-format";
 import { TablePaginationActionsWrapped } from "../TablePaginationActions/TablePaginationActions";
-import {fetchWebcasts} from "../ScheduleDao/ScheduleDao";
+import { fetchWebcasts } from "../ScheduleDao/ScheduleDao";
 
 export const styles = theme => ({
   root: {
@@ -39,7 +39,9 @@ export class Live extends React.Component {
       rowsPerPage: 5,
       totalRows: 0,
       sid: "",
-      date: moment().utc().startOf('day')
+      date: moment()
+        .utc()
+        .startOf("day")
     };
   }
 
@@ -49,14 +51,24 @@ export class Live extends React.Component {
 
   componentDidUpdate(prevProps) {
     //get request for webcasts
-    const start = moment(this.props.date).utc().format();
-    const end = moment(this.props.date).add(1, 'days').utc().format();
-    if ((this.state.page !== this.state.previousPage)
-      ||
-      (this.props.date !== prevProps.date)
+    const start = moment(this.props.date)
+      .utc()
+      .format();
+    const end = moment(this.props.date)
+      .add(1, "days")
+      .utc()
+      .format();
+    if (
+      this.state.page !== this.state.previousPage ||
+      this.props.date !== prevProps.date
     ) {
       //console.log("have page %d want page %d", this.state.previousPage, this.state.page);
-      fetchWebcasts(this.props.sid, start, end, this.state.page, this.state.rowsPerPage,
+      fetchWebcasts(
+        this.props.sid,
+        start,
+        end,
+        this.state.page,
+        this.state.rowsPerPage,
         (schedule, totalRows) => {
           this.setState({
             sid: this.props.sid,
@@ -72,7 +84,7 @@ export class Live extends React.Component {
   }
 
   handleChangePage = (event, page) => {
-    console.log('live:handleChangePage', page);
+    console.log("live:handleChangePage", page);
     this.setState({ page: page });
   };
 
@@ -81,7 +93,7 @@ export class Live extends React.Component {
   };
 
   formattedDuration(item) {
-    return moment.duration(item.duration).format('hh:mm:ss', {trim:false});
+    return moment.duration(item.duration).format("hh:mm:ss", { trim: false });
   }
 
   addButton(item) {
@@ -101,13 +113,13 @@ export class Live extends React.Component {
     const { classes } = this.props;
     const { date, rows, rowsPerPage, page, totalRows } = this.state;
     let emptyRows = 0;
-    if(rows.length<rowsPerPage) {
+    if (rows.length < rowsPerPage) {
       emptyRows = rowsPerPage - rows.length;
     }
 
     return (
       <div>
-      {date.format("YYYY-MM-DD")}
+        {date.format("YYYY-MM-DD")}
         <Paper className={classes.root}>
           <div className={classes.tableWrapper}>
             <Table className={classes.table}>
@@ -119,7 +131,6 @@ export class Live extends React.Component {
                 </TableRow>
               </TableHead>
               <TableBody>
-
                 {rows.map(row => (
                   <TableRow key={row.pid}>
                     <TableCell component="th" scope="row">
