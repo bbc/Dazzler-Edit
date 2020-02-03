@@ -5,6 +5,7 @@ import moment from "moment";
 import "moment-duration-format";
 import { cloneDeep } from "lodash-es";
 import { Typography } from "@material-ui/core";
+import { saveLoop, uploadLoop, emergencyContent } from "../LoopDao/LoopDao";
 
 const durationFormatter = ({ value }) => {
   return moment.duration(value).format("hh:mm:ss", { trim: false });
@@ -25,7 +26,9 @@ class Loop extends React.Component {
   constructor(props) {
     super(props);
     this.pasteToFill = this.pasteToFill.bind(this);
-    this.saveLoop = this.saveLoop.bind(this);
+    this.saveContent = this.saveContent.bind(this);
+    this.uploadContent = this.uploadContent.bind(this);
+    this.backupLoop = this.backupLoop.bind(this);
     this.state = {};
   }
 
@@ -80,10 +83,13 @@ class Loop extends React.Component {
     this.props.onPaste(m);
   }
 
-  saveLoop() {
+  saveContent() {
     //save the loop here.
     //load and then change button to save
   }
+
+  uploadContent() {}
+
   render() {
     const d = this.props.data.length === 0;
     return (
@@ -145,15 +151,34 @@ class Loop extends React.Component {
             <button
               disabled={d}
               className="ui primary button"
-              onClick={this.saveLoop}
+              onClick={this.saveContent}
             >
-              <Typography>Save Loop</Typography>
+              <i className="save icon"></i>
+              <Typography>Save</Typography>
             </button>
+            <button
+              disabled={d}
+              className="ui primary button"
+              onClick={this.uploadContent}
+            >
+              <i className="upload icon"></i>
+              <Typography>Upload</Typography>
+            </button>
+
             {/*<button className="ui button" onClick={this.props.onTest}
           ><Typography>Test</Typography>
           </button>*/}
           </Box>
         </Box>
+        <br />
+        <button
+          disabled={d}
+          className="fluid ui button ui primary button"
+          onClick={this.backupLoop}
+        >
+          <i className="save icon"></i>
+          <Typography>Set As Emergency Content</Typography>
+        </button>
       </div>
     );
   }
