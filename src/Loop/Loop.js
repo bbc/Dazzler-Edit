@@ -31,6 +31,12 @@ class Loop extends React.Component {
 
   componentDidMount() {}
 
+  componentDidUpdate(prevProps) {
+    if (this.props.data != prevProps.data) {
+      //butto text is save
+    }
+  }
+
   pasteToFill() {
     if (this.props.data.length === 0) return;
     const repetitions = Math.floor(this.props.timeToFill / this.props.duration);
@@ -76,6 +82,7 @@ class Loop extends React.Component {
 
   saveLoop() {
     //save the loop here.
+    //load and then change button to save
   }
   render() {
     const d = this.props.data.length === 0;

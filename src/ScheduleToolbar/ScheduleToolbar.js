@@ -1,105 +1,119 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { makeStyles } from '@material-ui/core/styles';
-import Fade from '@material-ui/core/Fade';
-import Button from '@material-ui/core/Button';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import { makeStyles } from "@material-ui/core/styles";
+import Fade from "@material-ui/core/Fade";
+import Button from "@material-ui/core/Button";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 const useStyles = makeStyles(theme => ({
   root: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'stretch',
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "stretch"
   },
   button: {
-    margin: theme.spacing(2),
+    margin: theme.spacing(2)
   },
   placeholder: {
-    height: 40,
-  },
+    height: 40
+  }
 }));
 
-export default function ScheduleToolbar(
-  { 
-    saveEnabled=false, contentModified=false, 
-    onSave=function(){console.log('save pressed');}, 
-    onClear=function(){console.log('clear pressed');}, 
-    onReload=function(){console.log('reload pressed');}
+export default function ScheduleToolbar({
+  saveEnabled = false,
+  contentModified = false,
+  onSave = function() {
+    console.log("save pressed");
+  },
+  onClear = function() {
+    console.log("clear pressed");
+  },
+  onReload = function() {
+    console.log("reload pressed");
   }
-) {
+}) {
   const classes = useStyles();
   const [clear, setClear] = React.useState(false);
-  const [reload, setReload] = React.useState('idle');
-  const [saving, setSaving] = React.useState('idle');
+  const [reload, setReload] = React.useState("idle");
+  const [saving, setSaving] = React.useState("idle");
   const timerRef = React.useRef();
 
   React.useEffect(
     () => () => {
       clearTimeout(timerRef.current);
     },
-    [],
+    []
   );
 
   const handleClickClear = () => {
     setClear(true);
     onClear();
     setClear(false);
-  }
+  };
 
   const handleClickReload = () => {
-    setReload('progress')
+    setReload("progress");
     onReload();
-  }
+  };
 
   const handleClickSave = () => {
-    setSaving('progress');
+    setSaving("progress");
     onSave();
   };
 
   // statements in the body of the function are called on rendering!!!
-  console.log('saving', contentModified, saving, typeof saving);
+  console.log("saving", contentModified, saving, typeof saving);
 
-  if(reload !== 'idle' && !contentModified ) {
-    setReload('idle');
+  if (reload !== "idle" && !contentModified) {
+    setReload("idle");
   }
 
-  if((saving === 'progress' && !contentModified)) {
-    console.log('success - setting timer');
-    setSaving('success');
+  if (saving === "progress" && !contentModified) {
+    console.log("success - setting timer");
+    setSaving("success");
     timerRef.current = setTimeout(() => {
-      setSaving('idle');
+      setSaving("idle");
     }, 2000);
   }
 
   return (
     <div className={classes.root}>
       <div className={classes.placeholder}>
-        <Button disabled={!contentModified} variant='outlined' onClick={handleClickClear} className={classes.button}>
-          {clear?'Clearing':'Clear'}
+        <Button
+          disabled={!contentModified}
+          variant="outlined"
+          onClick={handleClickClear}
+          className={classes.button}
+        >
+          {clear ? "Clearing" : "Clear"}
         </Button>
       </div>
       <div className={classes.placeholder}>
         <Fade
-          in={reload === 'progress'}
+          in={reload === "progress"}
           style={{
-            transitionDelay: reload === 'progress' ? '800ms' : '0ms',
+            transitionDelay: reload === "progress" ? "800ms" : "0ms"
           }}
           unmountOnExit
         >
           <CircularProgress />
         </Fade>
-        <Button variant='outlined' onClick={handleClickReload} className={classes.button}>
-          {reload !== 'idle' ? 'Loading' : 'Reload'}
+        <Button
+          variant="outlined"
+          onClick={handleClickReload}
+          className={classes.button}
+        >
+          {reload !== "idle" ? "Loading" : "Reload"}
         </Button>
       </div>
       <div className={classes.placeholder}>
-        {saving === 'success' ? (
-          ''
+        {saving === "success" ? (
+          ""
         ) : (
           <Fade
-            in={saving === 'progress'}
+            in={saving === "progress"}
             style={{
-              transitionDelay: saving === 'progress' ? '800ms' : '0ms',
+              transitionDelay: saving === "progress" ? "800ms" : "0ms"
             }}
             unmountOnExit
           >
@@ -107,8 +121,18 @@ export default function ScheduleToolbar(
           </Fade>
         )}
       </div>
-      <Button disabled={(!contentModified)||(!saveEnabled)} color='primary' variant='contained' onClick={handleClickSave} className={classes.button}>
-        {(saving === 'idle')? 'Save':(saving==='progress')?'Saving':'Saved'}
+      <Button
+        disabled={!contentModified || !saveEnabled}
+        color="primary"
+        variant="contained"
+        onClick={handleClickSave}
+        className={classes.button}
+      >
+        {saving === "idle"
+          ? "Save"
+          : saving === "progress"
+          ? "Saving"
+          : "Saved"}
       </Button>
     </div>
   );
