@@ -279,6 +279,106 @@ export let endOfScheduleItems = [
   }
 ];
 
+export let ItemsWithOverlap = [
+  {
+    startTime: moment("2020-02-03T00:00:00.000Z"),
+    duration: "PT0S",
+    insertionType: "sentinel",
+    title: "Dummy Start"
+  },
+  {
+    duration: "PT48S",
+    insertionType: "loopEnd",
+    title: "हनोईमधल्या अयशस्वी चर्चेनंतरही किम यांचं उत्तर कोरियात जंगी स्वागत",
+    asset: {
+      title:
+        "हनोईमधल्या अयशस्वी चर्चेनंतरही किम यांचं उत्तर कोरियात जंगी स्वागत",
+      duration: "PT48S",
+      live: false,
+      insertionType: "loopEnd",
+      versionCrid: "crid://bbc.co.uk/p/202856409",
+      pid: "p072n9w0",
+      vpid: "p072n9w3",
+      action: ""
+    },
+    startTime: moment("2020-02-03T23:48:58.000Z")
+  },
+  {
+    duration: "PT2M35S",
+    insertionType: "loopStart",
+    title: "हात नाहीत म्हणून काय झालं",
+    asset: {
+      title: "हात नाहीत म्हणून काय झालं",
+      duration: "PT2M35S",
+      live: false,
+      insertionType: "loopStart",
+      versionCrid: "crid://bbc.co.uk/p/230980009",
+      pid: "p0823bsy",
+      vpid: "p0823bt0",
+      action: ""
+    },
+    startTime: moment("2020-02-03T23:49:46.000Z")
+  },
+  {
+    duration: "PT2M10S",
+    insertionType: "midLoop",
+    title: "कहाणी ब्रेक्झिटची: अथपासून इतिपर्यंत",
+    asset: {
+      title: "कहाणी ब्रेक्झिटची: अथपासून इतिपर्यंत",
+      duration: "PT2M10S",
+      live: false,
+      insertionType: "midLoop",
+      versionCrid: "crid://bbc.co.uk/p/230970829",
+      pid: "p082317t",
+      vpid: "p082317w",
+      action: ""
+    },
+    startTime: moment("2020-02-03T23:52:21.000Z")
+  },
+  {
+    duration: "PT4M7S",
+    insertionType: "midLoop",
+    title:
+      "पी. व्ही. सिंधू: BBC इंडियन स्पोर्ट्सवुमन ऑफ द इयर पुरस्कारासाठी नामांकन",
+    asset: {
+      title:
+        "पी. व्ही. सिंधू: BBC इंडियन स्पोर्ट्सवुमन ऑफ द इयर पुरस्कारासाठी नामांकन",
+      duration: "PT4M7S",
+      live: false,
+      insertionType: "midLoop",
+      versionCrid: "crid://bbc.co.uk/p/230908755",
+      pid: "p0820yn9",
+      vpid: "p0820ynh",
+      action: ""
+    },
+    startTime: moment("2020-02-03T23:54:31.000Z")
+  },
+  {
+    title:
+      "'या' कारणामुळे चीनमधला कोरोना व्हायरस ठरला जागतिक आरोग्य आणीबाणीचं कारण",
+    startTime: moment("2020-02-03T23:58:38.000Z"),
+    duration: "PT1M22S",
+    insertionType: "overlap",
+    asset: {
+      title:
+        "'या' कारणामुळे चीनमधला कोरोना व्हायरस ठरला जागतिक आरोग्य आणीबाणीचं कारण",
+      duration: "PT2M27S",
+      live: false,
+      insertionType: "midLoop",
+      versionCrid: "crid://bbc.co.uk/p/230824388",
+      pid: "p081y3vs",
+      vpid: "p081y3vz",
+      action: ""
+    }
+  },
+  {
+    startTime: moment("2020-02-04T00:00:00.000Z"),
+    duration: "PT0S",
+    insertionType: "sentinel",
+    title: "Dummy End"
+  }
+];
+
 export let singleItemLoop = [
   {
     startTime: "2020-01-31T00:00:00.000Z",

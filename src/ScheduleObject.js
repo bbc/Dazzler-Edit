@@ -383,7 +383,9 @@ class ScheduleObject {
       let done = false;
       switch (schedule[i].insertionType) {
         case "gap":
-          schedule[i].startTime.subtract(duration);
+          schedule[i].startTime = moment(schedule[i].startTime).subtract(
+            duration
+          );
           schedule[i].duration = moment
             .duration(schedule[i].duration)
             .add(duration)
@@ -428,7 +430,9 @@ class ScheduleObject {
           });
           break;
         default:
-          schedule[i].startTime.subtract(duration);
+          schedule[i].startTime = moment(schedule[i].startTime).subtract(
+            duration
+          );
       }
       if (done) break;
     }

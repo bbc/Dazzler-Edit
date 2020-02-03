@@ -3,7 +3,8 @@ import {
   loopItems,
   clipsAndLiveItem,
   endOfScheduleItems,
-  singleItemLoop
+  singleItemLoop,
+  ItemsWithOverlap
 } from "./templates/items";
 import moment from "moment";
 
@@ -399,51 +400,64 @@ describe("ScheduleObject", () => {
     //Check that the system recalculates schedule when overlapping item is deleted.
   });
 
-  // test("System should correctly recalculate schedule when overlapping item is deleted", () => {
-  //   let myScheduleObject = new ScheduleObject(
-  //     "bbc_marathi_tv",
-  //     moment("2020-01-27"),
-  //     endOfScheduleItems
-  //   );
+  test("System should correctly recalculate schedule when overlapping item is deleted", () => {
+    let myScheduleObject = new ScheduleObject(
+      "bbc_marathi_tv",
+      moment("2020-01-27"),
+      ItemsWithOverlap
+    );
 
-  //   let index = 1;
+    //index of overlap item
+    const index = 5;
+    const originalLength = myScheduleObject.items.length;
 
-  //   const itemToAdd = {
-  //     title: "ItemToAdd",
-  //     duration: "PT6M51S",
-  //     live: false,
-  //     insertionType: "",
-  //     versionCrid: "crid://bbc.co.uk/p/229911861",
-  //     pid: "p080y6c2",
-  //     vpid: "p080yh9m"
-  //   };
+    console.log("PID", myScheduleObject.items[5].asset.pid);
+    myScheduleObject.deleteItemClosingGap(index);
 
-  //   myScheduleObject.addFloating(index, itemToAdd);
-  //   myScheduleObject.deleteItemClosingGap(index);
-  //   //There is no overlap so we should have an insertion type of ""
-  //   expect(myScheduleObject.items[index].insertionType).toEqual("");
-  //   //There is no overlap so the duration should remain the same
-  //   expect(myScheduleObject.items[index].duration).toEqual(
-  //     myScheduleObject.items[index].asset.duration
-  //   );
+    //Insertion type should change from overlap to gap at the specified index
+    expect(myScheduleObject.items[index].insertionType).toEqual("gap");
+    expect(myScheduleObject.items[index].title).toEqual("gap");
+    //expect item length to be the same since overlapping item has been replaced with a gap
+    expect(originalLength).toEqual(myScheduleObject.items.length);
+  });
 
-  //   expect(myScheduleObject.items[index + 1].insertionType).toEqual("gap");
-  // });
-  test("System should clear the schedule when all occurences of a single item loop are deleted ", () => {
+  test("System should correctly recalculate schedule when an item is deleted and the overlap remains but is shorter", () => {
+    let myScheduleObject = new ScheduleObject(
+      "bbc_marathi_tv",
+      moment("2020-01-27"),
+      ItemsWithOverlap
+    );
+    const index = 1;
+    const originalLength = myScheduleObject.items.length;
+
+    let newDuration = moment
+      .duration(myScheduleObject.items[5].duration)
+      .add(moment.duration(myScheduleObject.items[1].duration));
+
+    myScheduleObject.deleteItemClosingGap(index);
+    //Our overlapped item duration should be its original duration plus the duration of the recently deleted item
+    expect(myScheduleObject.items[4].duration).toBe(newDuration.toISOString());
+    //Expect overlapped item to retain insertiontype status of 'overlap'
+    expect(myScheduleObject.items[4].insertionType).toBe("overlap");
+    //Length should be 1 less since item has been deleted
+    expect(originalLength).toBeGreaterThan(myScheduleObject.items.length);
+  });
+
+  test("System should clear the schedule when all occurences of an item, in a single item loop is deleted ", () => {
     let myScheduleObject = new ScheduleObject(
       "bbc_marathi_tv",
       moment("2020-01-27"),
       singleItemLoop
     );
 
-    let index = 2;
+    let index = 1;
     let pid = myScheduleObject.items[index].asset.pid;
 
     myScheduleObject.deleteAllOccurencesClosingGap(pid);
 
-    //Only the sentinels should remain
+    // Only the sentinels should remain
     expect(myScheduleObject.items.length).toEqual(3);
     //There is no overlap so the duration should remain the same
-    expect(myScheduleObject.items[0].title).toEqual("sentinel");
+    expect(myScheduleObject.items[0].title).toEqual("Dummy Start");
   });
 });
