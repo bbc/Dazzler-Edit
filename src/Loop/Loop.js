@@ -6,6 +6,8 @@ import "moment-duration-format";
 import { cloneDeep } from "lodash-es";
 import { Typography } from "@material-ui/core";
 import { backupPlaylist } from "../LoopDao/LoopDao";
+import Fade from "@material-ui/core/Fade";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 const durationFormatter = ({ value }) => {
   return moment.duration(value).format("hh:mm:ss", { trim: false });
@@ -27,7 +29,10 @@ class Loop extends React.Component {
     super(props);
     this.pasteToFill = this.pasteToFill.bind(this);
     this.emergencyPlaylist = this.emergencyPlaylist.bind(this);
-    this.state = {};
+    this.state = {
+      loopModified: "Set as Emergency Content",
+      saving: "idle"
+    };
   }
 
   pasteToFill() {
@@ -73,12 +78,27 @@ class Loop extends React.Component {
     this.props.onPaste(m);
   }
   emergencyPlaylist() {
-    let backup = backupPlaylist(this.props.data, function() {
-      alert("Saved");
-    });
+    const This = this; // closure for callback - How does this fix it?
+    this.setState({ saving: "progress" });
+    try {
+      let backup = backupPlaylist(this.props.data, function() {
+        This.setState({ loopModified: "Saved", saving: "idle" });
+      });
+    } catch (err) {
+      this.setState({ saving: "idle" });
+      console.log(err);
+      alert("Cannot save backup schedule");
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.data != this.props.data) {
+      this.setState({ loopModified: "Set as Emergency Content" });
+    }
   }
 
   render() {
+    let { saving } = this.state;
     const d = this.props.data.length === 0;
     return (
       <div style={{ width: "100%" }}>
@@ -163,7 +183,7 @@ class Loop extends React.Component {
           onClick={this.emergencyPlaylist}
         >
           <i className="save icon"></i>
-          <Typography>Set As Emergency Content</Typography>
+          <Typography>{this.state.loopModified}</Typography>
         </button>
         <input
           type="file"
@@ -172,6 +192,19 @@ class Loop extends React.Component {
             this.props.onUpload(e);
           }}
         />
+        {saving === "success" ? (
+          ""
+        ) : (
+          <Fade
+            in={saving === "progress"}
+            style={{
+              transitionDelay: saving === "progress" ? "800ms" : "0ms"
+            }}
+            unmountOnExit
+          >
+            <CircularProgress />
+          </Fade>
+        )}
       </div>
     );
   }
