@@ -5,7 +5,7 @@ import moment from "moment";
 import "moment-duration-format";
 import { cloneDeep } from "lodash-es";
 import { Typography } from "@material-ui/core";
-import { saveLoop, uploadLoop, emergencyContent } from "../LoopDao/LoopDao";
+import { backupPlaylist } from "../LoopDao/LoopDao";
 
 const durationFormatter = ({ value }) => {
   return moment.duration(value).format("hh:mm:ss", { trim: false });
@@ -26,18 +26,8 @@ class Loop extends React.Component {
   constructor(props) {
     super(props);
     this.pasteToFill = this.pasteToFill.bind(this);
-    this.saveContent = this.saveContent.bind(this);
-    this.uploadContent = this.uploadContent.bind(this);
-    this.backupLoop = this.backupLoop.bind(this);
+    this.emergencyPlaylist = this.emergencyPlaylist.bind(this);
     this.state = {};
-  }
-
-  componentDidMount() {}
-
-  componentDidUpdate(prevProps) {
-    if (this.props.data != prevProps.data) {
-      //butto text is save
-    }
   }
 
   pasteToFill() {
@@ -82,15 +72,11 @@ class Loop extends React.Component {
     //console.log('remaining milliseconds after', remaining);
     this.props.onPaste(m);
   }
-
-  saveContent() {
-    //save the loop here.
-    //load and then change button to save
+  emergencyPlaylist() {
+    let backup = backupPlaylist(this.props.data, function() {
+      alert("Saved");
+    });
   }
-
-  uploadContent() {}
-
-  backupLoop() {}
 
   render() {
     const d = this.props.data.length === 0;
@@ -150,37 +136,42 @@ class Loop extends React.Component {
             >
               <Typography>Paste to Fill</Typography>
             </button>
+
             <button
               disabled={d}
               className="ui primary button"
-              onClick={this.saveContent}
+              onClick={this.props.onSave}
             >
-              <i className="save icon"></i>
-              <Typography>Save</Typography>
-            </button>
-            <button
-              disabled={d}
-              className="ui primary button"
-              onClick={this.uploadContent}
-            >
-              <i className="upload icon"></i>
-              <Typography>Upload</Typography>
+              <Typography>Save Loop</Typography>
             </button>
 
-            {/*<button className="ui button" onClick={this.props.onTest}
-          ><Typography>Test</Typography>
-          </button>*/}
+            <button
+              disabled={!d}
+              className="ui primary button"
+              // onClick={this.props.onUpload}
+            >
+              <i className="upload icon"></i>
+              <Typography>Upload Loop </Typography>
+            </button>
           </Box>
         </Box>
         <br />
+
         <button
           disabled={d}
           className="fluid ui button ui primary button"
-          onClick={this.backupLoop}
+          onClick={this.emergencyPlaylist}
         >
           <i className="save icon"></i>
           <Typography>Set As Emergency Content</Typography>
         </button>
+        <input
+          type="file"
+          name="file"
+          onChange={e => {
+            this.props.onUpload(e);
+          }}
+        />
       </div>
     );
   }

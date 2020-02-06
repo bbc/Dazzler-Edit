@@ -117,6 +117,8 @@ class Editor extends React.Component {
     this.handleAddLive = this.handleAddLive.bind(this);
     this.handleAddClipOrEpisode = this.handleAddClipOrEpisode.bind(this);
     this.clearLoop = this.clearLoop.bind(this);
+    this.uploadLoop = this.uploadLoop.bind(this);
+    this.saveLoop = this.saveLoop.bind(this);
     this.pasteIntoSchedule = this.pasteIntoSchedule.bind(this);
     this.handleDrawerOpen = this.handleDrawerOpen.bind(this);
     this.handleDrawerClose = this.handleDrawerClose.bind(this);
@@ -338,6 +340,40 @@ class Editor extends React.Component {
     this.setState({ loop: [], loopDuration: moment.duration() });
   }
 
+  uploadLoop(e) {
+    try {
+      var file = e.target.files[0];
+      let reader = new FileReader();
+      reader.onload = e => {
+        try {
+          let items = JSON.parse(e.target.result);
+          this.setState({ loop: items });
+          console.log(e.target.result);
+        } catch (err) {
+          alert("Invalid format");
+          console.log(err);
+        }
+      };
+
+      reader.readAsText(file);
+    } catch (err) {
+      alert("error");
+      console.log(err);
+    }
+  }
+
+  saveLoop() {
+    const element = document.createElement("a");
+    // const items = JSON.stringify(this.state.loop);
+    const file = new Blob([JSON.stringify(this.state.loop)], {
+      type: "application/json"
+    });
+    element.href = URL.createObjectURL(file);
+    element.download = "Schedule.json";
+    document.body.appendChild(element); // Required for this to work in FireFox
+    element.click();
+  }
+
   deleteItemFromLoop = index => {
     const r = this.state.loop[index];
     let loop = [...this.state.loop];
@@ -368,7 +404,6 @@ class Editor extends React.Component {
   render() {
     const { classes } = this.props;
     const { open } = this.state;
-    console.log("ITEMS", JSON.stringify(this.state.schedule.items));
     //console.log('Editor.render');
     return (
       <div className={classes.root}>
@@ -573,6 +608,8 @@ class Editor extends React.Component {
                 onDelete={this.deleteItemFromLoop}
                 onPaste={this.pasteIntoSchedule}
                 onClear={this.clearLoop}
+                onUpload={this.uploadLoop}
+                onSave={this.saveLoop}
               />
             </Box>
             <Box width="44%" flexGrow={1} flexDirection="column">
