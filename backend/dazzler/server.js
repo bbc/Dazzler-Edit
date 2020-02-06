@@ -62,21 +62,21 @@ app.get("/api/v1/schedule", async (req, res) => {
     let pids = [];
     for (let i = 0; i < s.length; i++) {
       const link = s[i].version[0].version_of[0].link[0].$;
-      if (link.rel === 'pips-meta:clip') {
+      if (link.rel === "pips-meta:clip") {
         pids.push(link.pid);
       }
     }
-    if(pids.length > 0) {
-        await nitro.addClips(s, pids);
+    if (pids.length > 0) {
+      await nitro.addClips(s, pids);
     }
     // work around circular dependencies
     let o = {};
-    for(let key of Object.keys(schedule)) {
-        o[key] = schedule[key];
+    for (let key of Object.keys(schedule)) {
+      o[key] = schedule[key];
     }
-    res.json({"total":s.length, item:s, sid:sid, date:date});
-  } catch(e) {
-    res.json({"total":0});
+    res.json({ total: s.length, item: s, sid: sid, date: date });
+  } catch (e) {
+    res.json({ total: 0 });
   }
 });
 
@@ -92,11 +92,11 @@ app.get("/api/v1/broadcast", async (req, res) => {
   if (req.query.hasOwnProperty("page_size")) {
     q.page_size = req.query.page_size;
   }
-  try{
+  try {
     const r = await nitro.request("schedules", q);
     res.json(r.data.nitro.results);
-  } catch(e) {
-    res.status(404).send("Not found") // TODO use proper error message
+  } catch (e) {
+    res.status(404).send("Not found"); // TODO use proper error message
   }
 });
 
@@ -113,8 +113,8 @@ app.get("/api/v1/webcast", async (req, res) => {
   }
   if (req.query.hasOwnProperty("sid")) {
     q.sid = config[req.query.sid].webcast_channels;
-    if(!q.hasOwnProperty("descendants_of")) {
-        q.descendants_of = config[req.query.sid].live_brand;
+    if (!q.hasOwnProperty("descendants_of")) {
+      q.descendants_of = config[req.query.sid].live_brand;
     }
   }
   if (req.query.hasOwnProperty("page")) {
@@ -123,11 +123,11 @@ app.get("/api/v1/webcast", async (req, res) => {
   if (req.query.hasOwnProperty("page_size")) {
     q.page_size = req.query.page_size;
   }
-  try{
+  try {
     const r = await nitro.request("schedules", q);
     res.json(add_crids_to_webcast(r.data.nitro.results));
-  } catch(e) {
-    res.status(404).send("Not found") // TODO use proper error message
+  } catch (e) {
+    res.status(404).send("Not found"); // TODO use proper error message
   }
 });
 
@@ -149,8 +149,8 @@ app.get("/api/v1/special", async (req, res) => {
 
 app.get("/api/v1/clip", async (req, res) => {
   let q = {};
-  let sid = 'bbc_marathi_tv';
-  if(req.query.sid) {
+  let sid = "bbc_marathi_tv";
+  if (req.query.sid) {
     sid = req.query.sid;
   }
   if (req.query.hasOwnProperty("type")) {
@@ -195,13 +195,13 @@ async function clip(q, query, res) {
         for (let j = 0; j < version.length; j++) {
           version[j].crid = map[version[j].pid];
         }
-     }
+      }
     }
     res.json(clips);
-  } catch(e) {
+  } catch (e) {
     console.log(e);
-    res.status(404).send("Not found") // TODO use proper error message
-  } 
+    res.status(404).send("Not found"); // TODO use proper error message
+  }
 }
 
 app.get("/api/v1/episode", async (req, res, next) => {
@@ -232,8 +232,10 @@ app.get("/api/v1/episode", async (req, res, next) => {
     if (nres.status !== 200) {
       console.log(nres.status);
     }
-    const available_episodes = add_version_crids_to_episodes(nres.data.nitro.results);
-    if(available_episodes.total>0) {
+    const available_episodes = add_version_crids_to_episodes(
+      nres.data.nitro.results
+    );
+    if (available_episodes.total > 0) {
       items = available_episodes.items;
     }
     res.json({
@@ -248,31 +250,24 @@ app.get("/api/v1/episode", async (req, res, next) => {
   }
 });
 
-app.put("/api/v1/loop", async (req, res, next) => {
-  let user = "dazzler"; // assume local
-  if (req.header("sslclientcertsubject")) {
-    const subject = parseSSLsubject(req);
-    user = subject.emailAddress;
-  }
-  if (auth(user)) {
-    const collection_pid = config[req.query.sid].loop_collection;
-    const members = JSON.parse(req.body);
-    try {
-      await pips.clearCollection(collection_pid);
-      await pips.setCollectionMembers(collection_pid, members);
-      res.json({ pid: collection_pid, members: members });
-    } catch (e) {
-      // this will eventually be handled by our error handling middleware
-      next(e);
-    }
-  } else {
-    const message = user + " is not authorised to save the loop";
-    console.log(message);
-    res.status(403).send(message);
+app.post("/api/v1/loop", async function(req, res) {
+  const aws = require("aws-sdk");
+  const s3 = new aws.S3({ apiVersion: "2006-03-01" });
+  var params = {
+    Body: req.body,
+    Bucket: process.env.BUCKET,
+    Key: process.env.BUCKET_KEY
+  };
+  try {
+    let s3Response = await s3.putObject(params).promise();
+    res.send("saved");
+  } catch (e) {
+    console.log("error ", e);
+    res.send("error");
   }
 });
 
-app.post("/api/v1/tva", async (req, res) =>  {
+app.post("/api/v1/tva", async (req, res) => {
   if (req.body.includes('serviceIDRef="TVMAR01')) {
     let user = "dazzler"; // assume local
     if (req.header("sslclientcertsubject")) {
@@ -306,7 +301,7 @@ function add_crids_to_webcast(results) {
 
 async function get_version_pid2crid_map(pids) {
   let map = {};
-  if(pids.length>0) {
+  if (pids.length > 0) {
     const response = await nitro.request("versions", { pid: pids });
     const items = response.data.nitro.results.items;
     for (let i = 0; i < items.length; i++) {
@@ -325,12 +320,16 @@ async function get_version_pid2crid_map(pids) {
 function add_version_crids_to_episodes(results) {
   let pids = [];
   let versions = [];
-  if (results && results.total>0) {
+  if (results && results.total > 0) {
     for (let i = 0; i < results.items.length; i++) {
       if (results.items[i].available_versions.hasOwnProperty("version")) {
-        for (let j = 0; j < results.items[i].available_versions.version.length; j++) {
+        for (
+          let j = 0;
+          j < results.items[i].available_versions.version.length;
+          j++
+        ) {
           let version = results.items[i].available_versions.version[j];
-          if(version.pid.startsWith('w')) {
+          if (version.pid.startsWith("w")) {
             version.crid = pid2crid.crid(version.pid);
           } else {
             pids.push(version.pid);
@@ -341,7 +340,7 @@ function add_version_crids_to_episodes(results) {
     }
   }
   const map = get_version_pid2crid_map(pids);
-  versions.forEach((version) => {
+  versions.forEach(version => {
     version.crid = map[version.pid];
   });
   return results;

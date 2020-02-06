@@ -239,6 +239,9 @@ class ScheduleObject {
         case "sentinel":
           // do nothing
           break;
+        case "":
+          // do nothing
+          break;
         default:
           prev.insertionType = "overlap";
           prev.duration = slotDurationString;

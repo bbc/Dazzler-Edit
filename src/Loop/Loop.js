@@ -5,6 +5,9 @@ import moment from "moment";
 import "moment-duration-format";
 import { cloneDeep } from "lodash-es";
 import { Typography } from "@material-ui/core";
+import { backupPlaylist } from "../LoopDao/LoopDao";
+import Fade from "@material-ui/core/Fade";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 const durationFormatter = ({ value }) => {
   return moment.duration(value).format("hh:mm:ss", { trim: false });
@@ -25,16 +28,11 @@ class Loop extends React.Component {
   constructor(props) {
     super(props);
     this.pasteToFill = this.pasteToFill.bind(this);
-    this.saveLoop = this.saveLoop.bind(this);
-    this.state = {};
-  }
-
-  componentDidMount() {}
-
-  componentDidUpdate(prevProps) {
-    if (this.props.data != prevProps.data) {
-      //butto text is save
-    }
+    this.emergencyPlaylist = this.emergencyPlaylist.bind(this);
+    this.state = {
+      loopModified: "Set as Emergency Content",
+      saving: "idle"
+    };
   }
 
   pasteToFill() {
@@ -79,12 +77,28 @@ class Loop extends React.Component {
     //console.log('remaining milliseconds after', remaining);
     this.props.onPaste(m);
   }
-
-  saveLoop() {
-    //save the loop here.
-    //load and then change button to save
+  emergencyPlaylist() {
+    const This = this; // closure for callback - How does this fix it?
+    this.setState({ saving: "progress" });
+    try {
+      let backup = backupPlaylist(this.props.data, function() {
+        This.setState({ loopModified: "Saved", saving: "idle" });
+      });
+    } catch (err) {
+      this.setState({ saving: "idle" });
+      console.log(err);
+      alert("Cannot save backup schedule");
+    }
   }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.data != this.props.data) {
+      this.setState({ loopModified: "Set as Emergency Content" });
+    }
+  }
+
   render() {
+    let { saving } = this.state;
     const d = this.props.data.length === 0;
     return (
       <div style={{ width: "100%" }}>
@@ -142,18 +156,56 @@ class Loop extends React.Component {
             >
               <Typography>Paste to Fill</Typography>
             </button>
+
             <button
               disabled={d}
               className="ui primary button"
-              onClick={this.saveLoop}
+              onClick={this.props.onSave}
             >
               <Typography>Save Loop</Typography>
             </button>
-            {/*<button className="ui button" onClick={this.props.onTest}
-          ><Typography>Test</Typography>
-          </button>*/}
+
+            <button disabled={!d} className="ui primary button">
+              <input
+                type="file"
+                name="file"
+                id="files"
+                style={{ display: "none" }}
+                onChange={e => {
+                  this.props.onUpload(e);
+                }}
+              />
+              <label for="files">
+                <i className="upload icon"></i>
+                <Typography>Upload Loop </Typography>
+              </label>
+            </button>
           </Box>
         </Box>
+        <br />
+
+        <button
+          disabled={d}
+          className="fluid ui button ui primary button"
+          onClick={this.emergencyPlaylist}
+        >
+          <i className="save icon"></i>
+          <Typography>{this.state.loopModified}</Typography>
+        </button>
+
+        {saving === "success" ? (
+          ""
+        ) : (
+          <Fade
+            in={saving === "progress"}
+            style={{
+              transitionDelay: saving === "progress" ? "800ms" : "0ms"
+            }}
+            unmountOnExit
+          >
+            <CircularProgress />
+          </Fade>
+        )}
       </div>
     );
   }
