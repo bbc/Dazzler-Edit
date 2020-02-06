@@ -165,13 +165,20 @@ class Loop extends React.Component {
               <Typography>Save Loop</Typography>
             </button>
 
-            <button
-              disabled={!d}
-              className="ui primary button"
-              // onClick={this.props.onUpload}
-            >
-              <i className="upload icon"></i>
-              <Typography>Upload Loop </Typography>
+            <button disabled={!d} className="ui primary button">
+              <input
+                type="file"
+                name="file"
+                id="files"
+                style={{ display: "none" }}
+                onChange={e => {
+                  this.props.onUpload(e);
+                }}
+              />
+              <label for="files">
+                <i className="upload icon"></i>
+                <Typography>Upload Loop </Typography>
+              </label>
             </button>
           </Box>
         </Box>
@@ -185,13 +192,7 @@ class Loop extends React.Component {
           <i className="save icon"></i>
           <Typography>{this.state.loopModified}</Typography>
         </button>
-        <input
-          type="file"
-          name="file"
-          onChange={e => {
-            this.props.onUpload(e);
-          }}
-        />
+
         {saving === "success" ? (
           ""
         ) : (
