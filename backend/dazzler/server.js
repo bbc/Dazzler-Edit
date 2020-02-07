@@ -255,8 +255,8 @@ app.post("/api/v1/loop", async function(req, res) {
   const s3 = new aws.S3({ apiVersion: "2006-03-01" });
   var params = {
     Body: req.body,
-    Bucket: process.env.BUCKET,
-    Key: process.env.BUCKET_KEY
+    Bucket: "ws-dazzler-assets",
+    Key: "Schedule/Schedule.json"
   };
   try {
     let s3Response = await s3.putObject(params).promise();
