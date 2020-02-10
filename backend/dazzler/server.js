@@ -16,12 +16,12 @@ if (!process.env.AUTHORISED_USERS) {
 }
 
 const config = {
-  bbc_marathi_tv: {
-    mid: "bbc_marathi_tv",
+  bbc_hindi_tv: {
+    mid: "bbc_hindi_tv",
     loop_collection: process.env.LOOP_COLLECTION.trim(),
     specials_collection: process.env.SPECIALS_COLLECTION.trim(),
     live_brand: process.env.LIVE_BRAND.trim(),
-    clip_language: "marathi",
+    clip_language: "hindi",
     webcast_channels: [
       "world_service_stream_05",
       "world_service_stream_06",
@@ -149,7 +149,7 @@ app.get("/api/v1/special", async (req, res) => {
 
 app.get("/api/v1/clip", async (req, res) => {
   let q = {};
-  let sid = "bbc_marathi_tv";
+  let sid = "bbc_hindi_tv";
   if (req.query.sid) {
     sid = req.query.sid;
   }
@@ -255,8 +255,8 @@ app.post("/api/v1/loop", async function(req, res) {
   const s3 = new aws.S3({ apiVersion: "2006-03-01" });
   var params = {
     Body: req.body,
-    Bucket: "ws-dazzler-assets",
-    Key: "Schedule/Schedule.json"
+    Bucket: process.env.BUCKET,
+    Key: process.env.BUCKET_KEY
   };
   try {
     let s3Response = await s3.putObject(params).promise();
@@ -283,8 +283,8 @@ app.post("/api/v1/tva", async (req, res) => {
       res.status(403).send(message);
     }
   } else {
-    console.log("Marathi only please");
-    res.status(403).send("Marathi only please");
+    console.log("Hindi only please");
+    res.status(403).send("Hindi only please");
   }
 });
 
