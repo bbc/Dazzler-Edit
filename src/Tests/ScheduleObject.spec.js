@@ -11,7 +11,7 @@ import moment from "moment";
 describe("ScheduleObject", () => {
   test("Should add item at the chosen index", () => {
     let myScheduleObject = new ScheduleObject(
-      "bbc_marathi_tv",
+      "bbc_hindi_tv",
       moment("2019-12-08")
     );
     myScheduleObject.addFloating(1, [
@@ -41,7 +41,7 @@ describe("ScheduleObject", () => {
 
   test("Should add item with a gap before live", () => {
     let myScheduleObject = new ScheduleObject(
-      "bbc_marathi_tv",
+      "bbc_hindi_tv",
       moment("2019-12-08"),
       [
         {
@@ -151,7 +151,7 @@ describe("ScheduleObject", () => {
 
   test("Should add items to empty schedule with unique start times", () => {
     let myScheduleObject = new ScheduleObject(
-      "bbc_marathi_tv",
+      "bbc_hindi_tv",
       moment("2019-12-08")
     );
     myScheduleObject.addFloating(1, [
@@ -233,7 +233,7 @@ describe("ScheduleObject", () => {
 
   test("Should add items to non-empty schedule with unique start times", () => {
     let myScheduleObject = new ScheduleObject(
-      "bbc_marathi_tv",
+      "bbc_hindi_tv",
       moment("2019-12-08")
     );
     const test_item = {
@@ -302,7 +302,7 @@ describe("ScheduleObject", () => {
 
   test("Should delete all occurences of clip in schedule", () => {
     let myScheduleObject = new ScheduleObject(
-      "bbc_marathi_tv",
+      "bbc_hindi_tv",
       moment("2020-01-21"),
       loopItems
     );
@@ -322,7 +322,7 @@ describe("ScheduleObject", () => {
 
   test("System should not delete all occurences of live items", () => {
     let myScheduleObject = new ScheduleObject(
-      "bbc_marathi_tv",
+      "bbc_hindi_tv",
       moment("2020-01-21"),
       loopItems
     );
@@ -342,7 +342,7 @@ describe("ScheduleObject", () => {
 
   test("System should correctly add overlap before start of live", () => {
     let myScheduleObject = new ScheduleObject(
-      "bbc_marathi_tv",
+      "bbc_hindi_tv",
       moment("2020-01-27"),
       clipsAndLiveItem
     );
@@ -371,7 +371,7 @@ describe("ScheduleObject", () => {
   });
   test("System should correctly calculate overlap before the end of the day's schedule", () => {
     let myScheduleObject = new ScheduleObject(
-      "bbc_marathi_tv",
+      "bbc_hindi_tv",
       moment("2020-01-27"),
       endOfScheduleItems
     );
@@ -402,7 +402,7 @@ describe("ScheduleObject", () => {
 
   test("System should correctly recalculate schedule when overlapping item is deleted", () => {
     let myScheduleObject = new ScheduleObject(
-      "bbc_marathi_tv",
+      "bbc_hindi_tv",
       moment("2020-01-27"),
       ItemsWithOverlap
     );
@@ -423,7 +423,7 @@ describe("ScheduleObject", () => {
 
   test("System should correctly recalculate schedule when an item is deleted and the overlap remains but is shorter", () => {
     let myScheduleObject = new ScheduleObject(
-      "bbc_marathi_tv",
+      "bbc_hindi_tv",
       moment("2020-01-27"),
       ItemsWithOverlap
     );
@@ -445,7 +445,7 @@ describe("ScheduleObject", () => {
 
   test("System should clear the schedule when all occurences of an item, in a single item loop is deleted ", () => {
     let myScheduleObject = new ScheduleObject(
-      "bbc_marathi_tv",
+      "bbc_hindi_tv",
       moment("2020-01-27"),
       singleItemLoop
     );

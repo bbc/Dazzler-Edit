@@ -101,9 +101,9 @@ const styles = theme => ({
 });
 
 const services = {
-  bbc_marathi_tv: {
-    sid: "bbc_marathi_tv",
-    name: "Marathi",
+  bbc_hindi_tv: {
+    sid: "bbc_hindi_tv",
+    name: "Hindi",
     serviceIDRef: "TVMAR01"
   }
 };
@@ -133,7 +133,7 @@ class Editor extends React.Component {
 
     this.state = {
       schedule: new ScheduleObject(
-        "bbc_marathi_tv",
+        "bbc_hindi_tv",
         moment()
           .utc()
           .startOf("day")
