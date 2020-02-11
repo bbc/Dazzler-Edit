@@ -28,10 +28,8 @@
               "Fn::Join": [
                 "",
                 [
-                  {
-                    "Ref": "Environment"
-                  },
-                  "ws-dazzler-edit"
+                  { "Ref": "Environment" },
+                  { "Ref": "Component" }
                 ]
               ]
             },
@@ -39,7 +37,7 @@
           },
           {
             "Key": "BBCComponent",
-            "Value": "ws-dazzler-edit",
+            "Value": { "Ref": "Component" },
             "PropagateAtLaunch": true
           },
           {
@@ -184,6 +182,15 @@
             },
             {
               "Action": [
+                  "sqs:DeleteMessage",
+                  "sqs:SendMessage",
+                  "sqs:ReceiveMessage"
+              ],
+              "Resource": { "Fn::GetAtt" : ["captureTaskQueue", "Arn"]},
+              "Effect": "Allow"
+            },
+            {
+              "Action": [
                 "s3:GetBucketLocation",
                 "s3:GetBucketNotification",
                 "s3:GetObject",
@@ -205,7 +212,7 @@
               ],
               "Resource": [
                 {
-                  "Fn::Join": [ "", [ { "Ref": "S3BucketArn" }, "/ws-dazzler-edit/", { "Ref": "Environment" }, "/logs/*" ] ]
+                  "Fn::Join": [ "", [ { "Ref": "S3BucketArn" }, "/", { "Ref": "Component" }, "/", { "Ref": "Environment" }, "/logs/*" ] ]
                 }
               ],
               "Effect": "Allow"
@@ -217,6 +224,11 @@
             },
             {
               "Action": [ "ec2:Describe*" ],
+              "Resource": [ "*" ],
+              "Effect": "Allow"
+            },
+            {
+              "Action": [ "tag:GetResources" ],
               "Resource": [ "*" ],
               "Effect": "Allow"
             }
@@ -266,9 +278,21 @@
           ]
         }
       }
+    },
+    "captureTaskQueue": {
+      "Type": "AWS::SQS::Queue",
+      "Properties": {
+        "QueueName": { "Fn::Join": [ "-", [ { "Ref": "Environment" }, "dazzler-capture-tasks" ] ] },
+        "Tags": [ { "Key": "Purpose", "Value": "captureTasks" } ]
+      }
     }
   },
   "Parameters": {
+    "Component": {
+      "Default": "ws-dazzler-edit",
+      "Type": "String",
+      "Description": "The name of the Cosmos Component"
+    },
     "DomainNameBase": {
       "Default": "1c9eb4db7739eb1a.xhst.bbci.co.uk.",
       "Type": "String",
