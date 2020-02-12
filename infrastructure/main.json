@@ -282,8 +282,27 @@
     "captureTaskQueue": {
       "Type": "AWS::SQS::Queue",
       "Properties": {
-        "QueueName": { "Fn::Join": [ "-", [ { "Ref": "Environment" }, "dazzler-capture-tasks" ] ] },
+        "QueueName": { "Fn::Join": [ "-", [ { "Ref": "Environment" }, "dazzler-capture-tasks.fifo" ] ] },
+	"FifoQueue": true,
+        "ContentBasedDeduplication": true,
         "Tags": [ { "Key": "Purpose", "Value": "captureTasks" } ]
+      }
+    },
+    "captureTaskQueuePolicy": {
+      "Type" : "AWS::SQS::QueuePolicy",
+      "Properties" : {
+        "PolicyDocument" : {
+          "Version": "2012-10-17",
+            "Statement": [
+             {
+               "Effect": "Allow",
+               "Principal": "*",
+               "Action": "sqs:sendMessage",
+               "Resource": { "Fn::GetAtt" : ["captureTaskQueue", "Arn"] }
+             }
+           ]
+        },
+        "Queues" : [ { "Fn::GetAtt" : ["captureTaskQueue", "QueueName"] } ]
       }
     }
   },
