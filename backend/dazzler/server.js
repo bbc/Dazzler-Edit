@@ -15,21 +15,33 @@ if (!process.env.AUTHORISED_USERS) {
   process.env = configuration;
 }
 
+/*
+w13xttlw
+w13xttx5
+w13xttxb
+w13xttz9
+*/
+
 const config = {
   bbc_hindi_tv: {
     mid: "bbc_hindi_tv",
-    loop_collection: process.env.LOOP_COLLECTION.trim(),
-    specials_collection: process.env.SPECIALS_COLLECTION.trim(),
-    live_brand: process.env.LIVE_BRAND.trim(),
+    loop_collection: "p0845svx",
+    specials_collection: "p0845sqf",
+    live_brand: "w13xttlw",
     clip_language: "hindi",
-    webcast_channels: [
-      "world_service_stream_05",
-      "world_service_stream_06",
-      "world_service_stream_07",
-      "world_service_stream_08"
-    ]
+    webcast_channels: [ "world_service_stream_05", "world_service_stream_06", "world_service_stream_07", "world_service_stream_08" ]
+  },
+  bbc_marathi_tv: {
+    mid: "bbc_marathi_tv",
+    loop_collection: "p0510sbc",
+    specials_collection: "p0715nv4",
+    live_brand: "w13xttvl",
+    clip_language: "marathi",
+    webcast_channels: [ "world_service_stream_05", "world_service_stream_06", "world_service_stream_07", "world_service_stream_08" ]
   }
 };
+
+const default_sid = "bbc_hindi_tv";
 
 app.use(bodyParser.text({ type: "*/*", limit: "500kb" }));
 
@@ -149,7 +161,7 @@ app.get("/api/v1/special", async (req, res) => {
 
 app.get("/api/v1/clip", async (req, res) => {
   let q = {};
-  let sid = "bbc_hindi_tv";
+  let sid = default_sid;
   if (req.query.sid) {
     sid = req.query.sid;
   }
@@ -292,8 +304,10 @@ app.post("/api/v1/tva", async (req, res) => {
 function add_crids_to_webcast(results) {
   if (results && results.total > 0) {
     for (let i = 0; i < results.items.length; i++) {
-      const pid = results.items[i].window_of[0].pid;
-      results.items[i].window_of[0].crid = pid2crid.crid(pid);
+      const w = results.items[i].window_of;
+      for (let j = 0; j < w.length; j++) {
+        w[j].crid = pid2crid.crid(w[j].pid);
+      }
     }
   }
   return results;

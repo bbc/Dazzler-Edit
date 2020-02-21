@@ -83,7 +83,7 @@ class ScheduleDao {
     const item = {
       live: true,
       startTime: start,
-      title: "Live programme at " + start.format("HH:mm:ss"),
+      title: "Live programme at " + start.format("HH:mm:ss") + " local",
       duration: duration.toISOString(),
       captureChannel: window.service.sid,
       insertionType: "live"
