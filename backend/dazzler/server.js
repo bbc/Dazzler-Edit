@@ -6,6 +6,8 @@ const pid2crid = require("./pid2crid");
 const nitro = require("./nitro");
 const spw = require("./spw");
 const pips = require("./pips");
+const aws = require("aws-sdk");
+const s3 = new aws.S3({ apiVersion: "2006-03-01" });
 
 const app = express();
 var configuration;
@@ -263,19 +265,21 @@ app.get("/api/v1/episode", async (req, res, next) => {
 });
 
 app.post("/api/v1/loop", async function(req, res) {
-  const aws = require("aws-sdk");
-  const s3 = new aws.S3({ apiVersion: "2006-03-01" });
+  let sid = default_sid;
+  if (req.query.sid) {
+    sid = req.query.sid;
+  }
   var params = {
     Body: req.body,
-    Bucket: process.env.BUCKET,
-    Key: process.env.BUCKET_KEY
+    Bucket: process.env.PLAY_BUCKET,
+    Key: `emergency-playlists/${sid}.json`
   };
   try {
     let s3Response = await s3.putObject(params).promise();
     res.send("saved");
   } catch (e) {
     console.log("error ", e);
-    res.send("error");
+    res.status(404).send("error");
   }
 });
 
