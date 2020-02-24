@@ -191,6 +191,20 @@
             },
             {
               "Action": [
+                "s3:GetObject",
+                "s3:PutObject"
+              ],
+              "Resource": [ 
+		{ "Fn::Sub": [ "arn:aws:s3:::${Bucket}/*", {
+                    "Bucket": { "Fn::FindInMap": [ "OperationsMap", "PlayoutBucketMap", { "Ref": "Environment" } ] }
+		  }
+		 ]
+		}
+              ],
+              "Effect": "Allow"
+            },
+            {
+              "Action": [
                 "s3:GetBucketLocation",
                 "s3:GetBucketNotification",
                 "s3:GetObject",
@@ -376,6 +390,14 @@
       "Default": "core-infrastructure",
       "Type": "String",
       "Description": "Name of the AWS account's core-infrastructure stack. Used to import other network parameters (vpc id, subnets etc)"
+    }
+  },
+  "Mappings": {
+    "OperationsMap": {
+      "PlayoutBucketMap": {
+        "live": "ws-dazzler-assets",
+        "test": "ws-dazzler-assets-test"
+      }
     }
   }
 }
