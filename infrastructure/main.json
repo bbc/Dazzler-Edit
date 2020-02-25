@@ -140,29 +140,23 @@
         }
       }
     },
-    "ComponentDNS": {
-      "Type": "AWS::Route53::RecordSet",
-      "Properties": {
-        "HostedZoneName": {
-          "Ref": "DomainNameBase"
-        },
-        "TTL": "60",
-        "Type": "CNAME",
-        "Name": {
-          "Fn::Join": [
-            ".",
-            [
-              {
-                "Ref": "CnameEntry"
-              },
-              {
-                "Ref": "DomainNameBase"
-              }
+      "ComponentDNS": {
+        "Type": "AWS::Route53::RecordSet",
+        "Properties": {
+          "HostedZoneName": { "Fn::FindInMap": [ "OperationsMap", "DomainNameBaseMap", { "Ref": "Environment" } ] },
+          "Name": {
+            "Fn::Join": [
+              ".",
+              [
+                { "Fn::FindInMap": [ "OperationsMap", "CnameEntryMap", { "Ref": "Environment" } ] },
+                { "Fn::FindInMap": [ "OperationsMap", "DomainNameBaseMap", { "Ref": "Environment" } ] }
+              ]
             ]
-          ]
-        },
-        "ResourceRecords": [ { "Fn::GetAtt": [ "ComponentElasticLoadBalancer", "DNSName" ] } ]
-      }
+          },
+          "Type": "CNAME",
+          "ResourceRecords": [ { "Fn::GetAtt": [ "ComponentElasticLoadBalancer", "DNSName" ] } ],
+          "TTL": "60"
+        }
     },
     "ComponentPolicy": {
       "Type": "AWS::IAM::Policy",
@@ -326,20 +320,10 @@
       "Type": "String",
       "Description": "The name of the Cosmos Component"
     },
-    "DomainNameBase": {
-      "Default": "1c9eb4db7739eb1a.xhst.bbci.co.uk.",
-      "Type": "String",
-      "Description": "Base domain name (ending with a '.') under which new DNS entries are added"
-    },
     "MinSize": {
       "Default": "1",
       "Type": "String",
       "Description": "The minimum number of instances"
-    },
-    "CnameEntry": {
-      "Default": "dazzler.test",
-      "Type": "String",
-      "Description": "The cname entry for the component"
     },
     "UpdatePauseTime": {
       "Default": "PT0S",
@@ -357,15 +341,20 @@
       "Description": "The maximum number of instances"
     },
     "ImageId": {
-      "Default": "ami-0c7872372088f74f6",
+      "Default": "ami-9398d3e0",
       "Type": "String",
       "Description": "The AMI to use for this component"
     },
-    "Environment": {
-      "Default": "test",
-      "Type": "String",
-      "Description": "The name of the environment. Test or Live"
-    },
+      "Environment": {
+        "Default": "test",
+        "ConstraintDescription": "Values must be test or live",
+        "Type": "String",
+        "Description": "The deployment environment",
+        "AllowedValues": [
+          "test",
+          "live"
+        ]
+      },
     "KeyName": {
       "Default": "cosmos",
       "Type": "String",
@@ -392,12 +381,24 @@
       "Description": "Name of the AWS account's core-infrastructure stack. Used to import other network parameters (vpc id, subnets etc)"
     }
   },
-  "Mappings": {
-    "OperationsMap": {
+    "Mappings": {
+        "OperationsMap": {
+            "DomainNameBaseMap": {
+                "live": "7a576ea3ed7ca599.xhst.bbci.co.uk.",
+                "test": "1c9eb4db7739eb1a.xhst.bbci.co.uk."
+            },
+            "CnameEntryMap": {
+                "live": "dazzler",
+                "test": "dazzler.test"
+            },
+            "VpcCidrIpMap" : {
+                "live": "10.124.64.0/18",
+                "test": "10.98.0.0/18"
+            },
       "PlayoutBucketMap": {
         "live": "ws-dazzler-assets",
         "test": "ws-dazzler-assets-test"
       }
+        }
     }
-  }
 }

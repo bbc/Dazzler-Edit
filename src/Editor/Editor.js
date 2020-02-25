@@ -369,7 +369,7 @@ class Editor extends React.Component {
       type: "application/json"
     });
     element.href = URL.createObjectURL(file);
-    element.download = "Schedule.json";
+    element.download = services[this.state.schedule.sid].name+' '+this.state.user.name+" Loop.json";,
     document.body.appendChild(element); // Required for this to work in FireFox
     element.click();
   }

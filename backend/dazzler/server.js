@@ -272,7 +272,7 @@ app.post("/api/v1/loop", async function(req, res) {
   var params = {
     Body: req.body,
     Bucket: process.env.PLAY_BUCKET,
-    Key: `emergency-playlists/${sid}.json`
+    Key: `${sid}/emergency-playlist.json`
   };
   try {
     let s3Response = await s3.putObject(params).promise();
