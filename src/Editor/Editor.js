@@ -107,7 +107,7 @@ const services = {
     serviceIDRef: "TVHIND01"
   },
   bbc_marathi_tv: {
-    sid: "bbc_mararhi_tv",
+    sid: "bbc_marathi_tv",
     name: "Marathi",
     serviceIDRef: "TVMAR01"
   }
