@@ -104,6 +104,11 @@ const services = {
   bbc_hindi_tv: {
     sid: "bbc_hindi_tv",
     name: "Hindi",
+    serviceIDRef: "TVHIND01"
+  },
+  bbc_marathi_tv: {
+    sid: "bbc_mararhi_tv",
+    name: "Marathi",
     serviceIDRef: "TVMAR01"
   }
 };
