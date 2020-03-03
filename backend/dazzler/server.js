@@ -7,7 +7,9 @@ const nitro = require("./nitro");
 const spw = require("./spw");
 const pips = require("./pips");
 const aws = require("aws-sdk");
-const s3 = new aws.S3({ apiVersion: "2006-03-01" });
+const s3 = new aws.S3({
+  apiVersion: "2006-03-01"
+});
 
 const app = express();
 var configuration;
@@ -31,7 +33,7 @@ const config = {
     specials_collection: "p0845sqf",
     live_brand: "w13xttlw",
     clip_language: "hindi",
-    webcast_channels: [ "world_service_stream_05", "world_service_stream_06", "world_service_stream_07", "world_service_stream_08" ]
+    webcast_channels: ["world_service_stream_05", "world_service_stream_06", "world_service_stream_07", "world_service_stream_08"]
   },
   bbc_marathi_tv: {
     mid: "bbc_marathi_tv",
@@ -39,31 +41,40 @@ const config = {
     specials_collection: "p0715nv4",
     live_brand: "w13xttvl",
     clip_language: "marathi",
-    webcast_channels: [ "world_service_stream_05", "world_service_stream_06", "world_service_stream_07", "world_service_stream_08" ]
+    webcast_channels: ["world_service_stream_05", "world_service_stream_06", "world_service_stream_07", "world_service_stream_08"]
   }
 };
 
 const default_sid = "bbc_hindi_tv";
 
-app.use(bodyParser.text({ type: "*/*", limit: "500kb" }));
+app.use(bodyParser.text({
+  type: "*/*",
+  limit: "500kb"
+}));
 
 app.use(express.static(__dirname + "/../edit"));
 
 // /status is used by ELB health checkers to assert that the service is running OK
-app.get("/status", function(req, res) {
+app.get("/status", function (req, res) {
   res.send("OK");
 });
 
-app.get("/api/v1/user", function(req, res) {
+app.get("/api/v1/user", function (req, res) {
   if (req.header("sslclientcertsubject")) {
     const subject = parseSSLsubject(req);
-    let r = { email: subject.emailAddress, auth: auth(subject.emailAddress) };
+    let r = {
+      email: subject.emailAddress,
+      auth: auth(subject.emailAddress)
+    };
     if (subject.hasOwnProperty("CN")) {
       r.name = subject.CN;
     }
     res.json(r);
   } else {
-    res.json({ name: "anonymous", auth: false });
+    res.json({
+      name: "anonymous",
+      auth: false
+    });
   }
 });
 
@@ -88,9 +99,16 @@ app.get("/api/v1/schedule", async (req, res) => {
     for (let key of Object.keys(schedule)) {
       o[key] = schedule[key];
     }
-    res.json({ total: s.length, item: s, sid: sid, date: date });
+    res.json({
+      total: s.length,
+      item: s,
+      sid: sid,
+      date: date
+    });
   } catch (e) {
-    res.json({ total: 0 });
+    res.json({
+      total: 0
+    });
   }
 });
 
@@ -193,21 +211,23 @@ async function clip(q, query, res) {
     let pids = [];
     let response = await nitro.request("programmes", q);
     let clips = response.data.nitro.results;
-    for (let i = 0; i < clips.items.length; i++) {
-      if (clips.items[i].available_versions.hasOwnProperty("version")) {
-        const version = clips.items[i].available_versions.version;
-        for (let j = 0; j < version.length; j++) {
-          pids.push(version[j].pid);
+    if (clips.items) {
+      for (let i = 0; i < clips.items.length; i++) {
+        if (clips.items[i].available_versions.hasOwnProperty("version")) {
+          const version = clips.items[i].available_versions.version;
+          for (let j = 0; j < version.length; j++) {
+            pids.push(version[j].pid);
+          }
         }
       }
-    }
-    const map = await get_version_pid2crid_map(pids);
-    console.log(map);
-    for (let i = 0; i < clips.items.length; i++) {
-      if (clips.items[i].available_versions.hasOwnProperty("version")) {
-        const version = clips.items[i].available_versions.version;
-        for (let j = 0; j < version.length; j++) {
-          version[j].crid = map[version[j].pid];
+      const map = await get_version_pid2crid_map(pids);
+      console.log(map);
+      for (let i = 0; i < clips.items.length; i++) {
+        if (clips.items[i].available_versions.hasOwnProperty("version")) {
+          const version = clips.items[i].available_versions.version;
+          for (let j = 0; j < version.length; j++) {
+            version[j].crid = map[version[j].pid];
+          }
         }
       }
     }
@@ -264,7 +284,7 @@ app.get("/api/v1/episode", async (req, res, next) => {
   }
 });
 
-app.post("/api/v1/loop", async function(req, res) {
+app.post("/api/v1/loop", async function (req, res) {
   let sid = default_sid;
   if (req.query.sid) {
     sid = req.query.sid;
@@ -320,7 +340,9 @@ function add_crids_to_webcast(results) {
 async function get_version_pid2crid_map(pids) {
   let map = {};
   if (pids.length > 0) {
-    const response = await nitro.request("versions", { pid: pids });
+    const response = await nitro.request("versions", {
+      pid: pids
+    });
     const items = response.data.nitro.results.items;
     for (let i = 0; i < items.length; i++) {
       const ids = items[i].identifiers.identifier;
@@ -342,9 +364,7 @@ function add_version_crids_to_episodes(results) {
     for (let i = 0; i < results.items.length; i++) {
       if (results.items[i].available_versions.hasOwnProperty("version")) {
         for (
-          let j = 0;
-          j < results.items[i].available_versions.version.length;
-          j++
+          let j = 0; j < results.items[i].available_versions.version.length; j++
         ) {
           let version = results.items[i].available_versions.version[j];
           if (version.pid.startsWith("w")) {
