@@ -139,7 +139,11 @@ export class Live extends React.Component {
                         {row.title === undefined
                           ? row.presentation_title
                           : row.title}
-                        <span className="tooltiptext">{'PID = '+row.pid.trim()}</span>
+                        <span className="tooltiptext">
+                          {
+                          'PID = '+(row.pid?row.pid.trim():'')
+                          }
+                        </span>
                       </div>
                     </TableCell>
                     <TableCell align="right">
