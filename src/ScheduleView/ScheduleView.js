@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import ScheduleItem from "../ScheduleItem/ScheduleItem";
-import moment from "moment";
+// import moment from "moment";
 
 /*
   <ScheduleView 
@@ -50,9 +50,7 @@ class ScheduleView extends React.Component {
   }
 
   render() {
-    let offset = moment()
-      .format()
-      .substring(19);
+    // let offset = moment().format().substring(19);
     let selectedItem = this.props.row;
     if (selectedItem === -1) {
       // put at first gap
