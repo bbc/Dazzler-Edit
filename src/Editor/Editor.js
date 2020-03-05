@@ -554,24 +554,6 @@ class Editor extends React.Component {
               <ExpansionPanel>
                 <ExpansionPanelSummary
                   expandIcon={<ExpandMoreIcon />}
-                  aria-controls="panel3bh-content"
-                  id="panel2bh-header"
-                >
-                  <Typography className={classes.heading}>
-                    Jupiter Clips
-                  </Typography>
-                </ExpansionPanelSummary>
-                <ExpansionPanelDetails>
-                  <Clips
-                    type="jupiter"
-                    sid={this.state.schedule.sid}
-                    handleClick={this.handleAddClipOrEpisode}
-                  />
-                </ExpansionPanelDetails>
-              </ExpansionPanel>
-              <ExpansionPanel>
-                <ExpansionPanelSummary
-                  expandIcon={<ExpandMoreIcon />}
                   aria-controls="panel4bh-content"
                   id="panel2bh-header"
                 >
