@@ -81,7 +81,7 @@ class Loop extends React.Component {
     const This = this; // closure for callback - How does this fix it?
     this.setState({ saving: "progress" });
     try {
-      let backup = backupPlaylist(this.props.data, function() {
+      backupPlaylist(this.props.data, function() {
         This.setState({ loopModified: "Saved", saving: "idle" });
       });
     } catch (err) {
@@ -92,7 +92,7 @@ class Loop extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.data != this.props.data) {
+    if (prevProps.data !== this.props.data) {
       this.setState({ loopModified: "Set as Emergency Content" });
     }
   }
