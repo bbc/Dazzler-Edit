@@ -114,6 +114,7 @@ class ScheduleItem extends React.Component {
                       if (item.title === this.props.title) {
                         tally++;
                       }
+                      return tally;
                     });
                     this.setState({ open: true, count: tally });
                   }
