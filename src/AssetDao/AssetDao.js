@@ -30,12 +30,12 @@ class AssetDao {
   }
 
   static getEpisodes(sid, availability, page, rowsPerPage, cb) {
-    axios
-      .get(
-        `${URLPrefix}/api/v1/episode?sid=${sid}&page=${page}&page_size=${rowsPerPage}&availability=${availability}`
-      )
+    const url = `${URLPrefix}/api/v1/episode?sid=${sid}&page=${page}&page_size=${rowsPerPage}&availability=${availability}`;
+    console.log('getEpisodes', url);
+    axios.get(url)
       .then(cb)
       .catch(e => {
+        console.log(url);
         console.log(e);
       });
   }
