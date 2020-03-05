@@ -1,0 +1,94 @@
+import React from "react";
+import PropTypes from "prop-types";
+import moment from "moment";
+import "moment-duration-format";
+import TableBody from "@material-ui/core/TableBody";
+import TableRow from "@material-ui/core/TableRow";
+import TableCell from "@material-ui/core/TableCell";
+import AssetDao from "../AssetDao/AssetDao";
+
+function addButton(episode) {
+    return (
+      <button
+        className="ui compact icon button"
+        onClick={() => {
+          this.props.handleClick(AssetDao.episode2Item(episode));
+        }}
+      >
+        <i className="plus icon"></i>
+      </button>
+    );
+  }
+
+function formattedDuration(clip) {
+    const duration = moment.duration(
+      clip.available_versions.version[0].duration
+    );
+    return duration.format("hh:mm:ss", { trim: false });
+}
+
+export default function EpisodeList({
+  sid,
+  availability,
+  page = 0,
+  rowsPerPage=5,
+  onPageChange = function(page, rowsPerPage, total) {
+    console.log("page changed", page, rowsPerPage, total);
+  }
+}) {
+  const [currentPage, setCurrentPage] = React.useState(-1);
+  const [currentRowsPerPage, setCurrentRowsPerPage] = React.useState(5);
+  const [rows, setRows] = React.useState([]);
+
+  // statements in the body of the function are called on rendering!!!
+
+  if(page === currentPage && rowsPerPage === currentRowsPerPage) {
+    console.log("episodelist no change", page, rowsPerPage);
+  } else {
+    console.log("episodelist fetching", page, rowsPerPage);
+    AssetDao.getEpisodes(
+        sid,
+        availability,
+        page + 1, // nitro is one-based
+        rowsPerPage,
+        response => {
+            let items = response.data.items;
+            console.log("updated", items);
+            let total = response.data.total;
+            console.log("got episode data for", availability);
+            setRows(items);
+            onPageChange(currentPage, currentRowsPerPage, total);
+        }
+    );
+    setCurrentPage(page);
+    setCurrentRowsPerPage(rowsPerPage);
+  }
+
+  return (
+    <TableBody>
+    {rows.map(row => (
+        <TableRow key={row.pid} className={row.insertionType}>
+        <TableCell component="th" scope="row">
+            <div className="tooltip">
+            {" "}
+            {row.title === undefined
+                ? row.presentation_title
+                : row.title}
+            <span className="tooltiptext">PID = {row.pid}</span>
+            </div>
+        </TableCell>
+        <TableCell align="right">
+            {formattedDuration(row)}
+        </TableCell>
+
+        <TableCell align="right">{addButton(row)}</TableCell>
+        </TableRow>
+    ))}
+    </TableBody>
+  );
+}
+
+EpisodeList.propTypes = {
+  page: PropTypes.func.isRequired,
+  rowsPerPage: PropTypes.func.isRequired
+};

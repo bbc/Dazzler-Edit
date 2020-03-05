@@ -3,7 +3,6 @@ import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
 import TableHead from "@material-ui/core/TableHead";
-import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 import TableFooter from "@material-ui/core/TableFooter";
 import TablePagination from "@material-ui/core/TablePagination";
@@ -12,7 +11,7 @@ import Paper from "@material-ui/core/Paper";
 import moment from "moment";
 import "moment-duration-format";
 import { TablePaginationActionsWrapped } from "../TablePaginationActions/TablePaginationActions";
-import AssetDao from "../AssetDao/AssetDao";
+import EpisodeList from "../EpisodeList";
 
 export const styles = theme => ({
   root: {
@@ -27,6 +26,11 @@ export const styles = theme => ({
   }
 });
 
+/*
+ * Note: material-ui TablePagination is zero based. 
+ * Nitro and therefore our current API is one based.
+*/
+
 export class Episode extends React.Component {
   constructor(props) {
     super(props);
@@ -35,14 +39,17 @@ export class Episode extends React.Component {
       spinner: false,
       totalRows: 0,
       rows: [],
-      page: 0,
-      previousPage: -1,
+      page: 0, // zero based current page
       rowsPerPage: 5,
       sid: "",
-      date: moment()
-        .utc()
-        .format()
+      date: moment().utc().format()
     };
+  }
+
+  onPageChange = (page, rowsPerPage, totalRows) => {
+    this.setState({
+      page, rowsPerPage, totalRows
+    });
   }
 
   componentDidMount = () => {
@@ -53,50 +60,13 @@ export class Episode extends React.Component {
   };
 
   componentDidUpdate(prevProps) {
-    if (
-      this.state.page !== this.state.previousPage ||
-      this.props.availability !== prevProps.availability
-    ) {
-      console.log(
-        "Episode: %s %s have page %d want page %d",
-        this.props.sid,
-        this.props.availability,
-        this.state.page,
-        this.state.previousPage
-      );
-      AssetDao.getEpisodes(
-        this.props.sid,
-        this.props.availability,
-        this.state.page + 1,
-        this.state.rowsPerPage,
-        response => {
-          let items = response.data.items;
-          console.log("updated", items);
-          let total = response.data.total;
-          console.log(
-            "episodeDidUpdate",
-            this.props.availability,
-            this.props.resultsFilter
-          );
-          if (this.props.resultsFilter) {
-            items = this.props.resultsFilter(items);
-            if (response.data.items.length > items.length) {
-              total = items.length;
-            }
-          }
-          let new_page = 0;
-          if (response.data.hasOwnProperty("page")) {
-            new_page = response.data.page - 1;
-          }
-          this.setState({
-            previousPage: new_page,
-            page: new_page,
-            totalRows: total,
-            rows: items
-          });
-        }
-      );
-    }
+    console.log(
+      "Episode: %s %s want page %d items per page %d",
+      this.props.sid,
+      this.props.availability,
+      this.state.page,
+      this.state.rowsPerPage
+    );
   }
 
   handleChangePage = (event, page) => {
@@ -107,33 +77,13 @@ export class Episode extends React.Component {
     this.setState({ page: 0, rowsPerPage: parseInt(event.target.value) });
   };
 
-  formattedDuration(clip) {
-    const duration = moment.duration(
-      clip.available_versions.version[0].duration
-    );
-    return duration.format("hh:mm:ss", { trim: false });
-  }
-
-  addButton(episode) {
-    return (
-      <button
-        className="ui compact icon button"
-        onClick={() => {
-          this.props.handleClick(AssetDao.episode2Item(episode));
-        }}
-      >
-        <i className="plus icon"></i>
-      </button>
-    );
-  }
+  onPageLoaded = (page, rowsPerPage, totalRows) => {
+    this.setState({ totalRows});
+  };
 
   render() {
     const { classes } = this.props;
-    const { rows, rowsPerPage, page, totalRows } = this.state;
-    let emptyRows = 0;
-    if (rows.length < rowsPerPage) {
-      emptyRows = rowsPerPage - rows.length;
-    }
+    let { rowsPerPage, page, totalRows } = this.state;
 
     return (
       <div>
@@ -147,32 +97,11 @@ export class Episode extends React.Component {
                   <TableCell>Add</TableCell>
                 </TableRow>
               </TableHead>
-              <TableBody>
-                {rows.map(row => (
-                  <TableRow key={row.pid} className={row.insertionType}>
-                    <TableCell component="th" scope="row">
-                      <div className="tooltip">
-                        {" "}
-                        {row.title === undefined
-                          ? row.presentation_title
-                          : row.title}
-                        <span className="tooltiptext">PID = {row.pid}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell align="right">
-                      {this.formattedDuration(row)}
-                    </TableCell>
-
-                    <TableCell align="right">{this.addButton(row)}</TableCell>
-                  </TableRow>
-                ))}
-
-                {emptyRows > 0 && (
-                  <TableRow style={{ height: 48 * emptyRows }}>
-                    <TableCell colSpan={6} />
-                  </TableRow>
-                )}
-              </TableBody>
+              <EpisodeList
+                sid={this.props.sid} availability={this.props.availability}
+                page={this.state.page} rowsPerPage={this.state.rowsPerPage}
+                onPageChange={this.onPageLoaded}
+              />
               <TableFooter>
                 <TableRow>
                   <TablePagination
