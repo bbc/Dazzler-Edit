@@ -7,19 +7,6 @@ import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
 import AssetDao from "../AssetDao/AssetDao";
 
-function addButton(episode) {
-    return (
-      <button
-        className="ui compact icon button"
-        onClick={() => {
-          this.props.handleClick(AssetDao.episode2Item(episode));
-        }}
-      >
-        <i className="plus icon"></i>
-      </button>
-    );
-  }
-
 function formattedDuration(clip) {
     const duration = moment.duration(
       clip.available_versions.version[0].duration
@@ -32,7 +19,10 @@ export default function EpisodeList({
   availability,
   page = 0,
   rowsPerPage=5,
-  onPageChange = function(page, rowsPerPage, total) {
+  onAddClicked = function() {
+    console.log('add clicked');
+  },
+  onPageLoaded = function(page, rowsPerPage, total) {
     console.log("page changed", page, rowsPerPage, total);
   }
 }) {
@@ -57,7 +47,7 @@ export default function EpisodeList({
             let total = response.data.total;
             console.log("got episode data for", availability);
             setRows(items);
-            onPageChange(currentPage, currentRowsPerPage, total);
+            onPageLoaded(currentPage, currentRowsPerPage, total);
         }
     );
     setCurrentPage(page);
@@ -80,9 +70,14 @@ export default function EpisodeList({
         <TableCell align="right">
             {formattedDuration(row)}
         </TableCell>
-
-        <TableCell align="right">{addButton(row)}</TableCell>
-        </TableRow>
+        <TableCell align="right">
+          <button className="ui compact icon button"
+            onClick={() => {onAddClicked(AssetDao.episode2Item(row));} }
+          >
+            <i className="plus icon"></i>
+          </button>
+        </TableCell>
+      </TableRow>
     ))}
     </TableBody>
   );

@@ -101,6 +101,7 @@ export class Episode extends React.Component {
                 sid={this.props.sid} availability={this.props.availability}
                 page={this.state.page} rowsPerPage={this.state.rowsPerPage}
                 onPageChange={this.onPageLoaded}
+                onAddClicked={this.props.handleClick}
               />
               <TableFooter>
                 <TableRow>
