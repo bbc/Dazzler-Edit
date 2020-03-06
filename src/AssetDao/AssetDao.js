@@ -40,7 +40,6 @@ class AssetDao {
   ) {
     var sort_direction = sort_direction == "desc" ? "descending" : "ascending";
     const url = `${URLPrefix}/api/v1/episode?sid=${sid}&page=${page}&page_size=${rowsPerPage}&availability=${availability}&sort=${sort}&sort_direction=${sort_direction}`;
-    console.log("getEpisodes", url);
     axios
       .get(url)
       .then(cb)

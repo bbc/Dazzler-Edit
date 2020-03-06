@@ -97,13 +97,7 @@ export class Episode extends React.Component {
 
   render() {
     const headCells = [
-      { id: "title", numeric: false, disablePadding: true, label: "Title" },
-      {
-        id: "duration",
-        numeric: true,
-        disablePadding: false,
-        label: "Duration"
-      }
+      { id: "title", numeric: false, disablePadding: true, label: "Title" }
     ];
     const { classes } = this.props;
     let { rowsPerPage, page, totalRows, order, orderBy } = this.state;
