@@ -6,6 +6,8 @@ import TableBody from "@material-ui/core/TableBody";
 import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
 import AssetDao from "../AssetDao/AssetDao";
+import Fade from "@material-ui/core/Fade";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 function formattedDuration(clip) {
     const duration = moment.duration(
@@ -29,6 +31,7 @@ export default function EpisodeList({
   const [currentPage, setCurrentPage] = React.useState(-1);
   const [currentRowsPerPage, setCurrentRowsPerPage] = React.useState(5);
   const [rows, setRows] = React.useState([]);
+  const [loading, setLoading] = React.useState("idle");
 
   // statements in the body of the function are called on rendering!!!
 
@@ -36,6 +39,7 @@ export default function EpisodeList({
     console.log("episodelist no change", page, rowsPerPage);
   } else {
     console.log("episodelist fetching", page, rowsPerPage);
+    setLoading("progress");
     AssetDao.getEpisodes(
         sid,
         availability,
@@ -48,6 +52,7 @@ export default function EpisodeList({
             console.log("got episode data for", availability);
             setRows(items);
             onPageLoaded(currentPage, currentRowsPerPage, total);
+            setLoading("idle");
         }
     );
     setCurrentPage(page);
@@ -55,6 +60,15 @@ export default function EpisodeList({
   }
 
   return (
+    <div>
+    <Fade in={loading === "progress"}
+          style={{
+            transitionDelay: loading === "progress" ? "800ms" : "0ms"
+          }}
+          unmountOnExit
+        >
+          <CircularProgress />
+        </Fade>
     <TableBody>
     {rows.map(row => (
         <TableRow key={row.pid} className={row.insertionType}>
@@ -80,6 +94,7 @@ export default function EpisodeList({
       </TableRow>
     ))}
     </TableBody>
+    </div>
   );
 }
 
