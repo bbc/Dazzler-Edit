@@ -69,7 +69,7 @@ export class Episode extends React.Component {
     );
   }
 
-  handleChangePage = (event, page) => {
+  handleChangePage = (_event, page) => {
     this.setState({ page: parseInt(page) });
   };
 
@@ -77,8 +77,8 @@ export class Episode extends React.Component {
     this.setState({ page: 0, rowsPerPage: parseInt(event.target.value) });
   };
 
-  onPageLoaded = (page, rowsPerPage, totalRows) => {
-    this.setState({ totalRows});
+  onPageLoaded = (_page, _rowsPerPage, totalRows) => {
+    this.setState({totalRows});
   };
 
   render() {
@@ -100,7 +100,7 @@ export class Episode extends React.Component {
               <EpisodeList
                 sid={this.props.sid} availability={this.props.availability}
                 page={this.state.page} rowsPerPage={this.state.rowsPerPage}
-                onPageChange={this.onPageLoaded}
+                onPageLoaded={this.onPageLoaded}
                 onAddClicked={this.props.handleClick}
               />
               <TableFooter>
