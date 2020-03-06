@@ -29,10 +29,20 @@ class AssetDao {
       });
   }
 
-  static getEpisodes(sid, availability, page, rowsPerPage, cb) {
-    const url = `${URLPrefix}/api/v1/episode?sid=${sid}&page=${page}&page_size=${rowsPerPage}&availability=${availability}`;
-    console.log('getEpisodes', url);
-    axios.get(url)
+  static getEpisodes(
+    sid,
+    availability,
+    page,
+    rowsPerPage,
+    cb,
+    sort,
+    sort_direction
+  ) {
+    var sort_direction = sort_direction == "desc" ? "descending" : "ascending";
+    const url = `${URLPrefix}/api/v1/episode?sid=${sid}&page=${page}&page_size=${rowsPerPage}&availability=${availability}&sort=${sort}&sort_direction=${sort_direction}`;
+    console.log("getEpisodes", url);
+    axios
+      .get(url)
       .then(cb)
       .catch(e => {
         console.log(url);

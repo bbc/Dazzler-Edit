@@ -8,77 +8,86 @@ import TableCell from "@material-ui/core/TableCell";
 import AssetDao from "../AssetDao/AssetDao";
 
 function formattedDuration(clip) {
-    const duration = moment.duration(
-      clip.available_versions.version[0].duration
-    );
-    return duration.format("hh:mm:ss", { trim: false });
+  const duration = moment.duration(clip.available_versions.version[0].duration);
+  return duration.format("hh:mm:ss", { trim: false });
 }
 
 export default function EpisodeList({
   sid,
   availability,
   page = 0,
-  rowsPerPage=5,
+  rowsPerPage = 5,
   onAddClicked = function() {
-    console.log('add clicked');
+    console.log("add clicked");
   },
   onPageLoaded = function(page, rowsPerPage, total) {
     console.log("page changed", page, rowsPerPage, total);
-  }
+  },
+  sort,
+  sort_direction
 }) {
   const [currentPage, setCurrentPage] = React.useState(-1);
   const [currentRowsPerPage, setCurrentRowsPerPage] = React.useState(5);
+  const [currentSortDirection, setcurrentSortDirection] = React.useState(
+    "desc"
+  );
   const [rows, setRows] = React.useState([]);
 
   // statements in the body of the function are called on rendering!!!
 
-  if(page === currentPage && rowsPerPage === currentRowsPerPage) {
+  if (
+    page === currentPage &&
+    rowsPerPage === currentRowsPerPage &&
+    sort_direction == currentSortDirection
+  ) {
     console.log("episodelist no change", page, rowsPerPage);
   } else {
     console.log("episodelist fetching", page, rowsPerPage);
     AssetDao.getEpisodes(
-        sid,
-        availability,
-        page + 1, // nitro is one-based
-        rowsPerPage,
-        response => {
-            let items = response.data.items;
-            console.log("updated", items);
-            let total = response.data.total;
-            console.log("got episode data for", availability);
-            setRows(items);
-            onPageLoaded(currentPage, currentRowsPerPage, total);
-        }
+      sid,
+      availability,
+      page + 1, // nitro is one-based
+      rowsPerPage,
+      response => {
+        let items = response.data.items;
+        console.log("updated", items);
+        let total = response.data.total;
+        console.log("got episode data for", availability);
+        setRows(items);
+        onPageLoaded(currentPage, currentRowsPerPage, total);
+      },
+      sort,
+      sort_direction
     );
     setCurrentPage(page);
     setCurrentRowsPerPage(rowsPerPage);
+    setcurrentSortDirection(sort_direction);
   }
 
   return (
     <TableBody>
-    {rows.map(row => (
+      {rows.map(row => (
         <TableRow key={row.pid} className={row.insertionType}>
-        <TableCell component="th" scope="row">
+          <TableCell component="th" scope="row">
             <div className="tooltip">
-            {" "}
-            {row.title === undefined
-                ? row.presentation_title
-                : row.title}
-            <span className="tooltiptext">PID = {row.pid}</span>
+              {" "}
+              {row.title === undefined ? row.presentation_title : row.title}
+              <span className="tooltiptext">PID = {row.pid}</span>
             </div>
-        </TableCell>
-        <TableCell align="right">
-            {formattedDuration(row)}
-        </TableCell>
-        <TableCell align="right">
-          <button className="ui compact icon button"
-            onClick={() => {onAddClicked(AssetDao.episode2Item(row));} }
-          >
-            <i className="plus icon"></i>
-          </button>
-        </TableCell>
-      </TableRow>
-    ))}
+          </TableCell>
+          <TableCell align="right">{formattedDuration(row)}</TableCell>
+          <TableCell align="right">
+            <button
+              className="ui compact icon button"
+              onClick={() => {
+                onAddClicked(AssetDao.episode2Item(row));
+              }}
+            >
+              <i className="plus icon"></i>
+            </button>
+          </TableCell>
+        </TableRow>
+      ))}
     </TableBody>
   );
 }

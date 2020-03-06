@@ -253,8 +253,11 @@ async function clip(q, query, res) {
 app.get("/api/v1/episode", async (req, res, next) => {
   let q = {
     mixin: ["images", "available_versions"],
-    entity_type: "episode"
+    entity_type: "episode",
+    sort: req.query.sort,
+    sort_direction: req.query.sort_direction
   };
+
   if (req.query.hasOwnProperty("sid")) {
     q.master_brand = config[req.query.sid].mid;
   }
