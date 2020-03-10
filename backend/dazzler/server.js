@@ -314,7 +314,7 @@ app.post("/api/v1/loop", async function(req, res) {
     }
     var params = {
       Body: req.body,
-      Bucket: process.env.PLAY_BUCKET,
+      Bucket: process.env.BUCKET,
       Key: `${sid}/emergency-playlist.json`
     };
     try {
