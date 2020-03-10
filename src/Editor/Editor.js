@@ -506,7 +506,6 @@ class Editor extends React.Component {
                   <Button
                     onClick={() => {
                       this.setState({ refresh: this.state.refresh + 1 });
-                      alert("UPDATED");
                     }}
                     variant="contained"
                     color="primary"

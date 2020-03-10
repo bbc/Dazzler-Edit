@@ -28,7 +28,13 @@ export const styles = theme => ({
 });
 
 const headCells = [
-  { id: "title", numeric: false, disablePadding: true, label: "Title" }
+  { id: "title", numeric: false, disablePadding: true, label: "Title" },
+  {
+    id: "release_date",
+    numeric: false,
+    disablePadding: true,
+    label: "Release Date"
+  }
 ];
 
 /*
@@ -129,8 +135,7 @@ export class Episode extends React.Component {
                       </TableSortLabel>
                     </TableCell>
                   ))}
-
-                  <TableCell>Add</TableCell>
+                  <TableCell>Duration</TableCell>
                 </TableRow>
               </TableHead>
               <EpisodeList

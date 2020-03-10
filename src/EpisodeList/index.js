@@ -75,6 +75,7 @@ export default function EpisodeList({
               <span className="tooltiptext">PID = {row.pid}</span>
             </div>
           </TableCell>
+          <TableCell align="right">{row.release_date}</TableCell>
           <TableCell align="right">{formattedDuration(row)}</TableCell>
           <TableCell align="right">
             <button

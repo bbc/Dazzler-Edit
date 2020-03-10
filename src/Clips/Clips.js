@@ -128,7 +128,7 @@ export class Clips extends React.Component {
                     </TableCell>
                   ))}
 
-                  <TableCell>Add</TableCell>
+                  <TableCell>Duration</TableCell>
                 </TableRow>
               </TableHead>
               <ClipList
