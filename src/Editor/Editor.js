@@ -2,6 +2,8 @@ import React from "react";
 import PropTypes from "prop-types";
 import classNames from "classnames";
 import { Box } from "@material-ui/core";
+import RefreshIcon from "@material-ui/icons/Refresh";
+import Button from "@material-ui/core/Button";
 import ExpansionPanel from "@material-ui/core/ExpansionPanel";
 import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
 import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
@@ -153,6 +155,7 @@ class Editor extends React.Component {
       panelShow: null,
       loop: [],
       loopDuration: moment.duration(),
+      refresh: 0,
       user: { name: "anonymous", auth: true }
     };
   }
@@ -374,7 +377,11 @@ class Editor extends React.Component {
       type: "application/json"
     });
     element.href = URL.createObjectURL(file);
-    element.download = services[this.state.schedule.sid].name+' '+this.state.user.name+" Loop.json";
+    element.download =
+      services[this.state.schedule.sid].name +
+      " " +
+      this.state.user.name +
+      " Loop.json";
     document.body.appendChild(element); // Required for this to work in FireFox
     element.click();
   }
@@ -496,8 +503,19 @@ class Editor extends React.Component {
                     control={<Radio color="primary" />}
                     label="Schedule"
                   />
+                  <Button
+                    onClick={() => {
+                      this.setState({ refresh: this.state.refresh + 1 });
+                    }}
+                    variant="contained"
+                    color="primary"
+                    size="small"
+                    className={classes.button}
+                    startIcon={<RefreshIcon />}
+                  ></Button>
                 </RadioGroup>
               </FormControl>
+
               <ExpansionPanel>
                 <ExpansionPanelSummary
                   expandIcon={<ExpandMoreIcon />}

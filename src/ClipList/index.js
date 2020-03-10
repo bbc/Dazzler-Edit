@@ -12,9 +12,9 @@ function formattedDuration(clip) {
   return duration.format("hh:mm:ss", { trim: false });
 }
 
-export default function EpisodeList({
+export default function ClipList({
   sid,
-  availability,
+  type,
   page = 0,
   rowsPerPage = 5,
   onAddClicked = function() {
@@ -28,6 +28,7 @@ export default function EpisodeList({
 }) {
   const [currentPage, setCurrentPage] = React.useState(-1);
   const [currentRowsPerPage, setCurrentRowsPerPage] = React.useState(5);
+  const [currentType, setcurrentType] = React.useState("web");
   const [currentSortDirection, setcurrentSortDirection] = React.useState(
     "desc"
   );
@@ -38,21 +39,22 @@ export default function EpisodeList({
   if (
     page === currentPage &&
     rowsPerPage === currentRowsPerPage &&
-    sort_direction == currentSortDirection
+    sort_direction == currentSortDirection &&
+    type == currentType
   ) {
-    console.log("episodelist no change", page, rowsPerPage);
+    console.log("cliplist no change", page, rowsPerPage);
   } else {
-    console.log("episodelist fetching", page, rowsPerPage);
-    AssetDao.getEpisodes(
+    console.log("cliplist fetching", page, rowsPerPage);
+    AssetDao.getClips(
       sid,
-      availability,
-      page + 1, // nitro is one-based
+      type,
+      page, // nitro is one-based
       rowsPerPage,
       response => {
         let items = response.data.items;
         console.log("updated", items);
         let total = response.data.total;
-        console.log("got episode data for", availability);
+        console.log("got clip data for", type);
         setRows(items);
         onPageLoaded(currentPage, currentRowsPerPage, total);
       },
@@ -62,6 +64,7 @@ export default function EpisodeList({
     setCurrentPage(page);
     setCurrentRowsPerPage(rowsPerPage);
     setcurrentSortDirection(sort_direction);
+    setcurrentType(type);
   }
 
   return (
@@ -75,13 +78,12 @@ export default function EpisodeList({
               <span className="tooltiptext">PID = {row.pid}</span>
             </div>
           </TableCell>
-          <TableCell align="right">{row.release_date}</TableCell>
           <TableCell align="right">{formattedDuration(row)}</TableCell>
           <TableCell align="right">
             <button
               className="ui compact icon button"
               onClick={() => {
-                onAddClicked(AssetDao.episode2Item(row));
+                onAddClicked(AssetDao.clip2Item(row));
               }}
             >
               <i className="plus icon"></i>
@@ -93,7 +95,7 @@ export default function EpisodeList({
   );
 }
 
-EpisodeList.propTypes = {
+ClipList.propTypes = {
   page: PropTypes.func.isRequired,
   rowsPerPage: PropTypes.func.isRequired
 };

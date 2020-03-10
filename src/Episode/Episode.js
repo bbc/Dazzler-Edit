@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
 import TableHead from "@material-ui/core/TableHead";
+import TableSortLabel from "@material-ui/core/TableSortLabel";
 import TableCell from "@material-ui/core/TableCell";
 import TableFooter from "@material-ui/core/TableFooter";
 import TablePagination from "@material-ui/core/TablePagination";
@@ -26,10 +27,20 @@ export const styles = theme => ({
   }
 });
 
+const headCells = [
+  { id: "title", numeric: false, disablePadding: true, label: "Title" },
+  {
+    id: "release_date",
+    numeric: false,
+    disablePadding: true,
+    label: "Release Date"
+  }
+];
+
 /*
- * Note: material-ui TablePagination is zero based. 
+ * Note: material-ui TablePagination is zero based.
  * Nitro and therefore our current API is one based.
-*/
+ */
 
 export class Episode extends React.Component {
   constructor(props) {
@@ -42,15 +53,21 @@ export class Episode extends React.Component {
       page: 0, // zero based current page
       rowsPerPage: 5,
       sid: "",
-      date: moment().utc().format()
+      orderBy: "title",
+      order: "desc",
+      date: moment()
+        .utc()
+        .format()
     };
   }
 
   onPageChange = (page, rowsPerPage, totalRows) => {
     this.setState({
-      page, rowsPerPage, totalRows
+      page,
+      rowsPerPage,
+      totalRows
     });
-  }
+  };
 
   componentDidMount = () => {
     this.setState({
@@ -69,6 +86,13 @@ export class Episode extends React.Component {
     );
   }
 
+  handleSort = cell => {
+    this.setState({
+      order: this.state.order == "asc" ? "desc" : "asc",
+      orderBy: cell
+    });
+  };
+
   handleChangePage = (_event, page) => {
     this.setState({ page: parseInt(page) });
   };
@@ -78,12 +102,12 @@ export class Episode extends React.Component {
   };
 
   onPageLoaded = (_page, _rowsPerPage, totalRows) => {
-    this.setState({totalRows});
+    this.setState({ totalRows });
   };
 
   render() {
     const { classes } = this.props;
-    let { rowsPerPage, page, totalRows } = this.state;
+    let { rowsPerPage, page, totalRows, order, orderBy } = this.state;
 
     return (
       <div>
@@ -92,16 +116,37 @@ export class Episode extends React.Component {
             <Table className={classes.table}>
               <TableHead>
                 <TableRow>
-                  <TableCell>Title</TableCell>
+                  {headCells.map(headCell => (
+                    <TableCell
+                      key={headCell.id}
+                      align={headCell.numeric ? "right" : "left"}
+                      padding={headCell.disablePadding ? "none" : "default"}
+                      order={orderBy === headCell.id ? order : false}
+                    >
+                      <TableSortLabel
+                        active={orderBy === headCell.id}
+                        direction={orderBy === headCell.id ? order : "desc"}
+                        onClick={() => {
+                          this.handleSort(headCell.id);
+                        }}
+                        // onClick={createSortHandler(headCell.id)}
+                      >
+                        {headCell.label}
+                      </TableSortLabel>
+                    </TableCell>
+                  ))}
                   <TableCell>Duration</TableCell>
-                  <TableCell>Add</TableCell>
                 </TableRow>
               </TableHead>
               <EpisodeList
-                sid={this.props.sid} availability={this.props.availability}
-                page={this.state.page} rowsPerPage={this.state.rowsPerPage}
+                sid={this.props.sid}
+                availability={this.props.availability}
+                page={this.state.page}
+                rowsPerPage={this.state.rowsPerPage}
                 onPageLoaded={this.onPageLoaded}
                 onAddClicked={this.props.handleClick}
+                sort={orderBy}
+                sort_direction={order}
               />
               <TableFooter>
                 <TableRow>

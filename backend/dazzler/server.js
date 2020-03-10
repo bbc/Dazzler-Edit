@@ -192,7 +192,10 @@ app.get("/api/v1/special", async (req, res) => {
 });
 
 app.get("/api/v1/clip", async (req, res) => {
-  let q = {};
+  let q = {
+    sort: req.query.sort,
+    sort_direction: req.query.sort_direction
+  };
   let sid = default_sid;
   if (req.query.sid) {
     sid = req.query.sid;
@@ -253,8 +256,11 @@ async function clip(q, query, res) {
 app.get("/api/v1/episode", async (req, res, next) => {
   let q = {
     mixin: ["images", "available_versions"],
-    entity_type: "episode"
+    entity_type: "episode",
+    sort: req.query.sort,
+    sort_direction: req.query.sort_direction
   };
+
   if (req.query.hasOwnProperty("sid")) {
     q.master_brand = config[req.query.sid].mid;
   }
@@ -297,21 +303,31 @@ app.get("/api/v1/episode", async (req, res, next) => {
 });
 
 app.post("/api/v1/loop", async function(req, res) {
-  let sid = default_sid;
-  if (req.query.sid) {
-    sid = req.query.sid;
+  if (req.header("sslclientcertsubject")) {
+    const subject = parseSSLsubject(req);
+    user = subject.emailAddress;
   }
-  var params = {
-    Body: req.body,
-    Bucket: process.env.PLAY_BUCKET,
-    Key: `${sid}/emergency-playlist.json`
-  };
-  try {
-    let s3Response = await s3.putObject(params).promise();
-    res.send("saved");
-  } catch (e) {
-    console.log("error ", e);
-    res.status(404).send("error");
+  if (auth(user)) {
+    let sid = default_sid;
+    if (req.query.sid) {
+      sid = req.query.sid;
+    }
+    var params = {
+      Body: req.body,
+      Bucket: process.env.BUCKET,
+      Key: `${sid}/emergency-playlist.json`
+    };
+    try {
+      let s3Response = await s3.putObject(params).promise();
+      res.send("saved");
+    } catch (e) {
+      console.log("error ", e);
+      res.status(404).send("error");
+    }
+  } else {
+    const message = user + " is not authorised to save schedules";
+    console.log(message);
+    res.status(403).send(message);
   }
 });
 

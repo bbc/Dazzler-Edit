@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
 import TableHead from "@material-ui/core/TableHead";
-import TableBody from "@material-ui/core/TableBody";
+import TableSortLabel from "@material-ui/core/TableSortLabel";
 import TableCell from "@material-ui/core/TableCell";
 import TableFooter from "@material-ui/core/TableFooter";
 import TablePagination from "@material-ui/core/TablePagination";
@@ -11,9 +11,8 @@ import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import moment from "moment";
 import "moment-duration-format";
-// import Spinner from "../Spinner/Spinner";
 import { TablePaginationActionsWrapped } from "../TablePaginationActions/TablePaginationActions";
-import AssetDao from "../AssetDao/AssetDao";
+import ClipList from "../ClipList";
 
 export const styles = theme => ({
   root: {
@@ -28,21 +27,39 @@ export const styles = theme => ({
   }
 });
 
+const headCells = [
+  { id: "title", numeric: false, disablePadding: true, label: "Title" }
+];
+
+/*
+ * Note: material-ui TablePagination is zero based.
+ * Nitro and therefore our current API is one based.
+ */
+
 export class Clips extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
+      spinner: false,
       totalRows: 0,
       rows: [],
-      page: 0,
-      previousPage: -1,
+      page: 0, // zero based current page
       rowsPerPage: 5,
-      data: [],
       sid: "",
-      type: "web"
+      type: "web",
+      orderBy: "title",
+      order: "desc"
     };
   }
+
+  onPageChange = (page, rowsPerPage, totalRows) => {
+    this.setState({
+      page,
+      rowsPerPage,
+      totalRows
+    });
+  };
 
   componentDidMount = () => {
     this.setState({
@@ -52,73 +69,38 @@ export class Clips extends React.Component {
   };
 
   componentDidUpdate(prevProps) {
-    //console.log("update %s page %d -> %d", this.state.type, this.state.previousPage, this.state.page);
-    let reload = false;
-    if (this.state.sid !== prevProps.sid) {
-      reload = true;
-    }
-    if (this.state.type !== prevProps.type) {
-      reload = true;
-    }
-    if (this.state.page !== this.state.previousPage) reload = true;
-    if (reload) {
-      //console.log("have page %d want page %d", this.state.previousPage, this.state.page);
-      AssetDao.getClips(
-        this.props.sid,
-        this.props.type,
-        this.state.page,
-        this.state.rowsPerPage,
-        response => {
-          let new_page = 0;
-          if (response.data.hasOwnProperty("page")) {
-            new_page = response.data.page - 1;
-          }
-          this.setState({
-            previousPage: new_page,
-            page: new_page,
-            rows: response.data.items,
-            totalRows: response.data.total
-          });
-        }
-      );
-    }
+    console.log(
+      "Clips: %s %s want page %d items per page %d",
+      this.props.sid,
+      this.props.availability,
+      this.state.page,
+      this.state.rowsPerPage
+    );
   }
 
-  handleChangePage = (event, page) => {
-    this.setState({ page });
+  handleSort = cell => {
+    this.setState({
+      order: this.state.order == "asc" ? "desc" : "asc",
+      orderBy: cell
+    });
+  };
+
+  handleChangePage = (_event, page) => {
+    this.setState({ page: parseInt(page) });
   };
 
   handleChangeRowsPerPage = event => {
-    this.setState({ page: 0, rowsPerPage: event.target.value });
+    this.setState({ page: 0, rowsPerPage: parseInt(event.target.value) });
   };
 
-  formattedDuration(clip) {
-    const duration = moment.duration(
-      clip.available_versions.version[0].duration
-    );
-    return duration.format("hh:mm:ss", { trim: false });
-  }
-
-  addButton(clip) {
-    return (
-      <button
-        className="ui compact icon button"
-        onClick={() => {
-          this.props.handleClick(AssetDao.clip2Item(clip));
-        }}
-      >
-        <i className="plus icon"></i>
-      </button>
-    );
-  }
+  onPageLoaded = (_page, _rowsPerPage, totalRows) => {
+    this.setState({ totalRows });
+  };
 
   render() {
     const { classes } = this.props;
-    const { rows, rowsPerPage, page, totalRows } = this.state;
-    let emptyRows = 0;
-    if (rows.length < rowsPerPage) {
-      emptyRows = rowsPerPage - rows.length;
-    }
+    let { rowsPerPage, page, totalRows, order, orderBy } = this.state;
+
     return (
       <div>
         <Paper className={classes.root}>
@@ -126,37 +108,39 @@ export class Clips extends React.Component {
             <Table className={classes.table}>
               <TableHead>
                 <TableRow>
-                  <TableCell>Title</TableCell>
+                  {headCells.map(headCell => (
+                    <TableCell
+                      key={headCell.id}
+                      align={headCell.numeric ? "right" : "left"}
+                      padding={headCell.disablePadding ? "none" : "default"}
+                      order={orderBy === headCell.id ? order : false}
+                    >
+                      <TableSortLabel
+                        active={orderBy === headCell.id}
+                        direction={orderBy === headCell.id ? order : "desc"}
+                        onClick={() => {
+                          this.handleSort(headCell.id);
+                        }}
+                        // onClick={createSortHandler(headCell.id)}
+                      >
+                        {headCell.label}
+                      </TableSortLabel>
+                    </TableCell>
+                  ))}
+
                   <TableCell>Duration</TableCell>
-                  <TableCell>Add</TableCell>
                 </TableRow>
               </TableHead>
-              <TableBody>
-                {rows.map(row => (
-                  <TableRow key={row.pid}>
-                    <TableCell component="th" scope="row">
-                      <div className="tooltip">
-                        {" "}
-                        {row.title}
-                        <span className="tooltiptext">PID = {row.pid}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell align="right">
-                      {this.formattedDuration(row)}
-                    </TableCell>
-
-                    <TableCell align="right">{this.addButton(row)}</TableCell>
-                  </TableRow>
-                ))}
-                {/*Array.from(Array(emptyRows)).map((val, index) =>(
-                <TableRow key={index+rows.length}>
-                    <TableCell colSpan={6} />
-                  </TableRow>
-                ))*/}
-                <TableRow height={48 * emptyRows} key={rows.length}>
-                  <TableCell colSpan={6} />
-                </TableRow>
-              </TableBody>
+              <ClipList
+                sid={this.props.sid}
+                type={this.props.type}
+                page={this.state.page}
+                rowsPerPage={this.state.rowsPerPage}
+                onPageLoaded={this.onPageLoaded}
+                onAddClicked={this.props.handleClick}
+                sort={orderBy}
+                sort_direction={order}
+              />
               <TableFooter>
                 <TableRow>
                   <TablePagination
@@ -181,10 +165,7 @@ export class Clips extends React.Component {
 }
 
 Clips.propTypes = {
-  classes: PropTypes.object.isRequired,
-  type: PropTypes.string.isRequired,
-  sid: PropTypes.string.isRequired,
-  handleClick: PropTypes.func.isRequired
+  classes: PropTypes.object.isRequired
 };
 
 export default withStyles(styles)(Clips);
