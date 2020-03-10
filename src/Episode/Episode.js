@@ -54,7 +54,7 @@ export class Episode extends React.Component {
       rowsPerPage: 5,
       sid: "",
       orderBy: "title",
-      order: "desc",
+      order: "asc",
       date: moment()
         .utc()
         .format()

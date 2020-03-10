@@ -49,7 +49,7 @@ export class Clips extends React.Component {
       sid: "",
       type: "web",
       orderBy: "title",
-      order: "desc"
+      order: "asc"
     };
   }
 
