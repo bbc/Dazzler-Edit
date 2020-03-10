@@ -27,6 +27,10 @@ export const styles = theme => ({
   }
 });
 
+const headCells = [
+  { id: "title", numeric: false, disablePadding: true, label: "Title" }
+];
+
 /*
  * Note: material-ui TablePagination is zero based.
  * Nitro and therefore our current API is one based.
@@ -96,9 +100,6 @@ export class Episode extends React.Component {
   };
 
   render() {
-    const headCells = [
-      { id: "title", numeric: false, disablePadding: true, label: "Title" }
-    ];
     const { classes } = this.props;
     let { rowsPerPage, page, totalRows, order, orderBy } = this.state;
 

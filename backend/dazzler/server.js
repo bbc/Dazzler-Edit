@@ -192,7 +192,10 @@ app.get("/api/v1/special", async (req, res) => {
 });
 
 app.get("/api/v1/clip", async (req, res) => {
-  let q = {};
+  let q = {
+    sort: req.query.sort,
+    sort_direction: req.query.sort_direction
+  };
   let sid = default_sid;
   if (req.query.sid) {
     sid = req.query.sid;

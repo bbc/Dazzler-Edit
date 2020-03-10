@@ -4,6 +4,7 @@ import { withStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
 import TableHead from "@material-ui/core/TableHead";
 import TableBody from "@material-ui/core/TableBody";
+import TableSortLabel from "@material-ui/core/TableSortLabel";
 import TableCell from "@material-ui/core/TableCell";
 import TableFooter from "@material-ui/core/TableFooter";
 import TablePagination from "@material-ui/core/TablePagination";
@@ -28,6 +29,10 @@ export const styles = theme => ({
   }
 });
 
+const headCells = [
+  { id: "title", numeric: false, disablePadding: true, label: "Title" }
+];
+
 export class Clips extends React.Component {
   constructor(props) {
     super(props);
@@ -40,7 +45,9 @@ export class Clips extends React.Component {
       rowsPerPage: 5,
       data: [],
       sid: "",
-      type: "web"
+      type: "web",
+      orderBy: "title",
+      order: "desc"
     };
   }
 
@@ -60,7 +67,11 @@ export class Clips extends React.Component {
     if (this.state.type !== prevProps.type) {
       reload = true;
     }
+    // if (this.state.order !== prevProps.order) {
+    //   reload = true;
+    // }
     if (this.state.page !== this.state.previousPage) reload = true;
+    if (this.state.so !== this.state.previousPage) reload = true;
     if (reload) {
       //console.log("have page %d want page %d", this.state.previousPage, this.state.page);
       AssetDao.getClips(
@@ -79,10 +90,19 @@ export class Clips extends React.Component {
             rows: response.data.items,
             totalRows: response.data.total
           });
-        }
+        },
+        this.state.orderBy,
+        this.state.order
       );
     }
   }
+
+  handleSort = cell => {
+    this.setState({
+      order: this.state.order == "asc" ? "desc" : "asc",
+      orderBy: cell
+    });
+  };
 
   handleChangePage = (event, page) => {
     this.setState({ page });
@@ -114,7 +134,7 @@ export class Clips extends React.Component {
 
   render() {
     const { classes } = this.props;
-    const { rows, rowsPerPage, page, totalRows } = this.state;
+    const { rows, rowsPerPage, page, totalRows, order, orderBy } = this.state;
     let emptyRows = 0;
     if (rows.length < rowsPerPage) {
       emptyRows = rowsPerPage - rows.length;
@@ -126,8 +146,25 @@ export class Clips extends React.Component {
             <Table className={classes.table}>
               <TableHead>
                 <TableRow>
-                  <TableCell>Title</TableCell>
-                  <TableCell>Duration</TableCell>
+                  {headCells.map(headCell => (
+                    <TableCell
+                      key={headCell.id}
+                      align={headCell.numeric ? "right" : "left"}
+                      padding={headCell.disablePadding ? "none" : "default"}
+                      order={orderBy === headCell.id ? order : false}
+                    >
+                      <TableSortLabel
+                        active={orderBy === headCell.id}
+                        direction={orderBy === headCell.id ? order : "desc"}
+                        onClick={() => {
+                          this.handleSort(headCell.id);
+                        }}
+                        // onClick={createSortHandler(headCell.id)}
+                      >
+                        {headCell.label}
+                      </TableSortLabel>
+                    </TableCell>
+                  ))}
                   <TableCell>Add</TableCell>
                 </TableRow>
               </TableHead>

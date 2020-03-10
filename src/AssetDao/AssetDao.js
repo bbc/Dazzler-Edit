@@ -5,12 +5,12 @@ const URLPrefix =
   process.env.NODE_ENV === "development" ? "http://localhost:8080" : "";
 
 class AssetDao {
-  static getClips(sid, type, page, rowsPerPage, cb) {
+  static getClips(sid, type, page, rowsPerPage, cb, sort, sort_direction) {
+    var sort_direction = sort_direction == "desc" ? "descending" : "ascending";
+    const url = `${URLPrefix}/api/v1/clip?sid=${sid}&type=${type}&page=${page +
+      1}&page_size=${rowsPerPage}&sort=${sort}&sort_direction=${sort_direction}`;
     axios
-      .get(
-        `${URLPrefix}/api/v1/clip?sid=${sid}&type=${type}&page=${page +
-          1}&page_size=${rowsPerPage}`
-      )
+      .get(url)
       .then(cb)
       .catch(e => {
         console.log(e);
