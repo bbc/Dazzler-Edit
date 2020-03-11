@@ -28,6 +28,7 @@ w13xttz9
 
 const config = {
   bbc_hindi_tv: {
+    serviceIDRef: "TVHIND01",
     mid: "bbc_hindi_tv",
     loop_collection: "p0845svx",
     specials_collection: "p0845sqf",
@@ -41,6 +42,7 @@ const config = {
     ]
   },
   bbc_marathi_tv: {
+    serviceIDRef: "TVMAR01",
     mid: "bbc_marathi_tv",
     loop_collection: "p0510sbc",
     specials_collection: "p0715nv4",
@@ -332,7 +334,12 @@ app.post("/api/v1/loop", async function(req, res) {
 });
 
 app.post("/api/v1/tva", async (req, res) => {
-  if (req.body.includes('serviceIDRef="TVMAR01')) {
+  let sid = default_sid;
+  if (req.query.sid) {
+    sid = req.query.sid;
+  }
+
+  if (req.body.includes(`serviceIDRef="${config[sid].serviceIDRef}"`)) {
     let user = "dazzler"; // assume local
     if (req.header("sslclientcertsubject")) {
       const subject = parseSSLsubject(req);

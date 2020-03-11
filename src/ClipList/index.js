@@ -45,6 +45,7 @@ export default function ClipList({
     console.log("cliplist no change", page, rowsPerPage);
   } else {
     console.log("cliplist fetching", page, rowsPerPage);
+
     AssetDao.getClips(
       sid,
       type,
