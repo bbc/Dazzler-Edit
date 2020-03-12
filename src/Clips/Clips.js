@@ -28,7 +28,8 @@ export const styles = theme => ({
 });
 
 const headCells = [
-  { id: "title", numeric: false, disablePadding: true, label: "Title" }
+  { id: "title", numeric: false, disablePadding: true, label: "Title" },
+  { id: "pid", numeric: false, disablePadding: true, label: "Latest" }
 ];
 
 /*

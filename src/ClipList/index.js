@@ -79,6 +79,7 @@ export default function ClipList({
               <span className="tooltiptext">PID = {row.pid}</span>
             </div>
           </TableCell>
+          <TableCell align="right">{row.pid}</TableCell>
           <TableCell align="right">{formattedDuration(row)}</TableCell>
           <TableCell align="right">
             <button
