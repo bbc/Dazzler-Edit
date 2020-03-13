@@ -53,7 +53,7 @@ export default function ClipList({
       rowsPerPage,
       response => {
         let items = response.data.items;
-        console.log("updated", items);
+        console.log("update", items);
         let total = response.data.total;
         console.log("got clip data for", type);
         setRows(items);
@@ -78,6 +78,9 @@ export default function ClipList({
               {row.title === undefined ? row.presentation_title : row.title}
               <span className="tooltiptext">PID = {row.pid}</span>
             </div>
+          </TableCell>
+          <TableCell align="right">
+            {moment(row.updated_time).format("DD-MM-YYYY")}
           </TableCell>
           <TableCell align="right">{formattedDuration(row)}</TableCell>
           <TableCell align="right">
