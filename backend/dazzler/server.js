@@ -305,6 +305,7 @@ app.get("/api/v1/episode", async (req, res, next) => {
 });
 
 app.post("/api/v1/loop", async function(req, res) {
+  let user = "dazzler"; // assume local
   if (req.header("sslclientcertsubject")) {
     const subject = parseSSLsubject(req);
     user = subject.emailAddress;
@@ -320,7 +321,7 @@ app.post("/api/v1/loop", async function(req, res) {
       Key: `${sid}/emergency-playlist.json`
     };
     try {
-      let s3Response = await s3.putObject(params).promise();
+      await s3.putObject(params).promise();
       res.send("saved");
     } catch (e) {
       console.log("error ", e);
