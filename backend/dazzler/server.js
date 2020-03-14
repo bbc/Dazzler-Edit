@@ -194,15 +194,20 @@ app.get("/api/v1/special", async (req, res) => {
 });
 
 app.get("/api/v1/clip", async (req, res) => {
-  let q = {
-    sort: req.query.sort,
-    sort_direction: req.query.sort_direction
-  };
   let sid = default_sid;
   if (req.query.sid) {
     sid = req.query.sid;
   }
-  if (req.query.hasOwnProperty("type")) {
+  const q = {};
+  if (req.query.sort) {
+    q.sort = req.query.sort;
+    if (req.query.sort_direction) {
+      q.sort_direction = req.query.sort_direction;
+    } else {
+      q.sort_direction = 'descending';
+    }
+  }
+  if (req.query.type) {
     if (req.query.type === "web") {
       q.tag_name = config[sid].clip_language;
     } else {
@@ -258,24 +263,29 @@ async function clip(q, query, res) {
 app.get("/api/v1/episode", async (req, res, next) => {
   let q = {
     mixin: ["images", "available_versions"],
-    entity_type: "episode",
-    sort: req.query.sort,
-    sort_direction: req.query.sort_direction
+    entity_type: "episode"
   };
-
-  if (req.query.hasOwnProperty("sid")) {
+  if (req.query.sort) {
+    q.sort = req.query.sort;
+    if (req.query.sort_direction) {
+      q.sort_direction = req.query.sort_direction;
+    } else {
+      q.sort_direction = 'descending';
+    }
+  }
+  if (req.query.sid) {
     q.master_brand = config[req.query.sid].mid;
   }
-  if (req.query.hasOwnProperty("pid")) {
+  if (req.query.pid) {
     q.pid = req.query.pid;
   }
-  if (req.query.hasOwnProperty("page")) {
+  if (req.query.page) {
     q.page = req.query.page;
   }
-  if (req.query.hasOwnProperty("page_size")) {
+  if (req.query.page_size) {
     q.page_size = req.query.page_size;
   }
-  if (req.query.hasOwnProperty("availability")) {
+  if (req.query.availability) {
     q.availability = req.query.availability;
   } else {
     q.availability = "available";
