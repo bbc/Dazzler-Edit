@@ -260,6 +260,10 @@ async function clip(q, query, res) {
   }
 }
 
+/*
+ available in appw is has actual start and now between start and end
+*/
+
 app.get("/api/v1/episode", async (req, res, next) => {
   let q = {
     mixin: ["images", "available_versions"],
@@ -445,3 +449,4 @@ function parseSSLsubject(req) {
 
 // We do the "listen" call in index.js - making this module easier to test
 module.exports.app = app;
+module.exports.config = config;
