@@ -29,8 +29,11 @@ export default function usePushNotifications() {
       setLoading(true);
       setError(false);
       registerServiceWorker().then((r) => {
-        console.log('sw', r);
+        console.log('service worked registered', r);
         setLoading(false);
+        setTimeout(() => {
+          alert('sw');
+        }, 3000);
       });
     }
   }, []);
@@ -86,7 +89,7 @@ export default function usePushNotifications() {
         console.log(subscription);
       })
       .catch(err => {
-        console.error("Couldn't create the notification subscription", err, "name:", err.name, "message:", err.message, "code:", err.code);
+        console.error(err.message, "name:", err.name, "code:", err.code);
         setError(err);
         setLoading(false);
       });

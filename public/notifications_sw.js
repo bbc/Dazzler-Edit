@@ -12,15 +12,27 @@ async function addToPage(payload) {
   }
 }
 
-self.addEventListener('install', function(event) {
-     /*
+self.addEventListener('install', event => {
+  console.log('SW installing…');
+
+  // cache a cat SVG
   event.waitUntil(
-    caches.open(currentCacheName).then(function(cache) {
-      return cache.addAll(arrayOfFilesToCache);
-    })
+    caches.open('static-v1').then(cache => cache.add('/favicon.ico'))
   );
-    */
-   console.log('sw install');
+});
+
+self.addEventListener('activate', event => {
+  console.log('SW now ready to handle notifications!');
+});
+
+self.addEventListener('fetch', event => {
+  const url = new URL(event.request.url);
+
+  // serve the cat SVG from the cache if the request is
+  // same-origin and the path is '/dog.svg'
+  if (url.origin == location.origin && url.pathname === '/dog.svg') {
+    event.respondWith(caches.match('/cat.svg'));
+  }
 });
 
 self.addEventListener('push', event => {

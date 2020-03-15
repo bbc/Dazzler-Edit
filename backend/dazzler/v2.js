@@ -120,7 +120,7 @@ const episode = async (req, res) => {
   }
   try {
     const answer = await ax.post(
-      'https://localhost:8443/episode/_search',
+      `https://${process.env.ES_HOST}/episode/_search`,
       data,
       params
     );

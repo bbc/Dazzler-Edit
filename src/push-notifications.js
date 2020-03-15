@@ -1,5 +1,5 @@
 
-const pushServerPublicKey = "BLpTsaEAy-BGQnkZ1DeFYYNS6EH1gWP-cP49n9NmbWtjkSVMJQjj-wVI0tapfsK7Ju9r0VQz7jpE9kf8BETAdns";
+const pushServerPublicKey = process.env.VAPID_PUBLIC_KEY;
 
 /**
  * checks if Push notification and service workers are supported by your browser
@@ -27,7 +27,7 @@ function sendNotification() {
  *
  */
 function registerServiceWorker() {
-  return navigator.serviceWorker.register("/sw.js");
+  return navigator.serviceWorker.register("/notifications_sw.js");
 }
 
 /**
