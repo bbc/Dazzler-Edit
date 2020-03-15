@@ -1,16 +1,11 @@
 import React from "react";
 import PropTypes from "prop-types";
-import moment from "moment";
-import "moment-duration-format";
 import TableBody from "@material-ui/core/TableBody";
 import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
+import moment from "moment";
+import "moment-duration-format";
 import AssetDao from "../AssetDao/AssetDao";
-
-function formattedDuration(clip) {
-  const duration = moment.duration(clip.available_versions.version[0].duration);
-  return duration.format("hh:mm:ss", { trim: false });
-}
 
 export default function EpisodeList({
   sid,
@@ -50,10 +45,8 @@ export default function EpisodeList({
       rowsPerPage,
       sort,
       sort_direction,
-      response => {
-        let items = response.data.items;
+      (items, total) => {
         console.log("updated", items);
-        let total = response.data.total;
         console.log("got episode data for", availability);
         setRows(items);
         onPageLoaded(currentPage, currentRowsPerPage, total);
@@ -71,17 +64,19 @@ export default function EpisodeList({
           <TableCell component="th" scope="row">
             <div className="tooltip">
               {" "}
-              {row.title === undefined ? row.presentation_title : row.title}
+              {row.title}
               <span className="tooltiptext">PID = {row.pid}</span>
             </div>
           </TableCell>
           <TableCell align="right">{row.release_date}</TableCell>
-          <TableCell align="right">{formattedDuration(row)}</TableCell>
+          <TableCell align="right">{
+            moment.duration(row.duration).format("hh:mm:ss", { trim: false })
+            }</TableCell>
           <TableCell align="right">
             <button
               className="ui compact icon button"
               onClick={() => {
-                onAddClicked(AssetDao.episode2Item(row));
+                onAddClicked(row);
               }}
             >
               <i className="plus icon"></i>

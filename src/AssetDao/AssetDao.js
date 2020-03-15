@@ -29,6 +29,16 @@ class AssetDao {
       });
   }
 
+  // The EpisodeList class uses the following fields:
+  //    pid, insertionType, title, presentation_title, release_date, 
+  //    available_versions.version[0].duration
+  //
+  // downstream processors use the item type which has the following fields:
+  //
+  //    pid, vpid, versionCrid, insertionType, live, duration, title
+  //
+  //    so we just need to add release_date and we can use items everywhere
+
   static getEpisodes(
     sid,
     availability,
@@ -42,7 +52,13 @@ class AssetDao {
     const url = `${URLPrefix}/api/v1/episode?sid=${sid}&page=${page}&page_size=${rowsPerPage}&availability=${availability}&sort=${sort}&sort_direction=${sort_direction}`;
     axios
       .get(url)
-      .then(cb)
+      .then((response) => {
+        const items = [];
+        response.data.items.forEach((item) => {
+          items.push(this.episode2Item(item));
+        });
+        cb(items, response.data.total);
+      })
       .catch(e => {
         console.log(url);
         console.log(e);
@@ -63,11 +79,16 @@ class AssetDao {
   }
 
   static episode2Item(episode) {
-    const item = this.clip2Item(episode);
-    if (!item.title) {
-      item.title = episode.presentation_title;
-    }
-    return item;
+    const version = episode.available_versions.version[0]; // TODO pick a version
+    return {
+      title: episode.title || episode.presentation_title,
+      duration: moment.duration(version.duration).toISOString(),
+      live: false,
+      insertionType: "",
+      versionCrid: version.crid,
+      pid: episode.pid,
+      vpid: version.pid
+    };
   }
 
   static getLoop() {}
