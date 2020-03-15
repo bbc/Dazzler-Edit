@@ -38,7 +38,7 @@ export default function EpisodeList({
   if (
     page === currentPage &&
     rowsPerPage === currentRowsPerPage &&
-    sort_direction == currentSortDirection
+    sort_direction === currentSortDirection
   ) {
     console.log("episodelist no change", page, rowsPerPage);
   } else {

@@ -9,8 +9,6 @@ import TableFooter from "@material-ui/core/TableFooter";
 import TablePagination from "@material-ui/core/TablePagination";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
-import moment from "moment";
-import "moment-duration-format";
 import { TablePaginationActionsWrapped } from "../TablePaginationActions/TablePaginationActions";
 import ClipList from "../ClipList";
 
@@ -81,7 +79,7 @@ export class Clips extends React.Component {
 
   handleSort = cell => {
     this.setState({
-      order: this.state.order == "asc" ? "desc" : "asc",
+      order: this.state.order === "asc" ? "desc" : "asc",
       orderBy: cell
     });
   };

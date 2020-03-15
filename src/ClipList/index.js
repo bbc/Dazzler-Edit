@@ -39,8 +39,8 @@ export default function ClipList({
   if (
     page === currentPage &&
     rowsPerPage === currentRowsPerPage &&
-    sort_direction == currentSortDirection &&
-    type == currentType
+    sort_direction === currentSortDirection &&
+    type === currentType
   ) {
     console.log("cliplist no change", page, rowsPerPage);
   } else {

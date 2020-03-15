@@ -88,7 +88,7 @@ export class Episode extends React.Component {
 
   handleSort = cell => {
     this.setState({
-      order: this.state.order == "asc" ? "desc" : "asc",
+      order: this.state.order === "asc" ? "desc" : "asc",
       orderBy: cell
     });
   };
