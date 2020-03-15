@@ -5,13 +5,20 @@ const URLPrefix =
   process.env.NODE_ENV === "development" ? "http://localhost:8080" : "";
 
 class AssetDao {
+
   static getClips(sid, type, page, rowsPerPage, sort, direction, cb) {
     var sort_direction = direction === "desc" ? "descending" : "ascending";
     const url = `${URLPrefix}/api/v1/clip?sid=${sid}&type=${type}&page=${page +
       1}&page_size=${rowsPerPage}&sort=${sort}&sort_direction=${sort_direction}`;
     axios
       .get(url)
-      .then(cb)
+      .then((response) => {
+        const items = [];
+        response.data.items.forEach((clip) => {
+          items.push(this.clip2Item(clip));
+        });
+        cb(items, response.data.total);
+      })
       .catch(e => {
         console.log(e);
       });
@@ -23,21 +30,17 @@ class AssetDao {
         `${URLPrefix}/api/v1/special?sid=${sid}&page=${page +
           1}&page_size=${rowsPerPage}`
       )
-      .then(cb)
+      .then((response) => {
+        const items = [];
+        response.data.items.forEach((clip) => {
+          items.push(this.clip2Item(clip));
+        });
+        cb(items, response.data.total);
+      })
       .catch(e => {
         console.log(e);
       });
   }
-
-  // The EpisodeList class uses the following fields:
-  //    pid, insertionType, title, presentation_title, release_date, 
-  //    available_versions.version[0].duration
-  //
-  // downstream processors use the item type which has the following fields:
-  //
-  //    pid, vpid, versionCrid, insertionType, live, duration, title
-  //
-  //    so we just need to add release_date and we can use items everywhere
 
   static getEpisodes(
     sid,
@@ -54,8 +57,17 @@ class AssetDao {
       .get(url)
       .then((response) => {
         const items = [];
-        response.data.items.forEach((item) => {
-          items.push(this.episode2Item(item));
+        response.data.items.forEach((episode) => {
+          const version = episode.available_versions.version[0]; // TODO pick a version
+          items.push({
+            title: episode.title || episode.presentation_title,
+            duration: moment.duration(version.duration).toISOString(),
+            live: false,
+            insertionType: "",
+            versionCrid: version.crid,
+            pid: episode.pid,
+            vpid: version.pid
+          });
         });
         cb(items, response.data.total);
       })
@@ -74,19 +86,6 @@ class AssetDao {
       insertionType: "",
       versionCrid: version.crid,
       pid: clip.pid,
-      vpid: version.pid
-    };
-  }
-
-  static episode2Item(episode) {
-    const version = episode.available_versions.version[0]; // TODO pick a version
-    return {
-      title: episode.title || episode.presentation_title,
-      duration: moment.duration(version.duration).toISOString(),
-      live: false,
-      insertionType: "",
-      versionCrid: version.crid,
-      pid: episode.pid,
       vpid: version.pid
     };
   }

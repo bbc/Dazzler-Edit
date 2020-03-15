@@ -10,8 +10,6 @@ import TablePagination from "@material-ui/core/TablePagination";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import {TablePaginationActionsWrapped} from "../TablePaginationActions/TablePaginationActions";
-import moment from "moment";
-import 'moment-duration-format';
 import AssetDao from "../AssetDao/AssetDao";
 
 export const styles = theme => ({
@@ -54,16 +52,11 @@ export class Specials extends React.Component {
         this.state.sid,
         this.state.page,
         this.state.rowsPerPage,
-        response => {
-          let new_page = 0;
-          if(response.data.hasOwnProperty('page')) {
-            new_page = response.data.page - 1;
-          }
+        (items, total) => {
+          console.log("updated specials", items);
           this.setState({ 
-            previousPage: new_page,
-            page: new_page,
-            rows: response.data.items,
-            totalRows: response.data.total
+            rows: items,
+            totalRows: total
           });
       });
     }
@@ -76,13 +69,6 @@ export class Specials extends React.Component {
   handleChangeRowsPerPage = event => {
     this.setState({ page: 0, rowsPerPage: event.target.value });
   };
-
-  formattedDuration(clip) {
-    const duration = moment.duration(
-      clip.available_versions.version[0].duration
-    );
-    return duration.format('hh:mm:ss', {trim:false});
-  }
 
   addButton(clip) {
     return (
@@ -120,9 +106,7 @@ export class Specials extends React.Component {
                     <TableCell component="th" scope="row">
                       <div className="tooltip">
                         {" "}
-                        {row.title === undefined
-                          ? row.presentation_title
-                          : row.title}
+                        {row.title}
                         <span className="tooltiptext">PID = {row.pid}</span>
                       </div>
                     </TableCell>
