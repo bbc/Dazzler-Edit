@@ -154,6 +154,15 @@ const episode = async (req, res) => {
 module.exports = {
   init(app, configObject) {
     config = configObject;
-    app.get("/api/v2/episode", episode);
+    // app.get("/api/v1/user", user);
+    // app.get("/api/v1/schedule", schedule);
+    // app.get("/api/v1/broadcast", broadcast);
+    // app.get("/api/v1/webcast", webcast);
+    // app.get("/api/v1/loop", loop);
+    // app.get("/api/v1/special", special);
+    // app.get("/api/v1/clip", clip);
+    app.get("/api/v1/episode", episode);
+    // app.post("/api/v1/loop", loop);
+    // app.post("/api/v1/tva", tva);
   }
 }
