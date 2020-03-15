@@ -10,7 +10,7 @@ import TablePagination from "@material-ui/core/TablePagination";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import {TablePaginationActionsWrapped} from "../TablePaginationActions/TablePaginationActions";
-import AssetDao from "../AssetDao/AssetDao";
+import AssetDao from "../AssetDaoV1";
 
 export const styles = theme => ({
   root: {

@@ -5,7 +5,7 @@ import "moment-duration-format";
 import TableBody from "@material-ui/core/TableBody";
 import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
-import AssetDao from "../AssetDao/AssetDao";
+import AssetDao from "../AssetDaoV1";
 
 export default function ClipList({
   sid,

@@ -52,21 +52,17 @@ class AssetDao {
     cb
   ) {
     var sort_direction = direction === "desc" ? "descending" : "ascending";
-    const url = `${URLPrefix}/api/v1/episode?sid=${sid}&page=${page}&page_size=${rowsPerPage}&availability=${availability}&sort=${sort}&sort_direction=${sort_direction}`;
+    const url = `${URLPrefix}/api/v2/episode?sid=${sid}&page=${page}&page_size=${rowsPerPage}&availability=${availability}&sort=${sort}&sort_direction=${sort_direction}`;
     axios
       .get(url)
       .then((response) => {
+        console.log('episode DAO', response);
         const items = [];
         response.data.items.forEach((episode) => {
-          const version = episode.available_versions.version[0]; // TODO pick a version
           items.push({
-            title: episode.title || episode.presentation_title,
-            duration: moment.duration(version.duration).toISOString(),
+            ...episode,
             live: false,
-            insertionType: "",
-            versionCrid: version.crid,
-            pid: episode.pid,
-            vpid: version.pid
+            insertionType: ""
           });
         });
         cb(items, response.data.total);

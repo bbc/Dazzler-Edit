@@ -5,7 +5,7 @@ import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
 import moment from "moment";
 import "moment-duration-format";
-import AssetDao from "../AssetDao/AssetDao";
+import AssetDao from "../AssetDaoV2";
 
 export default function EpisodeList({
   sid,
