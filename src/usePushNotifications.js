@@ -8,8 +8,8 @@ import {
     getUserSubscription
   } from "./push-notifications";
 
+// first thing to do: check if the push notifications are supported by the browser
 const pushNotificationSupported = isPushNotificationSupported();
-//first thing to do: check if the push notifications are supported by the browser
 
 export default function usePushNotifications() {
   const [userConsent, setSuserConsent] = useState(Notification.permission);
@@ -28,7 +28,8 @@ export default function usePushNotifications() {
     if (pushNotificationSupported) {
       setLoading(true);
       setError(false);
-      registerServiceWorker().then(() => {
+      registerServiceWorker().then((r) => {
+        console.log('sw', r);
         setLoading(false);
       });
     }
@@ -75,13 +76,14 @@ export default function usePushNotifications() {
    * define a click handler that creates a push notification subscription.
    * Once the subscription is created, it uses the setUserSubscription hook
    */
-  const onClickSusbribeToPushNotification = () => {
+  const onClickSubscribeToPushNotification = () => {
     setLoading(true);
     setError(false);
     createNotificationSubscription()
-      .then(function(subscrition) {
-        setUserSubscription(subscrition);
+      .then(function(subscription) {
+        setUserSubscription(subscription);
         setLoading(false);
+        console.log(subscription);
       })
       .catch(err => {
         console.error("Couldn't create the notification subscription", err, "name:", err.name, "message:", err.message, "code:", err.code);
@@ -105,7 +107,7 @@ export default function usePushNotifications() {
    */
   return {
     onClickAskUserPermission,
-    onClickSusbribeToPushNotification,
+    onClickSubscribeToPushNotification,
     onClickSendSubscriptionToPushServer,
     pushServerSubscriptionId,
     userConsent,

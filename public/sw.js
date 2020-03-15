@@ -1,29 +1,35 @@
-/* eslint-disable no-undef */
 /* eslint-disable no-restricted-globals */
-function receivePushNotification(event) {
-    console.log("[Service Worker] Push Received.");
-  
-    const { image, tag, url, title, text } = event.data.json();
-  
-    const options = {
-      data: url,
-      body: text,
-      icon: image,
-      vibrate: [200, 100, 200],
-      tag: tag,
-      image: image,
-      badge: "https://dazzler.tools.bbc.co.uk/favicon.ico",
-      actions: [{ action: "Detail", title: "View", icon: "https://via.placeholder.com/128/ff0000" }]
-    };
-    event.waitUntil(self.registration.showNotification(title, options));
+/* eslint-disable no-undef */
+async function addToPage(payload) {
+  let windowClients = await clients.matchAll({ type: 'window', includeUncontrolled: true });
+  let client = undefined;
+  for (let i = 0; i < windowClients.length; i++) {
+    client = windowClients[i];
+    break; // what if there is more than one? add to each?
   }
-  
-  function openPushNotification(event) {
-    console.log("[Service Worker] Notification click Received.", event.notification.data);
-    
-    event.notification.close();
-    event.waitUntil(clients.openWindow(event.notification.data));
+  if (client) {
+    client.postMessage(payload);
   }
-  
-  self.addEventListener("push", receivePushNotification);
-  self.addEventListener("notificationclick", openPushNotification);
+}
+
+self.addEventListener('install', function(event) {
+     /*
+  event.waitUntil(
+    caches.open(currentCacheName).then(function(cache) {
+      return cache.addAll(arrayOfFilesToCache);
+    })
+  );
+    */
+   console.log('sw install');
+});
+
+self.addEventListener('push', event => {
+  const payload = JSON.parse(event.data.text());
+  const notify = async () => {
+    await addToPage(payload);
+    self.registration.showNotification('Dazzler', {
+      body: payload.msg
+    });
+  };
+  event.waitUntil(notify());
+});

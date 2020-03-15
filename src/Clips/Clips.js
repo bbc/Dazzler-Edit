@@ -111,7 +111,7 @@ export class Clips extends React.Component {
                       key={headCell.id}
                       align={headCell.numeric ? "right" : "left"}
                       padding={headCell.disablePadding ? "none" : "default"}
-                      order={orderBy === headCell.id ? order : false}
+                      order={orderBy === headCell.id ? order : ""}
                     >
                       <TableSortLabel
                         active={orderBy === headCell.id}

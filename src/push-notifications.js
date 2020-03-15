@@ -1,5 +1,5 @@
 
-const pushServerPublicKey = "";
+const pushServerPublicKey = "BLpTsaEAy-BGQnkZ1DeFYYNS6EH1gWP-cP49n9NmbWtjkSVMJQjj-wVI0tapfsK7Ju9r0VQz7jpE9kf8BETAdns";
 
 /**
  * checks if Push notification and service workers are supported by your browser
