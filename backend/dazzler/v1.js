@@ -240,6 +240,12 @@ const episode = async (req, res, next) => {
 }
 
 const loop = async function(req, res) {
+  let q = {
+    group: config[req.query.sid].loop_collection,
+    sort: "group_position",
+    sort_direction: "ascending"
+  };
+  await getClip(q, req.query, res);
 }
 
 const saveEmergencyPlayList = async function(req, res) {
