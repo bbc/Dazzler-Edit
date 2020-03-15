@@ -240,6 +240,9 @@ const episode = async (req, res, next) => {
 }
 
 const loop = async function(req, res) {
+}
+
+const saveEmergencyPlayList = async function(req, res) {
   let user = "dazzler"; // assume local
   if (req.header("sslclientcertsubject")) {
     const subject = parseSSLsubject(req);
@@ -373,7 +376,7 @@ module.exports = {
     app.get("/api/v1/special", special);
     app.get("/api/v1/clip", clip);
     app.get("/api/v1/episode", episode);
-    app.post("/api/v1/loop", loop);
+    app.post("/api/v1/loop", saveEmergencyPlayList);
     app.post("/api/v1/tva", tva);
   }
 }
