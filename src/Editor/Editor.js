@@ -2,8 +2,6 @@ import React from "react";
 import PropTypes from "prop-types";
 import classNames from "classnames";
 import { Box } from "@material-ui/core";
-import RefreshIcon from "@material-ui/icons/Refresh";
-import Button from "@material-ui/core/Button";
 import ExpansionPanel from "@material-ui/core/ExpansionPanel";
 import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
 import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
@@ -34,6 +32,7 @@ import Loop from "../Loop/Loop";
 import PlatformDao from "../PlatformDao/PlatformDao";
 import { fetchSchedule, saveSchedule } from "../ScheduleDao/ScheduleDao";
 import TimeDisplay from "../TimeDisplay";
+import RefreshAndNotifications from "../RefreshAndNotifications";
 
 const drawerWidth = 240;
 
@@ -503,16 +502,7 @@ class Editor extends React.Component {
                     control={<Radio color="primary" />}
                     label="Schedule"
                   />
-                  <Button
-                    onClick={() => {
-                      this.setState({ refresh: this.state.refresh + 1 });
-                    }}
-                    variant="contained"
-                    color="primary"
-                    size="small"
-                    className={classes.button}
-                    startIcon={<RefreshIcon />}
-                  ></Button>
+                  <RefreshAndNotifications buttonClass={classes.button}/>
                 </RadioGroup>
               </FormControl>
 

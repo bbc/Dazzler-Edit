@@ -175,7 +175,7 @@ class Loop extends React.Component {
                   this.props.onUpload(e);
                 }}
               />
-              <label for="files">
+              <label htmlFor="files">
                 <i className="upload icon"></i>
                 <Typography>Upload Loop </Typography>
               </label>

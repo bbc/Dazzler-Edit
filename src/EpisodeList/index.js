@@ -89,6 +89,6 @@ export default function EpisodeList({
 }
 
 EpisodeList.propTypes = {
-  page: PropTypes.func.isRequired,
-  rowsPerPage: PropTypes.func.isRequired
+  page: PropTypes.number.isRequired,
+  rowsPerPage: PropTypes.number.isRequired
 };

@@ -95,6 +95,6 @@ export default function ClipList({
 }
 
 ClipList.propTypes = {
-  page: PropTypes.func.isRequired,
-  rowsPerPage: PropTypes.func.isRequired
+  page: PropTypes.number.isRequired,
+  rowsPerPage: PropTypes.number.isRequired
 };
