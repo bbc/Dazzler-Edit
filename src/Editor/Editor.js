@@ -140,9 +140,7 @@ class Editor extends React.Component {
     this.state = {
       schedule: new ScheduleObject(
         "bbc_hindi_tv",
-        moment()
-          .utc()
-          .startOf("day")
+        moment().utc().startOf("day")
       ),
       mode: "loop",
       scheduleInsertionPoint: 1,
@@ -154,7 +152,6 @@ class Editor extends React.Component {
       panelShow: null,
       loop: [],
       loopDuration: moment.duration(),
-      refresh: 0,
       user: { name: "anonymous", auth: true }
     };
   }

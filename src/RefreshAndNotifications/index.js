@@ -1,4 +1,4 @@
-import React from "react";
+import { React, useState } from "react";
 import RefreshIcon from "@material-ui/icons/Refresh";
 import Button from "@material-ui/core/Button";
 import usePushNotifications from "../usePushNotifications";
@@ -15,9 +15,12 @@ export default function RefreshAndNotifications(buttonClass) {
         error,
         loading
     } = usePushNotifications();
+    
+    const [refresh, setRefresh] = useState(0);
+
     return <Button
         onClick={() => {
-            this.setState({ refresh: this.state.refresh + 1 });
+            setRefresh(refresh+1);
         }}
         variant="contained"
         color="primary"
