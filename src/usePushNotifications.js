@@ -18,7 +18,6 @@ export default function usePushNotifications() {
   const [userSubscription, setUserSubscription] = useState(null);
   //to manage the use push notification subscription
   const [pushServerSubscriptionId, setPushServerSubscriptionId] = useState();
-  console.log('dummy', setPushServerSubscriptionId);
   //to manage the push server subscription
   const [error, setError] = useState(null);
   //to manage errors
@@ -92,8 +91,8 @@ export default function usePushNotifications() {
   };
 
   /**
-   * define a click handler that sends the push susbcribtion to the push server.
-   * Once the subscription ics created on the server, it saves the id using the hook setPushServerSubscriptionId
+   * define a click handler that sends the push subscription to the push server.
+   * Once the subscription is created on the server, it saves the id using the hook setPushServerSubscriptionId
    */
   const onClickSendSubscriptionToPushServer = () => {
     setLoading(true);

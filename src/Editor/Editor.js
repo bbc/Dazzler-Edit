@@ -130,6 +130,7 @@ class Editor extends React.Component {
     this.handleDrawerClose = this.handleDrawerClose.bind(this);
     this.handleDateChange = this.handleDateChange.bind(this);
     this.handleChangeMode = this.handleChangeMode.bind(this);
+    this.handleRefresh = this.handleRefresh.bind(this);
     this.savePlaylist = this.savePlaylist.bind(this);
     this.clearSchedule = this.clearSchedule.bind(this);
     this.reloadSchedule = this.reloadSchedule.bind(this);
@@ -152,7 +153,8 @@ class Editor extends React.Component {
       panelShow: null,
       loop: [],
       loopDuration: moment.duration(),
-      user: { name: "anonymous", auth: true }
+      user: { name: "anonymous", auth: true },
+      side: false
     };
   }
 
@@ -163,6 +165,10 @@ class Editor extends React.Component {
   }
 
   componentDidUpdate(prevProps) {}
+
+  handleRefresh = event => {
+    this.setState({ side: this.state.side?false:true });
+  };
 
   handleChangeMode = event => {
     this.setState({ mode: event.target.value });
@@ -499,7 +505,10 @@ class Editor extends React.Component {
                     control={<Radio color="primary" />}
                     label="Schedule"
                   />
-                  <RefreshAndNotifications buttonClass={classes.button}/>
+                  <RefreshAndNotifications
+                    buttonClass={classes.button}
+                    onRefresh={this.handleRefresh}
+                  />
                 </RadioGroup>
               </FormControl>
 
@@ -531,6 +540,7 @@ class Editor extends React.Component {
                 </ExpansionPanelSummary>
                 <ExpansionPanelDetails>
                   <Episode
+                    flip={this.state.side}
                     availability="available"
                     sid={this.state.schedule.sid}
                     handleClick={this.handleAddClipOrEpisode}

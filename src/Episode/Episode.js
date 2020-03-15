@@ -146,7 +146,8 @@ export class Episode extends React.Component {
                 onPageLoaded={this.onPageLoaded}
                 onAddClicked={this.props.handleClick}
                 sort={orderBy}
-                sort_direction={order}
+                sortDirection={order}
+                flip={this.props.flip}
               />
               <TableFooter>
                 <TableRow>

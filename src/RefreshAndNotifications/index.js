@@ -1,9 +1,15 @@
-import { React, useState } from "react";
+import React from "react";
 import RefreshIcon from "@material-ui/icons/Refresh";
 import Button from "@material-ui/core/Button";
 import usePushNotifications from "../usePushNotifications";
 
-export default function RefreshAndNotifications(buttonClass) {
+export default function RefreshAndNotifications({
+    buttonClass, 
+    onRefresh = function() {
+        console.log("refresh clicked");
+    }
+}) {
+    
     const {
         userConsent,
         pushNotificationSupported,
@@ -16,11 +22,9 @@ export default function RefreshAndNotifications(buttonClass) {
         loading
     } = usePushNotifications();
     
-    const [refresh, setRefresh] = useState(0);
-
     return <Button
         onClick={() => {
-            setRefresh(refresh+1);
+            onRefresh();
         }}
         variant="contained"
         color="primary"

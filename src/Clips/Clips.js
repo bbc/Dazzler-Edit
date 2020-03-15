@@ -69,9 +69,8 @@ export class Clips extends React.Component {
 
   componentDidUpdate(prevProps) {
     console.log(
-      "Clips: %s %s want page %d items per page %d",
+      "Clips: %s want page %d items per page %d",
       this.props.sid,
-      this.props.availability,
       this.state.page,
       this.state.rowsPerPage
     );

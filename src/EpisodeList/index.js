@@ -9,31 +9,32 @@ import AssetDao from "../AssetDaoV2";
 
 export default function EpisodeList({
   sid,
-  availability,
+  availability = 'available',
   page = 0,
   rowsPerPage = 5,
+  sort = 'title',
+  sortDirection = 'desc',
+  flip = false,
   onAddClicked = function() {
     console.log("add clicked");
   },
   onPageLoaded = function(page, rowsPerPage, total) {
     console.log("page changed", page, rowsPerPage, total);
-  },
-  sort,
-  sort_direction
+  }
 }) {
-  const [currentPage, setCurrentPage] = React.useState(-1);
+  const [currentPage, setCurrentPage] = React.useState(0);
   const [currentRowsPerPage, setCurrentRowsPerPage] = React.useState(5);
-  const [currentSortDirection, setcurrentSortDirection] = React.useState(
-    "desc"
-  );
+  const [currentSortDirection, setcurrentSortDirection] = React.useState("desc");
   const [rows, setRows] = React.useState([]);
+  const [side, setSide] = React.useState(true);
 
   // statements in the body of the function are called on rendering!!!
 
   if (
-    page === currentPage &&
-    rowsPerPage === currentRowsPerPage &&
-    sort_direction === currentSortDirection
+    flip === side
+    && page === currentPage
+    && rowsPerPage === currentRowsPerPage
+    && sortDirection === currentSortDirection
   ) {
     console.log("episodelist no change", page, rowsPerPage);
   } else {
@@ -44,7 +45,7 @@ export default function EpisodeList({
       page + 1, // nitro is one-based
       rowsPerPage,
       sort,
-      sort_direction,
+      sortDirection,
       (items, total) => {
         console.log("updated", items);
         console.log("got episode data for", availability);
@@ -54,7 +55,8 @@ export default function EpisodeList({
     );
     setCurrentPage(page);
     setCurrentRowsPerPage(rowsPerPage);
-    setcurrentSortDirection(sort_direction);
+    setcurrentSortDirection(sortDirection);
+    setSide(flip);
   }
 
   return (
