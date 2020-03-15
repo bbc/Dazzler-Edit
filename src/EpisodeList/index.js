@@ -48,6 +48,8 @@ export default function EpisodeList({
       availability,
       page + 1, // nitro is one-based
       rowsPerPage,
+      sort,
+      sort_direction,
       response => {
         let items = response.data.items;
         console.log("updated", items);
@@ -55,9 +57,7 @@ export default function EpisodeList({
         console.log("got episode data for", availability);
         setRows(items);
         onPageLoaded(currentPage, currentRowsPerPage, total);
-      },
-      sort,
-      sort_direction
+      }
     );
     setCurrentPage(page);
     setCurrentRowsPerPage(rowsPerPage);

@@ -51,6 +51,8 @@ export default function ClipList({
       type,
       page, // nitro is one-based
       rowsPerPage,
+      sort,
+      sort_direction,
       response => {
         let items = response.data.items;
         console.log("update", items);
@@ -58,9 +60,7 @@ export default function ClipList({
         console.log("got clip data for", type);
         setRows(items);
         onPageLoaded(currentPage, currentRowsPerPage, total);
-      },
-      sort,
-      sort_direction
+      }
     );
     setCurrentPage(page);
     setCurrentRowsPerPage(rowsPerPage);
