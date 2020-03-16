@@ -309,7 +309,8 @@ describe("ScheduleObject", () => {
 
     let index = 1;
     let pid = myScheduleObject.items[index].asset.pid;
-    myScheduleObject.deleteAllOccurencesClosingGap(pid);
+    let status = "deleteAll";
+    myScheduleObject.deleteAllOccurencesClosingGap(pid, index, status);
 
     //Our new items list should be less than our previous item list
     expect(myScheduleObject.items.length).toBeLessThan(loopItems.length);
@@ -317,6 +318,54 @@ describe("ScheduleObject", () => {
     expect(JSON.stringify(myScheduleObject.items).includes(pid)).toBeFalsy();
     expect(JSON.stringify(myScheduleObject.items)).toEqual(
       expect.not.stringContaining(pid)
+    );
+  });
+
+  test("Should delete all occurences of clip from index point and subsequent", () => {
+    let myScheduleObject = new ScheduleObject(
+      "bbc_hindi_tv",
+      moment("2020-01-21"),
+      loopItems
+    );
+
+    let index = 4;
+    let pid = myScheduleObject.items[index].asset.pid;
+    let status = "deleteAllNext";
+    myScheduleObject.deleteAllOccurencesClosingGap(pid, index, status);
+    let loopItemsLength = loopItems.length;
+
+    //Our new items list should be less than our previous item list
+    expect(myScheduleObject.items.length).toBe(loopItemsLength - 1);
+
+    /*The removed pid should still appear in our new item list, as we've removed
+    the second occurence, so the first should still exist */
+    expect(JSON.stringify(myScheduleObject.items).includes(pid)).toBeTruthy();
+    expect(JSON.stringify(myScheduleObject.items)).toEqual(
+      expect.stringContaining(pid)
+    );
+  });
+
+  test("Should delete all occurences of clip from index point and previous", () => {
+    let myScheduleObject = new ScheduleObject(
+      "bbc_hindi_tv",
+      moment("2020-01-21"),
+      loopItems
+    );
+
+    let index = 4;
+    let pid = myScheduleObject.items[index].asset.pid;
+    let status = "deleteAllPrev";
+    myScheduleObject.deleteAllOccurencesClosingGap(pid, index, status);
+    let loopItemsLength = loopItems.length;
+
+    //Our new items list should be less than our previous item list
+    expect(myScheduleObject.items.length).toBe(loopItemsLength - 1);
+
+    /*The removed pid should still appear in our new item list, as we've removed
+    the second occurence, so the first should still exist */
+    expect(JSON.stringify(myScheduleObject.items).includes(pid)).toBeTruthy();
+    expect(JSON.stringify(myScheduleObject.items)).toEqual(
+      expect.stringContaining(pid)
     );
   });
 
@@ -329,7 +378,7 @@ describe("ScheduleObject", () => {
 
     let index = 8;
     let pid = myScheduleObject.items[index].asset.pid;
-    myScheduleObject.deleteAllOccurencesClosingGap(pid);
+    myScheduleObject.deleteAllOccurencesClosingGap(pid, index, "deleteAll");
 
     //Our new items list should be the same length as our previous item list
     expect(myScheduleObject.items.length).toEqual(loopItems.length);
@@ -411,7 +460,6 @@ describe("ScheduleObject", () => {
     const index = 5;
     const originalLength = myScheduleObject.items.length;
 
-    console.log("PID", myScheduleObject.items[5].asset.pid);
     myScheduleObject.deleteItemClosingGap(index);
 
     //Insertion type should change from overlap to gap at the specified index
@@ -452,8 +500,9 @@ describe("ScheduleObject", () => {
 
     let index = 1;
     let pid = myScheduleObject.items[index].asset.pid;
+    let status = "deleteAll";
 
-    myScheduleObject.deleteAllOccurencesClosingGap(pid);
+    myScheduleObject.deleteAllOccurencesClosingGap(pid, index, status);
 
     // Only the sentinels should remain
     expect(myScheduleObject.items.length).toEqual(3);

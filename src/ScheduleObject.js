@@ -447,10 +447,24 @@ class ScheduleObject {
     return index;
   }
 
-  deleteAllOccurencesClosingGap(pid) {
-    let index;
+  deleteAllOccurencesClosingGap(pid, index, value) {
+    let start = 0;
+    let end = this.items.length;
+    switch (value) {
+      case "deleteAllPrev":
+        end = index + 1;
+        break;
+      case "deleteAllNext":
+        start = index;
+        break;
+      case "deleteAll":
+      default:
+        break;
+    }
+
     //Relying on length changing
-    for (let i = 0; i < this.items.length; i++) {
+
+    for (let i = start; i < end; i++) {
       if (
         this.items[i].asset &&
         this.items[i].asset.pid === pid &&
@@ -458,7 +472,14 @@ class ScheduleObject {
         this.items[i].insertionType !== "live"
       ) {
         index = this.deleteItemClosingGap(i);
+        end--;
         i--;
+        // if (value === "deleteAll") {
+        //   i--;
+        // } else {
+        //   end--;
+        // }
+        // end--;
       }
     }
     return index;
