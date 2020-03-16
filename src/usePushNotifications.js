@@ -55,17 +55,31 @@ export default function usePushNotifications() {
                     // use pushManger for subscribing here.
                     console.log("Just now activated. now we can subscribe for push notification")
                     // subscribeForPushNotification(reg);
+                    setLoading(true);
+                    setError(false);
+                    createNotificationSubscription()
+                      .then(function(subscription) {
+                        setUserSubscription(subscription);
+                        setLoading(false);
+                      })
+                      .catch(err => {
+                        console.error(err.message, "name:", err.name, "code:", err.code);
+                        setError(err);
+                        setLoading(false);
+                      });
+                } else {
+                  console.log('sw state not activated');
                 }
             });
         } else {
           console.log('SW problem, registration response is', reg);
         }
-  
-
         console.log('sw registered')
+        setLoading(false);
       })
       .catch((e) => {
         console.log(e);
+        setLoading(false);
       });
     }
   }, []);
