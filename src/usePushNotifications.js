@@ -29,14 +29,57 @@ export default function usePushNotifications() {
     if (pushNotificationSupported) {
       setLoading(true);
       setError(false);
-      registerServiceWorker().then((r) => {
+      registerServiceWorker("/notifications_sw.js")
+      .then((reg) => {
         setLoading(false);
-        setTimeout(() => {
-          console.log('here is a log from the service worker registration completion');
-        }, 500);
+        var serviceWorker;
+        if (reg.installing) {
+            serviceWorker = reg.installing;
+            console.log('Service worker installing');
+        } else if (reg.waiting) {
+            serviceWorker = reg.waiting;
+            console.log('Service worker installed & waiting');
+        } else if (reg.active) {
+            serviceWorker = reg.active;
+           console.log('Service worker active');
+        }
+        if (serviceWorker) {
+            console.log("sw current state", serviceWorker.state);
+            if (serviceWorker.state === "activated") {
+                //If push subscription wasnt done yet have to do here
+                console.log("sw already activated - Do whatever needed here");
+            }
+            serviceWorker.addEventListener("statechange", function(e) {
+                console.log("sw statechange : ", e.target.state);
+                if (e.target.state === "activated") {
+                    // use pushManger for subscribing here.
+                    console.log("Just now activated. now we can subscribe for push notification")
+                    // subscribeForPushNotification(reg);
+                }
+            });
+        } else {
+          console.log('SW problem, registration response is', reg);
+        }
+  
+
+        console.log('sw registered')
+      })
+      .catch((e) => {
+        console.log(e);
       });
     }
   }, []);
+
+/*
+  .then(
+  function (reg) {
+  },
+  function (err) {
+      console.error('unsuccessful registration with ', workerFileName, err);
+  }
+*/
+
+
   //if the push notifications are supported, registers the service worker
   //this effect runs only the first render
   
