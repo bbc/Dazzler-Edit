@@ -13,9 +13,9 @@ class PlatformDao {
         });
     }
 
-    static subscribe(userSubscription, cb, err) {
+    static subscribe(userSubscription, cb) {
         axios
-        .post(`${URLPrefix}/api/v1/subscribe`, userSubscription)
+        .post(`${URLPrefix}/api/v2/subscribe`, userSubscription)
         .then(response => cb(response))
         .catch(err => err(err)
         );
