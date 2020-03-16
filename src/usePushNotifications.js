@@ -21,6 +21,24 @@ export default function usePushNotifications() {
   const [loading, setLoading] = useState(true);
   //to manage async actions
 
+ function subscribe(serviceWorker) {
+    setLoading(true);
+    setError(false);
+    serviceWorker.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: process.env.VAPID_PUBLIC_KEY
+    })
+    .then((subscription) => {
+        setUserSubscription(subscription);
+        setLoading(false);
+    })
+    .catch((err) => {
+        console.error(err.message, "name:", err.name, "code:", err.code);
+        setError(err);
+        setLoading(false);
+    });
+  }
+
   useEffect(() => {
     if (pushNotificationSupported) {
       setLoading(true);
@@ -36,35 +54,16 @@ export default function usePushNotifications() {
             serviceWorker = reg.waiting;
             console.log('Service worker installed & waiting');
           } else if (reg.active) {
-            serviceWorker = reg.active;
             console.log('Service worker active');
+            subscribe(reg.active);
           }
           if (serviceWorker) {
             console.log("sw current state", serviceWorker.state);
-            if (serviceWorker.state === "activated") {
-              //If push subscription wasnt done yet have to do here
-              console.log("sw already activated - Do whatever needed here");
-            }
             serviceWorker.addEventListener("statechange", function (e) {
               console.log("sw statechange : ", e.target.state);
               if (e.target.state === "activated") {
                 // use pushManager for subscribing here.
                 console.log("Just now activated. now we can subscribe for push notification")
-                setLoading(true);
-                setError(false);
-                serviceWorker.pushManager.subscribe({
-                  userVisibleOnly: true,
-                  applicationServerKey: process.env.VAPID_PUBLIC_KEY
-                })
-                .then((subscription) => {
-                    setUserSubscription(subscription);
-                    setLoading(false);
-                })
-                .catch((err) => {
-                    console.error(err.message, "name:", err.name, "code:", err.code);
-                    setError(err);
-                    setLoading(false);
-                });
               } else {
                 console.log('sw state not activated');
               }
