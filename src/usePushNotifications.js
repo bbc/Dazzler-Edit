@@ -1,11 +1,9 @@
 import { useState, useEffect } from "react";
 import PlatformDao from "./PlatformDao/PlatformDao";
 
-import {
-  isPushNotificationSupported,
-  askUserPermission,
-  getUserSubscription
-} from "./push-notifications";
+function isPushNotificationSupported() {
+  return "serviceWorker" in navigator && "PushManager" in window;
+}
 
 // first thing to do: check if the push notifications are supported by the browser
 const pushNotificationSupported = isPushNotificationSupported();
@@ -84,31 +82,21 @@ export default function usePushNotifications() {
     }
   }, []);
 
-  /*
-    .then(
-    function (reg) {
-    },
-    function (err) {
-        console.error('unsuccessful registration with ', workerFileName, err);
-    }
-  */
-
-
   //if the push notifications are supported, registers the service worker
   //this effect runs only the first render
 
   useEffect(() => {
     setLoading(true);
     setError(false);
-    const getExistingSubscription = async () => {
-      const existingSubscription = await getUserSubscription();
-      setUserSubscription(existingSubscription);
-      setLoading(false);
-    };
-    getExistingSubscription();
+    navigator.serviceWorker.ready
+      .then((serviceWorker) => {
+        setUserSubscription(serviceWorker.pushManager.getSubscription());
+        setLoading(false);
+      })
+      .then(function(pushSubscription) {
+        return pushSubscription;
+      });
   }, []);
-  //Retrieve if there is any push notification subscription for the registered service worker
-  // this use effect runs only in the first render
 
   /**
    * define a click handler that asks the user permission,
@@ -118,7 +106,7 @@ export default function usePushNotifications() {
   const onClickAskUserPermission = () => {
     setLoading(true);
     setError(false);
-    askUserPermission().then(consent => {
+    Notification.requestPermission().then(consent => {
       setSuserConsent(consent);
       if (consent !== "granted") {
         setError({
