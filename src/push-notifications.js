@@ -37,13 +37,38 @@ function registerServiceWorker() {
  */
 async function createNotificationSubscription() {
   //wait for service worker installation to be ready
-  const serviceWorker = await navigator.serviceWorker.ready;
+  const serviceWorkerRegistration = await navigator.serviceWorker.ready;
   // subscribe and return the subscription
-  return await serviceWorker.pushManager.subscribe({
-    userVisibleOnly: true,
-    applicationServerKey: pushServerPublicKey
-  });
+  console.log('sw is ready');
+  try {
+     const pushSubscription = await serviceWorkerRegistration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: pushServerPublicKey
+    });  
+    console.log(pushSubscription.endpoint);
+    return pushSubscription;
+  } catch (e) {
+    console.log('error subscribing', e);
+  }
 }
+
+/*
+
+navigator.serviceWorker.ready.then(
+  function(serviceWorkerRegistration) {
+    var options = {
+      userVisibleOnly: true,
+      applicationServerKey: applicationServerKey
+    };
+    serviceWorkerRegistration.pushManager.subscribe(options).then(
+      function(pushSubscription) {
+        console.log(pushSubscription.endpoint);
+      }, function(error) {
+        console.log(error);
+      }
+    );
+  });
+*/
 
 /**
  * returns the subscription if present or nothing

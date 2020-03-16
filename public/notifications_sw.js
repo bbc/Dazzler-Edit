@@ -25,6 +25,7 @@ self.addEventListener('activate', event => {
   console.log('SW now ready to handle notifications!');
 });
 
+/* 
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
 
@@ -34,6 +35,8 @@ self.addEventListener('fetch', event => {
     event.respondWith(caches.match('/cat.svg'));
   }
 });
+
+*/
 
 self.addEventListener('push', event => {
   const payload = JSON.parse(event.data.text());
