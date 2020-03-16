@@ -1,0 +1,8 @@
+1 - have a cloudwatch alarm triggered on CPU
+2 - when this alarm CLEARs trigger a lambda
+3 - the lambda reads all the messages currently in the queue into a map of entity/pid/upsert|delete
+4 - for each item in the map it sends a synthesised S3 event to the WS-Appw-Input topic
+
+The result of this is that any updates that got missed will be re-triggered but with the latest values.
+
+Note - we don't need to read the message bodies - all the information we need is in the message attributes.

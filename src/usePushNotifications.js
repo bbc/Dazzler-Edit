@@ -21,14 +21,16 @@ export default function usePushNotifications() {
   const [loading, setLoading] = useState(true);
   //to manage async actions
 
- function subscribe(serviceWorker) {
+ function subscribe(pushManager) {
     setLoading(true);
     setError(false);
-    serviceWorker.pushManager.subscribe({
+    console.log('calling subscribe');
+    pushManager.subscribe({
       userVisibleOnly: true,
       applicationServerKey: process.env.VAPID_PUBLIC_KEY
     })
     .then((subscription) => {
+      console.log('subscription successful', subscription);
         setUserSubscription(subscription);
         setLoading(false);
     })
@@ -45,41 +47,22 @@ export default function usePushNotifications() {
       setError(false);
       navigator.serviceWorker.register("/notifications_sw.js", {scope: "/"})
         .then((reg) => {
-          setLoading(false);
-          var serviceWorker;
-          if (reg.installing) {
-            serviceWorker = reg.installing;
-            console.log('Service worker installing');
-          } else if (reg.waiting) {
-            serviceWorker = reg.waiting;
-            console.log('Service worker installed & waiting');
-          } else if (reg.active) {
-            console.log('Service worker active');
-            subscribe(reg.active);
-          }
-          if (serviceWorker) {
-            console.log("sw current state", serviceWorker.state);
-            serviceWorker.addEventListener("statechange", function (e) {
-              console.log("sw statechange : ", e.target.state);
-              if (e.target.state === "activated") {
-                // use pushManager for subscribing here.
-                console.log("Just now activated. now we can subscribe for push notification")
-              } else {
-                console.log('sw state not activated');
-              }
-            });
+          console.log('registered', reg);  
+          if(reg.active) {
+            console.log('zzz active', reg);
           } else {
-            console.log('SW problem, registration response is', reg);
+            console.log('not active');
+            reg.addEventListener("activate", (e) => {
+              console.log('xx', e);
+            });
           }
-          console.log('sw registered')
-          setLoading(false);
         })
         .catch((e) => {
           console.log(e);
           setLoading(false);
         });
     }
-  }, []);
+  }, [userSubscription]);
 
   //if the push notifications are supported, registers the service worker
   //this effect runs only the first render
@@ -89,8 +72,14 @@ export default function usePushNotifications() {
     setError(false);
     navigator.serviceWorker.ready
       .then((serviceWorker) => {
-        setUserSubscription(serviceWorker.pushManager.getSubscription());
-        setLoading(false);
+        serviceWorker.pushManager.getSubscription()
+        .then((x) => {
+          setUserSubscription(x);
+          setLoading(false);  
+        })
+        .catch((e) => {
+          console.log(e);
+        });
       })
       .then(function(pushSubscription) {
         return pushSubscription;
