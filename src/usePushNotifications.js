@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { subscribe } from "../PlatformDao";
 
 import {
     isPushNotificationSupported,
@@ -29,11 +30,10 @@ export default function usePushNotifications() {
       setLoading(true);
       setError(false);
       registerServiceWorker().then((r) => {
-        console.log('service worked registered', r);
         setLoading(false);
         setTimeout(() => {
-          alert('sw');
-        }, 3000);
+          console.log('here is a log from the service worker registration completion');
+        }, 500);
       });
     }
   }, []);
@@ -86,7 +86,6 @@ export default function usePushNotifications() {
       .then(function(subscription) {
         setUserSubscription(subscription);
         setLoading(false);
-        console.log(subscription);
       })
       .catch(err => {
         console.error(err.message, "name:", err.name, "code:", err.code);
@@ -102,7 +101,10 @@ export default function usePushNotifications() {
   const onClickSendSubscriptionToPushServer = () => {
     setLoading(true);
     setError(false);
-    console.log('this is where we will send a push subscription to the server');
+    subscribe(userSubscription, (response) => {
+      console.log(response);
+      setPushServerSubscriptionId('some random id');
+    });
   };
 
   /**

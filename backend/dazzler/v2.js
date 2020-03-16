@@ -151,6 +151,11 @@ const episode = async (req, res) => {
   }
 };
 
+const subscribe = async (req, res) => {
+  console.log(req.data);
+  res.json({id:"abc"});
+};
+
 module.exports = {
   init(app, configObject) {
     config = configObject;
@@ -164,5 +169,6 @@ module.exports = {
     app.get("/api/v2/episode", episode);
     // app.post("/api/v2/loop", loop);
     // app.post("/api/v2/tva", tva);
+    app.get("/api/v2/subscribe", subscribe);
   }
 }

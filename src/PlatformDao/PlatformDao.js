@@ -21,8 +21,5 @@ class PlatformDao {
         );
     }
 
-    static async sendTestNotification(pushServerSubscriptionId) {
-        await axios.get(`${URLPrefix}/api/v1/subscribe/${pushServerSubscriptionId}`);
-    }
 }
 export default PlatformDao;
