@@ -187,7 +187,6 @@ class Editor extends React.Component {
       this.state.schedule.items
     );
     const indexOfLive = scheduleObject.addLive(item);
-    console.log("ITEMS", this.state.schedule.items);
     this.updateSchedule(scheduleObject, indexOfLive - 1, true);
   }
 
@@ -250,14 +249,19 @@ class Editor extends React.Component {
     this.updateSchedule(scheduleObject, newIndex, true);
   }
 
-  handleOccurenceDelete(index) {
+  handleOccurenceDelete(index, value) {
     let scheduleObject = new ScheduleObject(
       this.state.schedule.sid,
       this.state.schedule.date,
       this.state.schedule.items
     );
     let pid = scheduleObject.items[index].asset.pid;
-    const newIndex = scheduleObject.deleteAllOccurencesClosingGap(pid);
+    console.log("pid is from editor", pid);
+    const newIndex = scheduleObject.deleteAllOccurencesClosingGap(
+      pid,
+      index,
+      value
+    );
     this.updateSchedule(scheduleObject, newIndex, true);
   }
 

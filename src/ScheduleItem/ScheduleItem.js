@@ -8,6 +8,10 @@ import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
+import Radio from "@material-ui/core/Radio";
+import RadioGroup from "@material-ui/core/RadioGroup";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+
 import "react-confirm-alert/src/react-confirm-alert.css";
 
 /*
@@ -32,10 +36,14 @@ class ScheduleItem extends React.Component {
 
     this.state = {
       open: false,
-      count: 0
+      count: 0,
+      value: "deleteAll"
     };
   }
 
+  handleChange = event => {
+    this.setState({ value: event.target.value });
+  };
   handleClickOpen = () => {
     this.setState({ open: true });
   };
@@ -103,7 +111,7 @@ class ScheduleItem extends React.Component {
               <button
                 className="mini ui button"
                 onClick={() => {
-                  this.props.onDelete(this.props.index);
+                  this.props.onDelete(this.props.index, this.state.value);
                 }}
                 onContextMenu={event => {
                   event.preventDefault();
@@ -131,15 +139,40 @@ class ScheduleItem extends React.Component {
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
         >
-          <DialogTitle id="alert-dialog-title">
-            {`Are you sure you want to delete all ${this.state.count} occurences of
-                         ${this.props.title}`}
-          </DialogTitle>
-          <DialogContent></DialogContent>
+          <DialogTitle id="alert-dialog-title">{this.props.title}</DialogTitle>
+          <DialogContent>
+            <RadioGroup
+              aria-label="items"
+              name="items1"
+              value={this.state.value}
+              onChange={this.handleChange}
+            >
+              <FormControlLabel
+                value="deleteAll"
+                control={<Radio />}
+                label={`Delete all ${this.state.count} occurences`}
+              />
+              <FormControlLabel
+                value="deleteAllPrev"
+                control={<Radio />}
+                label="Delete this and all previous"
+              />
+              <FormControlLabel
+                value="deleteAllNext"
+                control={<Radio />}
+                label="Delete this and all subsequent"
+              />
+            </RadioGroup>
+          </DialogContent>
+          <DialogContent>Are you sure?</DialogContent>
+
           <DialogActions>
             <Button
               onClick={() => {
-                this.props.onOccurenceDelete(this.props.index);
+                this.props.onOccurenceDelete(
+                  this.props.index,
+                  this.state.value
+                );
                 this.setState({ open: false });
               }}
               color="primary"

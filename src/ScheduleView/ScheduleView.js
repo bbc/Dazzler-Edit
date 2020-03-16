@@ -38,8 +38,8 @@ class ScheduleView extends React.Component {
     this.props.onDelete(index); // TODO can we use this directly?
   };
 
-  handleOccurenceDelete = index => {
-    this.props.onOccurenceDelete(index); // TODO can we use this directly?
+  handleOccurenceDelete = (index, value) => {
+    this.props.onOccurenceDelete(index, value); // TODO can we use this directly?
   };
 
   componentDidMount() {}

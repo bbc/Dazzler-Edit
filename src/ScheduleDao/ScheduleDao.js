@@ -49,12 +49,14 @@ class ScheduleDao {
             const broadcast = item.broadcast[0];
             const published_time = broadcast.published_time[0].$;
             const live = broadcast.live[0].$.value === "true";
+            const pid = item.broadcast[0].$.pid;
             const asset = {
               title: ScheduleDao.getTitle(item, index),
               duration: moment.duration(published_time.duration).toISOString(),
               versionPid: item.version[0].pid,
               versionCrid: item.version[0].crid[0].$.uri,
-              insertionType: live ? "live" : ""
+              insertionType: live ? "live" : "",
+              pid: pid
             };
             schedule.push({
               title: asset.title,
