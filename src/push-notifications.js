@@ -25,18 +25,11 @@ function sendNotification() {
 
 /**
  *
- */
-function registerServiceWorker(workerFileName) {
-  return navigator.serviceWorker.register(workerFileName, {scope: "/"});
-}
-
-/**
- *
  * using the registered service worker creates a push notification subscription and returns it
  *
  */
 async function createNotificationSubscription() {
-  //wait for service worker installation to be ready
+  // wait for service worker installation to be ready
   const serviceWorkerRegistration = await navigator.serviceWorker.ready;
   // subscribe and return the subscription
   console.log('sw is ready');

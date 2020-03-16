@@ -2,12 +2,10 @@ import { useState, useEffect } from "react";
 import PlatformDao from "./PlatformDao/PlatformDao";
 
 import {
-    isPushNotificationSupported,
-    askUserPermission,
-    registerServiceWorker,
-    createNotificationSubscription,
-    getUserSubscription
-  } from "./push-notifications";
+  isPushNotificationSupported,
+  askUserPermission,
+  getUserSubscription
+} from "./push-notifications";
 
 // first thing to do: check if the push notifications are supported by the browser
 const pushNotificationSupported = isPushNotificationSupported();
@@ -29,74 +27,76 @@ export default function usePushNotifications() {
     if (pushNotificationSupported) {
       setLoading(true);
       setError(false);
-      registerServiceWorker("/notifications_sw.js")
-      .then((reg) => {
-        setLoading(false);
-        var serviceWorker;
-        if (reg.installing) {
+      navigator.serviceWorker.register("/notifications_sw.js", {scope: "/"})
+        .then((reg) => {
+          setLoading(false);
+          var serviceWorker;
+          if (reg.installing) {
             serviceWorker = reg.installing;
             console.log('Service worker installing');
-        } else if (reg.waiting) {
+          } else if (reg.waiting) {
             serviceWorker = reg.waiting;
             console.log('Service worker installed & waiting');
-        } else if (reg.active) {
+          } else if (reg.active) {
             serviceWorker = reg.active;
-           console.log('Service worker active');
-        }
-        if (serviceWorker) {
+            console.log('Service worker active');
+          }
+          if (serviceWorker) {
             console.log("sw current state", serviceWorker.state);
             if (serviceWorker.state === "activated") {
-                //If push subscription wasnt done yet have to do here
-                console.log("sw already activated - Do whatever needed here");
+              //If push subscription wasnt done yet have to do here
+              console.log("sw already activated - Do whatever needed here");
             }
-            serviceWorker.addEventListener("statechange", function(e) {
-                console.log("sw statechange : ", e.target.state);
-                if (e.target.state === "activated") {
-                    // use pushManger for subscribing here.
-                    console.log("Just now activated. now we can subscribe for push notification")
-                    // subscribeForPushNotification(reg);
-                    setLoading(true);
-                    setError(false);
-                    createNotificationSubscription()
-                      .then(function(subscription) {
-                        setUserSubscription(subscription);
-                        setLoading(false);
-                      })
-                      .catch(err => {
-                        console.error(err.message, "name:", err.name, "code:", err.code);
-                        setError(err);
-                        setLoading(false);
-                      });
-                } else {
-                  console.log('sw state not activated');
-                }
+            serviceWorker.addEventListener("statechange", function (e) {
+              console.log("sw statechange : ", e.target.state);
+              if (e.target.state === "activated") {
+                // use pushManager for subscribing here.
+                console.log("Just now activated. now we can subscribe for push notification")
+                setLoading(true);
+                setError(false);
+                serviceWorker.pushManager.subscribe({
+                  userVisibleOnly: true,
+                  applicationServerKey: process.env.VAPID_PUBLIC_KEY
+                })
+                .then((subscription) => {
+                    setUserSubscription(subscription);
+                    setLoading(false);
+                })
+                .catch((err) => {
+                    console.error(err.message, "name:", err.name, "code:", err.code);
+                    setError(err);
+                    setLoading(false);
+                });
+              } else {
+                console.log('sw state not activated');
+              }
             });
-        } else {
-          console.log('SW problem, registration response is', reg);
-        }
-        console.log('sw registered')
-        setLoading(false);
-      })
-      .catch((e) => {
-        console.log(e);
-        setLoading(false);
-      });
+          } else {
+            console.log('SW problem, registration response is', reg);
+          }
+          console.log('sw registered')
+          setLoading(false);
+        })
+        .catch((e) => {
+          console.log(e);
+          setLoading(false);
+        });
     }
   }, []);
 
-/*
-  .then(
-  function (reg) {
-  },
-  function (err) {
-      console.error('unsuccessful registration with ', workerFileName, err);
-  }
-*/
+  /*
+    .then(
+    function (reg) {
+    },
+    function (err) {
+        console.error('unsuccessful registration with ', workerFileName, err);
+    }
+  */
 
 
   //if the push notifications are supported, registers the service worker
   //this effect runs only the first render
-  
+
   useEffect(() => {
     setLoading(true);
     setError(false);
@@ -133,25 +133,6 @@ export default function usePushNotifications() {
   //
 
   /**
-   * define a click handler that creates a push notification subscription.
-   * Once the subscription is created, it uses the setUserSubscription hook
-   */
-  const onClickSubscribeToPushNotification = () => {
-    setLoading(true);
-    setError(false);
-    createNotificationSubscription()
-      .then(function(subscription) {
-        setUserSubscription(subscription);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error(err.message, "name:", err.name, "code:", err.code);
-        setError(err);
-        setLoading(false);
-      });
-  };
-
-  /**
    * define a click handler that sends the push subscription to the push server.
    * Once the subscription is created on the server, it saves the id using the hook setPushServerSubscriptionId
    */
@@ -170,7 +151,6 @@ export default function usePushNotifications() {
    */
   return {
     onClickAskUserPermission,
-    onClickSubscribeToPushNotification,
     onClickSendSubscriptionToPushServer,
     pushServerSubscriptionId,
     userConsent,

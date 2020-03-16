@@ -2,13 +2,12 @@ import React from "react";
 import usePushNotifications from "../usePushNotifications";
 
 export default function PushControl() {
-    
+
     const {
         userConsent,
         pushNotificationSupported,
         userSubscription,
         onClickAskUserPermission,
-        onClickSubscribeToPushNotification,
         onClickSendSubscriptionToPushServer,
         pushServerSubscriptionId,
         error,
@@ -18,14 +17,14 @@ export default function PushControl() {
     console.log('pushServerSubscriptionId', pushServerSubscriptionId);
     console.log('userSubscription', userSubscription);
     if (error) {
-        return  (
-          <section className="app-error">
-            <h2>{error.name}</h2>
-            <p>Error message : {error.message}</p>
-            <p>Error code : {error.code}</p>
-          </section>)
-      }
-      
+        return (
+            <section className="app-error">
+                <h2>{error.name}</h2>
+                <p>Error message : {error.message}</p>
+                <p>Error code : {error.code}</p>
+            </section>)
+    }
+
     if (loading) {
         return <div>Loading, please stand by</div>;
     }
@@ -39,21 +38,21 @@ export default function PushControl() {
     let tooltip;
     if (pushNotificationSupported) {
         switch (userConsent) {
-        case 'default':
-            icon = 'ban icon';
-            tooltip  = 'click to enable notifications';
-            break;
-        case 'granted':
-            icon ='alarm icon';
-            tooltip = 'click to disable notifications';
-            break;
-        case 'denied':
-                icon ='ban icon';
+            case 'default':
+                icon = 'ban icon';
+                tooltip = 'click to enable notifications';
+                break;
+            case 'granted':
+                icon = 'alarm icon';
+                tooltip = 'click to disable notifications';
+                break;
+            case 'denied':
+                icon = 'ban icon';
                 tooltip = 'click to enable notifications';
                 break;
             default:
-            icon ='alarm slash icon';
-            tooltip = userConsent;
+                icon = 'alarm slash icon';
+                tooltip = userConsent;
         }
     } else {
         icon = 'alarm slash icon';
@@ -61,9 +60,8 @@ export default function PushControl() {
     }
 
     return <span className="tooltip">
-    <i className={icon} onClick={onClickAskUserPermission} />
-    <i className="alarm icon" onClick={onClickSubscribeToPushNotification} />
-    <i className="exchange icon" onClick={onClickSendSubscriptionToPushServer} />
-    <span className="tooltiptext">{tooltip}</span>
+        <i className={icon} onClick={onClickAskUserPermission} />
+        <i className="exchange icon" onClick={onClickSendSubscriptionToPushServer} />
+        <span className="tooltiptext">{tooltip}</span>
     </span>;
 }
