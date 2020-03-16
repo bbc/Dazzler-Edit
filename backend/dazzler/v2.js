@@ -188,7 +188,7 @@ const saveEmergencyPlayList = async function(req, res) {
 const subscribe = async function(req, res) {
   const sid = req.query.sid || config.default_sid;
   try {
-    notifications.addSubscription(sid, req.body);
+    notifications.addSubscription(sid, JSON.parse(req.body));
     res.send("saved");
   } catch (e) {
     console.log("error ", e);

@@ -4,11 +4,15 @@ const auth = require("./auth");
 const s3 = new aws.S3({ apiVersion: "2006-03-01" });
 
 async function getSubscriptions(sid) {
-    const s = await s3.getObject({
-        Bucket: process.env.BUCKET,
-        Key: `${sid}/subscriptions`
-    }).promise();
-    return JSON.parse(s.Body.toString("utf-8"));
+    try {
+        const s = await s3.getObject({
+            Bucket: process.env.BUCKET,
+            Key: `${sid}/subscriptions`
+        }).promise();
+        return JSON.parse(s.Body.toString("utf-8"));            
+    } catch (error) { // assume doc does not exist
+        return [];
+    }
 }
 
 async function putSubscriptions(sid, subscriptions) {
