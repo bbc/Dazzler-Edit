@@ -5,12 +5,7 @@ import "moment-duration-format";
 import TableBody from "@material-ui/core/TableBody";
 import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
-import AssetDao from "../AssetDao/AssetDao";
-
-function formattedDuration(clip) {
-  const duration = moment.duration(clip.available_versions.version[0].duration);
-  return duration.format("hh:mm:ss", { trim: false });
-}
+import AssetDao from "../AssetDaoV1";
 
 export default function ClipList({
   sid,
@@ -39,8 +34,8 @@ export default function ClipList({
   if (
     page === currentPage &&
     rowsPerPage === currentRowsPerPage &&
-    sort_direction == currentSortDirection &&
-    type == currentType
+    sort_direction === currentSortDirection &&
+    type === currentType
   ) {
     console.log("cliplist no change", page, rowsPerPage);
   } else {
@@ -51,16 +46,14 @@ export default function ClipList({
       type,
       page, // nitro is one-based
       rowsPerPage,
-      response => {
-        let items = response.data.items;
-        console.log("update", items);
-        let total = response.data.total;
+      sort,
+      sort_direction,
+      (items, total) => {
+        console.log("updated", items);
         console.log("got clip data for", type);
         setRows(items);
         onPageLoaded(currentPage, currentRowsPerPage, total);
-      },
-      sort,
-      sort_direction
+      }
     );
     setCurrentPage(page);
     setCurrentRowsPerPage(rowsPerPage);
@@ -75,19 +68,21 @@ export default function ClipList({
           <TableCell component="th" scope="row">
             <div className="tooltip">
               {" "}
-              {row.title === undefined ? row.presentation_title : row.title}
+              {row.title}
               <span className="tooltiptext">PID = {row.pid}</span>
             </div>
           </TableCell>
           <TableCell align="right">
             {moment(row.updated_time).format("DD-MM-YYYY")}
           </TableCell>
-          <TableCell align="right">{formattedDuration(row)}</TableCell>
+          <TableCell align="right">{
+            moment.duration(row.duration).format("hh:mm:ss", { trim: false })
+          }</TableCell>
           <TableCell align="right">
             <button
               className="ui compact icon button"
               onClick={() => {
-                onAddClicked(AssetDao.clip2Item(row));
+                onAddClicked(row);
               }}
             >
               <i className="plus icon"></i>
@@ -100,6 +95,6 @@ export default function ClipList({
 }
 
 ClipList.propTypes = {
-  page: PropTypes.func.isRequired,
-  rowsPerPage: PropTypes.func.isRequired
+  page: PropTypes.number.isRequired,
+  rowsPerPage: PropTypes.number.isRequired
 };

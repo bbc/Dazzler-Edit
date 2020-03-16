@@ -9,8 +9,6 @@ import TableFooter from "@material-ui/core/TableFooter";
 import TablePagination from "@material-ui/core/TablePagination";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
-import moment from "moment";
-import "moment-duration-format";
 import { TablePaginationActionsWrapped } from "../TablePaginationActions/TablePaginationActions";
 import ClipList from "../ClipList";
 
@@ -71,9 +69,8 @@ export class Clips extends React.Component {
 
   componentDidUpdate(prevProps) {
     console.log(
-      "Clips: %s %s want page %d items per page %d",
+      "Clips: %s want page %d items per page %d",
       this.props.sid,
-      this.props.availability,
       this.state.page,
       this.state.rowsPerPage
     );
@@ -81,7 +78,7 @@ export class Clips extends React.Component {
 
   handleSort = cell => {
     this.setState({
-      order: this.state.order == "asc" ? "desc" : "asc",
+      order: this.state.order === "asc" ? "desc" : "asc",
       orderBy: cell
     });
   };
@@ -114,7 +111,7 @@ export class Clips extends React.Component {
                       key={headCell.id}
                       align={headCell.numeric ? "right" : "left"}
                       padding={headCell.disablePadding ? "none" : "default"}
-                      order={orderBy === headCell.id ? order : false}
+                      order={orderBy === headCell.id ? order : ""}
                     >
                       <TableSortLabel
                         active={orderBy === headCell.id}

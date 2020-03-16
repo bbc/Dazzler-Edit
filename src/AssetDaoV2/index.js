@@ -5,13 +5,20 @@ const URLPrefix =
   process.env.NODE_ENV === "development" ? "http://localhost:8080" : "";
 
 class AssetDao {
-  static getClips(sid, type, page, rowsPerPage, cb, sort, sort_direction) {
-    var sort_direction = sort_direction == "desc" ? "descending" : "ascending";
+
+  static getClips(sid, type, page, rowsPerPage, sort, direction, cb) {
+    var sort_direction = direction === "desc" ? "descending" : "ascending";
     const url = `${URLPrefix}/api/v1/clip?sid=${sid}&type=${type}&page=${page +
       1}&page_size=${rowsPerPage}&sort=${sort}&sort_direction=${sort_direction}`;
     axios
       .get(url)
-      .then(cb)
+      .then((response) => {
+        const items = [];
+        response.data.items.forEach((clip) => {
+          items.push(this.clip2Item(clip));
+        });
+        cb(items, response.data.total);
+      })
       .catch(e => {
         console.log(e);
       });
@@ -23,7 +30,13 @@ class AssetDao {
         `${URLPrefix}/api/v1/special?sid=${sid}&page=${page +
           1}&page_size=${rowsPerPage}`
       )
-      .then(cb)
+      .then((response) => {
+        const items = [];
+        response.data.items.forEach((clip) => {
+          items.push(this.clip2Item(clip));
+        });
+        cb(items, response.data.total);
+      })
       .catch(e => {
         console.log(e);
       });
@@ -34,15 +47,26 @@ class AssetDao {
     availability,
     page,
     rowsPerPage,
-    cb,
     sort,
-    sort_direction
+    direction,
+    cb
   ) {
-    var sort_direction = sort_direction == "desc" ? "descending" : "ascending";
-    const url = `${URLPrefix}/api/v1/episode?sid=${sid}&page=${page}&page_size=${rowsPerPage}&availability=${availability}&sort=${sort}&sort_direction=${sort_direction}`;
+    var sort_direction = direction === "desc" ? "descending" : "ascending";
+    const url = `${URLPrefix}/api/v2/episode?sid=${sid}&page=${page}&page_size=${rowsPerPage}&availability=${availability}&sort=${sort}&sort_direction=${sort_direction}`;
     axios
       .get(url)
-      .then(cb)
+      .then((response) => {
+        console.log('episode DAO', response);
+        const items = [];
+        response.data.items.forEach((episode) => {
+          items.push({
+            ...episode,
+            live: false,
+            insertionType: ""
+          });
+        });
+        cb(items, response.data.total);
+      })
       .catch(e => {
         console.log(url);
         console.log(e);
@@ -60,14 +84,6 @@ class AssetDao {
       pid: clip.pid,
       vpid: version.pid
     };
-  }
-
-  static episode2Item(episode) {
-    const item = this.clip2Item(episode);
-    if (!item.title) {
-      item.title = episode.presentation_title;
-    }
-    return item;
   }
 
   static getLoop() {}

@@ -239,6 +239,15 @@
               "Action": [ "tag:GetResources" ],
               "Resource": [ "*" ],
               "Effect": "Allow"
+            },
+            {
+              "Action": [ "es:*" ],
+              "Resource": { "Fn::Sub": [ "arn:aws:s3:::${Bucket}/*", {
+                    "Host": { "Fn::FindInMap": [ "OperationsMap", "ElasticSearchMap", { "Ref": "Environment" } ] }
+		  }
+		 ]
+		},
+              "Effect": "Allow"
             }
           ]
         },
@@ -398,6 +407,10 @@
       "PlayoutBucketMap": {
         "live": "ws-dazzler-assets",
         "test": "ws-dazzler-assets-test"
+      },
+      "ElasticSearchMap": {
+        "live": "vpc-live-pws-es-01-sharq3wijppafqfq2v3isa5ram.eu-west-1.es.amazonaws.com",
+        "test": "vpc-test-pws-es-01-ntq5eu3xhbkw56fc2yi4vt2ndm.eu-west-1.es.amazonaws.com"
       }
         }
     }

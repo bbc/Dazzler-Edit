@@ -88,7 +88,7 @@ export class Episode extends React.Component {
 
   handleSort = cell => {
     this.setState({
-      order: this.state.order == "asc" ? "desc" : "asc",
+      order: this.state.order === "asc" ? "desc" : "asc",
       orderBy: cell
     });
   };
@@ -121,7 +121,7 @@ export class Episode extends React.Component {
                       key={headCell.id}
                       align={headCell.numeric ? "right" : "left"}
                       padding={headCell.disablePadding ? "none" : "default"}
-                      order={orderBy === headCell.id ? order : false}
+                      order={orderBy === headCell.id ? order : ""}
                     >
                       <TableSortLabel
                         active={orderBy === headCell.id}
@@ -146,7 +146,8 @@ export class Episode extends React.Component {
                 onPageLoaded={this.onPageLoaded}
                 onAddClicked={this.props.handleClick}
                 sort={orderBy}
-                sort_direction={order}
+                sortDirection={order}
+                flip={this.props.flip}
               />
               <TableFooter>
                 <TableRow>
