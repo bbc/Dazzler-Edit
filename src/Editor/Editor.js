@@ -33,7 +33,7 @@ import PlatformDao from "../PlatformDao/PlatformDao";
 import { fetchSchedule, saveSchedule } from "../ScheduleDao/ScheduleDao";
 import TimeDisplay from "../TimeDisplay";
 import Refresh from "../Refresh";
-import PushControl from "../PushControl";
+// import PushControl from "../PushControl";
 
 const drawerWidth = 240;
 
@@ -460,7 +460,6 @@ class Editor extends React.Component {
           </Toolbar>
           <Typography variant="h6">
             <TimeDisplay />
-            <PushControl/>
           </Typography>
         </AppBar>
         <Drawer
