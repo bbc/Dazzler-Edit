@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { subscribe } from "../PlatformDao";
+import PlatformDao from "./PlatformDao/PlatformDao";
 
 import {
     isPushNotificationSupported,
@@ -101,7 +101,7 @@ export default function usePushNotifications() {
   const onClickSendSubscriptionToPushServer = () => {
     setLoading(true);
     setError(false);
-    subscribe(userSubscription, (response) => {
+    PlatformDao.subscribe(userSubscription, (response) => {
       console.log(response);
       setPushServerSubscriptionId('some random id');
     });
