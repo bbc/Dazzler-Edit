@@ -103,7 +103,7 @@ export default function usePushNotifications() {
     setError(false);
     PlatformDao.subscribe(userSubscription, (response) => {
       console.log(response);
-      setPushServerSubscriptionId('some random id');
+      setPushServerSubscriptionId(response);
     });
   };
 

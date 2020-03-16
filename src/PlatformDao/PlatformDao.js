@@ -17,8 +17,9 @@ class PlatformDao {
         axios
         .post(`${URLPrefix}/api/v2/subscribe`, userSubscription)
         .then(response => cb(response))
-        .catch(err => err(err)
-        );
+        .catch(e => {
+            console.log(e);
+        });
     }
 
 }
