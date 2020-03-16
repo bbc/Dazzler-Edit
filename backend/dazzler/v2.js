@@ -163,7 +163,7 @@ const saveEmergencyPlayList = async function(req, res) {
     const subject = auth.parseSSLsubject(req);
     user = subject.emailAddress;
   }
-  if (auth(user)) {
+  if (auth.isAuthorised(user)) {
     const sid = req.query.sid || config.default_sid;
     var params = {
       Body: req.body,
