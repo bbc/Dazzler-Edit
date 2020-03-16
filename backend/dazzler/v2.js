@@ -1,5 +1,10 @@
 const axios = require("axios");
 const https = require("https");
+const aws = require("aws-sdk");
+const auth = require("./auth");
+
+const s3 = new aws.S3({ apiVersion: "2006-03-01" });
+
 let config;
 
 const ax = axios.create({
@@ -151,10 +156,100 @@ const episode = async (req, res) => {
   }
 };
 
-const subscribe = async (req, res) => {
-  console.log(req.data);
-  res.json({id:"abc"});
-};
+
+const saveEmergencyPlayList = async function(req, res) {
+  let user = "dazzler"; // assume local
+  if (req.header("sslclientcertsubject")) {
+    const subject = auth.parseSSLsubject(req);
+    user = subject.emailAddress;
+  }
+  if (auth(user)) {
+    const sid = req.query.sid || config.default_sid;
+    var params = {
+      Body: req.body,
+      Bucket: process.env.BUCKET,
+      Key: `${sid}/emergency-playlist.json`
+    };
+    try {
+      await s3.putObject(params).promise();
+      res.send("saved");
+    } catch (e) {
+      console.log("error ", e);
+      res.status(404).send("error");
+    }
+  } else {
+    const message = user + " is not authorised to save schedules";
+    console.log(message);
+    res.status(403).send(message);
+  }
+}
+
+async function getSubscriptions() {
+  const s = await s3.getObject({ Bucket: process.env.STATE_BUCKET, Key: 'subscriptions'}).promise();
+  return JSON.parse(s.Body.toString("utf-8"));
+}
+
+async function putSubscription(subscription, sid) {
+  const s = await s3.putObject({
+    Bucket: process.env.STATE_BUCKET, 
+    Key: 'subscriptions',
+
+  }).promise();
+}
+
+/* here is the code from the PoC lambda for subscriptions
+
+        if(entity.languages) {
+          const lang = entity.languages.language[0].$;
+          if(process.env.LANGUAGES.includes(lang)) {
+            const payload = {
+              msg: `new or changed ${entity_type} ${pid}`,
+              pid: pid,
+              entity_type: entity_type,
+              entity: entity
+            };
+            console.log(`new or changed ${entity_type} ${pid}`);
+            const subscriptions = await getSubscriptions();
+            await send(subscriptions, payload, { TTL: 5 }, 0);
+          }
+        }
+
+
+function send(subscriptions, payload, options) {
+  console.log('send', subscriptions, payload, options);
+  const payload_string = typeof (payload) === 'string' ? payload : JSON.stringify(payload)
+
+  return new Promise((success) => {
+
+    Promise.all(subscriptions.map((each_subscription) => {
+      return webPush.sendNotification(each_subscription, payload_string, options);
+    }))
+      .then(function () {
+        success(response(201, {}));
+      }).catch(function (error) {
+        console.log('ERROR>', error);
+        success(response(500, { error: error }));
+      });
+  });
+}
+
+*/
+
+const subscribe = async function(req, res) {
+  const sid = req.query.sid || config.default_sid;
+  var params = {
+    Body: req.body,
+    Bucket: process.env.BUCKET,
+    Key: `${sid}/emergency-playlist.json`
+  };
+  try {
+    await s3.putObject(params).promise();
+    res.send("saved");
+  } catch (e) {
+    console.log("error ", e);
+    res.status(404).send("error");
+  }
+}
 
 module.exports = {
   init(app, configObject) {
@@ -168,7 +263,8 @@ module.exports = {
     // app.get("/api/v2/clip", clip);
     app.get("/api/v2/episode", episode);
     // app.post("/api/v2/loop", loop);
+    // app.put("/api/v2/loop", loop);
     // app.post("/api/v2/tva", tva);
-    app.get("/api/v2/subscribe", subscribe);
+    app.post("/api/v2/subscribe", subscribe);
   }
 }

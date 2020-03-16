@@ -11,25 +11,6 @@ const s3 = new aws.S3({
 
 let config;
 
-const user = function(req, res) {
-  if (req.header("sslclientcertsubject")) {
-    const subject = parseSSLsubject(req);
-    let r = {
-      email: subject.emailAddress,
-      auth: auth(subject.emailAddress)
-    };
-    if (subject.hasOwnProperty("CN")) {
-      r.name = subject.CN;
-    }
-    res.json(r);
-  } else {
-    res.json({
-      name: "anonymous",
-      auth: true
-    });
-  }
-}
-
 const schedule = async (req, res) => {
   try {
     const sid = req.query.sid || config.default_sid;
@@ -251,7 +232,7 @@ const loop = async function(req, res) {
 const saveEmergencyPlayList = async function(req, res) {
   let user = "dazzler"; // assume local
   if (req.header("sslclientcertsubject")) {
-    const subject = parseSSLsubject(req);
+    const subject = auth.parseSSLsubject(req);
     user = subject.emailAddress;
   }
   if (auth(user)) {
@@ -281,7 +262,7 @@ const tva = async (req, res) => {
   if (req.body.includes(`serviceIDRef="${config[sid].serviceIDRef}"`)) {
     let user = "dazzler"; // assume local
     if (req.header("sslclientcertsubject")) {
-      const subject = parseSSLsubject(req);
+      const subject = auth.parseSSLsubject(req);
       user = subject.emailAddress;
     }
     if (auth(user)) {
@@ -360,21 +341,10 @@ function add_version_crids_to_episodes(results) {
   return results;
 }
 
-function parseSSLsubject(req) {
-  var subject = req.header("sslclientcertsubject");
-  var fields = subject.split(",");
-  var data = {};
-  for (var i = 0; i < fields.length; i++) {
-    var [key, val] = fields[i].split("=");
-    data[key] = val;
-  }
-  return data;
-}
-
 module.exports = {
   init(app, configObject) {
     config = configObject;
-    app.get("/api/v1/user", user);
+    app.get("/api/v1/user", auth.user);
     app.get("/api/v1/schedule", schedule);
     app.get("/api/v1/broadcast", broadcast);
     app.get("/api/v1/webcast", webcast);
