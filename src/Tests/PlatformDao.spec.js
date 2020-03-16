@@ -1,5 +1,4 @@
 import PlatformDao from "../PlatformDao/PlatformDao.js";
-import moment from "moment";
 
 describe("ScheduleObject", () => {
   test("platformDAO", () => {
