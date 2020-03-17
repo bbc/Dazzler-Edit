@@ -157,7 +157,7 @@ class Editor extends React.Component {
       loop: [],
       loopDuration: moment.duration(),
       user: { name: "anonymous", auth: true },
-      side: false
+      side: true
     };
   }
 

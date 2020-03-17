@@ -162,7 +162,7 @@ class ScheduleDao {
         tva += ScheduleDao.makeScheduleEvent(serviceIDRef, data[i]);
       }
       tva += "\n      </Schedule>\n    </ProgramLocationTable>\n" + tvaEnd;
-      console.log(tva);
+      console.log("tva is", tva);
 
       axios({
         method: "post",
