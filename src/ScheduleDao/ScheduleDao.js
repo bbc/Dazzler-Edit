@@ -46,6 +46,7 @@ class ScheduleDao {
         let schedule = [];
         if (response.data.total > 0) {
           response.data.item.forEach((item, index) => {
+            console.log("items is SDAO", item);
             if (
               moment(date).format("DD-MM-YYYY") ===
               moment(item.broadcast[0].published_time[0].$.start).format(
