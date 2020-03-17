@@ -142,7 +142,9 @@ class Editor extends React.Component {
     this.state = {
       schedule: new ScheduleObject(
         "bbc_hindi_tv",
-        moment().utc().startOf("day")
+        moment()
+          .utc()
+          .startOf("day")
       ),
       mode: "loop",
       scheduleInsertionPoint: 1,
@@ -168,7 +170,7 @@ class Editor extends React.Component {
   componentDidUpdate(prevProps) {}
 
   handleRefresh = event => {
-    this.setState({ side: this.state.side?false:true });
+    this.setState({ side: this.state.side ? false : true });
   };
 
   handleChangeMode = event => {
@@ -421,6 +423,7 @@ class Editor extends React.Component {
   };
 
   render() {
+    console.log("items", this.state.schedule.items);
     const { classes } = this.props;
     const { open } = this.state;
     //console.log('Editor.render');
@@ -463,7 +466,8 @@ class Editor extends React.Component {
             </Typography>
           </Toolbar>
           <Typography variant="h6">
-            <TimeDisplay /><PushControl />
+            <TimeDisplay />
+            <PushControl />
           </Typography>
         </AppBar>
         <Drawer
