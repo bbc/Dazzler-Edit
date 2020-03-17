@@ -46,25 +46,34 @@ class ScheduleDao {
         let schedule = [];
         if (response.data.total > 0) {
           response.data.item.forEach((item, index) => {
-            const broadcast = item.broadcast[0];
-            const published_time = broadcast.published_time[0].$;
-            const live = broadcast.live[0].$.value === "true";
-            const pid = item.broadcast[0].$.pid;
-            const asset = {
-              title: ScheduleDao.getTitle(item, index),
-              duration: moment.duration(published_time.duration).toISOString(),
-              versionPid: item.version[0].pid,
-              versionCrid: item.version[0].crid[0].$.uri,
-              insertionType: live ? "live" : "",
-              pid: pid
-            };
-            schedule.push({
-              title: asset.title,
-              startTime: moment(published_time.start),
-              duration: asset.duration,
-              insertionType: asset.insertionType,
-              asset: asset
-            });
+            if (
+              moment(date).format("DD-MM-YYYY") ===
+              moment(item.broadcast[0].published_time[0].$.start).format(
+                "DD-MM-YYYY"
+              )
+            ) {
+              const broadcast = item.broadcast[0];
+              const published_time = broadcast.published_time[0].$;
+              const live = broadcast.live[0].$.value === "true";
+              const pid = item.broadcast[0].$.pid;
+              const asset = {
+                title: ScheduleDao.getTitle(item, index),
+                duration: moment
+                  .duration(published_time.duration)
+                  .toISOString(),
+                versionPid: item.version[0].pid,
+                versionCrid: item.version[0].crid[0].$.uri,
+                insertionType: live ? "live" : "",
+                pid: pid
+              };
+              schedule.push({
+                title: asset.title,
+                startTime: moment(published_time.start),
+                duration: asset.duration,
+                insertionType: asset.insertionType,
+                asset: asset
+              });
+            }
           });
         }
         const sched = new ScheduleObject(sid, date);
@@ -153,7 +162,7 @@ class ScheduleDao {
         tva += ScheduleDao.makeScheduleEvent(serviceIDRef, data[i]);
       }
       tva += "\n      </Schedule>\n    </ProgramLocationTable>\n" + tvaEnd;
-      console.log(tva);
+      console.log("tva is", tva);
 
       axios({
         method: "post",

@@ -43,7 +43,7 @@ const schedule = async (req, res) => {
       total: 0
     });
   }
-}
+};
 
 const broadcast = async (req, res) => {
   let q = {
@@ -63,9 +63,9 @@ const broadcast = async (req, res) => {
   } catch (e) {
     res.status(404).send("Not found"); // TODO use proper error message
   }
-}
+};
 
-const webcast =async (req, res) => {
+const webcast = async (req, res) => {
   let q = {};
   if (req.query.hasOwnProperty("start")) {
     q.start_from = req.query.start;
@@ -94,14 +94,14 @@ const webcast =async (req, res) => {
   } catch (e) {
     res.status(404).send("Not found"); // TODO use proper error message
   }
-}
+};
 
 const special = async (req, res) => {
   let q = {
     group: config[req.query.sid].specials_collection
   };
   await getClip(q, req.query, res);
-}
+};
 
 const clip = async (req, res) => {
   const sid = req.query.sid || config.default_sid;
@@ -111,7 +111,7 @@ const clip = async (req, res) => {
     if (req.query.sort_direction) {
       q.sort_direction = req.query.sort_direction;
     } else {
-      q.sort_direction = 'descending';
+      q.sort_direction = "descending";
     }
   }
   if (req.query.type) {
@@ -124,7 +124,7 @@ const clip = async (req, res) => {
     q.tag_name = config[sid].clip_language;
   }
   await getClip(q, req.query, res);
-}
+};
 
 async function getClip(q, query, res) {
   if (query.hasOwnProperty("page")) {
@@ -178,7 +178,7 @@ const episode = async (req, res, next) => {
     if (req.query.sort_direction) {
       q.sort_direction = req.query.sort_direction;
     } else {
-      q.sort_direction = 'descending';
+      q.sort_direction = "descending";
     }
   }
   q.master_brand = config[sid].mid;
@@ -218,7 +218,7 @@ const episode = async (req, res, next) => {
     console.log(e);
     res.status(404).send("error");
   }
-}
+};
 
 const loop = async function(req, res) {
   let q = {
@@ -227,7 +227,7 @@ const loop = async function(req, res) {
     sort_direction: "ascending"
   };
   await getClip(q, req.query, res);
-}
+};
 
 const saveEmergencyPlayList = async function(req, res) {
   let user = "dazzler"; // assume local
@@ -235,7 +235,7 @@ const saveEmergencyPlayList = async function(req, res) {
     const subject = auth.parseSSLsubject(req);
     user = subject.emailAddress;
   }
-  if (auth(user)) {
+  if (auth.isAuthorised(user)) {
     const sid = req.query.sid || config.default_sid;
     var params = {
       Body: req.body,
@@ -254,7 +254,7 @@ const saveEmergencyPlayList = async function(req, res) {
     console.log(message);
     res.status(403).send(message);
   }
-}
+};
 
 const tva = async (req, res) => {
   const sid = req.query.sid || config.default_sid;
@@ -265,7 +265,7 @@ const tva = async (req, res) => {
       const subject = auth.parseSSLsubject(req);
       user = subject.emailAddress;
     }
-    if (auth(user)) {
+    if (auth.isAuthorised(user)) {
       const r = await pips.postTVA(req.body, res);
       res.json(r.data);
     } else {
@@ -277,7 +277,7 @@ const tva = async (req, res) => {
     console.log("Hindi only please");
     res.status(403).send("Hindi only please");
   }
-}
+};
 
 // we assume only IBMS schedules webcasts so pid2crid can work
 function add_crids_to_webcast(results) {
@@ -355,4 +355,4 @@ module.exports = {
     app.post("/api/v1/loop", saveEmergencyPlayList);
     app.post("/api/v1/tva", tva);
   }
-}
+};
