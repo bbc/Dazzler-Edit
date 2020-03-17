@@ -2,7 +2,7 @@ function isAuthorised(email) {
   if (process.env.AUTHORISED_USERS) {
     const auth = "," + process.env.AUTHORISED_USERS.trim() + ",";
     console.log('auth', auth, email);
-    return auth.includes(`,${email.trim()},`);
+    return auth.toLowerCase().includes(`,${email.trim().toLowerCase()},`);
   } else {
     return true; // allow saving in the local environment
   }
