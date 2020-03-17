@@ -19,7 +19,7 @@ function parseSSLsubject(req) {
   return data;
 }
 
-const user = function (req, res) {
+const user = function(req, res) {
   if (req.header("sslclientcertsubject")) {
     const subject = parseSSLsubject(req);
     let r = {
@@ -36,7 +36,7 @@ const user = function (req, res) {
       auth: true
     });
   }
-}
+};
 
 module.exports = {
   isAuthorised,
