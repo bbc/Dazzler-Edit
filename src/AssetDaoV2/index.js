@@ -43,31 +43,31 @@ class AssetDao {
 
   static getEpisodes(
     sid,
-    availability,
-    page,
+    mustBeAvailableBy,
+    mustBeAvailableUntil,
+  page,
     rowsPerPage,
     sort,
     direction,
     cb
   ) {
     var sort_direction = direction === "desc" ? "descending" : "ascending";
-    const url = `${URLPrefix}/api/v2/episode?sid=${sid}&page=${page}&page_size=${rowsPerPage}&availability=${availability}&sort=${sort}&sort_direction=${sort_direction}`;
+    const url = `${URLPrefix}/api/v2/episode`;
     axios
-      .get(url)
+      .get(url, { params: {
+        sid, page, sort, sort_direction,
+        page_size: rowsPerPage,
+        from: mustBeAvailableBy,
+        to: mustBeAvailableUntil,
+      }})
       .then(response => {
         console.log("episode DAO", response);
         const items = [];
         response.data.items.forEach(episode => {
           items.push({
-            duration: moment.duration(episode.duration).toISOString(),
-            pid: episode.pid,
-            release_date: episode.release_date,
-            title: episode.title,
-            versionCrid: episode.versionCrid,
-            vpid: episode.vpid,
+            ...episode,
             live: false,
             insertionType: "",
-            entityType: "episode"
           });
         });
         cb(items, response.data.total);

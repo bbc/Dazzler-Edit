@@ -1,3 +1,5 @@
+const moment = require("moment");
+require("moment-duration-format");
 const axios = require("axios");
 const https = require("https");
 const aws = require("aws-sdk");
@@ -29,7 +31,8 @@ ax = axios.create({
  pid
  page 1..
  page_size n
- availability available|P1D
+ from ISO8601
+ to ISO8601
 */
 const episode = async (req, res) => {
   const params = {
@@ -54,7 +57,7 @@ const episode = async (req, res) => {
     from = size * (req.query.page - 1);
   }
   let query;
-  if (req.query.availability === 'available') {
+  if (moment.utc().isAfter(from)) { // must be available now
     query = {
       "bool": {
         "must": [
@@ -68,7 +71,7 @@ const episode = async (req, res) => {
                 {
                   "range": {
                     "sonata.episode.availabilities.pc_streaming_concrete_combined_hd.end": {
-                      "gte": "now+1d"
+                      "gte": req.query.to, // "now+1d"
                     }
                   }
                 },
@@ -108,8 +111,8 @@ const episode = async (req, res) => {
           {
             "range": {
               "sonata.episode.release_date.date": {
-                "gte": "now-1d",
-                "lte": "now+2d"
+                "gte": req.query.from,
+                "lte": req.query.to,
               }
             }
         }
@@ -143,12 +146,13 @@ const episode = async (req, res) => {
       const versions = hit._source.pips.programme_availability.available_versions.available_version;
       const version = versions[0].version; // TODO pick a version
       const item = {
+        entityType: 'episode',
         release_date: hit._source.sonata.episode.release_date.date,
         title: hit._source.sonata.episode.aggregatedTitle,
         pid: hit._source.pips.episode.pid,
         vpid: version.pid,
         versionCrid: version.crid.uri,
-        duration: version.duration.$
+        duration: moment.duration(version.duration.$).toISOString()
       };
       items.push(item);
     });

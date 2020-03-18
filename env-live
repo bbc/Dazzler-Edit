@@ -1,0 +1,15 @@
+SQS_QUEUE_URL="https://sqs.eu-west-1.amazonaws.com/205979497597/ws-dazzler-trim-media-live-main-queue-1HM3JUQX02RT2"
+BUCKET_KEY="Schedule/Schedule.json"
+LOOP_COLLECTION="p0510sbc"
+BUCKET="ws-dazzler-assets"
+SPECIALS_COLLECTION="p0715nv4"
+LIVE_BRAND="w13xttvl"
+AUTHORISED_USERS=",mohamed.sheikh@bbc.co.uk,julian.cable@bbc.co.uk,Atul.Garg@bbc.co.uk,Anas.Ali.Shah@bbc.co.uk,Vinayak.Gaikwad@bbc.co.uk,mukesh.sharma@bbc.co.uk,Amresh.Dwivedi@bbc.co.uk,Vatsalya.Rai@bbc.co.uk,Prabhat.Pandey@bbc.co.uk,Sourabh.Madan@bbc.co.uk,Vidit.Mehra@bbc.co.uk,Dinesh.Upreti@bbc.co.uk,"
+NITRO_KEY="OIjo8PDvkMn5HSidDFNekUBlhFAlE516"
+SPW_KEY="mUvZU43V0uGr7ItNBGnxYXgZLFVgx8Zo"
+cosmos_env=live
+KEY=/etc/pki/tls/private/client.key
+CERT=/etc/pki/tls/private/client_crt_key.pem
+PASSPHRASE=client
+ES_HOST=localhost:8443
+VAPID_PUBLIC_KEY=BNm_5z3qCw3y7z95GGirbBCZa3EdsmvDNF5uHVyNBqSKXssc6-abBE6XKUvR_B18JTOeTI8gqH1YTuRky8TCyYU

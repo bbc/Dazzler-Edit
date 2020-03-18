@@ -9,7 +9,8 @@ import AssetDao from "../AssetDaoV2";
 
 export default function EpisodeList({
   sid,
-  availability = 'available',
+  mustBeAvailableBy,
+  mustBeAvailableUntil,
   page = 0,
   rowsPerPage = 5,
   sort = 'title',
@@ -47,14 +48,14 @@ export default function EpisodeList({
     console.log("episodelist fetching", page, rowsPerPage);
     AssetDao.getEpisodes(
       sid,
-      availability,
+      mustBeAvailableBy,
+      mustBeAvailableUntil,
       page + 1, // nitro is one-based
       rowsPerPage,
       sort,
       sortDirection,
       (items, total) => {
-        console.log("updated", items);
-        console.log("got episode data for", availability);
+        console.log('got', items.length, 'episodes for', mustBeAvailableBy, 'until', mustBeAvailableUntil);
         setRows(items);
         onPageLoaded(currentPage, currentRowsPerPage, total);
       }

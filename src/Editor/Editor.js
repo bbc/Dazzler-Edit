@@ -422,7 +422,23 @@ class Editor extends React.Component {
     );
   };
 
+  // available episodes need to be available.
+  // this is for simplicity
+  // available episodes need to be still available by the end of the day being scheduled
+  // we might relax this in future if we have short availability episodes we want to schedule
+  // early in the selected day
+  // or we could make it the middle of the day but then we should disable episodes depending
+  // on where the cursor is.
+  // but paste to fill assumes availability goes to the end of the current day!
+  // upcoming episodes need a start of availability in the near future, ideally by the cursor
+  // upcoming episodes need to be still available to the end of the day being scheduled
+
   render() {
+    const mustBeAvailableBy = moment.utc().format();
+    const mustBeAvailableUntil = moment.utc(this.state.schedule.date).add(1, 'd').format();
+    const upcomingMustBeAvailableBy = mustBeAvailableUntil;
+    const upcomingMustBeAvailableUntil = moment.utc(upcomingMustBeAvailableBy).add(1, 'd').format();
+
     const { classes } = this.props;
     const { open } = this.state;
     //console.log('Editor.render');
@@ -549,7 +565,8 @@ class Editor extends React.Component {
                 <ExpansionPanelDetails>
                   <Episode
                     flip={this.state.side}
-                    availability="available"
+                    mustBeAvailableBy={mustBeAvailableBy}
+                    mustBeAvailableUntil={mustBeAvailableUntil}
                     sid={this.state.schedule.sid}
                     handleClick={this.handleAddClipOrEpisode}
                   />
@@ -567,7 +584,8 @@ class Editor extends React.Component {
                 </ExpansionPanelSummary>
                 <ExpansionPanelDetails>
                   <Episode
-                    availability={this.state.upcomingAvailability.toISOString()}
+                    mustBeAvailableBy={upcomingMustBeAvailableBy}
+                    mustBeAvailableUntil={upcomingMustBeAvailableUntil}
                     sid={this.state.schedule.sid}
                     handleClick={this.handleAddClipOrEpisode}
                     // resultsFilter={this.filterUpcomingEpisodes}

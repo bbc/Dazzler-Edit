@@ -102,13 +102,12 @@ export default function PushControl() {
             </span>;
         case 'ready':
             return <span className="tooltip">
-                <i className="exchange icon" onClick={onClickSendSubscriptionToPushServer} />
+                <i className="bell slash icon" onClick={onClickSendSubscriptionToPushServer} />
                 <span className="tooltiptext">send to server</span>
             </span>;
         case 'active':
             return <span className="tooltip">
-                <i className="alarm icon" />
-                <span className="tooltiptext">active</span>
+                    <i className="bell icon" />
             </span>;
         case 'failed':
                 return <span className="tooltip">
