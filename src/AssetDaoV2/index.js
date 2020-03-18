@@ -59,10 +59,14 @@ class AssetDao {
         const items = [];
         response.data.items.forEach(episode => {
           items.push({
-            ...episode,
+            duration: moment.duration(episode.duration).toISOString(),
+            pid: episode.pid,
+            release_date: episode.release_date,
+            title: episode.title,
+            versionCrid: episode.versionCrid,
+            vpid: episode.vpid,
             live: false,
             insertionType: "",
-            duration: moment.duration(episode.duration).toISOString(),
             entityType: "episode"
           });
         });
