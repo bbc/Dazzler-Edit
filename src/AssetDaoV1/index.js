@@ -65,9 +65,10 @@ class AssetDao {
             release_date: episode.release_date,
             duration: moment.duration(version.duration).toISOString(),
             live: false,
-            insertionType: "",
+            insertionType: '',
             versionCrid: version.crid,
-            vpid: version.pid
+            vpid: version.pid,
+            entityType: 'episode'
           });
         });
         cb(items, response.data.total);
@@ -84,10 +85,11 @@ class AssetDao {
       title: clip.title,
       duration: moment.duration(version.duration).toISOString(),
       live: false,
-      insertionType: "",
+      insertionType: '',
       versionCrid: version.crid,
       pid: clip.pid,
-      vpid: version.pid
+      vpid: version.pid,
+      entityType: 'clip'
     };
   }
 

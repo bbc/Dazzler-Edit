@@ -7,8 +7,15 @@ const notifications = require("./notifications");
 const s3 = new aws.S3({ apiVersion: "2006-03-01" });
 
 let config;
+let ax;
+let host;
 
-const ax = axios.create({
+if (process.env.ES_HOST) {
+  host = process.env.ES_HOST;
+} else {
+  host = 'localhost:8443';
+}
+ax = axios.create({
   httpsAgent: new https.Agent({
     rejectUnauthorized: false
   })
@@ -126,7 +133,7 @@ const episode = async (req, res) => {
   }
   try {
     const answer = await ax.post(
-      `https://${process.env.ES_HOST}/episode/_search`,
+      `https://${host}/episode/_search`,
       data,
       params
     );

@@ -1,15 +1,16 @@
 /* eslint-disable no-restricted-globals */
 /* eslint-disable no-undef */
 async function addToPage(payload) {
+  
   let windowClients = await clients.matchAll({ type: 'window', includeUncontrolled: true });
   let client = undefined;
   for (let i = 0; i < windowClients.length; i++) {
     client = windowClients[i];
-    break; // what if there is more than one? add to each?
+    if (client) {
+      client.postMessage(payload);
+    }
   }
-  if (client) {
-    client.postMessage(payload);
-  }
+  
 }
 
 self.addEventListener('install', event => {

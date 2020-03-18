@@ -62,7 +62,8 @@ class AssetDao {
           items.push({
             ...episode,
             live: false,
-            insertionType: ""
+            insertionType: "",
+            entityType: 'episode'
           });
         });
         cb(items, response.data.total);
@@ -82,7 +83,8 @@ class AssetDao {
       insertionType: "",
       versionCrid: version.crid,
       pid: clip.pid,
-      vpid: version.pid
+      vpid: version.pid,
+      entityType: 'clip'
     };
   }
 

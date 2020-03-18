@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import TableBody from "@material-ui/core/TableBody";
 import TableRow from "@material-ui/core/TableRow";
@@ -22,11 +22,17 @@ export default function EpisodeList({
     console.log("page changed", page, rowsPerPage, total);
   }
 }) {
-  const [currentPage, setCurrentPage] = React.useState(0);
-  const [currentRowsPerPage, setCurrentRowsPerPage] = React.useState(5);
-  const [currentSortDirection, setcurrentSortDirection] = React.useState("desc");
-  const [rows, setRows] = React.useState([]);
-  const [side, setSide] = React.useState(true);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [currentRowsPerPage, setCurrentRowsPerPage] = useState(5);
+  const [currentSortDirection, setcurrentSortDirection] = useState("desc");
+  const [rows, setRows] = useState([]);
+  const [side, setSide] = useState(true);
+
+  useEffect(() => {
+    window.addEventListener("message", (event) => {
+      console.log(event);
+    }, false);
+  }, []); // run once
 
   // statements in the body of the function are called on rendering!!!
 
