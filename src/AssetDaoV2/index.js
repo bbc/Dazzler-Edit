@@ -5,16 +5,15 @@ const URLPrefix =
   process.env.NODE_ENV === "development" ? "http://localhost:8080" : "";
 
 class AssetDao {
-
   static getClips(sid, type, page, rowsPerPage, sort, direction, cb) {
     var sort_direction = direction === "desc" ? "descending" : "ascending";
     const url = `${URLPrefix}/api/v1/clip?sid=${sid}&type=${type}&page=${page +
       1}&page_size=${rowsPerPage}&sort=${sort}&sort_direction=${sort_direction}`;
     axios
       .get(url)
-      .then((response) => {
+      .then(response => {
         const items = [];
-        response.data.items.forEach((clip) => {
+        response.data.items.forEach(clip => {
           items.push(this.clip2Item(clip));
         });
         cb(items, response.data.total);
@@ -30,9 +29,9 @@ class AssetDao {
         `${URLPrefix}/api/v1/special?sid=${sid}&page=${page +
           1}&page_size=${rowsPerPage}`
       )
-      .then((response) => {
+      .then(response => {
         const items = [];
-        response.data.items.forEach((clip) => {
+        response.data.items.forEach(clip => {
           items.push(this.clip2Item(clip));
         });
         cb(items, response.data.total);
@@ -55,15 +54,16 @@ class AssetDao {
     const url = `${URLPrefix}/api/v2/episode?sid=${sid}&page=${page}&page_size=${rowsPerPage}&availability=${availability}&sort=${sort}&sort_direction=${sort_direction}`;
     axios
       .get(url)
-      .then((response) => {
-        console.log('episode DAO', response);
+      .then(response => {
+        console.log("episode DAO", response);
         const items = [];
-        response.data.items.forEach((episode) => {
+        response.data.items.forEach(episode => {
           items.push({
             ...episode,
             live: false,
             insertionType: "",
-            entityType: 'episode'
+            duration: moment.duration(episode.duration).toISOString(),
+            entityType: "episode"
           });
         });
         cb(items, response.data.total);
@@ -84,7 +84,7 @@ class AssetDao {
       versionCrid: version.crid,
       pid: clip.pid,
       vpid: version.pid,
-      entityType: 'clip'
+      entityType: "clip"
     };
   }
 
