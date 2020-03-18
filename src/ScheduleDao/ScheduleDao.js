@@ -46,7 +46,6 @@ class ScheduleDao {
         let schedule = [];
         if (response.data.total > 0) {
           response.data.item.forEach((item, index) => {
-            console.log("items is SDAO", item);
             if (
               moment(date).format("DD-MM-YYYY") ===
               moment(item.broadcast[0].published_time[0].$.start).format(
@@ -56,16 +55,15 @@ class ScheduleDao {
               const broadcast = item.broadcast[0];
               const published_time = broadcast.published_time[0].$;
               const live = broadcast.live[0].$.value === "true";
-              const pid = item.clip[0].pid;
               const asset = {
                 title: ScheduleDao.getTitle(item, index),
                 duration: moment
                   .duration(published_time.duration)
                   .toISOString(),
-                versionPid: item.version[0].pid,
+                versionPid: item.version[0].$.pid, //broadcast - broadcast of // version object  - version of  [version0.$.pid]
                 versionCrid: item.version[0].crid[0].$.uri,
                 insertionType: live ? "live" : "",
-                pid: pid
+                pid: item.version[0].version_of[0].link[0].$.pid
               };
               schedule.push({
                 title: asset.title,
@@ -163,7 +161,7 @@ class ScheduleDao {
         tva += ScheduleDao.makeScheduleEvent(serviceIDRef, data[i]);
       }
       tva += "\n      </Schedule>\n    </ProgramLocationTable>\n" + tvaEnd;
-      console.log("tva is", tva);
+      console.log("tva", tva);
 
       axios({
         method: "post",
