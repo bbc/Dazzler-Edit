@@ -16,10 +16,11 @@
       "Type": "AWS::AutoScaling::AutoScalingGroup",
       "Properties": {
         "HealthCheckGracePeriod": 300,
-        "Tags": [
-          {
+        "Tags": [{
             "Key": "BBCEnvironment",
-            "Value": { "Ref": "Environment" },
+            "Value": {
+              "Ref": "Environment"
+            },
             "PropagateAtLaunch": true
           },
           {
@@ -27,9 +28,12 @@
             "Value": {
               "Fn::Join": [
                 "",
-                [
-                  { "Ref": "Environment" },
-                  { "Ref": "Component" }
+                [{
+                    "Ref": "Environment"
+                  },
+                  {
+                    "Ref": "Component"
+                  }
                 ]
               ]
             },
@@ -37,7 +41,9 @@
           },
           {
             "Key": "BBCComponent",
-            "Value": { "Ref": "Component" },
+            "Value": {
+              "Ref": "Component"
+            },
             "PropagateAtLaunch": true
           },
           {
@@ -49,28 +55,45 @@
         "LaunchConfigurationName": {
           "Ref": "ComponentLaunchConfiguration"
         },
-        "MinSize": { "Ref": "MinSize" },
-        "MaxSize": { "Ref": "MaxSize" },
-        "VPCZoneIdentifier": [
-          {
-            "Fn::ImportValue": { "Fn::Sub": "${CoreInfrastructureStackName}-PrivateSubnet0" }
+        "MinSize": {
+          "Ref": "MinSize"
+        },
+        "MaxSize": {
+          "Ref": "MaxSize"
+        },
+        "VPCZoneIdentifier": [{
+            "Fn::ImportValue": {
+              "Fn::Sub": "${CoreInfrastructureStackName}-PrivateSubnet0"
+            }
           },
           {
-            "Fn::ImportValue": { "Fn::Sub": "${CoreInfrastructureStackName}-PrivateSubnet1" }
+            "Fn::ImportValue": {
+              "Fn::Sub": "${CoreInfrastructureStackName}-PrivateSubnet1"
+            }
           },
           {
-            "Fn::ImportValue": { "Fn::Sub": "${CoreInfrastructureStackName}-PrivateSubnet2" }
+            "Fn::ImportValue": {
+              "Fn::Sub": "${CoreInfrastructureStackName}-PrivateSubnet2"
+            }
           }
         ],
-        "LoadBalancerNames": [ { "Ref": "ComponentElasticLoadBalancer" } ],
-        "AvailabilityZones": [ "eu-west-1a", "eu-west-1b", "eu-west-1c" ],
+        "LoadBalancerNames": [{
+          "Ref": "ComponentElasticLoadBalancer"
+        }],
+        "AvailabilityZones": ["eu-west-1a", "eu-west-1b", "eu-west-1c"],
         "HealthCheckType": "ELB"
       },
       "UpdatePolicy": {
         "AutoScalingRollingUpdate": {
-          "PauseTime": { "Ref": "UpdatePauseTime" },
-          "MaxBatchSize": { "Ref": "UpdateMaxBatchSize" },
-          "MinInstancesInService": { "Ref": "UpdateMinInService" }
+          "PauseTime": {
+            "Ref": "UpdatePauseTime"
+          },
+          "MaxBatchSize": {
+            "Ref": "UpdateMaxBatchSize"
+          },
+          "MinInstancesInService": {
+            "Ref": "UpdateMinInService"
+          }
         }
       }
     },
@@ -84,55 +107,78 @@
           "Timeout": "10",
           "UnhealthyThreshold": "3"
         },
-        "Listeners": [
+        "Listeners": [{
+          "InstancePort": "7443",
+          "LoadBalancerPort": "443",
+          "Protocol": "tcp",
+          "InstanceProtocol": "tcp"
+        }],
+        "SecurityGroups": [{
+          "Ref": "LoadBalancerSecurityGroup"
+        }],
+        "Subnets": [{
+            "Fn::ImportValue": {
+              "Fn::Sub": "${CoreInfrastructureStackName}-PublicSubnet0"
+            }
+          },
           {
-            "InstancePort": "7443",
-            "LoadBalancerPort": "443",
-            "Protocol": "tcp",
-            "InstanceProtocol": "tcp"
+            "Fn::ImportValue": {
+              "Fn::Sub": "${CoreInfrastructureStackName}-PublicSubnet1"
+            }
+          },
+          {
+            "Fn::ImportValue": {
+              "Fn::Sub": "${CoreInfrastructureStackName}-PublicSubnet2"
+            }
           }
-        ],
-        "SecurityGroups": [ { "Ref": "LoadBalancerSecurityGroup" }
-        ],
-        "Subnets": [
-          { "Fn::ImportValue": { "Fn::Sub": "${CoreInfrastructureStackName}-PublicSubnet0" } },
-          { "Fn::ImportValue": { "Fn::Sub": "${CoreInfrastructureStackName}-PublicSubnet1" } },
-          { "Fn::ImportValue": { "Fn::Sub": "${CoreInfrastructureStackName}-PublicSubnet2" } }
         ]
       }
     },
     "ComponentLaunchConfiguration": {
       "Type": "AWS::AutoScaling::LaunchConfiguration",
       "Properties": {
-        "KeyName": { "Ref": "KeyName" },
-        "SecurityGroups": [
-          { "Fn::ImportValue": { "Fn::Sub": "${CoreInfrastructureStackName}-SSHFromBastionsSecGroup" } },
-          { "Ref": "ComponentSecurityGroup" }
+        "KeyName": {
+          "Ref": "KeyName"
+        },
+        "SecurityGroups": [{
+            "Fn::ImportValue": {
+              "Fn::Sub": "${CoreInfrastructureStackName}-SSHFromBastionsSecGroup"
+            }
+          },
+          {
+            "Ref": "ComponentSecurityGroup"
+          }
         ],
-        "InstanceType": { "Ref": "InstanceType" },
-        "IamInstanceProfile": { "Ref": "ComponentInstanceProfile" },
-        "ImageId": { "Ref": "ImageId" }
+        "InstanceType": {
+          "Ref": "InstanceType"
+        },
+        "IamInstanceProfile": {
+          "Ref": "ComponentInstanceProfile"
+        },
+        "ImageId": {
+          "Ref": "ImageId"
+        }
       }
     },
     "ComponentInstanceProfile": {
       "Type": "AWS::IAM::InstanceProfile",
       "Properties": {
         "Path": "/",
-        "Roles": [ { "Ref": "ComponentRole" } ]
+        "Roles": [{
+          "Ref": "ComponentRole"
+        }]
       }
     },
     "LoadBalancerSecurityGroup": {
       "Type": "AWS::EC2::SecurityGroup",
       "Properties": {
         "GroupDescription": "An ELB group allowing access only to from the corresponding component",
-        "SecurityGroupIngress": [
-          {
-            "ToPort": "443",
-            "FromPort": "443",
-            "IpProtocol": "tcp",
-            "CidrIp": "0.0.0.0/0"
-          }
-        ],
+        "SecurityGroupIngress": [{
+          "ToPort": "443",
+          "FromPort": "443",
+          "IpProtocol": "tcp",
+          "CidrIp": "0.0.0.0/0"
+        }],
         "VpcId": {
           "Fn::ImportValue": {
             "Fn::Sub": "${CoreInfrastructureStackName}-VpcId"
@@ -140,62 +186,107 @@
         }
       }
     },
-      "ComponentDNS": {
-        "Type": "AWS::Route53::RecordSet",
-        "Properties": {
-          "HostedZoneName": { "Fn::FindInMap": [ "OperationsMap", "DomainNameBaseMap", { "Ref": "Environment" } ] },
-          "Name": {
-            "Fn::Join": [
-              ".",
-              [
-                { "Fn::FindInMap": [ "OperationsMap", "CnameEntryMap", { "Ref": "Environment" } ] },
-                { "Fn::FindInMap": [ "OperationsMap", "DomainNameBaseMap", { "Ref": "Environment" } ] }
-              ]
+    "ComponentDNS": {
+      "Type": "AWS::Route53::RecordSet",
+      "Properties": {
+        "HostedZoneName": {
+          "Fn::FindInMap": ["OperationsMap", "DomainNameBaseMap", {
+            "Ref": "Environment"
+          }]
+        },
+        "Name": {
+          "Fn::Join": [
+            ".",
+            [{
+                "Fn::FindInMap": ["OperationsMap", "CnameEntryMap", {
+                  "Ref": "Environment"
+                }]
+              },
+              {
+                "Fn::FindInMap": ["OperationsMap", "DomainNameBaseMap", {
+                  "Ref": "Environment"
+                }]
+              }
             ]
-          },
-          "Type": "CNAME",
-          "ResourceRecords": [ { "Fn::GetAtt": [ "ComponentElasticLoadBalancer", "DNSName" ] } ],
-          "TTL": "60"
-        }
+          ]
+        },
+        "Type": "CNAME",
+        "ResourceRecords": [{
+          "Fn::GetAtt": ["ComponentElasticLoadBalancer", "DNSName"]
+        }],
+        "TTL": "60"
+      }
     },
     "ComponentPolicy": {
       "Type": "AWS::IAM::Policy",
       "Properties": {
         "PolicyName": "ComponentPolicy",
         "PolicyDocument": {
-          "Statement": [
-            {
-              "Action": [ "sts:AssumeRole" ],
-              "Resource": [ "*" ],
+          "Statement": [{
+              "Action": ["sts:AssumeRole"],
+              "Resource": ["*"],
               "Effect": "Allow"
             },
             {
-              "Action": [ "cloudwatch:PutMetricData" ],
-              "Resource": [ "*" ],
+              "Action": ["cloudwatch:PutMetricData"],
+              "Resource": ["*"],
               "Effect": "Allow"
             },
             {
               "Action": [
-                  "sqs:DeleteMessage",
-                  "sqs:SendMessage",
-                  "sqs:ReceiveMessage"
+                "sqs:DeleteMessage",
+                "sqs:SendMessage",
+                "sqs:ReceiveMessage"
               ],
-              "Resource": { "Fn::GetAtt" : ["captureTaskQueue", "Arn"]},
+              "Resource": {
+                "Fn::GetAtt": ["captureTaskQueue", "Arn"]
+              },
               "Effect": "Allow"
             },
             {
+              "Effect": "Allow",
               "Action": [
                 "s3:GetObject",
-                "s3:PutObject"
+                "s3:GetObjectAcl",
+                "s3:GetObjectVersion",
+                "s3:PutObject",
+                "s3:PutObjectAcl",
+                "s3:DeleteObject",
+                "s3:DeleteObjectTagging",
+                "s3:DeleteObjectVersionTagging",
+                "s3:GetObjectTagging",
+                "s3:GetObjectVersionTagging",
+                "s3:PutObjectTagging",
+                "s3:PutObjectVersionTagging"
               ],
-              "Resource": [ 
-		{ "Fn::Sub": [ "arn:aws:s3:::${Bucket}/*", {
-                    "Bucket": { "Fn::FindInMap": [ "OperationsMap", "PlayoutBucketMap", { "Ref": "Environment" } ] }
-		  }
-		 ]
-		}
+              "Resource": [
+                {
+                  "Fn::Sub": ["arn:aws:s3:::${bucketName}/*",
+                    { "bucketName": {
+                        "Fn::FindInMap": ["OperationsMap", "PlayoutBucketMap", { "Ref": "Environment" } ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "s3:ListBucket",
+                "s3:GetBucketLocation",
+                "s3:GetLifecycleConfiguration"
               ],
-              "Effect": "Allow"
+              "Resource": [
+                {
+                  "Fn::Sub": ["arn:aws:s3:::${bucketName}",
+                    { "bucketName": {
+                        "Fn::FindInMap": ["OperationsMap", "PlayoutBucketMap", { "Ref": "Environment" } ]
+                      }
+                    }
+                  ]
+                }
+              ]
             },
             {
               "Action": [
@@ -206,7 +297,9 @@
                 "s3:ListBucketMultipartUploads",
                 "s3:ListMultipartUploadParts"
               ],
-              "Resource": [ { "Ref": "S3BucketArn" } ],
+              "Resource": [{
+                "Ref": "S3BucketArn"
+              }],
               "Effect": "Allow"
             },
             {
@@ -218,66 +311,70 @@
                 "s3:PutObject",
                 "s3:DeleteObject"
               ],
-              "Resource": [
-                {
-                  "Fn::Join": [ "", [ { "Ref": "S3BucketArn" }, "/", { "Ref": "Component" }, "/", { "Ref": "Environment" }, "/logs/*" ] ]
-                }
-              ],
+              "Resource": [{
+                "Fn::Join": ["", [
+                  { "Ref": "S3BucketArn" }, "/",
+                  { "Ref": "Component" }, "/", 
+                  { "Ref": "Environment" }, "/logs/*"]
+                ]
+              }],
               "Effect": "Allow"
             },
             {
-              "Action": [ "cloudformation:Describe*" ],
-              "Resource": [ "*" ],
+              "Action": ["cloudformation:Describe*"],
+              "Resource": ["*"],
               "Effect": "Allow"
             },
             {
-              "Action": [ "ec2:Describe*" ],
-              "Resource": [ "*" ],
+              "Action": ["ec2:Describe*"],
+              "Resource": ["*"],
               "Effect": "Allow"
             },
             {
-              "Action": [ "tag:GetResources" ],
-              "Resource": [ "*" ],
-              "Effect": "Allow"
-            },
-            {
-              "Action": [ "es:*" ],
-              "Resource": { "Fn::Sub": [ "arn:aws:s3:::${Bucket}/*", {
-                    "Host": { "Fn::FindInMap": [ "OperationsMap", "ElasticSearchMap", { "Ref": "Environment" } ] }
-		  }
-		 ]
-		},
+              "Action": ["tag:GetResources"],
+              "Resource": ["*"],
               "Effect": "Allow"
             }
           ]
         },
-        "Roles": [ { "Ref": "ComponentRole" } ]
+        "Roles": [{
+          "Ref": "ComponentRole"
+        }]
       }
     },
     "ComponentSecurityGroup": {
       "Type": "AWS::EC2::SecurityGroup",
       "Properties": {
-        "SecurityGroupIngress": [
-          {
-            "SourceSecurityGroupId": { "Ref": "LoadBalancerSecurityGroup" },
+        "SecurityGroupIngress": [{
+            "SourceSecurityGroupId": {
+              "Ref": "LoadBalancerSecurityGroup"
+            },
             "FromPort": "7080",
             "ToPort": "7080",
             "IpProtocol": "tcp"
           },
           {
-            "SourceSecurityGroupId": { "Ref": "LoadBalancerSecurityGroup" },
+            "SourceSecurityGroupId": {
+              "Ref": "LoadBalancerSecurityGroup"
+            },
             "FromPort": "7443",
             "ToPort": "7443",
             "IpProtocol": "tcp"
           },
           {
-            "SourceSecurityGroupId": { "Ref": "LoadBalancerSecurityGroup" },
+            "SourceSecurityGroupId": {
+              "Ref": "LoadBalancerSecurityGroup"
+            },
             "FromPort": "123",
             "ToPort": "123",
             "IpProtocol": "udp"
           }
         ],
-        "VpcId": { "Fn::ImportValue": { "Fn::Sub": "${CoreInfrastructureStackName}-VpcId" } },
+        "VpcId": {
+          "Fn::ImportValue": {
+            "Fn::Sub": "${CoreInfrastructureStackName}-VpcId"
+          }
+        },
         "GroupDescription": "A component security group allowing access only from the corresponding ELB"
       }
     },
@@ -286,40 +383,49 @@
       "Properties": {
         "Path": "/",
         "AssumeRolePolicyDocument": {
-          "Statement": [
-            {
-              "Action": [ "sts:AssumeRole" ],
-              "Effect": "Allow",
-              "Principal": { "Service": [ "ec2.amazonaws.com" ] }
+          "Statement": [{
+            "Action": ["sts:AssumeRole"],
+            "Effect": "Allow",
+            "Principal": {
+              "Service": ["ec2.amazonaws.com"]
             }
-          ]
+          }]
         }
       }
     },
     "captureTaskQueue": {
       "Type": "AWS::SQS::Queue",
       "Properties": {
-        "QueueName": { "Fn::Join": [ "-", [ { "Ref": "Environment" }, "dazzler-capture-tasks.fifo" ] ] },
-	"FifoQueue": true,
+        "QueueName": {
+          "Fn::Join": ["-", [{
+            "Ref": "Environment"
+          }, "dazzler-capture-tasks.fifo"]]
+        },
+        "FifoQueue": true,
         "ContentBasedDeduplication": true,
-        "Tags": [ { "Key": "Purpose", "Value": "captureTasks" } ]
+        "Tags": [{
+          "Key": "Purpose",
+          "Value": "captureTasks"
+        }]
       }
     },
     "captureTaskQueuePolicy": {
-      "Type" : "AWS::SQS::QueuePolicy",
-      "Properties" : {
-        "PolicyDocument" : {
+      "Type": "AWS::SQS::QueuePolicy",
+      "Properties": {
+        "PolicyDocument": {
           "Version": "2012-10-17",
-            "Statement": [
-             {
-               "Effect": "Allow",
-               "Principal": "*",
-               "Action": "sqs:sendMessage",
-               "Resource": { "Fn::GetAtt" : ["captureTaskQueue", "Arn"] }
-             }
-           ]
+          "Statement": [{
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "sqs:sendMessage",
+            "Resource": {
+              "Fn::GetAtt": ["captureTaskQueue", "Arn"]
+            }
+          }]
         },
-        "Queues" : [ { "Fn::GetAtt" : ["captureTaskQueue", "QueueName"] } ]
+        "Queues": [{
+          "Fn::GetAtt": ["captureTaskQueue", "QueueName"]
+        }]
       }
     }
   },
@@ -354,16 +460,16 @@
       "Type": "String",
       "Description": "The AMI to use for this component"
     },
-      "Environment": {
-        "Default": "test",
-        "ConstraintDescription": "Values must be test or live",
-        "Type": "String",
-        "Description": "The deployment environment",
-        "AllowedValues": [
-          "test",
-          "live"
-        ]
-      },
+    "Environment": {
+      "Default": "test",
+      "ConstraintDescription": "Values must be test or live",
+      "Type": "String",
+      "Description": "The deployment environment",
+      "AllowedValues": [
+        "test",
+        "live"
+      ]
+    },
     "KeyName": {
       "Default": "cosmos",
       "Type": "String",
@@ -390,20 +496,20 @@
       "Description": "Name of the AWS account's core-infrastructure stack. Used to import other network parameters (vpc id, subnets etc)"
     }
   },
-    "Mappings": {
-        "OperationsMap": {
-            "DomainNameBaseMap": {
-                "live": "7a576ea3ed7ca599.xhst.bbci.co.uk.",
-                "test": "1c9eb4db7739eb1a.xhst.bbci.co.uk."
-            },
-            "CnameEntryMap": {
-                "live": "dazzler",
-                "test": "dazzler.test"
-            },
-            "VpcCidrIpMap" : {
-                "live": "10.124.64.0/18",
-                "test": "10.98.0.0/18"
-            },
+  "Mappings": {
+    "OperationsMap": {
+      "DomainNameBaseMap": {
+        "live": "7a576ea3ed7ca599.xhst.bbci.co.uk.",
+        "test": "1c9eb4db7739eb1a.xhst.bbci.co.uk."
+      },
+      "CnameEntryMap": {
+        "live": "dazzler",
+        "test": "dazzler.test"
+      },
+      "VpcCidrIpMap": {
+        "live": "10.124.64.0/18",
+        "test": "10.98.0.0/18"
+      },
       "PlayoutBucketMap": {
         "live": "ws-dazzler-assets",
         "test": "ws-dazzler-assets-test"
@@ -412,6 +518,6 @@
         "live": "vpc-live-pws-es-01-sharq3wijppafqfq2v3isa5ram.eu-west-1.es.amazonaws.com",
         "test": "vpc-test-pws-es-01-ntq5eu3xhbkw56fc2yi4vt2ndm.eu-west-1.es.amazonaws.com"
       }
-        }
     }
+  }
 }
