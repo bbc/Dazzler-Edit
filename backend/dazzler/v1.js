@@ -159,8 +159,8 @@ async function getClip(q, query, res) {
           }
         }
       }
-      res.json(clips);
     }
+    res.json(clips);
   } catch (e) {
     console.log(e);
     res.status(404).send("Not found"); // TODO use proper error message
