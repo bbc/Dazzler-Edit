@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
+import { makeStyles, useTheme } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
 import TableHead from "@material-ui/core/TableHead";
 import TableBody from "@material-ui/core/TableBody";
@@ -12,145 +12,118 @@ import Paper from "@material-ui/core/Paper";
 import {TablePaginationActionsWrapped} from "../TablePaginationActions/TablePaginationActions";
 import AssetDao from "../AssetDaoV1";
 
-export const styles = theme => ({
-  root: {
-    width: "100%",
-    marginTop: theme.spacing(3)
-  },
-  table: {
-    minWidth: 250
-  },
-  tableWrapper: {
-    overflowX: "hidden"
-  }
-});
-
-export class Specials extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      spinner: false,
-      totalRows: 0,
-      rows: [],
-      page: 0,
-      previousPage: -1,
-      rowsPerPage: 5,
-      data: [],
-      sid: ""
-    };
-  }
-
-  componentDidMount = () => {
-    this.setState({ sid: this.props.sid });
-  };
-
-  componentDidUpdate(prevProps) {
-    if (this.state.page !== this.state.previousPage) {
-      //console.log("have page %d want page %d", this.state.previousPage, this.state.page);
-      AssetDao.getSpecials(
-        this.state.sid,
-        this.state.page,
-        this.state.rowsPerPage,
-        (items, total) => {
-          console.log("updated specials", items);
-          this.setState({ 
-            rows: items,
-            totalRows: total
-          });
-      });
+const useStyles = (theme) => {
+  return makeStyles({
+    root: {
+      width: "100%",
+      marginTop: theme.spacing(3)
+    },
+    table: {
+      minWidth: 250
+    },
+    tableWrapper: {
+      overflowX: "hidden"
     }
-  }
+  });
+}
 
-  handleChangePage = (event, page) => {
-    this.setState({ page });
+export default function Specials({
+  sid = '',
+  handleClick = function() { console.log('specials, click pressed');},
+}) {
+  const theme = useTheme();
+  const classes = useStyles(theme);
+  const [totalRows, setTotalRows] = useState(0);
+  const [rows, setRows] = useState([]);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  console.log('specials want page', page);
+  AssetDao.getSpecials(
+    page,
+    rowsPerPage,
+    (items, total) => {
+      console.log('updated specials', total, items);
+      setRows(items);
+      setTotalRows(total);
+  });
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
   };
 
-  handleChangeRowsPerPage = event => {
-    this.setState({ page: 0, rowsPerPage: event.target.value });
+  const handleChangeRowsPerPage = event => {
+    setPage(0);
+    setRowsPerPage(event.target.value);
   };
 
-  addButton(clip) {
-    return (
-      <button
-        className="ui compact icon button"
-        onClick={() => {
-          this.props.handleClick(AssetDao.clip2Item(clip));
-        }}
-      >
-        <i className="plus icon"></i>
-      </button>
-    );
-  }
+  const emptyRows = rowsPerPage - Math.min(rowsPerPage, (rows.length?rows.length:0) - page * rowsPerPage);
 
-  render() {
-    const { classes } = this.props;
-    const { rows, rowsPerPage, page, totalRows } = this.state;
-    const emptyRows = rowsPerPage - Math.min(rowsPerPage, (rows.length?rows.length:0) - page * rowsPerPage);
+  return (
+    <div>
+      <Paper className={classes.root}>
+        <div className={classes.tableWrapper}>
+          <Table className={classes.table}>
+            <TableHead>
+            <TableRow>
+                <TableCell>Title</TableCell>
+                <TableCell>Duration</TableCell>
+                <TableCell>Add</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {rows.map(row => (
+                <TableRow key={row.pid}>
+                  <TableCell component="th" scope="row">
+                    <div className="tooltip">
+                      {" "}
+                      {row.title}
+                      <span className="tooltiptext">PID = {row.pid}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell align="right">
+                    {this.formattedDuration(row)}
+                  </TableCell>
+                  <TableCell align="right">
+                    <button className="ui compact icon button"
+                      onClick={() => { handleClick(row); }}
+                    >
+                      <i className="plus icon"></i>
+                    </button>
+                  </TableCell>
+                </TableRow>
+              ))}
 
-    return (
-      <div>
-        <Paper className={classes.root}>
-          <div className={classes.tableWrapper}>
-            <Table className={classes.table}>
-              <TableHead>
+              {emptyRows > 0 && (
+                <TableRow style={{ height: 48 * emptyRows }}>
+                  <TableCell colSpan={6} />
+                </TableRow>
+              )}
+            </TableBody>
+            <TableFooter>
               <TableRow>
-                  <TableCell>Title</TableCell>
-                  <TableCell>Duration</TableCell>
-                  <TableCell>Add</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map(row => (
-                  <TableRow key={row.pid}>
-                    <TableCell component="th" scope="row">
-                      <div className="tooltip">
-                        {" "}
-                        {row.title}
-                        <span className="tooltiptext">PID = {row.pid}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell align="right">
-                      {this.formattedDuration(row)}
-                    </TableCell>
-
-                    <TableCell align="right">{this.addButton(row)}</TableCell>
-                  </TableRow>
-                ))}
-
-                {emptyRows > 0 && (
-                  <TableRow style={{ height: 48 * emptyRows }}>
-                    <TableCell colSpan={6} />
-                  </TableRow>
-                )}
-              </TableBody>
-              <TableFooter>
-                <TableRow>
-                  <TablePagination
-                    rowsPerPageOptions={[5, 10, 25]}
-                    colSpan={3}
-                    count={totalRows}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    SelectProps={{
-                      native: true
-                    }}
-                    onChangePage={this.handleChangePage}
-                    onChangeRowsPerPage={this.handleChangeRowsPerPage}
-                    ActionsComponent={TablePaginationActionsWrapped}
-                  />
-                </TableRow>
-              </TableFooter>
-            </Table>
-          </div>
-        </Paper>
-      </div>
-    );
-  }
+                <TablePagination
+                  rowsPerPageOptions={[5, 10, 25]}
+                  colSpan={3}
+                  count={totalRows}
+                  rowsPerPage={rowsPerPage}
+                  page={page}
+                  SelectProps={{
+                    native: true
+                  }}
+                  onChangePage={handleChangePage}
+                  onChangeRowsPerPage={handleChangeRowsPerPage}
+                  ActionsComponent={TablePaginationActionsWrapped}
+                />
+              </TableRow>
+            </TableFooter>
+          </Table>
+        </div>
+      </Paper>
+    </div>
+  );
 }
 
 Specials.propTypes = {
-  classes: PropTypes.object.isRequired
+  sid: PropTypes.string.isRequired
 };
-
-export default withStyles(styles)(Specials);
