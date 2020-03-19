@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
@@ -38,15 +38,18 @@ export default function Specials({
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  console.log('specials want page', page);
-  AssetDao.getSpecials(
-    page,
-    rowsPerPage,
-    (items, total) => {
-      console.log('updated specials', total, items);
-      setRows(items);
-      setTotalRows(total);
-  });
+  useEffect(() => {
+    console.log('specials want page', page);
+    AssetDao.getSpecials(
+      sid,
+      page,
+      rowsPerPage,
+      (items, total) => {
+        console.log('updated specials', total, items);
+        setRows(items);
+        setTotalRows(total);
+    });
+  }, [sid, page, rowsPerPage]);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
