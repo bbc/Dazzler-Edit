@@ -53,13 +53,15 @@ class AssetDao {
   ) {
     var sort_direction = direction === "desc" ? "descending" : "ascending";
     const url = `${URLPrefix}/api/v2/episode`;
+    const params = {
+      sid, page, sort, sort_direction,
+      page_size: rowsPerPage,
+      from: mustBeAvailableBy,
+      to: mustBeAvailableUntil,
+    };
+    console.log('episode', params);
     axios
-      .get(url, { params: {
-        sid, page, sort, sort_direction,
-        page_size: rowsPerPage,
-        from: mustBeAvailableBy,
-        to: mustBeAvailableUntil,
-      }})
+      .get(url, { params })
       .then(response => {
         console.log("episode DAO", response);
         const items = [];

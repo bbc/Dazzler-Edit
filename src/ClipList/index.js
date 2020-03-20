@@ -12,10 +12,10 @@ export default function ClipList({
   type,
   page = 0,
   rowsPerPage = 5,
-  onAddClicked = function() {
+  onAddClicked = function () {
     console.log("add clicked");
   },
-  onPageLoaded = function(page, rowsPerPage, total) {
+  onPageLoaded = function (page, rowsPerPage, total) {
     console.log("page changed", page, rowsPerPage, total);
   },
   sort,
@@ -44,21 +44,20 @@ export default function ClipList({
     AssetDao.getClips(
       sid,
       type,
-      page, // nitro is one-based
+      page + 1, // nitro is one-based
       rowsPerPage,
       sort,
       sort_direction,
       (items, total) => {
-        console.log("updated", items);
-        console.log("got clip data for", type);
+        console.log("got clip data for", type, total, items);
         setRows(items);
+        setCurrentPage(page);
+        setCurrentRowsPerPage(rowsPerPage);
+        setcurrentSortDirection(sort_direction);
+        setcurrentType(type);    
         onPageLoaded(currentPage, currentRowsPerPage, total);
       }
     );
-    setCurrentPage(page);
-    setCurrentRowsPerPage(rowsPerPage);
-    setcurrentSortDirection(sort_direction);
-    setcurrentType(type);
   }
 
   return (

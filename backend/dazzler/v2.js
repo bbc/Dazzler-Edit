@@ -57,7 +57,10 @@ const episode = async (req, res) => {
     from = size * (req.query.page - 1);
   }
   let query;
-  if (moment.utc().isAfter(from)) { // must be available now
+  const after = req.query.from;
+  const until = req.query.to;
+  console.log(after, until);
+  if (moment.utc().isAfter(after)) { // must be available now
     query = {
       "bool": {
         "must": [
@@ -97,6 +100,7 @@ const episode = async (req, res) => {
       "bool": {
         "must": [
           { "match": { "pips.master_brand_for.master_brand.mid": mid } },
+          { "exists": { "field": "pips.programme_availability" } },
           {
             "bool": {
               "must_not": [
@@ -121,6 +125,7 @@ const episode = async (req, res) => {
     };
   }
   const data = { query, _source, from, size };
+  console.log(JSON.stringify(data, 2));
   if (req.query.sort) {
     let sortDirection = 'desc';
     if (req.query.sort_direction === 'ascending') {

@@ -6,40 +6,36 @@ const URLPrefix =
 
 class AssetDao {
 
-  static getClips(sid, type, page, rowsPerPage, sort, direction, cb) {
-    var sort_direction = direction === "desc" ? "descending" : "ascending";
-    const url = `${URLPrefix}/api/v1/clip?sid=${sid}&type=${type}&page=${page +
-      1}&page_size=${rowsPerPage}&sort=${sort}&sort_direction=${sort_direction}`;
+  static get(path, params, cb) {
     axios
-      .get(url)
+      .get(`${URLPrefix}/api/v1/${path}`, { params }
+      )
       .then((response) => {
         const items = [];
-        response.data.items.forEach((clip) => {
-          items.push(this.clip2Item(clip));
-        });
+        if (response.data.items) {
+          response.data.items.forEach((clip) => {
+            items.push(this.clip2Item(clip));
+          });
+        }
         cb(items, response.data.total);
       })
       .catch(e => {
         console.log(e);
       });
   }
+ 
+  static getClips(sid, type, page, rowsPerPage, sort, direction, cb) {
+    var sort_direction = direction === "desc" ? "descending" : "ascending";
+    const params = {
+      sid, type, sort, sort_direction,
+      page, page_size: rowsPerPage
+    };
+    this.get('clip', params, cb);
+  }
 
   static getSpecials(sid, page, rowsPerPage, cb) {
-    axios
-      .get(
-        `${URLPrefix}/api/v1/special?sid=${sid}&page=${page +
-          1}&page_size=${rowsPerPage}`
-      )
-      .then((response) => {
-        const items = [];
-        response.data.items.forEach((clip) => {
-          items.push(this.clip2Item(clip));
-        });
-        cb(items, response.data.total);
-      })
-      .catch(e => {
-        console.log(e);
-      });
+    console.log('special', sid, page, rowsPerPage);
+    this.get('special', { sid, page, page_size: rowsPerPage }, cb);
   }
 
   static getEpisodes(
