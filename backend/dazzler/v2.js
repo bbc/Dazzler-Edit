@@ -62,9 +62,26 @@ const episode = async (req, res) => {
         {
           "range": {
             "sonata.episode.availabilities.av_pv13_pa4.start": {
-              "gte": after,
-              "lte": before,
+              "lt": after
             }
+          }
+        },
+        {
+          "bool": {
+            "should": [
+              {
+                "bool": { "must_not": [
+                  { "exists": {"field": "sonata.episode.availabilities.av_pv13_pa4.end"}}
+                ] }
+              },
+              {
+                "range": {
+                  "sonata.episode.availabilities.av_pv13_pa4.end": {
+                    "gte": before
+                  }
+                }      
+              }
+            ]
           }
         }
       ]
