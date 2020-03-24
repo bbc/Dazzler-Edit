@@ -42,88 +42,34 @@ const episode = async (req, res) => {
     "pips.episode.pid",
     "sonata.episode.aggregatedTitle",
     "sonata.episode.release_date.date",
-    "pips.programme_availability.available_versions.available_version"
+    "pips.programme_availability.available_versions.available_version",
+    "sonata.episode.availabilities.av_pv13_pa4"
   ];
-  let mid = 'bbc_hindi_tv';
-  if (req.query.sid) {
-    mid = config[req.query.sid].mid;
-  }
-  let size = 20;
-  if (req.query.page_size) {
-    size = req.query.page_size;
-  }
+  const sid = req.query.sid || config.default_sid;
+  const mid = config[sid].mid;
+  const size = req.query.page_size || 20;
   let from = 0;
   if (req.query.page) {
     from = size * (req.query.page - 1);
   }
-  let query;
-  const after = req.query.from;
-  const until = req.query.to;
-  console.log(after, until);
-  if (moment.utc().isAfter(after)) { // must be available now
-    query = {
-      "bool": {
-        "must": [
-          { "match": { "pips.master_brand_for.master_brand.mid": mid } },
-          {
-            "exists": { "field": "sonata.episode.availabilities.pc_streaming_concrete_combined_hd.actual_start" }
-          },
-          { 
-            "bool": {
-              "should": [
-                {
-                  "range": {
-                    "sonata.episode.availabilities.pc_streaming_concrete_combined_hd.end": {
-                      "gte": req.query.to, // "now+1d"
-                    }
-                  }
-                },
-            {
-            "bool": {
-              "must_not": [
-                {
-                  "exists": {
-                    "field": "sonata.episode.availabilities.pc_streaming_concrete_combined_hd.end"
-                  }
-                }
-              ]
-            }
-            }
-              ]
+  const after = req.query.from || '1970-01-01T00:00:00Z';
+  const before = req.query.to || moment.utc().plus(1, 'y');
+  console.log('from', after,'to', before);
+  const query = {
+    "bool": {
+      "must": [
+        { "match": { "pips.master_brand_for.master_brand.mid": mid } },
+        {
+          "range": {
+            "sonata.episode.availabilities.av_pv13_pa4.start": {
+              "gte": after,
+              "lte": before,
             }
           }
-        ]
-      }
-    };
-  } else {
-    query = {
-      "bool": {
-        "must": [
-          { "match": { "pips.master_brand_for.master_brand.mid": mid } },
-          { "exists": { "field": "pips.programme_availability" } },
-          {
-            "bool": {
-              "must_not": [
-                {
-                  "exists": {
-                    "field": "sonata.episode.availabilities.pc_streaming_concrete_combined_hd.actual_start"
-                  }
-                }
-              ]
-            }
-          },          
-          {
-            "range": {
-              "sonata.episode.release_date.date": {
-                "gte": req.query.from,
-                "lte": req.query.to,
-              }
-            }
         }
       ]
-      }
-    };
-  }
+    }
+  };
   const data = { query, _source, from, size };
   console.log(JSON.stringify(data, 2));
   if (req.query.sort) {
