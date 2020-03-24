@@ -59,7 +59,7 @@ class AssetDao {
       page_size: rowsPerPage,
       from: mustBeAvailableBy,
       to: mustBeAvailableUntil,
-      availability,
+      availability: availability,
     };
     console.log('episode', params);
     axios
