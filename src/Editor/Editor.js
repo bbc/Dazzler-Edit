@@ -565,7 +565,7 @@ class Editor extends React.Component {
                 <ExpansionPanelDetails>
                   <Episode
                     flip={this.state.side}
-                    availability='available'
+                    availability={'available'}
                     mustBeAvailableBy={mustBeAvailableBy}
                     mustBeAvailableUntil={mustBeAvailableUntil}
                     sid={this.state.schedule.sid}
@@ -585,7 +585,7 @@ class Editor extends React.Component {
                 </ExpansionPanelSummary>
                 <ExpansionPanelDetails>
                   <Episode
-                    availability='P1D'
+                    availability={'P1D'}
                     mustBeAvailableBy={upcomingMustBeAvailableBy}
                     mustBeAvailableUntil={upcomingMustBeAvailableUntil}
                     sid={this.state.schedule.sid}
