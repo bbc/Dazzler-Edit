@@ -140,6 +140,7 @@ export class Episode extends React.Component {
               </TableHead>
               <EpisodeList
                 sid={this.props.sid}
+                availability={this.props.availability}
                 mustBeAvailableBy={this.props.mustBeAvailableBy}
                 mustBeAvailableUntil={this.props.mustBeAvailableUntil}
                 page={this.state.page}

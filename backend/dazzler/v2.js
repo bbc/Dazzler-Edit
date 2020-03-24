@@ -168,7 +168,7 @@ const episode = async (req, res) => {
           expected_start: moment.utc(se.availabilities.av_pv13_pa4.start).add(duration).add(10, 'm').format()
       };
       if (se.availabilities.av_pv13_pa4.actual_start) {
-        availability.end = se.availabilities.av_pv13_pa4.actual_start;
+        availability.actual_start = se.availabilities.av_pv13_pa4.actual_start;
       }
       if (se.availabilities.av_pv13_pa4.end) {
         availability.end = se.availabilities.av_pv13_pa4.end;
