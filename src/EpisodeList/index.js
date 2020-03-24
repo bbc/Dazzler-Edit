@@ -9,6 +9,7 @@ import AssetDao from "../AssetDaoV2";
 
 export default function EpisodeList({
   sid,
+  availability,
   mustBeAvailableBy,
   mustBeAvailableUntil,
   page = 0,
@@ -48,6 +49,7 @@ export default function EpisodeList({
     console.log("episodelist fetching", page, rowsPerPage);
     AssetDao.getEpisodes(
       sid,
+      availability,
       mustBeAvailableBy,
       mustBeAvailableUntil,
       page + 1, // nitro is one-based

@@ -23,39 +23,8 @@ ax = axios.create({
   })
 });
 
-/*
- parameters from v1:
- sort title|release_date
- sort_direction descending|ascending
- sid bbc_hindi_tv|bbc_marathi_tv
- pid
- page 1..
- page_size n
- from ISO8601
- to ISO8601
-*/
-const episode = async (req, res) => {
-  const params = {
-    headers: { "Content-Type": "application/json" }
-  };
-  const _source = [
-    "pips.episode.pid",
-    "sonata.episode.aggregatedTitle",
-    "sonata.episode.release_date.date",
-    "pips.programme_availability.available_versions.available_version",
-    "sonata.episode.availabilities.av_pv13_pa4"
-  ];
-  const sid = req.query.sid || config.default_sid;
-  const mid = config[sid].mid;
-  const size = req.query.page_size || 20;
-  let from = 0;
-  if (req.query.page) {
-    from = size * (req.query.page - 1);
-  }
-  const after = req.query.from || '1970-01-01T00:00:00Z';
-  const before = req.query.to || moment.utc().add(1, 'y');
-  console.log('from', after,'to', before);
-  const query = {
+function availableQuery(mid, after, before) {
+  return {
     "bool": {
       "must": [
         { "match": { "pips.master_brand_for.master_brand.mid": mid } },
@@ -87,7 +56,86 @@ const episode = async (req, res) => {
       ]
     }
   };
-  const data = { query, _source, from, size };
+}
+
+function unavailableQuery(mid, after, before) {
+  return {
+    "bool": {
+      "must": [
+        { "match": { "pips.master_brand_for.master_brand.mid": mid } },
+        {
+          "bool": { "must_not": [
+            { "exists": {"field": "sonata.episode.availabilities.av_pv13_pa4.actual_start"}}
+          ] }
+        },
+        {
+          "range": {
+            "sonata.episode.availabilities.av_pv13_pa4.start": {
+              "lt": after
+            }
+          }
+        },
+        {
+          "bool": {
+            "should": [
+              {
+                "bool": { "must_not": [
+                  { "exists": {"field": "sonata.episode.availabilities.av_pv13_pa4.end"}}
+                ] }
+              },
+              {
+                "range": {
+                  "sonata.episode.availabilities.av_pv13_pa4.end": {
+                    "gte": before
+                  }
+                }      
+              }
+            ]
+          }
+        }
+      ]
+    }
+  };
+}
+/*
+ parameters from v1:
+ sort title|release_date
+ sort_direction descending|ascending
+ sid bbc_hindi_tv|bbc_marathi_tv
+ pid
+ page 1..
+ page_size n
+ from ISO8601
+ to ISO8601
+*/
+const episode = async (req, res) => {
+  const params = {
+    headers: { "Content-Type": "application/json" }
+  };
+  const _source = [
+    "pips.episode.pid",
+    "sonata.episode.aggregatedTitle",
+    "sonata.episode.release_date.date",
+    "pips.programme_availability.available_versions.available_version",
+    "sonata.episode.availabilities.av_pv13_pa4"
+  ];
+  const sid = req.query.sid || config.default_sid;
+  const mid = config[sid].mid;
+  const size = req.query.page_size || 20;
+  let from = 0;
+  if (req.query.page) {
+    from = size * (req.query.page - 1);
+  }
+  const after = req.query.from || '1970-01-01T00:00:00Z';
+  const before = req.query.to || moment.utc().add(1, 'y');
+  const a = req.query.availability || 'available';
+  console.log('from', after,'to', before);
+  const data = { _source, from, size };
+  if (a==='available') {
+    data.query = availableQuery(mid, after, before);
+  } else {
+    data.query = unavailableQuery(mid, after, before);
+  }
   console.log(JSON.stringify(data, 2));
   if (req.query.sort) {
     let sortDirection = 'desc';
@@ -117,7 +165,7 @@ const episode = async (req, res) => {
       const duration = moment.duration(version.duration.$);
       const availability = {
           planned_start: se.availabilities.av_pv13_pa4.start,
-          expected_start: moment.utc(se.availabilities.av_pv13_pa4.start).add(duration).add(10, m).format()
+          expected_start: moment.utc(se.availabilities.av_pv13_pa4.start).add(duration).add(10, 'm').format()
       };
       if (se.availabilities.av_pv13_pa4.actual_start) {
         availability.end = se.availabilities.av_pv13_pa4.actual_start;

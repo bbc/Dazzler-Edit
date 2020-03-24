@@ -43,6 +43,7 @@ class AssetDao {
 
   static getEpisodes(
     sid,
+    availability,
     mustBeAvailableBy,
     mustBeAvailableUntil,
   page,
@@ -58,6 +59,7 @@ class AssetDao {
       page_size: rowsPerPage,
       from: mustBeAvailableBy,
       to: mustBeAvailableUntil,
+      availability,
     };
     console.log('episode', params);
     axios
