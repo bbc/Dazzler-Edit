@@ -53,7 +53,7 @@ const episode = async (req, res) => {
     from = size * (req.query.page - 1);
   }
   const after = req.query.from || '1970-01-01T00:00:00Z';
-  const before = req.query.to || moment.utc().plus(1, 'y');
+  const before = req.query.to || moment.utc().add(1, 'y');
   console.log('from', after,'to', before);
   const query = {
     "bool": {
@@ -94,16 +94,29 @@ const episode = async (req, res) => {
     const result = answer.data;
     const items = [];
     result.hits.hits.forEach((hit) => {
+      const se = hit._source.sonata.episode;
       const versions = hit._source.pips.programme_availability.available_versions.available_version;
       const version = versions[0].version; // TODO pick a version
+      const duration = moment.duration(version.duration.$);
+      const availability = {
+          planned_start: se.availabilities.av_pv13_pa4.start,
+          expected_start: moment.utc(se.availabilities.av_pv13_pa4.start).add(duration).add(10, m).format()
+      };
+      if (se.availabilities.av_pv13_pa4.actual_start) {
+        availability.end = se.availabilities.av_pv13_pa4.actual_start;
+      }
+      if (se.availabilities.av_pv13_pa4.end) {
+        availability.end = se.availabilities.av_pv13_pa4.end;
+      }
       const item = {
         entityType: 'episode',
-        release_date: hit._source.sonata.episode.release_date.date,
-        title: hit._source.sonata.episode.aggregatedTitle,
+        release_date: se.release_date.date,
+        title: se.aggregatedTitle,
         pid: hit._source.pips.episode.pid,
         vpid: version.pid,
         versionCrid: version.crid.uri,
-        duration: moment.duration(version.duration.$).toISOString()
+        duration: duration.toISOString(),
+        availability
       };
       items.push(item);
     });
