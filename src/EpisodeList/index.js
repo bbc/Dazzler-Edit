@@ -14,35 +14,42 @@ export default function EpisodeList({
   mustBeAvailableUntil,
   page = 0,
   rowsPerPage = 5,
-  sort = 'title',
-  sortDirection = 'desc',
+  sort = "title",
+  sortDirection = "desc",
   flip = false,
   onAddClicked = function() {
     console.log("add clicked");
   },
   onPageLoaded = function(page, rowsPerPage, total) {
     console.log("page changed", page, rowsPerPage, total);
-  }
+  },
+  search
 }) {
   const [currentPage, setCurrentPage] = useState(0);
   const [currentRowsPerPage, setCurrentRowsPerPage] = useState(5);
   const [currentSortDirection, setcurrentSortDirection] = useState("desc");
+  const [currentSearch, setCurrentSearch] = useState("");
   const [rows, setRows] = useState([]);
   const [side, setSide] = useState(true);
 
   useEffect(() => {
-    window.addEventListener("message", (event) => {
-      console.log(event);
-    }, false);
+    window.addEventListener(
+      "message",
+      event => {
+        console.log(event);
+      },
+      false
+    );
   }, []); // run once
 
   // statements in the body of the function are called on rendering!!!
 
   if (
-    flip === side
-    && page === currentPage
-    && rowsPerPage === currentRowsPerPage
-    && sortDirection === currentSortDirection
+    flip === side &&
+    page === currentPage &&
+    rowsPerPage === currentRowsPerPage &&
+    sortDirection === currentSortDirection &&
+    search == currentSearch
   ) {
     console.log("episodelist no change", page, rowsPerPage);
   } else {
@@ -57,15 +64,24 @@ export default function EpisodeList({
       sort,
       sortDirection,
       (items, total) => {
-        console.log('got', items.length, 'episodes for', mustBeAvailableBy, 'until', mustBeAvailableUntil);
+        console.log(
+          "got",
+          items.length,
+          "episodes for",
+          mustBeAvailableBy,
+          "until",
+          mustBeAvailableUntil
+        );
         setRows(items);
         onPageLoaded(currentPage, currentRowsPerPage, total);
-      }
+      },
+      search
     );
     setCurrentPage(page);
     setCurrentRowsPerPage(rowsPerPage);
     setcurrentSortDirection(sortDirection);
     setSide(flip);
+    setCurrentSearch(search);
   }
 
   return (
@@ -80,9 +96,9 @@ export default function EpisodeList({
             </div>
           </TableCell>
           <TableCell align="right">{row.release_date}</TableCell>
-          <TableCell align="right">{
-            moment.duration(row.duration).format("hh:mm:ss", { trim: false })
-            }</TableCell>
+          <TableCell align="right">
+            {moment.duration(row.duration).format("hh:mm:ss", { trim: false })}
+          </TableCell>
           <TableCell align="right">
             <button
               className="ui compact icon button"

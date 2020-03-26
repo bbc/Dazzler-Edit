@@ -15,7 +15,7 @@ let host;
 if (process.env.ES_HOST) {
   host = process.env.ES_HOST;
 } else {
-  host = 'localhost:8443';
+  host = "localhost:8443";
 }
 ax = axios.create({
   httpsAgent: new https.Agent({
@@ -23,32 +23,43 @@ ax = axios.create({
   })
 });
 
-function availableQuery(mid, after, before) {
+function availableQuery(mid, after, before, search) {
+  let filter;
+  if (search !== "") {
+    filter = { match: { "pips.episode.title.$": search } };
+  }
   return {
-    "bool": {
-      "must": [
-        { "match": { "pips.master_brand_for.master_brand.mid": mid } },
+    bool: {
+      must: [
+        { match: { "pips.master_brand_for.master_brand.mid": mid } },
+        filter,
         {
-          "range": {
+          range: {
             "sonata.episode.availabilities.av_pv13_pa4.start": {
-              "lt": after
+              lt: after
             }
           }
         },
         {
-          "bool": {
-            "should": [
+          bool: {
+            should: [
               {
-                "bool": { "must_not": [
-                  { "exists": {"field": "sonata.episode.availabilities.av_pv13_pa4.end"}}
-                ] }
+                bool: {
+                  must_not: [
+                    {
+                      exists: {
+                        field: "sonata.episode.availabilities.av_pv13_pa4.end"
+                      }
+                    }
+                  ]
+                }
               },
               {
-                "range": {
+                range: {
                   "sonata.episode.availabilities.av_pv13_pa4.end": {
-                    "gte": before
+                    gte: before
                   }
-                }      
+                }
               }
             ]
           }
@@ -58,37 +69,55 @@ function availableQuery(mid, after, before) {
   };
 }
 
-function unavailableQuery(mid, after, before) {
+function unavailableQuery(mid, after, before, search) {
+  let filter;
+  if (search !== "") {
+    filter = { match_phrase: { "pips.episode.title.$": search } };
+  }
   return {
-    "bool": {
-      "must": [
-        { "match": { "pips.master_brand_for.master_brand.mid": mid } },
+    bool: {
+      must: [
+        { match: { "pips.master_brand_for.master_brand.mid": mid } },
+        filter,
         {
-          "bool": { "must_not": [
-            { "exists": {"field": "sonata.episode.availabilities.av_pv13_pa4.actual_start"}}
-          ] }
+          bool: {
+            must_not: [
+              {
+                exists: {
+                  field:
+                    "sonata.episode.availabilities.av_pv13_pa4.actual_start"
+                }
+              }
+            ]
+          }
         },
         {
-          "range": {
+          range: {
             "sonata.episode.availabilities.av_pv13_pa4.start": {
-              "lt": after
+              lt: after
             }
           }
         },
         {
-          "bool": {
-            "should": [
+          bool: {
+            should: [
               {
-                "bool": { "must_not": [
-                  { "exists": {"field": "sonata.episode.availabilities.av_pv13_pa4.end"}}
-                ] }
+                bool: {
+                  must_not: [
+                    {
+                      exists: {
+                        field: "sonata.episode.availabilities.av_pv13_pa4.end"
+                      }
+                    }
+                  ]
+                }
               },
               {
-                "range": {
+                range: {
                   "sonata.episode.availabilities.av_pv13_pa4.end": {
-                    "gte": before
+                    gte: before
                   }
-                }      
+                }
               }
             ]
           }
@@ -97,6 +126,49 @@ function unavailableQuery(mid, after, before) {
     }
   };
 }
+
+function searchQuery(mid, after, before, search) {
+  return {
+    bool: {
+      must: [
+        { match: { "pips.master_brand_for.master_brand.mid": mid } },
+        { match_phrase: { "pips.episode.title.$": search } },
+        {
+          range: {
+            "sonata.episode.availabilities.av_pv13_pa4.start": {
+              lt: after
+            }
+          }
+        },
+        {
+          bool: {
+            should: [
+              {
+                bool: {
+                  must_not: [
+                    {
+                      exists: {
+                        field: "sonata.episode.availabilities.av_pv13_pa4.end"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                range: {
+                  "sonata.episode.availabilities.av_pv13_pa4.end": {
+                    gte: before
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  };
+}
+
 /*
  parameters from v1:
  sort title|release_date
@@ -126,25 +198,27 @@ const episode = async (req, res) => {
   if (req.query.page) {
     from = size * (req.query.page - 1);
   }
-  const after = req.query.from || '1970-01-01T00:00:00Z';
-  const before = req.query.to || moment.utc().add(1, 'y');
-  const a = req.query.availability || 'available';
-  console.log('from', after,'to', before);
+  const after = req.query.from || "1970-01-01T00:00:00Z";
+  const before = req.query.to || moment.utc().add(1, "y");
+  const a = req.query.availability || "available";
+  const search = req.query.search;
+  console.log("from", after, "to", before);
   const data = { _source, from, size };
-  if (a==='available') {
-    data.query = availableQuery(mid, after, before);
+  if (a === "available") {
+    data.query = availableQuery(mid, after, before, search);
   } else {
-    data.query = unavailableQuery(mid, after, before);
+    data.query = unavailableQuery(mid, after, before, search);
   }
+
   console.log(JSON.stringify(data, 2));
   if (req.query.sort) {
-    let sortDirection = 'desc';
-    if (req.query.sort_direction === 'ascending') {
-      sortDirection = 'asc';
+    let sortDirection = "desc";
+    if (req.query.sort_direction === "ascending") {
+      sortDirection = "asc";
     }
     const sortMap = {
-      "release_date": "sonata.episode.release_date.date",
-    "title": "sonata.episode.aggregatedTitle.keyword"
+      release_date: "sonata.episode.release_date.date",
+      title: "sonata.episode.aggregatedTitle.keyword"
     };
     const sort = {};
     sort[sortMap[req.query.sort]] = sortDirection;
@@ -158,14 +232,20 @@ const episode = async (req, res) => {
     );
     const result = answer.data;
     const items = [];
-    result.hits.hits.forEach((hit) => {
+    result.hits.hits.forEach(hit => {
       const se = hit._source.sonata.episode;
-      const versions = hit._source.pips.programme_availability.available_versions.available_version;
+      const versions =
+        hit._source.pips.programme_availability.available_versions
+          .available_version;
       const version = versions[0].version; // TODO pick a version
       const duration = moment.duration(version.duration.$);
       const availability = {
-          planned_start: se.availabilities.av_pv13_pa4.start,
-          expected_start: moment.utc(se.availabilities.av_pv13_pa4.start).add(duration).add(10, 'm').format()
+        planned_start: se.availabilities.av_pv13_pa4.start,
+        expected_start: moment
+          .utc(se.availabilities.av_pv13_pa4.start)
+          .add(duration)
+          .add(10, "m")
+          .format()
       };
       if (se.availabilities.av_pv13_pa4.actual_start) {
         availability.actual_start = se.availabilities.av_pv13_pa4.actual_start;
@@ -174,7 +254,7 @@ const episode = async (req, res) => {
         availability.end = se.availabilities.av_pv13_pa4.end;
       }
       const item = {
-        entityType: 'episode',
+        entityType: "episode",
         release_date: se.release_date.date,
         title: se.aggregatedTitle,
         pid: hit._source.pips.episode.pid,
@@ -209,7 +289,7 @@ const saveEmergencyPlayList = async function(req, res) {
       Body: req.body,
       Bucket: process.env.BUCKET,
       Key: `${sid}/emergency-playlist.json`,
-      ContentType: 'application/json'
+      ContentType: "application/json"
     };
     try {
       await s3.putObject(params).promise();
@@ -223,7 +303,7 @@ const saveEmergencyPlayList = async function(req, res) {
     console.log(message);
     res.status(403).send(message);
   }
-}
+};
 
 const subscribe = async function(req, res) {
   const sid = req.query.sid || config.default_sid;
@@ -234,7 +314,7 @@ const subscribe = async function(req, res) {
     console.log("error ", e);
     res.status(404).send("error");
   }
-}
+};
 
 module.exports = {
   init(app, configObject) {
@@ -252,4 +332,4 @@ module.exports = {
     // app.post("/api/v2/tva", tva);
     app.post("/api/v2/subscribe", subscribe);
   }
-}
+};

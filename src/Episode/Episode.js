@@ -10,6 +10,7 @@ import TablePagination from "@material-ui/core/TablePagination";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import moment from "moment";
+import TextField from "@material-ui/core/TextField";
 import "moment-duration-format";
 import { TablePaginationActionsWrapped } from "../TablePaginationActions/TablePaginationActions";
 import EpisodeList from "../EpisodeList";
@@ -24,6 +25,13 @@ export const styles = theme => ({
   },
   tableWrapper: {
     overflowX: "hidden"
+  },
+  search: {
+    "& > *": {
+      // margin: theme.spacing(1),
+      width: "25ch",
+      height: "6ch"
+    }
   }
 });
 
@@ -55,11 +63,15 @@ export class Episode extends React.Component {
       sid: "",
       orderBy: "title",
       order: "asc",
+      search: "",
       date: moment()
         .utc()
         .format()
     };
   }
+  handleChange = event => {
+    this.setState({ search: event.target.value });
+  };
 
   onPageChange = (page, rowsPerPage, totalRows) => {
     this.setState({
@@ -111,6 +123,13 @@ export class Episode extends React.Component {
 
     return (
       <div>
+        <TextField
+          className={classes.search}
+          id="outlined-basic"
+          label="Search"
+          variant="outlined"
+          onChange={this.handleChange}
+        />
         <Paper className={classes.root}>
           <div className={classes.tableWrapper}>
             <Table className={classes.table}>
@@ -150,6 +169,7 @@ export class Episode extends React.Component {
                 sort={orderBy}
                 sortDirection={order}
                 flip={this.props.flip}
+                search={this.state.search}
               />
               <TableFooter>
                 <TableRow>

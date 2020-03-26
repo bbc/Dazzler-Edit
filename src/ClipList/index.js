@@ -12,18 +12,20 @@ export default function ClipList({
   type,
   page = 0,
   rowsPerPage = 5,
-  onAddClicked = function () {
+  onAddClicked = function() {
     console.log("add clicked");
   },
-  onPageLoaded = function (page, rowsPerPage, total) {
+  onPageLoaded = function(page, rowsPerPage, total) {
     console.log("page changed", page, rowsPerPage, total);
   },
   sort,
-  sort_direction
+  sort_direction,
+  search
 }) {
   const [currentPage, setCurrentPage] = React.useState(-1);
   const [currentRowsPerPage, setCurrentRowsPerPage] = React.useState(5);
   const [currentType, setcurrentType] = React.useState("web");
+  const [currentSearch, setCurrentSearch] = React.useState("");
   const [currentSortDirection, setcurrentSortDirection] = React.useState(
     "desc"
   );
@@ -35,7 +37,8 @@ export default function ClipList({
     page === currentPage &&
     rowsPerPage === currentRowsPerPage &&
     sort_direction === currentSortDirection &&
-    type === currentType
+    type === currentType &&
+    search == currentSearch
   ) {
     console.log("cliplist no change", page, rowsPerPage);
   } else {
@@ -54,9 +57,12 @@ export default function ClipList({
         setCurrentPage(page);
         setCurrentRowsPerPage(rowsPerPage);
         setcurrentSortDirection(sort_direction);
-        setcurrentType(type);    
+        setCurrentSearch(search);
+        setcurrentType(type);
+
         onPageLoaded(currentPage, currentRowsPerPage, total);
-      }
+      },
+      search
     );
   }
 
@@ -74,9 +80,9 @@ export default function ClipList({
           <TableCell align="right">
             {moment(row.updated_time).format("DD-MM-YYYY")}
           </TableCell>
-          <TableCell align="right">{
-            moment.duration(row.duration).format("hh:mm:ss", { trim: false })
-          }</TableCell>
+          <TableCell align="right">
+            {moment.duration(row.duration).format("hh:mm:ss", { trim: false })}
+          </TableCell>
           <TableCell align="right">
             <button
               className="ui compact icon button"

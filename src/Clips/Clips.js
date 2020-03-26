@@ -9,6 +9,7 @@ import TableFooter from "@material-ui/core/TableFooter";
 import TablePagination from "@material-ui/core/TablePagination";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
+import TextField from "@material-ui/core/TextField";
 import { TablePaginationActionsWrapped } from "../TablePaginationActions/TablePaginationActions";
 import ClipList from "../ClipList";
 
@@ -22,6 +23,13 @@ export const styles = theme => ({
   },
   tableWrapper: {
     overflowX: "hidden"
+  },
+  search: {
+    "& > *": {
+      // margin: theme.spacing(1),
+      width: "25ch",
+      height: "6ch"
+    }
   }
 });
 
@@ -47,6 +55,7 @@ export class Clips extends React.Component {
       rowsPerPage: 5,
       sid: "",
       type: "web",
+      search: "",
       orderBy: "title",
       order: "asc"
     };
@@ -65,6 +74,10 @@ export class Clips extends React.Component {
       sid: this.props.sid,
       type: this.props.type
     });
+  };
+
+  handleChange = event => {
+    this.setState({ search: event.target.value });
   };
 
   componentDidUpdate(prevProps) {
@@ -101,6 +114,13 @@ export class Clips extends React.Component {
 
     return (
       <div>
+        <TextField
+          className={classes.search}
+          id="outlined-basic"
+          label="Search"
+          variant="outlined"
+          onChange={this.handleChange}
+        />
         <Paper className={classes.root}>
           <div className={classes.tableWrapper}>
             <Table className={classes.table}>
@@ -138,6 +158,7 @@ export class Clips extends React.Component {
                 onAddClicked={this.props.handleClick}
                 sort={orderBy}
                 sort_direction={order}
+                search={this.state.search}
               />
               <TableFooter>
                 <TableRow>

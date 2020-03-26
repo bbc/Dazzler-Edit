@@ -19,6 +19,7 @@ const config = {
     specials_collection: "p0845sqf",
     live_brand: "w13xttlw",
     clip_language: "hindi",
+    language_tag: "p0368zp7",
     webcast_channels: [
       "world_service_stream_05",
       "world_service_stream_06",
@@ -33,6 +34,7 @@ const config = {
     specials_collection: "p0715nv4",
     live_brand: "w13xttvl",
     clip_language: "marathi",
+    language_tag: "x",
     webcast_channels: [
       "world_service_stream_05",
       "world_service_stream_06",
