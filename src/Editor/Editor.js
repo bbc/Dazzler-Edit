@@ -435,9 +435,15 @@ class Editor extends React.Component {
 
   render() {
     const mustBeAvailableBy = moment.utc().format();
-    const mustBeAvailableUntil = moment.utc(this.state.schedule.date).add(1, 'd').format();
+    const mustBeAvailableUntil = moment
+      .utc(this.state.schedule.date)
+      .add(1, "d")
+      .format();
     const upcomingMustBeAvailableBy = mustBeAvailableUntil;
-    const upcomingMustBeAvailableUntil = moment.utc(upcomingMustBeAvailableBy).add(1, 'd').format();
+    const upcomingMustBeAvailableUntil = moment
+      .utc(upcomingMustBeAvailableBy)
+      .add(1, "d")
+      .format();
 
     const { classes } = this.props;
     const { open } = this.state;
@@ -565,7 +571,7 @@ class Editor extends React.Component {
                 <ExpansionPanelDetails>
                   <Episode
                     flip={this.state.side}
-                    availability={'available'}
+                    availability={"available"}
                     mustBeAvailableBy={mustBeAvailableBy}
                     mustBeAvailableUntil={mustBeAvailableUntil}
                     sid={this.state.schedule.sid}
@@ -585,7 +591,7 @@ class Editor extends React.Component {
                 </ExpansionPanelSummary>
                 <ExpansionPanelDetails>
                   <Episode
-                    availability={'P1D'}
+                    availability={"P1D"}
                     mustBeAvailableBy={upcomingMustBeAvailableBy}
                     mustBeAvailableUntil={upcomingMustBeAvailableUntil}
                     sid={this.state.schedule.sid}

@@ -60,3 +60,10 @@
   margin-left: 90%;
 }
 
+.unavailable {
+  background-color: red;
+}
+
+.noStart {
+  background-color: grey;
+}

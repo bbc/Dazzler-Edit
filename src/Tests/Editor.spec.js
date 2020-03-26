@@ -18,5 +18,4 @@ describe("< Editor />", () => {
     openMenu.simulate("click");
     expect(wrapper.state().open).toEqual(true);
   });
-  
 });

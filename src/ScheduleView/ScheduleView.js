@@ -1,6 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import ScheduleItem from "../ScheduleItem/ScheduleItem";
+import moment from "moment";
 // import moment from "moment";
 
 /*
@@ -27,6 +28,7 @@ class ScheduleView extends React.Component {
     super(props);
     this.handleClick = this.handleClick.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
+    this.checkStatus = this.checkStatus.bind(this);
     this.state = {};
   }
 
@@ -36,6 +38,22 @@ class ScheduleView extends React.Component {
 
   handleDelete = index => {
     this.props.onDelete(index); // TODO can we use this directly?
+  };
+
+  checkStatus = item => {
+    if (item.asset && item.asset.status == "unavailable") {
+      if (
+        moment(item.startTime).isAfter(
+          moment(item.asset.availability.expected_start).add(item.duration)
+        )
+      ) {
+        item.insertionType = "unavailable";
+        return "unavailable";
+      } else {
+        item.insertionType = "noStart";
+        return "noStart";
+      }
+    }
   };
 
   handleOccurenceDelete = (index, value) => {
@@ -80,7 +98,11 @@ class ScheduleView extends React.Component {
               key={item.insertionType + item.startTime.utc().format()}
               index={index}
               live={item.live}
-              insertionType={item.insertionType}
+              insertionType={
+                item.insertionType !== "sentinel"
+                  ? this.checkStatus(item)
+                  : item.insertionType
+              }
               selected={selectedItem === index}
               startTime={item.startTime}
               title={item.title}
