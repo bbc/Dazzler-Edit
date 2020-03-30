@@ -608,13 +608,13 @@ class Editor extends React.Component {
                 >
                   <Typography className={classes.heading}>Web Clips</Typography>
                 </ExpansionPanelSummary>
-                <ExpansionPanelDetails>
-                  <Clips
-                    type="web"
-                    sid={this.state.schedule.sid}
-                    handleClick={this.handleAddClipOrEpisode}
-                  />
-                </ExpansionPanelDetails>
+                {/* <ExpansionPanelDetails> */}
+                <Clips
+                  type="web"
+                  sid={this.state.schedule.sid}
+                  handleClick={this.handleAddClipOrEpisode}
+                />
+                {/* </ExpansionPanelDetails> */}
               </ExpansionPanel>
               <ExpansionPanel>
                 <ExpansionPanelSummary
