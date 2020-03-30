@@ -6,6 +6,7 @@ import TableCell from "@material-ui/core/TableCell";
 import moment from "moment";
 import "moment-duration-format";
 import AssetDao from "../AssetDaoV2";
+import { episodeInfo } from "../Utils";
 
 export default function EpisodeList({
   sid,
@@ -64,6 +65,7 @@ export default function EpisodeList({
       sort,
       sortDirection,
       (items, total) => {
+        console.log("eitems", items);
         console.log(
           "got",
           items.length,
@@ -87,12 +89,16 @@ export default function EpisodeList({
   return (
     <TableBody>
       {rows.map(row => (
-        <TableRow key={row.pid} className={row.insertionType}>
+        <TableRow
+          key={row.pid}
+          className={row.insertionType}
+          style={{ backgroundColor: episodeInfo(row)[0] }}
+        >
           <TableCell component="th" scope="row">
             <div className="tooltip">
               {" "}
               {row.title}
-              <span className="tooltiptext">PID = {row.pid}</span>
+              <span className="tooltiptext">{episodeInfo(row)[1]}</span>
             </div>
           </TableCell>
           <TableCell align="right">{row.release_date}</TableCell>

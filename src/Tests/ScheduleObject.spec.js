@@ -5,7 +5,7 @@ import {
   endOfScheduleItems,
   singleItemLoop,
   ItemsWithOverlap
-} from "./templates/items";
+} from "./templates/ScheduleObjectItems";
 import moment from "moment";
 
 describe("ScheduleObject", () => {

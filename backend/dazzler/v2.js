@@ -127,48 +127,6 @@ function unavailableQuery(mid, after, before, search) {
   };
 }
 
-function searchQuery(mid, after, before, search) {
-  return {
-    bool: {
-      must: [
-        { match: { "pips.master_brand_for.master_brand.mid": mid } },
-        { match_phrase: { "pips.episode.title.$": search } },
-        {
-          range: {
-            "sonata.episode.availabilities.av_pv13_pa4.start": {
-              lt: after
-            }
-          }
-        },
-        {
-          bool: {
-            should: [
-              {
-                bool: {
-                  must_not: [
-                    {
-                      exists: {
-                        field: "sonata.episode.availabilities.av_pv13_pa4.end"
-                      }
-                    }
-                  ]
-                }
-              },
-              {
-                range: {
-                  "sonata.episode.availabilities.av_pv13_pa4.end": {
-                    gte: before
-                  }
-                }
-              }
-            ]
-          }
-        }
-      ]
-    }
-  };
-}
-
 /*
  parameters from v1:
  sort title|release_date

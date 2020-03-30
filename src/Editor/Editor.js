@@ -435,9 +435,15 @@ class Editor extends React.Component {
 
   render() {
     const mustBeAvailableBy = moment.utc().format();
-    const mustBeAvailableUntil = moment.utc(this.state.schedule.date).add(1, 'd').format();
+    const mustBeAvailableUntil = moment
+      .utc(this.state.schedule.date)
+      .add(1, "d")
+      .format();
     const upcomingMustBeAvailableBy = mustBeAvailableUntil;
-    const upcomingMustBeAvailableUntil = moment.utc(upcomingMustBeAvailableBy).add(1, 'd').format();
+    const upcomingMustBeAvailableUntil = moment
+      .utc(upcomingMustBeAvailableBy)
+      .add(1, "d")
+      .format();
 
     const { classes } = this.props;
     const { open } = this.state;
@@ -544,13 +550,12 @@ class Editor extends React.Component {
                 >
                   <Typography className={classes.heading}>Live</Typography>
                 </ExpansionPanelSummary>
-                <ExpansionPanelDetails>
-                  <Live
-                    date={this.state.schedule.date.utc().format("YYYY-MM-DD")}
-                    sid={this.state.schedule.sid}
-                    handleClick={this.handleAddLive}
-                  />
-                </ExpansionPanelDetails>
+
+                <Live
+                  date={this.state.schedule.date.utc().format("YYYY-MM-DD")}
+                  sid={this.state.schedule.sid}
+                  handleClick={this.handleAddLive}
+                />
               </ExpansionPanel>
               <ExpansionPanel>
                 <ExpansionPanelSummary
@@ -562,16 +567,15 @@ class Editor extends React.Component {
                     Available Episodes
                   </Typography>
                 </ExpansionPanelSummary>
-                <ExpansionPanelDetails>
-                  <Episode
-                    flip={this.state.side}
-                    availability={'available'}
-                    mustBeAvailableBy={mustBeAvailableBy}
-                    mustBeAvailableUntil={mustBeAvailableUntil}
-                    sid={this.state.schedule.sid}
-                    handleClick={this.handleAddClipOrEpisode}
-                  />
-                </ExpansionPanelDetails>
+
+                <Episode
+                  flip={this.state.side}
+                  availability={"available"}
+                  mustBeAvailableBy={mustBeAvailableBy}
+                  mustBeAvailableUntil={mustBeAvailableUntil}
+                  sid={this.state.schedule.sid}
+                  handleClick={this.handleAddClipOrEpisode}
+                />
               </ExpansionPanel>
               <ExpansionPanel>
                 <ExpansionPanelSummary
@@ -583,16 +587,15 @@ class Editor extends React.Component {
                     Upcoming Episodes
                   </Typography>
                 </ExpansionPanelSummary>
-                <ExpansionPanelDetails>
-                  <Episode
-                    availability={'P1D'}
-                    mustBeAvailableBy={upcomingMustBeAvailableBy}
-                    mustBeAvailableUntil={upcomingMustBeAvailableUntil}
-                    sid={this.state.schedule.sid}
-                    handleClick={this.handleAddClipOrEpisode}
-                    // resultsFilter={this.filterUpcomingEpisodes}
-                  />
-                </ExpansionPanelDetails>
+
+                <Episode
+                  availability={"P1D"}
+                  mustBeAvailableBy={upcomingMustBeAvailableBy}
+                  mustBeAvailableUntil={upcomingMustBeAvailableUntil}
+                  sid={this.state.schedule.sid}
+                  handleClick={this.handleAddClipOrEpisode}
+                  // resultsFilter={this.filterUpcomingEpisodes}
+                />
               </ExpansionPanel>
               <ExpansionPanel>
                 <ExpansionPanelSummary
@@ -602,13 +605,12 @@ class Editor extends React.Component {
                 >
                   <Typography className={classes.heading}>Web Clips</Typography>
                 </ExpansionPanelSummary>
-                <ExpansionPanelDetails>
-                  <Clips
-                    type="web"
-                    sid={this.state.schedule.sid}
-                    handleClick={this.handleAddClipOrEpisode}
-                  />
-                </ExpansionPanelDetails>
+
+                <Clips
+                  type="web"
+                  sid={this.state.schedule.sid}
+                  handleClick={this.handleAddClipOrEpisode}
+                />
               </ExpansionPanel>
               <ExpansionPanel>
                 <ExpansionPanelSummary
@@ -618,12 +620,11 @@ class Editor extends React.Component {
                 >
                   <Typography className={classes.heading}>Specials</Typography>
                 </ExpansionPanelSummary>
-                <ExpansionPanelDetails>
-                  <Specials
-                    sid={this.state.schedule.sid}
-                    handleClick={this.handleAddClipOrEpisode}
-                  />
-                </ExpansionPanelDetails>
+
+                <Specials
+                  sid={this.state.schedule.sid}
+                  handleClick={this.handleAddClipOrEpisode}
+                />
               </ExpansionPanel>
             </Box>
             <Box mx="1rem" width="28%" flexGrow={1} flexDirection="column">
