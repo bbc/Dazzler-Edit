@@ -511,7 +511,7 @@ class Editor extends React.Component {
             m={1}
             bgcolor="background.paper"
           >
-            <Box width="28%" display="flex" flexDirection="column">
+            <Box width="31%" display="flex" flexDirection="column">
               <Typography variant="h4" align="center">
                 Picklists
               </Typography>
