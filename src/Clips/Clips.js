@@ -120,10 +120,11 @@ export class Clips extends React.Component {
           label="Search"
           variant="outlined"
           onChange={this.handleChange}
+          style={{ marginLeft: "5%" }}
         />
         <Paper className={classes.root}>
           <div className={classes.tableWrapper}>
-            <Table className={classes.table}>
+            <Table className={classes.table} style={{ marginLeft: "2%" }}>
               <TableHead>
                 <TableRow>
                   {headCells.map(headCell => (
@@ -147,6 +148,7 @@ export class Clips extends React.Component {
                   ))}
 
                   <TableCell>Duration</TableCell>
+                  <TableCell>Add</TableCell>
                 </TableRow>
               </TableHead>
               <ClipList

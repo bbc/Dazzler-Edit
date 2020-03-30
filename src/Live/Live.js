@@ -118,7 +118,7 @@ export class Live extends React.Component {
     }
 
     return (
-      <div>
+      <div style={{ marginLeft: "5%" }}>
         {date.format("YYYY-MM-DD")}
         <Paper className={classes.root}>
           <div className={classes.tableWrapper}>
@@ -140,9 +140,7 @@ export class Live extends React.Component {
                           ? row.presentation_title
                           : row.title}
                         <span className="tooltiptext">
-                          {
-                          'PID = '+(row.pid?row.pid.trim():'')
-                          }
+                          {"PID = " + (row.pid ? row.pid.trim() : "")}
                         </span>
                       </div>
                     </TableCell>

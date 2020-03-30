@@ -14,7 +14,6 @@ describe("< Editor />", () => {
   test("left menu opens when clicked", () => {
     const wrapper = mount(<Editor />);
     const openMenu = wrapper;
-
     openMenu.simulate("click");
     expect(wrapper.state().open).toEqual(true);
   });
