@@ -24,7 +24,7 @@ export const styles = theme => ({
     minWidth: 250
   },
   tableWrapper: {
-    overflowX: "hidden"
+    overflowX: "scroll"
   },
   search: {
     "& > *": {
