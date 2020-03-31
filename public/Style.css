@@ -67,3 +67,8 @@
 .noStart {
   background-color: grey;
 }
+
+.body {
+  width: 80%;
+  height: 80%;
+}
