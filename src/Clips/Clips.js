@@ -22,7 +22,7 @@ export const styles = theme => ({
     minWidth: 250
   },
   tableWrapper: {
-    overflowX: "hidden"
+    overflowX: "scroll"
   },
   search: {
     "& > *": {
@@ -148,7 +148,6 @@ export class Clips extends React.Component {
                   ))}
 
                   <TableCell>Duration</TableCell>
-                  <TableCell>Add</TableCell>
                 </TableRow>
               </TableHead>
               <ClipList

@@ -76,10 +76,10 @@ export default function ClipList({
               <span className="tooltiptext">PID = {row.pid}</span>
             </div>
           </TableCell>
-          <TableCell align="right">
+          <TableCell align="center">
             {moment(row.updated_time).format("DD-MM-YYYY")}
           </TableCell>
-          <TableCell align="right">
+          <TableCell align="center">
             {moment.duration(row.duration).format("hh:mm:ss", { trim: false })}
           </TableCell>
           <TableCell align="right">
