@@ -77,46 +77,54 @@ function unavailableQuery(mid, after, before, search) {
   return {
     bool: {
       must: [
-        { match: { "pips.master_brand_for.master_brand.mid": mid } },
-        filter,
         {
-          bool: {
-            must_not: [
-              {
-                exists: {
-                  field:
-                    "sonata.episode.availabilities.av_pv13_pa4.actual_start"
-                }
-              }
-            ]
-          }
-        },
-        {
-          range: {
-            "sonata.episode.availabilities.av_pv13_pa4.start": {
-              lt: after
-            }
+          match: {
+            "pips.episode.master_brand.link.mid": mid
           }
         },
         {
           bool: {
             should: [
               {
-                bool: {
-                  must_not: [
-                    {
-                      exists: {
-                        field: "sonata.episode.availabilities.av_pv13_pa4.end"
-                      }
-                    }
-                  ]
+                exists: {
+                  field: "sonata.episode.availabilities.upcoming.start"
+                }
+              },
+              {
+                exists: {
+                  field: "sonata.episode.availabilities.av_pv10_pa4.start"
+                }
+              }
+            ]
+          }
+        },
+        {
+          bool: {
+            should: [
+              {
+                range: {
+                  "sonata.episode.availabilities.upcoming.end": {
+                    gte: "now+1d"
+                  }
                 }
               },
               {
                 range: {
-                  "sonata.episode.availabilities.av_pv13_pa4.end": {
-                    gte: before
+                  "sonata.episode.availabilities.av_pv10_pa4.end": {
+                    gte: "now+1d"
                   }
+                }
+              }
+            ]
+          }
+        },
+        {
+          bool: {
+            must_not: [
+              {
+                exists: {
+                  field:
+                    "sonata.episode.availabilities.av_pv10_pa4.actual_start"
                 }
               }
             ]
@@ -197,19 +205,34 @@ const episode = async (req, res) => {
           .available_version;
       const version = versions[0].version; // TODO pick a version
       const duration = moment.duration(version.duration.$);
-      const availability = {
-        planned_start: se.availabilities.av_pv13_pa4.start,
-        expected_start: moment
-          .utc(se.availabilities.av_pv13_pa4.start)
-          .add(duration)
-          .add(10, "m")
-          .format()
-      };
-      if (se.availabilities.av_pv13_pa4.actual_start) {
-        availability.actual_start = se.availabilities.av_pv13_pa4.actual_start;
-      }
-      if (se.availabilities.av_pv13_pa4.end) {
-        availability.end = se.availabilities.av_pv13_pa4.end;
+
+      if (se.availabilities) {
+        var availability = {
+          planned_start: se.availabilities.av_pv13_pa4.start,
+          expected_start: moment
+            .utc(se.availabilities.av_pv13_pa4.start)
+            .add(duration)
+            .add(10, "m")
+            .format()
+        };
+
+        if (se.availabilities.av_pv13_pa4.actual_start) {
+          availability.actual_start =
+            se.availabilities.av_pv13_pa4.actual_start;
+        }
+        if (se.availabilities.av_pv13_pa4.end) {
+          availability.end = se.availabilities.av_pv13_pa4.end;
+        }
+      } else {
+        var availability = {
+          planned_start:
+            versions[0].availabilities.ondemand[0].availability.start,
+          expected_start: moment
+            .utc(versions[0].availabilities.ondemand[0].availability.start)
+            .add(duration)
+            .add(10, "m")
+            .format()
+        };
       }
       const item = {
         entityType: "episode",
