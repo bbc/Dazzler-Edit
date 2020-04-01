@@ -82,6 +82,7 @@ function unavailableQuery(mid, after, before, search) {
             "pips.episode.master_brand.link.mid": mid
           }
         },
+        filter,
         {
           bool: {
             should: [
@@ -206,33 +207,27 @@ const episode = async (req, res) => {
       const version = versions[0].version; // TODO pick a version
       const duration = moment.duration(version.duration.$);
 
-      if (se.availabilities) {
-        var availability = {
-          planned_start: se.availabilities.av_pv13_pa4.start,
-          expected_start: moment
-            .utc(se.availabilities.av_pv13_pa4.start)
-            .add(duration)
-            .add(10, "m")
-            .format()
-        };
-
-        if (se.availabilities.av_pv13_pa4.actual_start) {
-          availability.actual_start =
-            se.availabilities.av_pv13_pa4.actual_start;
-        }
-        if (se.availabilities.av_pv13_pa4.end) {
-          availability.end = se.availabilities.av_pv13_pa4.end;
-        }
-      } else {
-        var availability = {
-          planned_start:
-            versions[0].availabilities.ondemand[0].availability.start,
-          expected_start: moment
-            .utc(versions[0].availabilities.ondemand[0].availability.start)
-            .add(duration)
-            .add(10, "m")
-            .format()
-        };
+      const availability = {
+        planned_start: se.availabilities
+          ? se.availabilities.av_pv13_pa4.start
+          : versions[0].availabilities.ondemand[0].availability.start,
+        expected_start: se.availabilities
+          ? moment
+              .utc(se.availabilities.av_pv13_pa4.start)
+              .add(duration)
+              .add(10, "m")
+              .format()
+          : moment
+              .utc(versions[0].availabilities.ondemand[0].availability.start)
+              .add(duration)
+              .add(10, "m")
+              .format()
+      };
+      if (se.availabilities && se.availabilities.av_pv13_pa4.actual_start) {
+        availability.actual_start = se.availabilities.av_pv13_pa4.actual_start;
+      }
+      if (se.availabilities && se.availabilities.av_pv13_pa4.end) {
+        availability.end = se.availabilities.av_pv13_pa4.end;
       }
       const item = {
         entityType: "episode",

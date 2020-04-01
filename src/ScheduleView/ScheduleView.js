@@ -44,7 +44,7 @@ class ScheduleView extends React.Component {
     if (item.asset && item.asset.status == "unavailable") {
       if (
         moment(item.startTime).isAfter(
-          moment(item.asset.availability.expected_start).add(item.duration)
+          moment(item.asset.availability.expected_start)
         )
       ) {
         item.insertionType = "unavailable";
