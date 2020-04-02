@@ -160,6 +160,7 @@ export class Clips extends React.Component {
                 sort={orderBy}
                 sort_direction={order}
                 search={this.state.search}
+                flip={this.props.flip}
               />
               <TableFooter>
                 <TableRow>

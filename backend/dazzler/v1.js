@@ -241,7 +241,7 @@ const saveEmergencyPlayList = async function(req, res) {
       Body: req.body,
       Bucket: process.env.BUCKET,
       Key: `${sid}/emergency-playlist.json`,
-      ContentType: 'application/json'
+      ContentType: "application/json"
     };
     try {
       await s3.putObject(params).promise();

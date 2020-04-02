@@ -9,7 +9,7 @@
 .tooltip .tooltiptext {
   visibility: hidden;
   width: 50%;
-  height: 5%;
+  height: 7%;
   background-color: #0066ff;
   color: #fff;
   text-align: center;
@@ -65,10 +65,10 @@
 }
 
 .noStart {
-  background-color: grey;
+  background-color: #a9a9a9;
 }
 
 .body {
-  width: 90%;
-  height: 90%;
+  width: 80%;
+  height: 80%;
 }

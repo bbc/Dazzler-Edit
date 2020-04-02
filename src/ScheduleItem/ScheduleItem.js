@@ -53,6 +53,7 @@ class ScheduleItem extends React.Component {
   };
 
   render() {
+    console.log("!!!!", this.props.insertionType);
     let { open } = this.state;
     let rowStyle = this.props.insertionType;
     if (this.props.live === "true") rowStyle = "live";

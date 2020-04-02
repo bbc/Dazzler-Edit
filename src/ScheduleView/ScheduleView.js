@@ -40,19 +40,42 @@ class ScheduleView extends React.Component {
     this.props.onDelete(index); // TODO can we use this directly?
   };
 
+  /* if schedule time is before actual start, item becomes red
+   */
+
+  // checkStatus = item => {
+  //   if (item.asset && item.asset.status == "unavailable") {
+  //     if (
+  //       moment(item.startTime).isAfter(
+  //         moment(item.asset.availability.expected_start)
+  //       )
+  //     ) {
+  //       item.insertionType = "unavailable";
+  //       return "unavailable";
+  //     } else {
+  //       item.insertionType = "noStart";
+  //       return "noStart";
+  //     }
+  //   }
+  // };
+
+  /* If schedule is not available and there is 30 mins left until schedule time,
+  item becomes red*/
   checkStatus = item => {
     if (item.asset && item.asset.status == "unavailable") {
       if (
-        moment(item.startTime).isAfter(
-          moment(item.asset.availability.expected_start).add(item.duration)
-        )
+        moment(item.startTime)
+          .add(30, "minutes")
+          .isAfter(moment())
       ) {
-        item.insertionType = "unavailable";
-        return "unavailable";
-      } else {
         item.insertionType = "noStart";
         return "noStart";
+      } else {
+        item.insertionType = "unavailable";
+        return "unavailable";
       }
+    } else {
+      return item.insertionType;
     }
   };
 
@@ -98,11 +121,7 @@ class ScheduleView extends React.Component {
               key={item.insertionType + item.startTime.utc().format()}
               index={index}
               live={item.live}
-              insertionType={
-                item.insertionType !== "sentinel"
-                  ? this.checkStatus(item)
-                  : item.insertionType
-              }
+              insertionType={this.checkStatus(item)}
               selected={selectedItem === index}
               startTime={item.startTime}
               title={item.title}

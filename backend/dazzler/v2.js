@@ -77,46 +77,55 @@ function unavailableQuery(mid, after, before, search) {
   return {
     bool: {
       must: [
-        { match: { "pips.master_brand_for.master_brand.mid": mid } },
+        {
+          match: {
+            "pips.episode.master_brand.link.mid": mid
+          }
+        },
         filter,
         {
           bool: {
-            must_not: [
+            should: [
               {
                 exists: {
-                  field:
-                    "sonata.episode.availabilities.av_pv13_pa4.actual_start"
+                  field: "sonata.episode.availabilities.upcoming.start"
+                }
+              },
+              {
+                exists: {
+                  field: "sonata.episode.availabilities.av_pv10_pa4.start"
                 }
               }
             ]
           }
         },
         {
-          range: {
-            "sonata.episode.availabilities.av_pv13_pa4.start": {
-              lt: after
-            }
-          }
-        },
-        {
           bool: {
             should: [
               {
-                bool: {
-                  must_not: [
-                    {
-                      exists: {
-                        field: "sonata.episode.availabilities.av_pv13_pa4.end"
-                      }
-                    }
-                  ]
+                range: {
+                  "sonata.episode.availabilities.upcoming.end": {
+                    gte: "now+1d"
+                  }
                 }
               },
               {
                 range: {
-                  "sonata.episode.availabilities.av_pv13_pa4.end": {
-                    gte: before
+                  "sonata.episode.availabilities.av_pv10_pa4.end": {
+                    gte: "now+1d"
                   }
+                }
+              }
+            ]
+          }
+        },
+        {
+          bool: {
+            must_not: [
+              {
+                exists: {
+                  field:
+                    "sonata.episode.availabilities.av_pv10_pa4.actual_start"
                 }
               }
             ]
@@ -197,18 +206,27 @@ const episode = async (req, res) => {
           .available_version;
       const version = versions[0].version; // TODO pick a version
       const duration = moment.duration(version.duration.$);
+
       const availability = {
-        planned_start: se.availabilities.av_pv13_pa4.start,
-        expected_start: moment
-          .utc(se.availabilities.av_pv13_pa4.start)
-          .add(duration)
-          .add(10, "m")
-          .format()
+        planned_start: se.availabilities
+          ? se.availabilities.av_pv13_pa4.start
+          : versions[0].availabilities.ondemand[0].availability.start,
+        expected_start: se.availabilities
+          ? moment
+              .utc(se.availabilities.av_pv13_pa4.start)
+              .add(duration)
+              .add(10, "m")
+              .format()
+          : moment
+              .utc(versions[0].availabilities.ondemand[0].availability.start)
+              .add(duration)
+              .add(10, "m")
+              .format()
       };
-      if (se.availabilities.av_pv13_pa4.actual_start) {
+      if (se.availabilities && se.availabilities.av_pv13_pa4.actual_start) {
         availability.actual_start = se.availabilities.av_pv13_pa4.actual_start;
       }
-      if (se.availabilities.av_pv13_pa4.end) {
+      if (se.availabilities && se.availabilities.av_pv13_pa4.end) {
         availability.end = se.availabilities.av_pv13_pa4.end;
       }
       const item = {
@@ -229,6 +247,65 @@ const episode = async (req, res) => {
       total: result.hits.total,
       items
     });
+  } catch (e) {
+    console.log(e);
+    res.status(404).send("error");
+  }
+};
+
+const clip = async (req, res) => {
+  const params = {
+    headers: { "Content-Type": "application/json" }
+  };
+  const _source = ["pips"];
+  const sid = req.query.sid || config.default_sid;
+  const size = req.query.page_size || 20;
+  let from = 0;
+  if (req.query.page) {
+    from = size * (req.query.page - 1);
+  }
+  let filter;
+  if (req.query.search !== "") {
+    filter = { match: { "pips.clip.title.$": req.query.search } };
+  }
+  const query = {
+    bool: {
+      must: [
+        {
+          exists: {
+            field:
+              "pips.programme_availability.available_versions.available_version"
+          }
+        },
+        filter,
+        { match: { "pips.clip.languages.language.$": config[sid].language } }
+      ]
+    }
+  };
+  const data = { _source, from, size, query };
+  if (req.query.sort) {
+    var sortDirection = "desc";
+    if (req.query.sort_direction === "ascending") {
+      sortDirection = "asc";
+    }
+  }
+
+  const sortMap = {
+    release_date: "pips.clip.pid",
+    title: "pips.title_hierarchy.titles.title.$.keyword"
+  };
+  const sort = {};
+  sort[sortMap[req.query.sort]] = sortDirection;
+  data.sort = [sort];
+
+  try {
+    const answer = await ax.post(`https://${host}/clip/_search`, data, params);
+    const result = answer.data.hits.hits;
+    const total = answer.data.hits.total;
+    let items = {};
+    items.clips = result.map(hit => hit._source.pips);
+    items.total = total;
+    res.json(items);
   } catch (e) {
     console.log(e);
     res.status(404).send("error");
@@ -283,7 +360,7 @@ module.exports = {
     // app.get("/api/v2/webcast", webcast);
     // app.get("/api/v2/loop", loop);
     // app.get("/api/v2/special", special);
-    // app.get("/api/v2/clip", clip);
+    app.get("/api/v2/clip", clip);
     app.get("/api/v2/episode", episode);
     app.post("/api/v2/loop", saveEmergencyPlayList);
     // app.put("/api/v2/loop", loop);

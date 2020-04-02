@@ -607,6 +607,7 @@ class Editor extends React.Component {
                 </ExpansionPanelSummary>
 
                 <Clips
+                  flip={this.state.side}
                   type="web"
                   sid={this.state.schedule.sid}
                   handleClick={this.handleAddClipOrEpisode}

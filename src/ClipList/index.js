@@ -5,7 +5,7 @@ import "moment-duration-format";
 import TableBody from "@material-ui/core/TableBody";
 import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
-import AssetDao from "../AssetDaoV1";
+import AssetDao from "../AssetDaoV2";
 
 export default function ClipList({
   sid,
@@ -18,8 +18,9 @@ export default function ClipList({
   onPageLoaded = function(page, rowsPerPage, total) {
     console.log("page changed", page, rowsPerPage, total);
   },
-  sort,
-  sort_direction,
+  sort = "title",
+  sort_direction = "desc",
+  flip = false,
   search
 }) {
   const [currentPage, setCurrentPage] = React.useState(-1);
@@ -30,10 +31,12 @@ export default function ClipList({
     "desc"
   );
   const [rows, setRows] = React.useState([]);
+  const [side, setSide] = React.useState(true);
 
   // statements in the body of the function are called on rendering!!!
 
   if (
+    flip === side &&
     page === currentPage &&
     rowsPerPage === currentRowsPerPage &&
     sort_direction === currentSortDirection &&
@@ -54,16 +57,16 @@ export default function ClipList({
       (items, total) => {
         console.log("got clip data for", type, total, items);
         setRows(items);
-        setCurrentPage(page);
-        setCurrentRowsPerPage(rowsPerPage);
-        setcurrentSortDirection(sort_direction);
-        setCurrentSearch(search);
-        setcurrentType(type);
-
         onPageLoaded(currentPage, currentRowsPerPage, total);
       },
       search
     );
+    setCurrentPage(page);
+    setCurrentRowsPerPage(rowsPerPage);
+    setcurrentSortDirection(sort_direction);
+    setCurrentSearch(search);
+    setSide(flip);
+    setcurrentType(type);
   }
 
   return (
