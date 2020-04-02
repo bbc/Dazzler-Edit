@@ -18,8 +18,9 @@ export default function ClipList({
   onPageLoaded = function(page, rowsPerPage, total) {
     console.log("page changed", page, rowsPerPage, total);
   },
-  sort,
-  sort_direction,
+  sort = "title",
+  sort_direction = "desc",
+  flip = false,
   search
 }) {
   const [currentPage, setCurrentPage] = React.useState(-1);
@@ -30,10 +31,12 @@ export default function ClipList({
     "desc"
   );
   const [rows, setRows] = React.useState([]);
+  const [side, setSide] = React.useState(true);
 
   // statements in the body of the function are called on rendering!!!
 
   if (
+    flip === side &&
     page === currentPage &&
     rowsPerPage === currentRowsPerPage &&
     sort_direction === currentSortDirection &&
@@ -62,6 +65,7 @@ export default function ClipList({
     setCurrentRowsPerPage(rowsPerPage);
     setcurrentSortDirection(sort_direction);
     setCurrentSearch(search);
+    setSide(flip);
     setcurrentType(type);
   }
 
