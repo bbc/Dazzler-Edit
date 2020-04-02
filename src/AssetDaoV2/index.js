@@ -5,16 +5,17 @@ const URLPrefix =
   process.env.NODE_ENV === "development" ? "http://localhost:8080" : "";
 
 class AssetDao {
-  static getClips(sid, type, page, rowsPerPage, sort, direction, cb) {
+  static getClips(sid, type, page, rowsPerPage, sort, direction, cb, search) {
     var sort_direction = direction === "desc" ? "descending" : "ascending";
-    const url = `${URLPrefix}/api/v1/clip?sid=${sid}&type=${type}&page=${page +
-      1}&page_size=${rowsPerPage}&sort=${sort}&sort_direction=${sort_direction}`;
+    const url = `${URLPrefix}/api/v2/clip?sid=${sid}&type=${type}&page=${page +
+      1}&page_size=${rowsPerPage}&sort=${sort}&sort_direction=${sort_direction}&search=${search}`;
     axios
       .get(url)
       .then(response => {
         const items = [];
-        response.data.items.forEach(clip => {
+        response.data.clips.forEach(clip => {
           items.push(this.clip2Item(clip));
+          console.log("ITEM", items);
         });
         cb(items, response.data.total);
       })
@@ -95,14 +96,17 @@ class AssetDao {
   }
 
   static clip2Item(clip) {
-    const version = clip.available_versions.version[0]; // TODO pick a version
+    const version =
+      clip.programme_availability.available_versions.available_version[0]
+        .version; // TODO pick a version
+
     return {
-      title: clip.title,
-      duration: moment.duration(version.duration).toISOString(),
+      title: clip.clip.title.$,
+      duration: moment.duration(version.duration.$).toISOString(),
       live: false,
       insertionType: "",
-      versionCrid: version.crid,
-      pid: clip.pid,
+      versionCrid: version.crid.uri,
+      pid: clip.clip.pid,
       vpid: version.pid,
       entityType: "clip"
     };

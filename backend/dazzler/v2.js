@@ -253,6 +253,65 @@ const episode = async (req, res) => {
   }
 };
 
+const clip = async (req, res) => {
+  const params = {
+    headers: { "Content-Type": "application/json" }
+  };
+  const _source = ["pips"];
+  const sid = req.query.sid || config.default_sid;
+  const size = req.query.page_size || 20;
+  let from = 0;
+  if (req.query.page) {
+    from = size * (req.query.page - 1);
+  }
+  let filter;
+  if (req.query.search !== "") {
+    filter = { match: { "pips.clip.title.$": req.query.search } };
+  }
+  const query = {
+    bool: {
+      must: [
+        {
+          exists: {
+            field:
+              "pips.programme_availability.available_versions.available_version"
+          }
+        },
+        filter,
+        { match: { "pips.clip.languages.language.$": config[sid].language } }
+      ]
+    }
+  };
+  const data = { _source, from, size, query };
+  if (req.query.sort) {
+    var sortDirection = "desc";
+    if (req.query.sort_direction === "ascending") {
+      sortDirection = "asc";
+    }
+  }
+
+  const sortMap = {
+    release_date: "pips.clip.pid",
+    title: "pips.title_hierarchy.titles.title.$.keyword"
+  };
+  const sort = {};
+  sort[sortMap[req.query.sort]] = sortDirection;
+  data.sort = [sort];
+
+  try {
+    const answer = await ax.post(`https://${host}/clip/_search`, data, params);
+    const result = answer.data.hits.hits;
+    const total = answer.data.hits.total;
+    let items = {};
+    items.clips = result.map(hit => hit._source.pips);
+    items.total = total;
+    res.json(items);
+  } catch (e) {
+    console.log(e);
+    res.status(404).send("error");
+  }
+};
+
 const saveEmergencyPlayList = async function(req, res) {
   let user = "dazzler"; // assume local
   if (req.header("sslclientcertsubject")) {
@@ -301,7 +360,7 @@ module.exports = {
     // app.get("/api/v2/webcast", webcast);
     // app.get("/api/v2/loop", loop);
     // app.get("/api/v2/special", special);
-    // app.get("/api/v2/clip", clip);
+    app.get("/api/v2/clip", clip);
     app.get("/api/v2/episode", episode);
     app.post("/api/v2/loop", saveEmergencyPlayList);
     // app.put("/api/v2/loop", loop);

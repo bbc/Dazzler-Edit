@@ -20,6 +20,7 @@ const config = {
     live_brand: "w13xttlw",
     clip_language: "hindi",
     language_tag: "p0368zp7",
+    language: "hi",
     webcast_channels: [
       "world_service_stream_05",
       "world_service_stream_06",
@@ -35,6 +36,7 @@ const config = {
     live_brand: "w13xttvl",
     clip_language: "marathi",
     language_tag: "x",
+    language: "mr",
     webcast_channels: [
       "world_service_stream_05",
       "world_service_stream_06",

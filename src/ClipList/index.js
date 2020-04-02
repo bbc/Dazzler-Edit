@@ -5,7 +5,7 @@ import "moment-duration-format";
 import TableBody from "@material-ui/core/TableBody";
 import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
-import AssetDao from "../AssetDaoV1";
+import AssetDao from "../AssetDaoV2";
 
 export default function ClipList({
   sid,
@@ -54,16 +54,15 @@ export default function ClipList({
       (items, total) => {
         console.log("got clip data for", type, total, items);
         setRows(items);
-        setCurrentPage(page);
-        setCurrentRowsPerPage(rowsPerPage);
-        setcurrentSortDirection(sort_direction);
-        setCurrentSearch(search);
-        setcurrentType(type);
-
         onPageLoaded(currentPage, currentRowsPerPage, total);
       },
       search
     );
+    setCurrentPage(page);
+    setCurrentRowsPerPage(rowsPerPage);
+    setcurrentSortDirection(sort_direction);
+    setCurrentSearch(search);
+    setcurrentType(type);
   }
 
   return (
