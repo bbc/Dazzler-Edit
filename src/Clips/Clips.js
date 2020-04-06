@@ -13,29 +13,29 @@ import TextField from "@material-ui/core/TextField";
 import { TablePaginationActionsWrapped } from "../TablePaginationActions/TablePaginationActions";
 import ClipList from "../ClipList";
 
-export const styles = theme => ({
+export const styles = (theme) => ({
   root: {
     width: "100%",
-    marginTop: theme.spacing(3)
+    marginTop: theme.spacing(3),
   },
   table: {
-    minWidth: 250
+    minWidth: 250,
   },
   tableWrapper: {
-    overflowX: "scroll"
+    overflowX: "scroll",
   },
   search: {
     "& > *": {
       // margin: theme.spacing(1),
       width: "25ch",
-      height: "6ch"
-    }
-  }
+      height: "6ch",
+    },
+  },
 });
 
 const headCells = [
   { id: "title", numeric: false, disablePadding: true, label: "Title" },
-  { id: "pid", numeric: false, disablePadding: true, label: "Age" }
+  { id: "pid", numeric: false, disablePadding: true, label: "Age" },
 ];
 
 /*
@@ -57,7 +57,7 @@ export class Clips extends React.Component {
       type: "web",
       search: "",
       orderBy: "title",
-      order: "asc"
+      order: "asc",
     };
   }
 
@@ -65,18 +65,18 @@ export class Clips extends React.Component {
     this.setState({
       page,
       rowsPerPage,
-      totalRows
+      totalRows,
     });
   };
 
   componentDidMount = () => {
     this.setState({
       sid: this.props.sid,
-      type: this.props.type
+      type: this.props.type,
     });
   };
 
-  handleChange = event => {
+  handleChange = (event) => {
     this.setState({ search: event.target.value });
   };
 
@@ -89,10 +89,10 @@ export class Clips extends React.Component {
     );
   }
 
-  handleSort = cell => {
+  handleSort = (cell) => {
     this.setState({
       order: this.state.order === "asc" ? "desc" : "asc",
-      orderBy: cell
+      orderBy: cell,
     });
   };
 
@@ -100,7 +100,7 @@ export class Clips extends React.Component {
     this.setState({ page: parseInt(page) });
   };
 
-  handleChangeRowsPerPage = event => {
+  handleChangeRowsPerPage = (event) => {
     this.setState({ page: 0, rowsPerPage: parseInt(event.target.value) });
   };
 
@@ -127,7 +127,7 @@ export class Clips extends React.Component {
             <Table className={classes.table} style={{ marginLeft: "2%" }}>
               <TableHead>
                 <TableRow>
-                  {headCells.map(headCell => (
+                  {headCells.map((headCell) => (
                     <TableCell
                       key={headCell.id}
                       align={headCell.numeric ? "right" : "left"}
@@ -188,7 +188,7 @@ export class Clips extends React.Component {
 }
 
 Clips.propTypes = {
-  classes: PropTypes.object.isRequired
+  classes: PropTypes.object.isRequired,
 };
 
 export default withStyles(styles)(Clips);

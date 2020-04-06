@@ -7,19 +7,27 @@ const URLPrefix =
 class AssetDao {
   static getClips(sid, type, page, rowsPerPage, sort, direction, cb, search) {
     var sort_direction = direction === "desc" ? "descending" : "ascending";
-    const url = `${URLPrefix}/api/v2/clip?sid=${sid}&type=${type}&page=${page +
-      1}&page_size=${rowsPerPage}&sort=${sort}&sort_direction=${sort_direction}&search=${search}`;
+    const url = `${URLPrefix}/api/v2/clip`;
+    const params = {
+      sid,
+      type,
+      page: page + 1,
+      page_size: rowsPerPage,
+      sort,
+      sort_direction,
+      search: search,
+    };
+
     axios
-      .get(url)
-      .then(response => {
+      .get(url, { params })
+      .then((response) => {
         const items = [];
-        response.data.clips.forEach(clip => {
+        response.data.clips.forEach((clip) => {
           items.push(this.clip2Item(clip));
-          console.log("ITEM", items);
         });
         cb(items, response.data.total);
       })
-      .catch(e => {
+      .catch((e) => {
         console.log(e);
       });
   }
@@ -27,17 +35,18 @@ class AssetDao {
   static getSpecials(sid, page, rowsPerPage, cb) {
     axios
       .get(
-        `${URLPrefix}/api/v1/special?sid=${sid}&page=${page +
-          1}&page_size=${rowsPerPage}`
+        `${URLPrefix}/api/v1/special?sid=${sid}&page=${
+          page + 1
+        }&page_size=${rowsPerPage}`
       )
-      .then(response => {
+      .then((response) => {
         const items = [];
-        response.data.items.forEach(clip => {
+        response.data.items.forEach((clip) => {
           items.push(this.clip2Item(clip));
         });
         cb(items, response.data.total);
       })
-      .catch(e => {
+      .catch((e) => {
         console.log(e);
       });
   }
@@ -65,15 +74,15 @@ class AssetDao {
       from: mustBeAvailableBy,
       to: mustBeAvailableUntil,
       availability: availability,
-      search: search
+      search: search,
     };
     console.log("episode", params);
     axios
       .get(url, { params })
-      .then(response => {
+      .then((response) => {
         console.log("episode DAO", response);
         const items = [];
-        response.data.items.forEach(episode => {
+        response.data.items.forEach((episode) => {
           items.push({
             duration: moment.duration(episode.duration).toISOString(),
             pid: episode.pid,
@@ -84,12 +93,12 @@ class AssetDao {
             live: false,
             insertionType: "",
             entityType: "episode",
-            availability: episode.availability
+            availability: episode.availability,
           });
         });
         cb(items, response.data.total);
       })
-      .catch(e => {
+      .catch((e) => {
         console.log(url);
         console.log(e);
       });
@@ -108,7 +117,8 @@ class AssetDao {
       versionCrid: version.crid.uri,
       pid: clip.clip.pid,
       vpid: version.pid,
-      entityType: "clip"
+      entityType: "clip",
+      last_modified: clip.clip.last_modified,
     };
   }
 

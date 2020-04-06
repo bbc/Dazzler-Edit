@@ -12,16 +12,16 @@ export default function ClipList({
   type,
   page = 0,
   rowsPerPage = 5,
-  onAddClicked = function() {
+  onAddClicked = function () {
     console.log("add clicked");
   },
-  onPageLoaded = function(page, rowsPerPage, total) {
+  onPageLoaded = function (page, rowsPerPage, total) {
     console.log("page changed", page, rowsPerPage, total);
   },
   sort = "title",
   sort_direction = "desc",
   flip = false,
-  search
+  search,
 }) {
   const [currentPage, setCurrentPage] = React.useState(-1);
   const [currentRowsPerPage, setCurrentRowsPerPage] = React.useState(5);
@@ -55,6 +55,7 @@ export default function ClipList({
       sort,
       sort_direction,
       (items, total) => {
+        console.log("ITEMS IS", items);
         console.log("got clip data for", type, total, items);
         setRows(items);
         onPageLoaded(currentPage, currentRowsPerPage, total);
@@ -71,7 +72,7 @@ export default function ClipList({
 
   return (
     <TableBody>
-      {rows.map(row => (
+      {rows.map((row) => (
         <TableRow key={row.pid} className={row.insertionType}>
           <TableCell component="th" scope="row">
             <div className="tooltip">
@@ -80,7 +81,7 @@ export default function ClipList({
             </div>
           </TableCell>
           <TableCell align="center">
-            {moment(row.updated_time).format("DD-MM-YYYY")}
+            {moment(row.last_modified).format("DD-MM-YYYY")}
           </TableCell>
           <TableCell align="center">
             {moment.duration(row.duration).format("hh:mm:ss", { trim: false })}
@@ -103,5 +104,5 @@ export default function ClipList({
 
 ClipList.propTypes = {
   page: PropTypes.number.isRequired,
-  rowsPerPage: PropTypes.number.isRequired
+  rowsPerPage: PropTypes.number.isRequired,
 };
