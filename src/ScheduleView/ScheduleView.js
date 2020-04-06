@@ -32,11 +32,11 @@ class ScheduleView extends React.Component {
     this.state = {};
   }
 
-  handleClick = index => {
+  handleClick = (index) => {
     if (this.props.onRowSelected) this.props.onRowSelected(index);
   };
 
-  handleDelete = index => {
+  handleDelete = (index) => {
     this.props.onDelete(index); // TODO can we use this directly?
   };
 
@@ -61,18 +61,15 @@ class ScheduleView extends React.Component {
 
   /* If schedule is not available and there is 30 mins left until schedule time,
   item becomes red*/
-  checkStatus = item => {
+  checkStatus = (item) => {
     if (item.asset && item.asset.status == "unavailable") {
-      if (
-        moment(item.startTime)
-          .add(30, "minutes")
-          .isAfter(moment())
-      ) {
-        item.insertionType = "noStart";
-        return "noStart";
-      } else {
+      if (moment(item.startTime).add(30, "minutes").isAfter(moment())) {
+        console.log("nowis ,", moment());
         item.insertionType = "unavailable";
         return "unavailable";
+      } else {
+        item.insertionType = "noStart";
+        return "noStart";
       }
     } else {
       return item.insertionType;
@@ -142,7 +139,7 @@ class ScheduleView extends React.Component {
 ScheduleView.propTypes = {
   data: PropTypes.array.isRequired,
   onDelete: PropTypes.func.isRequired,
-  onRowSelected: PropTypes.func.isRequired
+  onRowSelected: PropTypes.func.isRequired,
 };
 
 export default ScheduleView;
