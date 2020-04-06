@@ -7,11 +7,19 @@ const URLPrefix =
 class AssetDao {
   static getClips(sid, type, page, rowsPerPage, sort, direction, cb, search) {
     var sort_direction = direction === "desc" ? "descending" : "ascending";
-    const url = `${URLPrefix}/api/v2/clip?sid=${sid}&type=${type}&page=${
-      page + 1
-    }&page_size=${rowsPerPage}&sort=${sort}&sort_direction=${sort_direction}&search=${search}`;
+    const url = `${URLPrefix}/api/v2/clip`;
+    const params = {
+      sid,
+      type,
+      page: page + 1,
+      page_size: rowsPerPage,
+      sort,
+      sort_direction,
+      search: search,
+    };
+
     axios
-      .get(url)
+      .get(url, { params })
       .then((response) => {
         const items = [];
         response.data.clips.forEach((clip) => {

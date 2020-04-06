@@ -76,7 +76,7 @@ export default function ClipList({
         <TableRow key={row.pid} className={row.insertionType}>
           <TableCell component="th" scope="row">
             <div className="tooltip">
-              {row.title} + !
+              {row.title}
               <span className="tooltiptext">PID = {row.pid}</span>
             </div>
           </TableCell>
