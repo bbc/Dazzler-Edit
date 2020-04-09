@@ -9,27 +9,30 @@ import TableFooter from "@material-ui/core/TableFooter";
 import TablePagination from "@material-ui/core/TablePagination";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
-import {TablePaginationActionsWrapped} from "../TablePaginationActions/TablePaginationActions";
+import moment from "moment";
+import { TablePaginationActionsWrapped } from "../TablePaginationActions/TablePaginationActions";
 import AssetDao from "../AssetDaoV1";
 
 const useStyles = (theme) => {
   return makeStyles({
     root: {
       width: "100%",
-      marginTop: theme.spacing(3)
+      marginTop: theme.spacing(3),
     },
     table: {
-      minWidth: 250
+      minWidth: 250,
     },
     tableWrapper: {
-      overflowX: "hidden"
-    }
+      overflowX: "hidden",
+    },
   });
-}
+};
 
 export default function Specials({
-  sid = '',
-  handleClick = function() { console.log('specials, click pressed');},
+  sid = "",
+  handleClick = function () {
+    console.log("specials, click pressed");
+  },
 }) {
   const theme = useTheme();
   const classes = useStyles(theme);
@@ -39,15 +42,11 @@ export default function Specials({
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
   useEffect(() => {
-    console.log('specials want page', page);
-    AssetDao.getSpecials(
-      sid,
-      page,
-      rowsPerPage,
-      (items, total) => {
-        console.log('updated specials', total, items);
-        setRows(items);
-        setTotalRows(total);
+    console.log("specials want page", page);
+    AssetDao.getSpecials(sid, page, rowsPerPage, (items, total) => {
+      console.log("updated specials", total, items);
+      setRows(items);
+      setTotalRows(total);
     });
   }, [sid, page, rowsPerPage]);
 
@@ -55,27 +54,32 @@ export default function Specials({
     setPage(newPage);
   };
 
-  const handleChangeRowsPerPage = event => {
+  const handleChangeRowsPerPage = (event) => {
     setPage(0);
     setRowsPerPage(event.target.value);
   };
 
-  const emptyRows = rowsPerPage - Math.min(rowsPerPage, (rows.length?rows.length:0) - page * rowsPerPage);
+  const emptyRows =
+    rowsPerPage -
+    Math.min(rowsPerPage, (rows.length ? rows.length : 0) - page * rowsPerPage);
 
+  const formattedDuration = (item) => {
+    return moment.duration(item.duration).format("hh:mm:ss", { trim: false });
+  };
   return (
     <div>
       <Paper className={classes.root}>
         <div className={classes.tableWrapper}>
           <Table className={classes.table}>
             <TableHead>
-            <TableRow>
+              <TableRow>
                 <TableCell>Title</TableCell>
                 <TableCell>Duration</TableCell>
                 <TableCell>Add</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {rows.map(row => (
+              {rows.map((row) => (
                 <TableRow key={row.pid}>
                   <TableCell component="th" scope="row">
                     <div className="tooltip">
@@ -84,12 +88,13 @@ export default function Specials({
                       <span className="tooltiptext">PID = {row.pid}</span>
                     </div>
                   </TableCell>
+                  <TableCell align="right">{formattedDuration(row)}</TableCell>
                   <TableCell align="right">
-                    {this.formattedDuration(row)}
-                  </TableCell>
-                  <TableCell align="right">
-                    <button className="ui compact icon button"
-                      onClick={() => { handleClick(row); }}
+                    <button
+                      className="ui compact icon button"
+                      onClick={() => {
+                        handleClick(row);
+                      }}
                     >
                       <i className="plus icon"></i>
                     </button>
@@ -112,7 +117,7 @@ export default function Specials({
                   rowsPerPage={rowsPerPage}
                   page={page}
                   SelectProps={{
-                    native: true
+                    native: true,
                   }}
                   onChangePage={handleChangePage}
                   onChangeRowsPerPage={handleChangeRowsPerPage}
@@ -128,5 +133,5 @@ export default function Specials({
 }
 
 Specials.propTypes = {
-  sid: PropTypes.string.isRequired
+  sid: PropTypes.string.isRequired,
 };

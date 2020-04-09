@@ -155,7 +155,12 @@ class Editor extends React.Component {
       mode: "loop",
       scheduleInsertionPoint: 1,
       scheduleModified: false,
-      langauge: "",
+      langauge: "Hindi",
+      configObj: {
+        Hindi: {
+          sid: "bbc_hindi_tv",
+        },
+      },
       timeToFill: moment.duration(),
       upcomingAvailability: moment.duration("P1D"),
       open: false,
@@ -170,13 +175,24 @@ class Editor extends React.Component {
   }
 
   componentDidMount() {
-    PlatformDao.getUser((user) => {
-      this.setState({ user: user });
-    });
+    try {
+      PlatformDao.getUser((user) => {
+        this.setState({ user: user });
+      });
 
-    getLanguages((response) => {
-      this.setState({ langaugeList: response });
-    });
+      getLanguages((response) => {
+        this.setState({
+          langaugeList: Object.keys(response),
+          configObj: response,
+          schedule: new ScheduleObject(
+            this.state.langauge,
+            moment().utc().startOf("day")
+          ),
+        });
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   componentDidUpdate(prevProps) {}
@@ -199,7 +215,7 @@ class Editor extends React.Component {
 
   handleAddLive(item) {
     let scheduleObject = new ScheduleObject(
-      this.state.schedule.sid,
+      this.state.configObj[this.state.langauge].sid,
       this.state.schedule.date,
       this.state.schedule.items
     );
@@ -258,7 +274,7 @@ class Editor extends React.Component {
 
   handleScheduleDelete(index) {
     let scheduleObject = new ScheduleObject(
-      this.state.schedule.sid,
+      this.state.configObj[this.state.langauge].sid,
       this.state.schedule.date,
       this.state.schedule.items
     );
@@ -268,7 +284,7 @@ class Editor extends React.Component {
 
   handleOccurenceDelete(index, value) {
     let scheduleObject = new ScheduleObject(
-      this.state.schedule.sid,
+      this.state.configObj[this.state.langauge].sid,
       this.state.schedule.date,
       this.state.schedule.items
     );
@@ -298,7 +314,7 @@ class Editor extends React.Component {
   handleDateChange = (date) => {
     //console.log('handleDateChange', date);
     try {
-      const sid = this.state.schedule.sid;
+      const sid = this.state.configObj[this.state.langauge].sid;
       fetchSchedule(sid, moment(date), (schedule) =>
         this.handleNewSchedule(schedule)
       );
@@ -310,7 +326,7 @@ class Editor extends React.Component {
   pasteIntoSchedule(items) {
     let index = this.state.scheduleInsertionPoint;
     let scheduleObject = new ScheduleObject(
-      this.state.schedule.sid,
+      this.state.configObj[this.state.langauge].sid,
       this.state.schedule.date,
       this.state.schedule.items
     );
@@ -342,7 +358,10 @@ class Editor extends React.Component {
 
   clearSchedule() {
     this.updateSchedule(
-      new ScheduleObject(this.state.schedule.sid, this.state.schedule.date),
+      new ScheduleObject(
+        this.state.configObj[this.state.langauge].sid,
+        this.state.schedule.date
+      ),
       1,
       false
     );
@@ -399,7 +418,7 @@ class Editor extends React.Component {
     });
     element.href = URL.createObjectURL(file);
     element.download =
-      services[this.state.schedule.sid].name +
+      services[this.state.configObj[this.state.langauge].sid].name +
       " " +
       this.state.user.name +
       " Loop.json";
@@ -423,7 +442,7 @@ class Editor extends React.Component {
     //console.log('savePlaylist');
     const This = this; // closure for callback
     saveSchedule(
-      services[this.state.schedule.sid].serviceIDRef,
+      services[this.state.configObj[this.state.langauge].sid].serviceIDRef,
       this.state.schedule.items,
       function () {
         This.setState({ scheduleModified: false });
@@ -499,7 +518,7 @@ class Editor extends React.Component {
               })}
             </Select>
             <Typography variant="h6" color="inherit" noWrap>
-              {/* {services[this.state.schedule.sid].name} */}
+              {/* {services[this.state.configObj[this.state.langauge].sid].name} */}
             </Typography>
             <Typography
               align="center"
@@ -586,7 +605,7 @@ class Editor extends React.Component {
 
                 <Live
                   date={this.state.schedule.date.utc().format("YYYY-MM-DD")}
-                  sid={this.state.schedule.sid}
+                  sid={this.state.configObj[this.state.langauge].sid}
                   handleClick={this.handleAddLive}
                 />
               </ExpansionPanel>
@@ -606,7 +625,7 @@ class Editor extends React.Component {
                   availability={"available"}
                   mustBeAvailableBy={mustBeAvailableBy}
                   mustBeAvailableUntil={mustBeAvailableUntil}
-                  sid={this.state.schedule.sid}
+                  sid={this.state.configObj[this.state.langauge].sid}
                   handleClick={this.handleAddClipOrEpisode}
                 />
               </ExpansionPanel>
@@ -625,7 +644,7 @@ class Editor extends React.Component {
                   availability={"P1D"}
                   mustBeAvailableBy={upcomingMustBeAvailableBy}
                   mustBeAvailableUntil={upcomingMustBeAvailableUntil}
-                  sid={this.state.schedule.sid}
+                  sid={this.state.configObj[this.state.langauge].sid}
                   handleClick={this.handleAddClipOrEpisode}
                   // resultsFilter={this.filterUpcomingEpisodes}
                 />
@@ -642,7 +661,7 @@ class Editor extends React.Component {
                 <Clips
                   flip={this.state.side}
                   type="web"
-                  sid={this.state.schedule.sid}
+                  sid={this.state.configObj[this.state.langauge].sid}
                   handleClick={this.handleAddClipOrEpisode}
                 />
               </ExpansionPanel>
@@ -656,7 +675,7 @@ class Editor extends React.Component {
                 </ExpansionPanelSummary>
 
                 <Specials
-                  sid={this.state.schedule.sid}
+                  sid={this.state.configObj[this.state.langauge].sid}
                   handleClick={this.handleAddClipOrEpisode}
                 />
               </ExpansionPanel>
