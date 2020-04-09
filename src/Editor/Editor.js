@@ -3,12 +3,15 @@ import PropTypes from "prop-types";
 import classNames from "classnames";
 import { Box } from "@material-ui/core";
 import ExpansionPanel from "@material-ui/core/ExpansionPanel";
-import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
+import InputLabel from "@material-ui/core/InputLabel";
+import MenuItem from "@material-ui/core/MenuItem";
+import FormHelperText from "@material-ui/core/FormHelperText";
+import Select from "@material-ui/core/Select";
+import FormControl from "@material-ui/core/FormControl";
 import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
 import Radio from "@material-ui/core/Radio";
 import RadioGroup from "@material-ui/core/RadioGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
-import FormControl from "@material-ui/core/FormControl";
 import FormLabel from "@material-ui/core/FormLabel";
 import Typography from "@material-ui/core/Typography";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
@@ -30,89 +33,93 @@ import ScheduleView from "../ScheduleView/ScheduleView";
 import ScheduleObject from "../ScheduleObject";
 import Loop from "../Loop/Loop";
 import PlatformDao from "../PlatformDao/PlatformDao";
-import { fetchSchedule, saveSchedule } from "../ScheduleDao/ScheduleDao";
+import {
+  fetchSchedule,
+  saveSchedule,
+  getLanguages,
+} from "../ScheduleDao/ScheduleDao";
 import TimeDisplay from "../TimeDisplay";
 import Refresh from "../Refresh";
 import PushControl from "../PushControl";
 
 const drawerWidth = 240;
 
-const styles = theme => ({
+const styles = (theme) => ({
   root: {
-    display: "flex"
+    display: "flex",
   },
   appBar: {
     transition: theme.transitions.create(["margin", "width"], {
       easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen
-    })
+      duration: theme.transitions.duration.leavingScreen,
+    }),
   },
   appBarShift: {
     width: `calc(100% - ${drawerWidth}px)`,
     marginLeft: drawerWidth,
     transition: theme.transitions.create(["margin", "width"], {
       easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen
-    })
+      duration: theme.transitions.duration.enteringScreen,
+    }),
   },
   appBarTitle: {
     margin: theme.spacing(2),
-    flexGrow: 1
+    flexGrow: 1,
   },
   appBarName: {
     margin: theme.spacing(2),
-    marginLeft: "auto"
+    marginLeft: "auto",
   },
   menuButton: {
     marginLeft: 12,
-    marginRight: 20
+    marginRight: 20,
   },
   hide: {
-    display: "none"
+    display: "none",
   },
   drawer: {
     width: drawerWidth,
-    flexShrink: 0
+    flexShrink: 0,
   },
   drawerPaper: {
-    width: drawerWidth
+    width: drawerWidth,
   },
   drawerHeader: {
     display: "flex",
     alignItems: "center",
     padding: "0 8px",
     ...theme.mixins.toolbar,
-    justifyContent: "flex-end"
+    justifyContent: "flex-end",
   },
   content: {
     flexGrow: 1,
     padding: theme.spacing(3),
     transition: theme.transitions.create("margin", {
       easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen
+      duration: theme.transitions.duration.leavingScreen,
     }),
-    marginLeft: -drawerWidth
+    marginLeft: -drawerWidth,
   },
   contentShift: {
     transition: theme.transitions.create("margin", {
       easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen
+      duration: theme.transitions.duration.enteringScreen,
     }),
-    marginLeft: 0
-  }
+    marginLeft: 0,
+  },
 });
 
 const services = {
   bbc_hindi_tv: {
     sid: "bbc_hindi_tv",
     name: "Hindi",
-    serviceIDRef: "TVHIND01"
+    serviceIDRef: "TVHIND01",
   },
   bbc_marathi_tv: {
     sid: "bbc_marathi_tv",
     name: "Marathi",
-    serviceIDRef: "TVMAR01"
-  }
+    serviceIDRef: "TVMAR01",
+  },
 };
 
 class Editor extends React.Component {
@@ -131,6 +138,7 @@ class Editor extends React.Component {
     this.handleDrawerClose = this.handleDrawerClose.bind(this);
     this.handleDateChange = this.handleDateChange.bind(this);
     this.handleChangeMode = this.handleChangeMode.bind(this);
+    this.handleChange = this.handleChange.bind(this);
     this.handleRefresh = this.handleRefresh.bind(this);
     this.savePlaylist = this.savePlaylist.bind(this);
     this.clearSchedule = this.clearSchedule.bind(this);
@@ -142,13 +150,12 @@ class Editor extends React.Component {
     this.state = {
       schedule: new ScheduleObject(
         "bbc_hindi_tv",
-        moment()
-          .utc()
-          .startOf("day")
+        moment().utc().startOf("day")
       ),
       mode: "loop",
       scheduleInsertionPoint: 1,
       scheduleModified: false,
+      langauge: "",
       timeToFill: moment.duration(),
       upcomingAvailability: moment.duration("P1D"),
       open: false,
@@ -157,23 +164,28 @@ class Editor extends React.Component {
       loop: [],
       loopDuration: moment.duration(),
       user: { name: "anonymous", auth: true },
-      side: true
+      side: true,
+      langaugeList: [],
     };
   }
 
   componentDidMount() {
-    PlatformDao.getUser(user => {
+    PlatformDao.getUser((user) => {
       this.setState({ user: user });
+    });
+
+    getLanguages((response) => {
+      this.setState({ langaugeList: response });
     });
   }
 
   componentDidUpdate(prevProps) {}
 
-  handleRefresh = event => {
+  handleRefresh = (event) => {
     this.setState({ side: this.state.side ? false : true });
   };
 
-  handleChangeMode = event => {
+  handleChangeMode = (event) => {
     this.setState({ mode: event.target.value });
   };
 
@@ -239,7 +251,7 @@ class Editor extends React.Component {
     return moment.duration();
   }
 
-  handleScheduleRowSelect = index => {
+  handleScheduleRowSelect = (index) => {
     const ttf = this.calculateTimeToFill(this.state.schedule.items, index);
     this.setState({ scheduleInsertionPoint: index, timeToFill: ttf });
   };
@@ -283,11 +295,11 @@ class Editor extends React.Component {
     this.updateSchedule(scheduleObject, 1, false);
   }
 
-  handleDateChange = date => {
+  handleDateChange = (date) => {
     //console.log('handleDateChange', date);
     try {
       const sid = this.state.schedule.sid;
-      fetchSchedule(sid, moment(date), schedule =>
+      fetchSchedule(sid, moment(date), (schedule) =>
         this.handleNewSchedule(schedule)
       );
     } catch (error) {
@@ -320,7 +332,7 @@ class Editor extends React.Component {
       schedule: scheduleObject,
       scheduleInsertionPoint: sip,
       scheduleModified: modified,
-      timeToFill: ttf
+      timeToFill: ttf,
     });
   }
 
@@ -339,7 +351,7 @@ class Editor extends React.Component {
   testLoop() {
     this.pasteIntoLoop({
       duration: "PT55M",
-      title: "A test item"
+      title: "A test item",
     });
   }
 
@@ -349,7 +361,7 @@ class Editor extends React.Component {
     loop.push({ ...item, insertionType: "" });
     this.setState({
       loop: loop,
-      loopDuration: this.state.loopDuration.add(moment.duration(item.duration))
+      loopDuration: this.state.loopDuration.add(moment.duration(item.duration)),
     });
   }
 
@@ -361,7 +373,7 @@ class Editor extends React.Component {
     try {
       var file = e.target.files[0];
       let reader = new FileReader();
-      reader.onload = e => {
+      reader.onload = (e) => {
         try {
           let items = JSON.parse(e.target.result);
           this.setState({ loop: items });
@@ -383,7 +395,7 @@ class Editor extends React.Component {
     const element = document.createElement("a");
     // const items = JSON.stringify(this.state.loop);
     const file = new Blob([JSON.stringify(this.state.loop)], {
-      type: "application/json"
+      type: "application/json",
     });
     element.href = URL.createObjectURL(file);
     element.download =
@@ -395,7 +407,7 @@ class Editor extends React.Component {
     element.click();
   }
 
-  deleteItemFromLoop = index => {
+  deleteItemFromLoop = (index) => {
     const r = this.state.loop[index];
     let loop = [...this.state.loop];
     loop.splice(index, 1);
@@ -403,7 +415,7 @@ class Editor extends React.Component {
       loop: loop,
       loopDuration: this.state.loopDuration.subtract(
         moment.duration(r.duration)
-      )
+      ),
     });
   };
 
@@ -413,13 +425,17 @@ class Editor extends React.Component {
     saveSchedule(
       services[this.state.schedule.sid].serviceIDRef,
       this.state.schedule.items,
-      function() {
+      function () {
         This.setState({ scheduleModified: false });
       },
-      function(e) {
+      function (e) {
         console.log(e);
       }
     );
+  };
+
+  handleChange = (event) => {
+    this.setState({ langauge: event.target.value });
   };
 
   // available episodes need to be available.
@@ -446,14 +462,14 @@ class Editor extends React.Component {
       .format();
 
     const { classes } = this.props;
-    const { open } = this.state;
+    const { open, langaugeList, langauge } = this.state;
     //console.log('Editor.render');
     return (
       <div className={classes.root}>
         <AppBar
           position="fixed"
           className={classNames(classes.appBar, {
-            [classes.appBarShift]: open
+            [classes.appBarShift]: open,
           })}
         >
           <Toolbar disableGutters={!open}>
@@ -465,8 +481,25 @@ class Editor extends React.Component {
             >
               <MenuIcon />
             </IconButton>
+
+            <Select
+              id="demo-simple-select-outlined"
+              labelId="demo-simple-select-outlined-label"
+              style={{ fontSize: 17, color: "white" }}
+              value={this.state.langauge}
+              onChange={this.handleChange}
+            >
+              {langaugeList.map((item) => {
+                return (
+                  <MenuItem value={item} style={{ fontSize: 17 }}>
+                    {" "}
+                    {item}
+                  </MenuItem>
+                );
+              })}
+            </Select>
             <Typography variant="h6" color="inherit" noWrap>
-              {services[this.state.schedule.sid].name}
+              {/* {services[this.state.schedule.sid].name} */}
             </Typography>
             <Typography
               align="center"
@@ -500,7 +533,7 @@ class Editor extends React.Component {
         ></Drawer>
         <main
           className={classNames(classes.content, {
-            [classes.contentShift]: open
+            [classes.contentShift]: open,
           })}
         >
           <div className={classes.drawerHeader} />
@@ -678,7 +711,7 @@ class Editor extends React.Component {
 
 Editor.propTypes = {
   classes: PropTypes.object.isRequired,
-  theme: PropTypes.object.isRequired
+  theme: PropTypes.object.isRequired,
 };
 
 export default withStyles(styles, { withTheme: true })(Editor);

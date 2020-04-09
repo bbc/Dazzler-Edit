@@ -14,6 +14,7 @@ const config = {
   default_sid: "bbc_hindi_tv",
   bbc_hindi_tv: {
     serviceIDRef: "TVHIND01",
+    name: "Hindi",
     mid: "bbc_hindi_tv",
     loop_collection: "p0845svx",
     specials_collection: "p0845sqf",
@@ -25,11 +26,12 @@ const config = {
       "world_service_stream_05",
       "world_service_stream_06",
       "world_service_stream_07",
-      "world_service_stream_08"
-    ]
+      "world_service_stream_08",
+    ],
   },
   bbc_marathi_tv: {
     serviceIDRef: "TVMAR01",
+    name: "Marathi",
     mid: "bbc_marathi_tv",
     loop_collection: "p0510sbc",
     specials_collection: "p0715nv4",
@@ -41,22 +43,22 @@ const config = {
       "world_service_stream_05",
       "world_service_stream_06",
       "world_service_stream_07",
-      "world_service_stream_08"
-    ]
-  }
+      "world_service_stream_08",
+    ],
+  },
 };
 
 app.use(
   bodyParser.text({
     type: "*/*",
-    limit: "500kb"
+    limit: "500kb",
   })
 );
 
 app.use(express.static(__dirname + "/../edit"));
 
 // /status is used by ELB health checkers to assert that the service is running OK
-app.get("/status", function(req, res) {
+app.get("/status", function (req, res) {
   res.send("OK");
 });
 

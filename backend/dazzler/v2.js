@@ -352,6 +352,23 @@ const subscribe = async function (req, res) {
   }
 };
 
+const langaugeServices = async function (req, res) {
+  console.log("HITTTTT");
+  try {
+    let keys = Object.keys(config);
+    let languages = [];
+    for (let x of keys) {
+      if (config[x].hasOwnProperty("name")) {
+        languages.push(config[x].name);
+      }
+    }
+    res.json(languages);
+    console.log("LANGUAGES IS", languages);
+  } catch (error) {
+    res.status(404).send("error");
+  }
+};
+
 module.exports = {
   init(app, configObject) {
     config = configObject;
@@ -361,9 +378,11 @@ module.exports = {
     // app.get("/api/v2/webcast", webcast);
     // app.get("/api/v2/loop", loop);
     // app.get("/api/v2/special", special);
+    app.get("/api/v2/langaugeservices", langaugeServices);
     app.get("/api/v2/clip", clip);
     app.get("/api/v2/episode", episode);
     app.post("/api/v2/loop", saveEmergencyPlayList);
+
     // app.put("/api/v2/loop", loop);
     // app.post("/api/v2/tva", tva);
     app.post("/api/v2/subscribe", subscribe);
