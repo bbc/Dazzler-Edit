@@ -17,4 +17,11 @@ describe("< Editor />", () => {
     openMenu.simulate("click");
     expect(wrapper.state().open).toEqual(true);
   });
+
+  test("sid changes when different language service chosen in dropdown", () => {
+    const wrapper = mount(<Editor />);
+    const openMenu = wrapper;
+    openMenu.simulate("click");
+    expect(wrapper.state().open).toEqual(true);
+  });
 });

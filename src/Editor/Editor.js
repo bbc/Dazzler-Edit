@@ -136,6 +136,7 @@ class Editor extends React.Component {
     this.handleDrawerOpen = this.handleDrawerOpen.bind(this);
     this.handleDrawerClose = this.handleDrawerClose.bind(this);
     this.handleDateChange = this.handleDateChange.bind(this);
+    this.handleTimeChange = this.handleTimeChange.bind(this);
     this.handleChangeMode = this.handleChangeMode.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleRefresh = this.handleRefresh.bind(this);
@@ -170,6 +171,8 @@ class Editor extends React.Component {
       user: { name: "anonymous", auth: true },
       side: true,
       langaugeList: [],
+      from: 0,
+      To: 12,
     };
   }
 
@@ -462,6 +465,10 @@ class Editor extends React.Component {
     });
   };
 
+  handleTimeChange = (event) => {
+    this.setState({ from: event.target.value });
+  };
+
   // available episodes need to be available.
   // this is for simplicity
   // available episodes need to be still available by the end of the day being scheduled
@@ -474,6 +481,7 @@ class Editor extends React.Component {
   // upcoming episodes need to be still available to the end of the day being scheduled
 
   render() {
+    const { from } = this.state;
     const mustBeAvailableBy = moment.utc().format();
     const mustBeAvailableUntil = moment
       .utc(this.state.schedule.date)
@@ -709,6 +717,8 @@ class Editor extends React.Component {
                 enabled={this.state.scheduleModified ? false : true}
                 scheduleDate={this.state.schedule.date}
                 onDateChange={this.handleDateChange}
+                handleTimeChange={this.handleTimeChange}
+                from={from}
               />
               <ScheduleView
                 onRowSelected={this.handleScheduleRowSelect}
@@ -717,6 +727,7 @@ class Editor extends React.Component {
                 data={this.state.schedule.items}
                 row={this.state.scheduleInsertionPoint}
                 lastUpdated=""
+                from={from}
               />
               <ScheduleToolbar
                 saveEnabled={this.state.user.auth}

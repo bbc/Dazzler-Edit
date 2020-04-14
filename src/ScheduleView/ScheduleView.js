@@ -112,23 +112,27 @@ class ScheduleView extends React.Component {
           </tr>
         </thead>
         <tbody>
-          {this.props.data.map((item, index) => (
-            <ScheduleItem
-              key={item.insertionType + item.startTime.utc().format()}
-              index={index}
-              live={item.live}
-              insertionType={this.checkStatus(item)}
-              selected={selectedItem === index}
-              startTime={item.startTime}
-              title={item.title}
-              duration={item.duration}
-              asset_duration={item.asset ? item.asset.duration : ""}
-              onClick={this.handleClick}
-              onDelete={this.handleDelete}
-              onOccurenceDelete={this.handleOccurenceDelete}
-              data={this.props.data}
-            />
-          ))}
+          {this.props.data.map((item, index) => {
+            if (moment(item.startTime).hour() >= this.props.from) {
+              return (
+                <ScheduleItem
+                  key={item.insertionType + item.startTime.utc().format()}
+                  index={index}
+                  live={item.live}
+                  insertionType={this.checkStatus(item)}
+                  selected={selectedItem === index}
+                  startTime={item.startTime}
+                  title={item.title}
+                  duration={item.duration}
+                  asset_duration={item.asset ? item.asset.duration : ""}
+                  onClick={this.handleClick}
+                  onDelete={this.handleDelete}
+                  onOccurenceDelete={this.handleOccurenceDelete}
+                  data={this.props.data}
+                />
+              );
+            }
+          })}
         </tbody>
       </table>
     );
