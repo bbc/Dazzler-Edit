@@ -125,7 +125,6 @@ const services = {
 class Editor extends React.Component {
   constructor(props) {
     super(props);
-
     this.handleScheduleDelete = this.handleScheduleDelete.bind(this);
     this.handleOccurenceDelete = this.handleOccurenceDelete.bind(this);
     this.handleAddLive = this.handleAddLive.bind(this);
@@ -315,6 +314,8 @@ class Editor extends React.Component {
     //console.log('handleDateChange', date);
     try {
       const sid = this.state.configObj[this.state.langauge].sid;
+      console.log("SID IS", sid);
+      console.log("language is", this.state.langauge);
       fetchSchedule(sid, moment(date), (schedule) =>
         this.handleNewSchedule(schedule)
       );
@@ -454,7 +455,11 @@ class Editor extends React.Component {
   };
 
   handleChange = (event) => {
-    this.setState({ langauge: event.target.value });
+    this.setState({ langauge: event.target.value }, () => {
+      const sid = this.state.configObj[this.state.langauge].sid;
+      this.reloadSchedule();
+      this.handleRefresh();
+    });
   };
 
   // available episodes need to be available.
@@ -505,7 +510,7 @@ class Editor extends React.Component {
               id="demo-simple-select-outlined"
               labelId="demo-simple-select-outlined-label"
               style={{ fontSize: 17, color: "white" }}
-              value={this.state.langauge}
+              value={langauge}
               onChange={this.handleChange}
             >
               {langaugeList.map((item) => {
@@ -605,7 +610,7 @@ class Editor extends React.Component {
 
                 <Live
                   date={this.state.schedule.date.utc().format("YYYY-MM-DD")}
-                  sid={this.state.configObj[this.state.langauge].sid}
+                  sid={this.state.configObj[langauge].sid}
                   handleClick={this.handleAddLive}
                 />
               </ExpansionPanel>
@@ -625,7 +630,7 @@ class Editor extends React.Component {
                   availability={"available"}
                   mustBeAvailableBy={mustBeAvailableBy}
                   mustBeAvailableUntil={mustBeAvailableUntil}
-                  sid={this.state.configObj[this.state.langauge].sid}
+                  sid={this.state.configObj[langauge].sid}
                   handleClick={this.handleAddClipOrEpisode}
                 />
               </ExpansionPanel>
@@ -644,7 +649,7 @@ class Editor extends React.Component {
                   availability={"P1D"}
                   mustBeAvailableBy={upcomingMustBeAvailableBy}
                   mustBeAvailableUntil={upcomingMustBeAvailableUntil}
-                  sid={this.state.configObj[this.state.langauge].sid}
+                  sid={this.state.configObj[langauge].sid}
                   handleClick={this.handleAddClipOrEpisode}
                   // resultsFilter={this.filterUpcomingEpisodes}
                 />
@@ -661,7 +666,7 @@ class Editor extends React.Component {
                 <Clips
                   flip={this.state.side}
                   type="web"
-                  sid={this.state.configObj[this.state.langauge].sid}
+                  sid={this.state.configObj[langauge].sid}
                   handleClick={this.handleAddClipOrEpisode}
                 />
               </ExpansionPanel>
@@ -675,7 +680,7 @@ class Editor extends React.Component {
                 </ExpansionPanelSummary>
 
                 <Specials
-                  sid={this.state.configObj[this.state.langauge].sid}
+                  sid={this.state.configObj[langauge].sid}
                   handleClick={this.handleAddClipOrEpisode}
                 />
               </ExpansionPanel>
