@@ -68,6 +68,10 @@
   background-color: #a9a9a9;
 }
 
+.current {
+  background-color: #13f25d;
+}
+
 .body {
   width: 80%;
   height: 80%;

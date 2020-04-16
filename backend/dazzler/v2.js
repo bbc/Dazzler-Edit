@@ -353,7 +353,7 @@ const subscribe = async function (req, res) {
   }
 };
 
-const langaugeServices = async function (req, res) {
+const languageServices = async function (req, res) {
   try {
     res.json(configV2);
   } catch (error) {
@@ -371,7 +371,7 @@ module.exports = {
     // app.get("/api/v2/webcast", webcast);
     // app.get("/api/v2/loop", loop);
     // app.get("/api/v2/special", special);
-    app.get("/api/v2/langaugeservices", langaugeServices);
+    app.get("/api/v2/languageservices", languageServices);
     app.get("/api/v2/clip", clip);
     app.get("/api/v2/episode", episode);
     app.post("/api/v2/loop", saveEmergencyPlayList);

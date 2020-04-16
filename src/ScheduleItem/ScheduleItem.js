@@ -57,6 +57,16 @@ class ScheduleItem extends React.Component {
 
     let { open } = this.state;
     let rowStyle = this.props.insertionType;
+    var elementStyle = "";
+
+    if (
+      moment().isSameOrAfter(moment(this.props.startTime)) &&
+      moment().isBefore(
+        moment(this.props.startTime).add(moment.duration(this.props.duration))
+      )
+    ) {
+      var elementStyle = "current";
+    }
     if (this.props.live === "true") rowStyle = "live";
     let arrowStyle = "bottomarrow";
     if (rowStyle === "gap") arrowStyle = "midarrow";
@@ -73,13 +83,19 @@ class ScheduleItem extends React.Component {
     return (
       <Fragment>
         <tr className={rowStyle}>
-          <td onClick={() => this.props.onClick(this.props.index)}>
+          <td
+            className={elementStyle}
+            onClick={() => this.props.onClick(this.props.index)}
+          >
             {this.props.selected ? <Arrow className={arrowStyle} /> : ""}
           </td>
 
-          <td> {localTime}</td>
+          <td className={elementStyle}> {localTime}</td>
 
-          <td onClick={() => this.props.onClick(this.props.index)}>
+          <td
+            className={elementStyle}
+            onClick={() => this.props.onClick(this.props.index)}
+          >
             {utcTime}
           </td>
 

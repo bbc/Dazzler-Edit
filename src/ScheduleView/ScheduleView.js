@@ -87,6 +87,7 @@ class ScheduleView extends React.Component {
   }
 
   render() {
+    console.log("data is ", this.props.data);
     // let offset = moment().format().substring(19);
     let selectedItem = this.props.row;
     if (selectedItem === -1) {
