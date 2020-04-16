@@ -122,6 +122,10 @@ const services = {
   },
 };
 
+var start = moment();
+var end = moment();
+start.set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
+end.set({ hour: 6, minute: 0, second: 0, millisecond: 0 });
 class Editor extends React.Component {
   constructor(props) {
     super(props);
@@ -136,7 +140,9 @@ class Editor extends React.Component {
     this.handleDrawerOpen = this.handleDrawerOpen.bind(this);
     this.handleDrawerClose = this.handleDrawerClose.bind(this);
     this.handleDateChange = this.handleDateChange.bind(this);
-    this.handleTimeChange = this.handleTimeChange.bind(this);
+    this.handleTo = this.handleTo.bind(this);
+    this.handleFrom = this.handleFrom.bind(this);
+    this.handleDay = this.handleDay.bind(this);
     this.handleChangeMode = this.handleChangeMode.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleRefresh = this.handleRefresh.bind(this);
@@ -171,8 +177,8 @@ class Editor extends React.Component {
       user: { name: "anonymous", auth: true },
       side: true,
       langaugeList: [],
-      from: 0,
-      To: 12,
+      from: start,
+      to: end,
     };
   }
 
@@ -317,8 +323,6 @@ class Editor extends React.Component {
     //console.log('handleDateChange', date);
     try {
       const sid = this.state.configObj[this.state.langauge].sid;
-      console.log("SID IS", sid);
-      console.log("language is", this.state.langauge);
       fetchSchedule(sid, moment(date), (schedule) =>
         this.handleNewSchedule(schedule)
       );
@@ -465,8 +469,47 @@ class Editor extends React.Component {
     });
   };
 
-  handleTimeChange = (event) => {
-    this.setState({ from: event.target.value });
+  handleFrom = (direction) => {
+    let { from, to } = this.state;
+    try {
+      if (direction === "back") {
+        this.setState({ from: moment(from).subtract(6, "hours") });
+      } else if (direction === "forward") {
+        if (!moment(from).isSameOrAfter(moment(to))) {
+          this.setState({ from: moment(from).add(6, "hours") });
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  handleTo = (direction) => {
+    let { to, from } = this.state;
+    try {
+      if (direction === "back") {
+        if (!moment(to).isSameOrBefore(moment(from))) {
+          this.setState({ to: moment(to).subtract(6, "hours") });
+        }
+      } else if (direction === "forward") {
+        this.setState({ to: moment(to).add(6, "hours") });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  handleDay = (direction) => {
+    let { from, to } = this.state;
+    try {
+      if (direction === "back") {
+        this.setState({ from: moment(from).subtract(1, "day") });
+      } else if (direction === "forward") {
+        this.setState({ to: moment(to).add(1, "day") });
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   // available episodes need to be available.
@@ -481,7 +524,7 @@ class Editor extends React.Component {
   // upcoming episodes need to be still available to the end of the day being scheduled
 
   render() {
-    const { from } = this.state;
+    let { from, to } = this.state;
     const mustBeAvailableBy = moment.utc().format();
     const mustBeAvailableUntil = moment
       .utc(this.state.schedule.date)
@@ -717,8 +760,11 @@ class Editor extends React.Component {
                 enabled={this.state.scheduleModified ? false : true}
                 scheduleDate={this.state.schedule.date}
                 onDateChange={this.handleDateChange}
-                handleTimeChange={this.handleTimeChange}
+                handleFrom={this.handleFrom}
+                handleTo={this.handleTo}
+                handleDay={this.handleDay}
                 from={from}
+                to={to}
               />
               <ScheduleView
                 onRowSelected={this.handleScheduleRowSelect}
@@ -728,6 +774,7 @@ class Editor extends React.Component {
                 row={this.state.scheduleInsertionPoint}
                 lastUpdated=""
                 from={from}
+                to={to}
               />
               <ScheduleToolbar
                 saveEnabled={this.state.user.auth}

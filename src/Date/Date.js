@@ -2,17 +2,24 @@ import React from "react";
 import Button from "@material-ui/core/Button";
 import { withStyles } from "@material-ui/core/styles";
 import moment from "moment";
-import MenuItem from "@material-ui/core/MenuItem";
-import Select from "@material-ui/core/Select";
+import AddIcon from "@material-ui/icons/Add";
+import ButtonGroup from "@material-ui/core/ButtonGroup";
+import RemoveIcon from "@material-ui/icons/Remove";
 import { Typography } from "@material-ui/core";
-import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
+import {
+  FaArrowLeft,
+  FaArrowRight,
+  FaAngleDoubleRight,
+  FaAngleDoubleLeft,
+} from "react-icons/fa";
 
 export const styles = (theme) => ({
   root: {
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
-    margin: "auto",
+    // margin: "auto",
+    margin: "0%",
     textAlign: "center",
     width: "50%",
   },
@@ -23,40 +30,30 @@ export const styles = (theme) => ({
     padding: 3,
     width: "1%",
   },
+  icon: {
+    display: "flex",
+    flexDirection: "column",
+    "& > *": {
+      marginBottom: theme.spacing(2),
+    },
+    "& .MuiBadge-root": {
+      marginRight: theme.spacing(4),
+    },
+  },
 });
 
-const hours = [
-  0,
-  1,
-  2,
-  3,
-  4,
-  5,
-  6,
-  7,
-  8,
-  9,
-  10,
-  11,
-  12,
-  13,
-  14,
-  15,
-  16,
-  17,
-  18,
-  19,
-  20,
-  21,
-  22,
-  23,
-];
+var start = moment();
+var end = moment();
+start.set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
+end.set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
 
 class Date extends React.Component {
   constructor() {
     super();
     this.state = {
       current: moment().startOf("day"),
+      from: start,
+      to: end,
     };
     this.handleClick = this.handleClick.bind(this);
   }
@@ -68,10 +65,22 @@ class Date extends React.Component {
   }
 
   render() {
+    console.log("time", moment.utc("00:00"));
     const { classes } = this.props;
     const { hour } = this.state;
+    let { from, to } = this.props;
     return (
       <div className={classes.root}>
+        <Button
+          className={classes.button}
+          variant="outlined"
+          onClick={() => {
+            this.props.handleDay("back");
+          }}
+        >
+          <FaAngleDoubleLeft />
+        </Button>
+        {moment(from).format("DD/MM/YY")}
         <Button
           className={classes.button}
           disabled={!this.props.enabled}
@@ -82,17 +91,49 @@ class Date extends React.Component {
         >
           <FaArrowLeft />
         </Button>
-        <Select
-          labelId="demo-simple-select-label"
-          id="demo-simple-select"
-          value={this.props.from}
-          onChange={this.props.handleTimeChange}
-        >
-          {hours.map((item) => {
-            return <MenuItem value={item}>{item}</MenuItem>;
-          })}
-        </Select>
+        <ButtonGroup>
+          <Button
+            aria-label="reduce"
+            onClick={() => {
+              this.props.handleFrom("back");
+            }}
+          >
+            <RemoveIcon fontSize="small" />
+          </Button>
+        </ButtonGroup>
+        {moment(from).format("HH:mm")}
+        <ButtonGroup>
+          <Button
+            aria-label="increase"
+            onClick={() => {
+              this.props.handleFrom("forward");
+            }}
+          >
+            <AddIcon fontSize="small" />
+          </Button>
+        </ButtonGroup>
         <Typography>{this.props.scheduleDate}</Typography>
+        <ButtonGroup>
+          <Button
+            aria-label="reduce"
+            onClick={() => {
+              this.props.handleTo("back");
+            }}
+          >
+            <RemoveIcon fontSize="small" />
+          </Button>
+        </ButtonGroup>
+        {moment(to).format("HH:mm")}
+        <ButtonGroup>
+          <Button
+            aria-label="increase"
+            onClick={() => {
+              this.props.handleTo("forward");
+            }}
+          >
+            <AddIcon fontSize="small" />
+          </Button>
+        </ButtonGroup>
         <Button
           className={classes.button}
           disabled={!this.props.enabled}
@@ -102,6 +143,16 @@ class Date extends React.Component {
           }}
         >
           <FaArrowRight />
+        </Button>
+        {moment(to).format("DD/MM/YY")}
+        <Button
+          className={classes.button}
+          variant="outlined"
+          onClick={() => {
+            this.props.handleDay("forward");
+          }}
+        >
+          <FaAngleDoubleRight />
         </Button>
       </div>
     );

@@ -113,7 +113,10 @@ class ScheduleView extends React.Component {
         </thead>
         <tbody>
           {this.props.data.map((item, index) => {
-            if (moment(item.startTime).hour() >= this.props.from) {
+            if (
+              moment(item.startTime).isSameOrAfter(this.props.from) &&
+              moment(item.startTime).isSameOrBefore(this.props.to)
+            ) {
               return (
                 <ScheduleItem
                   key={item.insertionType + item.startTime.utc().format()}
