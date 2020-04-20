@@ -180,8 +180,6 @@ class Editor extends React.Component {
       languageList: [],
       from: start,
       to: end,
-      dayTo: start,
-      dayFrom: end,
     };
   }
 
@@ -503,14 +501,18 @@ class Editor extends React.Component {
   };
 
   handleDayTo = (direction) => {
-    let { dayTo, dayFrom } = this.state;
+    let { to, from } = this.state;
     try {
       if (direction === "back") {
-        if (moment(dayTo).isSameOrAfter(moment(dayFrom))) {
-          this.setState({ dayTo: moment(dayTo).subtract(1, "day") });
+        if (
+          moment(to)
+            .format("DD/MM/YY")
+            .isSameOrAfter(moment(from).format("DD/MM/YY"))
+        ) {
+          this.setState({ to: moment(to).subtract(1, "day") });
         }
       } else if (direction === "forward") {
-        this.setState({ dayTo: moment(dayTo).add(1, "day") });
+        this.setState({ to: moment(to).add(1, "day") });
       }
     } catch (error) {
       console.log(error);
@@ -518,13 +520,17 @@ class Editor extends React.Component {
   };
 
   handleDayFrom = (direction) => {
-    let { dayTo, dayFrom } = this.state;
+    let { to, from } = this.state;
     try {
       if (direction === "back") {
-        this.setState({ dayFrom: moment(dayFrom).subtract(1, "day") });
+        this.setState({ from: moment(from).subtract(1, "day") });
       } else if (direction === "forward") {
-        if (moment(dayFrom).isSameOrBefore(moment(dayTo))) {
-          this.setState({ dayFrom: moment(dayFrom).add(1, "day") });
+        if (
+          moment(from)
+            .format("DD/MM/YY")
+            .isSameOrBefore(moment(to).format("DD/MM/YYYY"))
+        ) {
+          this.setState({ from: moment(from).add(1, "day") });
         }
       }
     } catch (error) {
@@ -544,7 +550,7 @@ class Editor extends React.Component {
   // upcoming episodes need to be still available to the end of the day being scheduled
 
   render() {
-    let { from, to, dayTo, dayFrom } = this.state;
+    let { from, to } = this.state;
     const mustBeAvailableBy = moment.utc().format();
     const mustBeAvailableUntil = moment
       .utc(this.state.schedule.date)
@@ -786,8 +792,6 @@ class Editor extends React.Component {
                 handleDayFrom={this.handleDayFrom}
                 from={from}
                 to={to}
-                dayFrom={dayFrom}
-                dayTo={dayTo}
               />
               <ScheduleView
                 onRowSelected={this.handleScheduleRowSelect}

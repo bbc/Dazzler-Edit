@@ -52,8 +52,6 @@ class SchedulePicker extends React.Component {
           handleDayFrom={this.props.handleDayFrom}
           from={this.props.from}
           to={this.props.to}
-          dayFrom={this.props.dayFrom}
-          dayTo={this.props.dayTo}
         />
       </div>
     );

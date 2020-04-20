@@ -68,7 +68,7 @@ class Date extends React.Component {
     console.log("time", moment.utc("00:00"));
     const { classes } = this.props;
     const { hour } = this.state;
-    let { from, to, dayFrom, dayTo } = this.props;
+    let { from, to } = this.props;
     return (
       <div className={classes.root}>
         <Button
@@ -80,7 +80,7 @@ class Date extends React.Component {
         >
           <FaAngleDoubleLeft />
         </Button>
-        {moment(dayFrom).format("DD/MM/YYYY")}
+        {moment(from).format("DD/MM/YYYY")}
         <Button
           className={classes.button}
           variant="outlined"
@@ -162,7 +162,7 @@ class Date extends React.Component {
         >
           <FaAngleDoubleLeft />
         </Button>
-        {moment(dayTo).format("DD/MM/YYYY")}
+        {moment(to).format("DD/MM/YYYY")}
         <Button
           className={classes.button}
           variant="outlined"
