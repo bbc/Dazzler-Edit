@@ -68,20 +68,29 @@ class Date extends React.Component {
     console.log("time", moment.utc("00:00"));
     const { classes } = this.props;
     const { hour } = this.state;
-    let { from, to } = this.props;
+    let { from, to, dayFrom, dayTo } = this.props;
     return (
       <div className={classes.root}>
         <Button
           className={classes.button}
           variant="outlined"
           onClick={() => {
-            this.props.handleDay("back");
+            this.props.handleDayFrom("back");
           }}
         >
           <FaAngleDoubleLeft />
         </Button>
-        {moment(from).format("DD/MM/YY")}
+        {moment(dayFrom).format("DD/MM/YYYY")}
         <Button
+          className={classes.button}
+          variant="outlined"
+          onClick={() => {
+            this.props.handleDayFrom("forward");
+          }}
+        >
+          <FaAngleDoubleRight />
+        </Button>
+        {/* <Button
           className={classes.button}
           disabled={!this.props.enabled}
           variant="outlined"
@@ -90,7 +99,7 @@ class Date extends React.Component {
           }}
         >
           <FaArrowLeft />
-        </Button>
+        </Button> */}
         <ButtonGroup>
           <Button
             aria-label="reduce"
@@ -134,7 +143,7 @@ class Date extends React.Component {
             <AddIcon fontSize="small" />
           </Button>
         </ButtonGroup>
-        <Button
+        {/* <Button
           className={classes.button}
           disabled={!this.props.enabled}
           variant="outlined"
@@ -143,13 +152,22 @@ class Date extends React.Component {
           }}
         >
           <FaArrowRight />
-        </Button>
-        {moment(to).format("DD/MM/YY")}
+        </Button> */}
         <Button
           className={classes.button}
           variant="outlined"
           onClick={() => {
-            this.props.handleDay("forward");
+            this.props.handleDayTo("back");
+          }}
+        >
+          <FaAngleDoubleLeft />
+        </Button>
+        {moment(dayTo).format("DD/MM/YYYY")}
+        <Button
+          className={classes.button}
+          variant="outlined"
+          onClick={() => {
+            this.props.handleDayTo("forward");
           }}
         >
           <FaAngleDoubleRight />

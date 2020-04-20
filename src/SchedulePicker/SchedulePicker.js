@@ -48,9 +48,12 @@ class SchedulePicker extends React.Component {
           enabled={this.props.enabled}
           handleFrom={this.props.handleFrom}
           handleTo={this.props.handleTo}
-          handleDay={this.props.handleDay}
+          handleDayTo={this.props.handleDayTo}
+          handleDayFrom={this.props.handleDayFrom}
           from={this.props.from}
           to={this.props.to}
+          dayFrom={this.props.dayFrom}
+          dayTo={this.props.dayTo}
         />
       </div>
     );
