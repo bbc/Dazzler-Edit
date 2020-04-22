@@ -29,7 +29,10 @@ class ScheduleView extends React.Component {
     this.handleClick = this.handleClick.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
     this.checkStatus = this.checkStatus.bind(this);
-    this.state = {};
+
+    this.state = {
+      side: false,
+    };
   }
 
   handleClick = (index) => {
@@ -79,7 +82,16 @@ class ScheduleView extends React.Component {
     this.props.onOccurenceDelete(index, value); // TODO can we use this directly?
   };
 
-  componentDidMount() {}
+  componentDidMount() {
+    this.interval = setInterval(
+      () => this.setState({ side: this.state.side ? false : true }),
+      30000
+    );
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
 
   componentDidUpdate(prevProps) {
     if (this.props.lastUpdated !== prevProps.lastUpdated) {
