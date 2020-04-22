@@ -90,7 +90,8 @@ class Date extends React.Component {
         >
           <FaAngleDoubleRight />
         </Button>
-        {/* <Button
+        {/* comment */}
+        <Button
           className={classes.button}
           disabled={!this.props.enabled}
           variant="outlined"
@@ -99,7 +100,8 @@ class Date extends React.Component {
           }}
         >
           <FaArrowLeft />
-        </Button> */}
+        </Button>
+        {/* uncomment */}
         <ButtonGroup>
           <Button
             aria-label="reduce"
@@ -143,7 +145,8 @@ class Date extends React.Component {
             <AddIcon fontSize="small" />
           </Button>
         </ButtonGroup>
-        {/* <Button
+        {/* comment */}
+        <Button
           className={classes.button}
           disabled={!this.props.enabled}
           variant="outlined"
@@ -152,7 +155,8 @@ class Date extends React.Component {
           }}
         >
           <FaArrowRight />
-        </Button> */}
+        </Button>
+        {/* uncomment */}
         <Button
           className={classes.button}
           variant="outlined"

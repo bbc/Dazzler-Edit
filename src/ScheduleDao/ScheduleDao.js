@@ -57,10 +57,11 @@ class ScheduleDao {
         if (response.data.total > 0) {
           response.data.item.forEach((item, index) => {
             if (
-              moment(date).format("DD-MM-YYYY") ===
-              moment(item.broadcast[0].published_time[0].$.start).format(
-                "DD-MM-YYYY"
-              )
+              // moment(date).format("DD-MM-YYYY") ===
+              // moment(item.broadcast[0].published_time[0].$.start).format(
+              //   "DD-MM-YYYY"
+              // )
+              1 == 1
             ) {
               const broadcast = item.broadcast[0];
               const published_time = broadcast.published_time[0].$;

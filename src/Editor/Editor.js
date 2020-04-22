@@ -502,17 +502,19 @@ class Editor extends React.Component {
 
   handleDayTo = (direction) => {
     let { to, from } = this.state;
+
     try {
-      if (direction === "back") {
-        if (
-          moment(to)
-            .format("DD/MM/YY")
-            .isSameOrAfter(moment(from).format("DD/MM/YY"))
-        ) {
-          this.setState({ to: moment(to).subtract(1, "day") });
-        }
-      } else if (direction === "forward") {
-        this.setState({ to: moment(to).add(1, "day") });
+      switch (direction) {
+        case "back":
+          if (moment(to).isAfter(moment(from), "day")) {
+            this.setState({ to: moment(to).subtract(1, "day") });
+          }
+          break;
+        case "forward":
+          if (moment(to).isBefore(moment(from).add(2, "day"), "day")) {
+            this.setState({ to: moment(to).add(1, "day") });
+          }
+          break;
       }
     } catch (error) {
       console.log(error);
@@ -522,16 +524,17 @@ class Editor extends React.Component {
   handleDayFrom = (direction) => {
     let { to, from } = this.state;
     try {
-      if (direction === "back") {
-        this.setState({ from: moment(from).subtract(1, "day") });
-      } else if (direction === "forward") {
-        if (
-          moment(from)
-            .format("DD/MM/YY")
-            .isSameOrBefore(moment(to).format("DD/MM/YYYY"))
-        ) {
-          this.setState({ from: moment(from).add(1, "day") });
-        }
+      switch (direction) {
+        case "back":
+          if (moment(to).diff(moment(from), "days") < 2) {
+            this.setState({ from: moment(from).subtract(1, "day") });
+          }
+          break;
+        case "forward":
+          if (moment(from).isBefore(moment(to), "day")) {
+            this.setState({ from: moment(from).add(1, "day") });
+          }
+          break;
       }
     } catch (error) {
       console.log(error);
