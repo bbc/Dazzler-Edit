@@ -11,6 +11,8 @@ import {
   FaArrowRight,
   FaAngleDoubleRight,
   FaAngleDoubleLeft,
+  FaMinus,
+  FaPlus,
 } from "react-icons/fa";
 
 export const styles = (theme) => ({
@@ -25,6 +27,13 @@ export const styles = (theme) => ({
   },
   button: {
     margin: theme.spacing(1),
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 3,
+    width: "1%",
+  },
+  buttonDuration: {
+    margin: theme.spacing(0),
     alignItems: "center",
     justifyContent: "center",
     padding: 3,
@@ -104,46 +113,50 @@ class Date extends React.Component {
         {/* uncomment */}
         <ButtonGroup>
           <Button
-            aria-label="reduce"
+            className={classes.buttonDuration}
+            variant="outlined"
             onClick={() => {
               this.props.handleFrom("back");
             }}
           >
-            <RemoveIcon fontSize="small" />
+            <FaMinus />
           </Button>
         </ButtonGroup>
         {moment(from).format("HH:mm")}
         <ButtonGroup>
           <Button
-            aria-label="increase"
+            className={classes.buttonDuration}
+            variant="outlined"
             onClick={() => {
               this.props.handleFrom("forward");
             }}
           >
-            <AddIcon fontSize="small" />
+            <FaPlus />
           </Button>
         </ButtonGroup>
         {/* <Typography> */} {moment(from).format("DD/MM")} To{" "}
         {moment(to).format("DD/MM")} {/* </Typography> */}
         <ButtonGroup>
           <Button
-            aria-label="reduce"
+            className={classes.buttonDuration}
+            variant="outlined"
             onClick={() => {
               this.props.handleTo("back");
             }}
           >
-            <RemoveIcon fontSize="small" />
+            <FaMinus />
           </Button>
         </ButtonGroup>
         {moment(to).format("HH:mm")}
         <ButtonGroup>
           <Button
-            aria-label="increase"
+            className={classes.buttonDuration}
+            variant="outlined"
             onClick={() => {
               this.props.handleTo("forward");
             }}
           >
-            <AddIcon fontSize="small" />
+            <FaPlus />
           </Button>
         </ButtonGroup>
         {/* comment */}

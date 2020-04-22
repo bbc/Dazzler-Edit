@@ -8,7 +8,7 @@ const URLPrefix =
 class ScheduleDao {
   static getLanguages(cb) {
     try {
-      let url = `${URLPrefix}/api/v2/langaugeservices`;
+      let url = `${URLPrefix}/api/v2/languageservices`;
       axios.get(url).then((response) => {
         cb(response.data);
       });
