@@ -321,7 +321,7 @@ class Editor extends React.Component {
   }
 
   handleDateChange = (date) => {
-    //console.log('handleDateChange', date);
+    console.log("handleDateChange", date);
     try {
       const sid = this.state.configObj[this.state.language].sid;
       fetchSchedule(sid, moment(date), (schedule) =>
@@ -523,16 +523,19 @@ class Editor extends React.Component {
 
   handleDayFrom = (direction) => {
     let { to, from } = this.state;
+    console.log("from1", from);
     try {
       switch (direction) {
         case "back":
           if (moment(to).diff(moment(from), "days") < 2) {
             this.setState({ from: moment(from).subtract(1, "day") });
+            this.handleDateChange(moment(from).subtract(1, "day"));
           }
           break;
         case "forward":
           if (moment(from).isBefore(moment(to), "day")) {
             this.setState({ from: moment(from).add(1, "day") });
+            this.handleDateChange(moment(from).add(1, "day"));
           }
           break;
       }

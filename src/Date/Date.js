@@ -91,7 +91,7 @@ class Date extends React.Component {
           <FaAngleDoubleRight />
         </Button>
         {/* comment */}
-        <Button
+        {/* <Button
           className={classes.button}
           disabled={!this.props.enabled}
           variant="outlined"
@@ -100,7 +100,7 @@ class Date extends React.Component {
           }}
         >
           <FaArrowLeft />
-        </Button>
+        </Button> */}
         {/* uncomment */}
         <ButtonGroup>
           <Button
@@ -123,7 +123,8 @@ class Date extends React.Component {
             <AddIcon fontSize="small" />
           </Button>
         </ButtonGroup>
-        <Typography>{this.props.scheduleDate}</Typography>
+        {/* <Typography> */} {moment(from).format("DD/MM")} To{" "}
+        {moment(to).format("DD/MM")} {/* </Typography> */}
         <ButtonGroup>
           <Button
             aria-label="reduce"
@@ -146,7 +147,7 @@ class Date extends React.Component {
           </Button>
         </ButtonGroup>
         {/* comment */}
-        <Button
+        {/* <Button
           className={classes.button}
           disabled={!this.props.enabled}
           variant="outlined"
@@ -155,7 +156,7 @@ class Date extends React.Component {
           }}
         >
           <FaArrowRight />
-        </Button>
+        </Button> */}
         {/* uncomment */}
         <Button
           className={classes.button}
