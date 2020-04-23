@@ -123,9 +123,10 @@ const services = {
 };
 
 var start = moment();
-var end = moment();
+var end = moment().add(1, "day");
 start.set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
-end.set({ hour: 6, minute: 0, second: 0, millisecond: 0 });
+end.set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
+
 class Editor extends React.Component {
   constructor(props) {
     super(props);

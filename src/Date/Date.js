@@ -24,6 +24,7 @@ export const styles = (theme) => ({
     margin: "0%",
     textAlign: "center",
     width: "50%",
+    fontSize: "84%",
   },
   button: {
     margin: theme.spacing(1),
@@ -31,6 +32,7 @@ export const styles = (theme) => ({
     justifyContent: "center",
     padding: 3,
     width: "1%",
+    fontSize: "84%",
   },
   buttonDuration: {
     margin: theme.spacing(0),
@@ -38,6 +40,7 @@ export const styles = (theme) => ({
     justifyContent: "center",
     padding: 3,
     width: "1%",
+    fontSize: "84%",
   },
   icon: {
     display: "flex",
