@@ -66,7 +66,9 @@ class ScheduleView extends React.Component {
   item becomes red*/
   checkStatus = (item) => {
     if (item.asset && item.asset.status == "unavailable") {
-      if (moment(item.startTime).add(30, "minutes").isAfter(moment())) {
+      if (
+        moment(item.startTime).isBetween(moment(), moment().add(30, "minutes"))
+      ) {
         item.insertionType = "unavailable";
         return "unavailable";
       } else {

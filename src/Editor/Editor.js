@@ -323,7 +323,6 @@ class Editor extends React.Component {
   }
 
   handleDateChange = (date) => {
-    console.log("SISHAND", date);
     try {
       const sid = this.state.configObj[this.state.language].sid;
       fetchSchedule(sid, moment(date), (schedule) =>
@@ -584,7 +583,6 @@ class Editor extends React.Component {
   // upcoming episodes need to be still available to the end of the day being scheduled
 
   render() {
-    console.log("SISSCHEUEDATE", this.state.schedule.date);
     let { from, to } = this.state;
     const mustBeAvailableBy = moment.utc().format();
     const mustBeAvailableUntil = moment
