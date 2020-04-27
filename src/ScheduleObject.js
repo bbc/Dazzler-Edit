@@ -12,20 +12,20 @@ class ScheduleObject {
           startTime: start,
           duration: "PT0S",
           insertionType: "sentinel",
-          title: "Dummy Start"
+          title: "Dummy Start",
         },
         {
           startTime: moment(start),
           duration: "P1D",
           insertionType: "gap",
-          title: "gap"
+          title: "gap4",
         },
         {
           startTime: moment(start).add(1, "days"),
           duration: "PT0S",
           insertionType: "sentinel",
-          title: "Dummy End"
-        }
+          title: "Dummy End",
+        },
       ];
     } else {
       this.items = items;
@@ -33,92 +33,98 @@ class ScheduleObject {
   }
 
   addFloating(index, assetsToAdd) {
-    if (!Array.isArray(assetsToAdd)) assetsToAdd = [assetsToAdd];
-    //console.log("addFloating", index, itemsToAdd, this.items);
-    // keep the schedule unchanged up to the insertion point
-    if (this.items[index].insertionType === "gap") {
-      // remove the gap;
-      this.items.splice(index, 1);
-      index = index - 1; // and insert after the previous item
-    }
-    let indexOfFixed = 0;
-    let floating = [];
-    let floating_duration = moment.duration();
-    // keep the schedule unchanged after the next fixed event
-    for (let i = index + 1; i < this.items.length; i++) {
-      if (this.items[i].insertionType === "gap") {
-        continue;
+    try {
+      if (!Array.isArray(assetsToAdd)) assetsToAdd = [assetsToAdd];
+      //console.log("addFloating", index, itemsToAdd, this.items);
+      // keep the schedule unchanged up to the insertion point
+      if (this.items[index].insertionType === "gap") {
+        // remove the gap;
+        this.items.splice(index, 1);
+        index = index - 1; // and insert after the previous item
       }
-      if (this.items[i].insertionType === "sentinel") {
-        indexOfFixed = i;
-        break;
+      let indexOfFixed = 0;
+      let floating = [];
+      let floating_duration = moment.duration();
+      // keep the schedule unchanged after the next fixed event
+      for (let i = index + 1; i < this.items.length; i++) {
+        if (this.items[i].insertionType === "gap") {
+          continue;
+        }
+        if (this.items[i].insertionType === "sentinel") {
+          indexOfFixed = i;
+          break;
+        }
+        if (this.items[i].insertionType === "live") {
+          indexOfFixed = i;
+          break;
+        } else {
+          floating.push(i);
+          floating_duration.add(moment.duration(this.items[i].duration));
+        }
       }
-      if (this.items[i].insertionType === "live") {
-        indexOfFixed = i;
-        break;
+      // remove gap before fixed
+      if (this.items[indexOfFixed - 1].insertionType === "gap") {
+        this.items.splice(indexOfFixed - 1, 1);
+        indexOfFixed--;
+      }
+      // calculate available space start and end
+      const startOfNew = moment(this.items[index].startTime).add(
+        moment.duration(this.items[index].duration)
+      );
+      const end = moment(this.items[indexOfFixed].startTime);
+      const availableDuration = moment
+        .duration(end.diff(startOfNew))
+        .subtract(floating_duration);
+      let indexOfInsert = indexOfFixed;
+      if (floating.length !== 0) {
+        indexOfInsert = floating[0];
+      }
+      // see what we have room for
+      let numItemsToAdd = 0;
+      let itemsToAddDuration = moment.duration();
+      for (let i = 0; i < assetsToAdd.length; i++) {
+        itemsToAddDuration.add(moment.duration(assetsToAdd[i].duration));
+        if (
+          itemsToAddDuration.asMilliseconds() >
+          availableDuration.asMilliseconds()
+        ) {
+          break;
+        }
+        numItemsToAdd++;
+      }
+      // splice in new items
+      const newItems = [];
+      for (let i = 0; i < numItemsToAdd; i++) {
+        newItems.push({
+          duration: assetsToAdd[i].duration,
+          insertionType: assetsToAdd[i].insertionType,
+          title: assetsToAdd[i].title,
+          asset: assetsToAdd[i],
+        });
+      }
+      this.items.splice(indexOfInsert, 0, ...newItems);
+      indexOfFixed += numItemsToAdd;
+      // set the start times of the added and floating items
+      let s = moment(startOfNew);
+      for (let i = indexOfInsert; i < indexOfFixed; i++) {
+        this.items[i].startTime = moment(s);
+        s.add(moment.duration(this.items[i].duration));
+      }
+      let newCursor = indexOfFixed;
+      if (this.items[indexOfFixed].insertionType === "sentinel") {
+        this.fixEndTime();
+      }
+      if (assetsToAdd.length > numItemsToAdd) {
+        this.insertOverlapIfNeeeded(indexOfFixed, assetsToAdd[numItemsToAdd]);
+        newCursor++;
       } else {
-        floating.push(i);
-        floating_duration.add(moment.duration(this.items[i].duration));
+        this.insertGap(indexOfFixed);
       }
+      return newCursor;
+    } catch (error) {
+      console.log(error);
+      console.log(error.stack);
     }
-    // remove gap before fixed
-    if (this.items[indexOfFixed - 1].insertionType === "gap") {
-      this.items.splice(indexOfFixed - 1, 1);
-      indexOfFixed--;
-    }
-    // calculate available space start and end
-    const startOfNew = moment(this.items[index].startTime).add(
-      moment.duration(this.items[index].duration)
-    );
-    const end = moment(this.items[indexOfFixed].startTime);
-    const availableDuration = moment
-      .duration(end.diff(startOfNew))
-      .subtract(floating_duration);
-    let indexOfInsert = indexOfFixed;
-    if (floating.length !== 0) {
-      indexOfInsert = floating[0];
-    }
-    // see what we have room for
-    let numItemsToAdd = 0;
-    let itemsToAddDuration = moment.duration();
-    for (let i = 0; i < assetsToAdd.length; i++) {
-      itemsToAddDuration.add(moment.duration(assetsToAdd[i].duration));
-      if (
-        itemsToAddDuration.asMilliseconds() > availableDuration.asMilliseconds()
-      ) {
-        break;
-      }
-      numItemsToAdd++;
-    }
-    // splice in new items
-    const newItems = [];
-    for (let i = 0; i < numItemsToAdd; i++) {
-      newItems.push({
-        duration: assetsToAdd[i].duration,
-        insertionType: assetsToAdd[i].insertionType,
-        title: assetsToAdd[i].title,
-        asset: assetsToAdd[i]
-      });
-    }
-    this.items.splice(indexOfInsert, 0, ...newItems);
-    indexOfFixed += numItemsToAdd;
-    // set the start times of the added and floating items
-    let s = moment(startOfNew);
-    for (let i = indexOfInsert; i < indexOfFixed; i++) {
-      this.items[i].startTime = moment(s);
-      s.add(moment.duration(this.items[i].duration));
-    }
-    let newCursor = indexOfFixed;
-    if (this.items[indexOfFixed].insertionType === "sentinel") {
-      this.fixEndTime();
-    }
-    if (assetsToAdd.length > numItemsToAdd) {
-      this.insertOverlapIfNeeeded(indexOfFixed, assetsToAdd[numItemsToAdd]);
-      newCursor++;
-    } else {
-      this.insertGap(indexOfFixed);
-    }
-    return newCursor;
   }
 
   insertGap(index) {
@@ -130,10 +136,10 @@ class ScheduleObject {
     );
     if (duration.asMilliseconds() >= 0) {
       this.items.splice(index, 0, {
-        title: "gap",
+        title: "gap5",
         startTime: gapStart,
         duration: duration.toISOString(),
-        insertionType: "gap"
+        insertionType: "gap",
       });
     }
   }
@@ -151,7 +157,7 @@ class ScheduleObject {
         startTime: gapStart,
         duration: duration.toISOString(),
         insertionType: "overlap",
-        asset: asset
+        asset: asset,
       });
     }
   }
@@ -185,7 +191,7 @@ class ScheduleObject {
       startTime: live.startTime,
       duration: live.duration,
       insertionType: "live",
-      asset: live
+      asset: live,
     };
     const startTime = moment(item.startTime);
     // const endTime = moment(startTime).add(moment.duration(item.duration));
@@ -284,10 +290,10 @@ class ScheduleObject {
   addGapAtPoint(index, endTime) {
     const next = this.items[index + 1].startTime;
     this.items.splice(index + 1, 0, {
-      title: "gap",
+      title: "gap1",
       startTime: endTime,
       duration: moment.duration(next.diff(endTime)).toISOString(),
-      insertionType: "gap"
+      insertionType: "gap",
     });
   }
 
@@ -335,6 +341,8 @@ class ScheduleObject {
         s.push(this.items[i]);
       }
     }
+
+    console.log("SIS", s);
     // add gap records
     let gaps = [];
     for (let i = 0; i < s.length - 1; i++) {
@@ -342,10 +350,10 @@ class ScheduleObject {
       const next = s[i + 1].startTime;
       if (end.isBefore(next)) {
         gaps.push({
-          title: "gap",
+          title: "gap2",
           startTime: end,
           duration: moment.duration(next.diff(end)).toISOString(),
-          insertionType: "gap"
+          insertionType: "gap",
         });
       }
     }
@@ -426,10 +434,10 @@ class ScheduleObject {
           );
 
           schedule.splice(i, 0, {
-            title: "gap",
+            title: "gap3",
             startTime: newStart,
             duration: newDuration.toISOString(),
-            insertionType: "gap"
+            insertionType: "gap",
           });
           break;
         default:

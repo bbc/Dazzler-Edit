@@ -53,8 +53,6 @@ class ScheduleItem extends React.Component {
   };
 
   render() {
-    console.log("!!!!", moment(this.props.startTime).hour());
-
     let { open } = this.state;
     let rowStyle = this.props.insertionType;
     var elementStyle = "";

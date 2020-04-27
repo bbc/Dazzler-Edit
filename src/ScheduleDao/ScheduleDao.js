@@ -45,11 +45,20 @@ class ScheduleDao {
   }
 
   static fetchSchedule(sid, date, cb) {
+    console.log("sisDate", date);
+    console.log(
+      "SISrequest",
+      `${URLPrefix}/api/v1/schedule?sid=${sid}&date=${date
+        .utc()
+        .startOf("day")
+        .format("YYYY-MM-DD")}`
+    );
     //console.log('fetchSchedule', sid, date.format());
     axios
       .get(
         `${URLPrefix}/api/v1/schedule?sid=${sid}&date=${date
           .utc()
+          .startOf("day")
           .format("YYYY-MM-DD")}`
       )
       .then((response) => {

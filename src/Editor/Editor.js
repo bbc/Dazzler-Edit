@@ -122,8 +122,8 @@ const services = {
   },
 };
 
-var start = moment();
-var end = moment().add(1, "day");
+var start = moment().utc().startOf("day");
+var end = moment().utc().add(1, "day");
 start.set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
 end.set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
 
@@ -318,11 +318,12 @@ class Editor extends React.Component {
       upcomingAvailability = moment.duration("P1D");
     }
     this.setState({ upcomingAvailability: upcomingAvailability });
+
     this.updateSchedule(scheduleObject, 1, false);
   }
 
   handleDateChange = (date) => {
-    console.log("handleDateChange", date);
+    console.log("SISHAND", date);
     try {
       const sid = this.state.configObj[this.state.language].sid;
       fetchSchedule(sid, moment(date), (schedule) =>
@@ -354,6 +355,13 @@ class Editor extends React.Component {
     if (sip === scheduleObject.items.length - 1) {
       sip--; // don't point at the end sentinel
     }
+    // sip should be the gap
+    for (let x of scheduleObject.items) {
+      if (x.insertionType === "gap") {
+        sip = scheduleObject.items.indexOf(x);
+      }
+    }
+
     this.setState({
       schedule: scheduleObject,
       scheduleInsertionPoint: sip,
@@ -473,13 +481,26 @@ class Editor extends React.Component {
 
   handleFrom = (direction) => {
     let { from, to } = this.state;
+
     try {
-      if (direction === "back") {
-        this.setState({ from: moment(from).subtract(6, "hours") });
-      } else if (direction === "forward") {
-        if (!moment(from).isSameOrAfter(moment(to))) {
-          this.setState({ from: moment(from).add(6, "hours") });
-        }
+      switch (direction) {
+        case "back":
+          if (moment(to).diff(moment(from), "hours") < 24) {
+            this.setState({ from: moment(from).subtract(6, "hours") });
+            if (moment(from).subtract(6, "hours").hour() === 0) {
+              this.handleDateChange(moment(from).subtract(6, "hours"));
+            }
+          }
+          break;
+
+        case "forward":
+          if (!moment(from).isSameOrAfter(moment(to))) {
+            this.setState({ from: moment(from).add(6, "hours") });
+            if (moment(from).add(6, "hours").hour() === 0) {
+              this.handleDateChange(moment(from).add(6, "hours"));
+            }
+          }
+          break;
       }
     } catch (error) {
       console.log(error);
@@ -489,12 +510,18 @@ class Editor extends React.Component {
   handleTo = (direction) => {
     let { to, from } = this.state;
     try {
-      if (direction === "back") {
-        if (!moment(to).isSameOrBefore(moment(from))) {
-          this.setState({ to: moment(to).subtract(6, "hours") });
-        }
-      } else if (direction === "forward") {
-        this.setState({ to: moment(to).add(6, "hours") });
+      switch (direction) {
+        case "back":
+          if (!moment(to).isSameOrBefore(moment(from))) {
+            this.setState({ to: moment(to).subtract(6, "hours") });
+          }
+          break;
+
+        case "forward":
+          if (moment(to).isBefore(moment(from).add(24, "hour"), "hour")) {
+            this.setState({ to: moment(to).add(6, "hours") });
+          }
+          break;
       }
     } catch (error) {
       console.log(error);
@@ -512,7 +539,7 @@ class Editor extends React.Component {
           }
           break;
         case "forward":
-          if (moment(to).isBefore(moment(from).add(2, "day"), "day")) {
+          if (moment(to).isBefore(moment(from).add(24, "hour"), "hour")) {
             this.setState({ to: moment(to).add(1, "day") });
           }
           break;
@@ -528,7 +555,7 @@ class Editor extends React.Component {
     try {
       switch (direction) {
         case "back":
-          if (moment(to).diff(moment(from), "days") < 2) {
+          if (moment(to).diff(moment(from), "hours") < 24) {
             this.setState({ from: moment(from).subtract(1, "day") });
             this.handleDateChange(moment(from).subtract(1, "day"));
           }
@@ -557,6 +584,7 @@ class Editor extends React.Component {
   // upcoming episodes need to be still available to the end of the day being scheduled
 
   render() {
+    console.log("SISSCHEUEDATE", this.state.schedule.date);
     let { from, to } = this.state;
     const mustBeAvailableBy = moment.utc().format();
     const mustBeAvailableUntil = moment
