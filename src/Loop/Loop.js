@@ -3,7 +3,7 @@ import Box from "@material-ui/core/Box";
 import ReactDataGrid from "react-data-grid";
 import moment from "moment";
 import "moment-duration-format";
-import { cloneDeep } from "lodash-es";
+// import { cloneDeep } from "lodash-es";
 import { Typography } from "@material-ui/core";
 import { backupPlaylist } from "../LoopDao/LoopDao";
 import Fade from "@material-ui/core/Fade";
@@ -19,9 +19,9 @@ const columns = [
     key: "duration",
     name: "Duration",
     width: 80,
-    formatter: durationFormatter
+    formatter: durationFormatter,
   },
-  { key: "action", name: "Action", width: 80 }
+  { key: "action", name: "Action", width: 80 },
 ];
 
 class Loop extends React.Component {
@@ -31,7 +31,7 @@ class Loop extends React.Component {
     this.emergencyPlaylist = this.emergencyPlaylist.bind(this);
     this.state = {
       loopModified: "Set as Emergency Content",
-      saving: "idle"
+      saving: "idle",
     };
   }
 
@@ -39,7 +39,8 @@ class Loop extends React.Component {
     if (this.props.data.length === 0) return;
     const repetitions = Math.floor(this.props.timeToFill / this.props.duration);
     //console.log('pasteToFill', repetitions);
-    let n = cloneDeep(this.props.data);
+    let n = JSON.parse(JSON.stringify(this.props.data));
+    // cloneDeep(this.props.data);
     switch (n.length) {
       case 1:
         n[0].insertionType = "";
@@ -56,7 +57,7 @@ class Loop extends React.Component {
     let m = n;
     let count = repetitions;
     while (count > 1) {
-      m = m.concat(cloneDeep(n));
+      m = m.concat(JSON.parse(JSON.stringify(n)));
       count--;
     }
     // now we want to eliminate the gap. Overlap is OK
@@ -81,7 +82,7 @@ class Loop extends React.Component {
     const This = this; // closure for callback - How does this fix it?
     this.setState({ saving: "progress" });
     try {
-      backupPlaylist(this.props.data, function() {
+      backupPlaylist(this.props.data, function () {
         This.setState({ loopModified: "Saved", saving: "idle" });
       });
     } catch (err) {
@@ -119,7 +120,7 @@ class Loop extends React.Component {
           </Box>
           <ReactDataGrid
             columns={columns}
-            rowGetter={i => {
+            rowGetter={(i) => {
               const item = { ...this.props.data[i], index: i };
               return item;
             }}
@@ -171,7 +172,7 @@ class Loop extends React.Component {
                 name="file"
                 id="files"
                 style={{ display: "none" }}
-                onChange={e => {
+                onChange={(e) => {
                   this.props.onUpload(e);
                 }}
               />
@@ -199,7 +200,7 @@ class Loop extends React.Component {
           <Fade
             in={saving === "progress"}
             style={{
-              transitionDelay: saving === "progress" ? "800ms" : "0ms"
+              transitionDelay: saving === "progress" ? "800ms" : "0ms",
             }}
             unmountOnExit
           >
@@ -216,8 +217,8 @@ class Loop extends React.Component {
         icon: <i className="trash alternate outline icon"></i>,
         callback: () => {
           this.props.onDelete(row.index);
-        }
-      }
+        },
+      },
     ];
     return column.key === "action" ? cellActions : null;
   };

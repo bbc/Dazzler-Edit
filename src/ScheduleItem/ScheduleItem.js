@@ -37,11 +37,11 @@ class ScheduleItem extends React.Component {
     this.state = {
       open: false,
       count: 0,
-      value: "deleteAll"
+      value: "deleteAll",
     };
   }
 
-  handleChange = event => {
+  handleChange = (event) => {
     this.setState({ value: event.target.value });
   };
   handleClickOpen = () => {
@@ -53,9 +53,18 @@ class ScheduleItem extends React.Component {
   };
 
   render() {
-    console.log("!!!!", this.props.insertionType);
     let { open } = this.state;
     let rowStyle = this.props.insertionType;
+    var elementStyle = "";
+
+    if (
+      moment().isSameOrAfter(moment(this.props.startTime)) &&
+      moment().isBefore(
+        moment(this.props.startTime).add(moment.duration(this.props.duration))
+      )
+    ) {
+      var elementStyle = "current";
+    }
     if (this.props.live === "true") rowStyle = "live";
     let arrowStyle = "bottomarrow";
     if (rowStyle === "gap") arrowStyle = "midarrow";
@@ -72,13 +81,19 @@ class ScheduleItem extends React.Component {
     return (
       <Fragment>
         <tr className={rowStyle}>
-          <td onClick={() => this.props.onClick(this.props.index)}>
+          <td
+            className={elementStyle}
+            onClick={() => this.props.onClick(this.props.index)}
+          >
             {this.props.selected ? <Arrow className={arrowStyle} /> : ""}
           </td>
 
-          <td> {localTime}</td>
+          <td className={elementStyle}> {localTime}</td>
 
-          <td onClick={() => this.props.onClick(this.props.index)}>
+          <td
+            className={elementStyle}
+            onClick={() => this.props.onClick(this.props.index)}
+          >
             {utcTime}
           </td>
 
@@ -114,12 +129,12 @@ class ScheduleItem extends React.Component {
                 onClick={() => {
                   this.props.onDelete(this.props.index, this.state.value);
                 }}
-                onContextMenu={event => {
+                onContextMenu={(event) => {
                   event.preventDefault();
 
                   if (this.props.insertionType !== "live") {
                     var tally = 0;
-                    this.props.data.map(item => {
+                    this.props.data.map((item) => {
                       if (item.title === this.props.title) {
                         tally++;
                       }

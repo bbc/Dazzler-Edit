@@ -17,4 +17,17 @@ describe("< Editor />", () => {
     openMenu.simulate("click");
     expect(wrapper.state().open).toEqual(true);
   });
+
+  test("sid changes when different language service chosen in dropdown", () => {
+    const wrapper = mount(<Editor />);
+    const openMenu = wrapper;
+    openMenu.simulate("click");
+    expect(wrapper.state().open).toEqual(true);
+  });
+
+  //Test when you click button date is changed
+
+  //Test that current point is selected
+
+  //test that menu opens when you click it
 });

@@ -29,7 +29,10 @@ class ScheduleView extends React.Component {
     this.handleClick = this.handleClick.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
     this.checkStatus = this.checkStatus.bind(this);
-    this.state = {};
+
+    this.state = {
+      side: false,
+    };
   }
 
   handleClick = (index) => {
@@ -63,7 +66,9 @@ class ScheduleView extends React.Component {
   item becomes red*/
   checkStatus = (item) => {
     if (item.asset && item.asset.status == "unavailable") {
-      if (moment(item.startTime).add(30, "minutes").isAfter(moment())) {
+      if (
+        moment(item.startTime).isBetween(moment(), moment().add(30, "minutes"))
+      ) {
         item.insertionType = "unavailable";
         return "unavailable";
       } else {
@@ -79,7 +84,16 @@ class ScheduleView extends React.Component {
     this.props.onOccurenceDelete(index, value); // TODO can we use this directly?
   };
 
-  componentDidMount() {}
+  componentDidMount() {
+    this.interval = setInterval(
+      () => this.setState({ side: this.state.side ? false : true }),
+      30000
+    );
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
 
   componentDidUpdate(prevProps) {
     if (this.props.lastUpdated !== prevProps.lastUpdated) {
@@ -87,6 +101,7 @@ class ScheduleView extends React.Component {
   }
 
   render() {
+    console.log("data is ", this.props.data);
     // let offset = moment().format().substring(19);
     let selectedItem = this.props.row;
     if (selectedItem === -1) {
@@ -112,23 +127,30 @@ class ScheduleView extends React.Component {
           </tr>
         </thead>
         <tbody>
-          {this.props.data.map((item, index) => (
-            <ScheduleItem
-              key={item.insertionType + item.startTime.utc().format()}
-              index={index}
-              live={item.live}
-              insertionType={this.checkStatus(item)}
-              selected={selectedItem === index}
-              startTime={item.startTime}
-              title={item.title}
-              duration={item.duration}
-              asset_duration={item.asset ? item.asset.duration : ""}
-              onClick={this.handleClick}
-              onDelete={this.handleDelete}
-              onOccurenceDelete={this.handleOccurenceDelete}
-              data={this.props.data}
-            />
-          ))}
+          {this.props.data.map((item, index) => {
+            if (
+              moment(item.startTime).isSameOrAfter(this.props.from) &&
+              moment(item.startTime).isSameOrBefore(this.props.to)
+            ) {
+              return (
+                <ScheduleItem
+                  key={item.insertionType + item.startTime.utc().format()}
+                  index={index}
+                  live={item.live}
+                  insertionType={this.checkStatus(item)}
+                  selected={selectedItem === index}
+                  startTime={item.startTime}
+                  title={item.title}
+                  duration={item.duration}
+                  asset_duration={item.asset ? item.asset.duration : ""}
+                  onClick={this.handleClick}
+                  onDelete={this.handleDelete}
+                  onOccurenceDelete={this.handleOccurenceDelete}
+                  data={this.props.data}
+                />
+              );
+            }
+          })}
         </tbody>
       </table>
     );

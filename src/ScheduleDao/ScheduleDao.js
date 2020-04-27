@@ -6,6 +6,16 @@ const URLPrefix =
   process.env.NODE_ENV === "development" ? "http://localhost:8080" : "";
 
 class ScheduleDao {
+  static getLanguages(cb) {
+    try {
+      let url = `${URLPrefix}/api/v2/languageservices`;
+      axios.get(url).then((response) => {
+        cb(response.data);
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
   static getTitle(item, index) {
     let title = "";
     if (item.hasOwnProperty("clip")) {
@@ -40,17 +50,19 @@ class ScheduleDao {
       .get(
         `${URLPrefix}/api/v1/schedule?sid=${sid}&date=${date
           .utc()
+          .startOf("day")
           .format("YYYY-MM-DD")}`
       )
-      .then(response => {
+      .then((response) => {
         let schedule = [];
         if (response.data.total > 0) {
           response.data.item.forEach((item, index) => {
             if (
-              moment(date).format("DD-MM-YYYY") ===
-              moment(item.broadcast[0].published_time[0].$.start).format(
-                "DD-MM-YYYY"
-              )
+              // moment(date).format("DD-MM-YYYY") ===
+              // moment(item.broadcast[0].published_time[0].$.start).format(
+              //   "DD-MM-YYYY"
+              // )
+              1 == 1
             ) {
               const broadcast = item.broadcast[0];
               const published_time = broadcast.published_time[0].$;
@@ -63,14 +75,14 @@ class ScheduleDao {
                 versionPid: item.version[0].$.pid, //broadcast - broadcast of // version object  - version of  [version0.$.pid]
                 versionCrid: item.version[0].crid[0].$.uri,
                 insertionType: live ? "live" : "",
-                pid: item.version[0].version_of[0].link[0].$.pid
+                pid: item.version[0].version_of[0].link[0].$.pid,
               };
               schedule.push({
                 title: asset.title,
                 startTime: moment(published_time.start),
                 duration: asset.duration,
                 insertionType: asset.insertionType,
-                asset: asset
+                asset: asset,
               });
             }
           });
@@ -81,7 +93,7 @@ class ScheduleDao {
         sched.sort();
         cb(sched);
       })
-      .catch(e => {
+      .catch((e) => {
         console.log(e);
       });
   }
@@ -96,7 +108,7 @@ class ScheduleDao {
       title: "Live programme at " + start.format("HH:mm:ss") + " local",
       duration: duration.toISOString(),
       captureChannel: window.service.sid,
-      insertionType: "live"
+      insertionType: "live",
     };
     for (let i = 0; i < window.window_of.length; i++) {
       switch (window.window_of[i].result_type) {
@@ -117,19 +129,20 @@ class ScheduleDao {
   static fetchWebcasts(sid, start, end, page, rowsPerPage, cb) {
     axios
       .get(
-        `${URLPrefix}/api/v1/webcast?sid=${sid}&start=${start}&end=${end}&page=${page +
-          1}&page_size=${rowsPerPage}`
+        `${URLPrefix}/api/v1/webcast?sid=${sid}&start=${start}&end=${end}&page=${
+          page + 1
+        }&page_size=${rowsPerPage}`
       )
-      .then(response => {
+      .then((response) => {
         const schedule = [];
         if (response.data.total > 0) {
-          response.data.items.forEach(window => {
+          response.data.items.forEach((window) => {
             schedule.push(ScheduleDao.window2Item(window));
           });
         }
         cb(schedule, response.data.total);
       })
-      .catch(e => {
+      .catch((e) => {
         console.log(e);
       });
   }
@@ -166,12 +179,12 @@ class ScheduleDao {
       axios({
         method: "post",
         url: URLPrefix + "/api/v1/tva",
-        data: tva
+        data: tva,
       })
-        .then(response => {
+        .then((response) => {
           cb(response);
         })
-        .catch(error => {
+        .catch((error) => {
           err(error);
         });
     } catch (error) {
@@ -214,4 +227,5 @@ class ScheduleDao {
 export const fetchSchedule = ScheduleDao.fetchSchedule;
 export const fetchWebcasts = ScheduleDao.fetchWebcasts;
 export const saveSchedule = ScheduleDao.saveSchedule;
+export const getLanguages = ScheduleDao.getLanguages;
 export default ScheduleDao;

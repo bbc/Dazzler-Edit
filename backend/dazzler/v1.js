@@ -6,7 +6,7 @@ const spw = require("./spw");
 const pips = require("./pips");
 const aws = require("aws-sdk");
 const s3 = new aws.S3({
-  apiVersion: "2006-03-01"
+  apiVersion: "2006-03-01",
 });
 
 let config;
@@ -36,11 +36,11 @@ const schedule = async (req, res) => {
       total: s.length,
       item: s,
       sid: sid,
-      date: date
+      date: date,
     });
   } catch (e) {
     res.json({
-      total: 0
+      total: 0,
     });
   }
 };
@@ -49,7 +49,7 @@ const broadcast = async (req, res) => {
   let q = {
     sid: req.query.sid || config.default_sid,
     start_from: req.query.start,
-    start_to: req.query.end
+    start_to: req.query.end,
   };
   if (req.query.hasOwnProperty("page")) {
     q.page = req.query.page;
@@ -98,7 +98,7 @@ const webcast = async (req, res) => {
 
 const special = async (req, res) => {
   let q = {
-    group: config[req.query.sid].specials_collection
+    group: config[req.query.sid].specials_collection,
   };
   await getClip(q, req.query, res);
 };
@@ -171,7 +171,7 @@ const episode = async (req, res, next) => {
   const sid = req.query.sid || config.default_sid;
   let q = {
     mixin: ["images", "available_versions"],
-    entity_type: "episode"
+    entity_type: "episode",
   };
   if (req.query.sort) {
     q.sort = req.query.sort;
@@ -212,7 +212,7 @@ const episode = async (req, res, next) => {
       page_size: q.page_size,
       page: q.page,
       total: available_episodes.total,
-      items: items
+      items: items,
     });
   } catch (e) {
     console.log(e);
@@ -220,16 +220,16 @@ const episode = async (req, res, next) => {
   }
 };
 
-const loop = async function(req, res) {
+const loop = async function (req, res) {
   let q = {
     group: config[req.query.sid].loop_collection,
     sort: "group_position",
-    sort_direction: "ascending"
+    sort_direction: "ascending",
   };
   await getClip(q, req.query, res);
 };
 
-const saveEmergencyPlayList = async function(req, res) {
+const saveEmergencyPlayList = async function (req, res) {
   let user = "dazzler"; // assume local
   if (req.header("sslclientcertsubject")) {
     const subject = auth.parseSSLsubject(req);
@@ -241,7 +241,7 @@ const saveEmergencyPlayList = async function(req, res) {
       Body: req.body,
       Bucket: process.env.BUCKET,
       Key: `${sid}/emergency-playlist.json`,
-      ContentType: "application/json"
+      ContentType: "application/json",
     };
     try {
       await s3.putObject(params).promise();
@@ -297,7 +297,7 @@ async function get_version_pid2crid_map(pids) {
   let map = {};
   if (pids.length > 0) {
     const response = await nitro.request("versions", {
-      pid: pids
+      pid: pids,
     });
     const items = response.data.nitro.results.items;
     for (let i = 0; i < items.length; i++) {
@@ -336,15 +336,16 @@ function add_version_crids_to_episodes(results) {
     }
   }
   const map = get_version_pid2crid_map(pids);
-  versions.forEach(version => {
+  versions.forEach((version) => {
     version.crid = map[version.pid];
   });
   return results;
 }
 
 module.exports = {
-  init(app, configObject) {
+  init(app, configObject, config2Object) {
     config = configObject;
+    configV2 = config2Object;
     app.get("/api/v1/user", auth.user);
     app.get("/api/v1/schedule", schedule);
     app.get("/api/v1/broadcast", broadcast);
@@ -355,5 +356,5 @@ module.exports = {
     app.get("/api/v1/episode", episode);
     app.post("/api/v1/loop", saveEmergencyPlayList);
     app.post("/api/v1/tva", tva);
-  }
+  },
 };

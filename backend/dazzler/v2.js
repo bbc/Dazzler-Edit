@@ -9,6 +9,7 @@ const notifications = require("./notifications");
 const s3 = new aws.S3({ apiVersion: "2006-03-01" });
 
 let config;
+let configV2;
 let ax;
 let host;
 
@@ -352,18 +353,29 @@ const subscribe = async function (req, res) {
   }
 };
 
+const languageServices = async function (req, res) {
+  try {
+    res.json(configV2);
+  } catch (error) {
+    res.status(404).send("error");
+  }
+};
+
 module.exports = {
-  init(app, configObject) {
+  init(app, configObject, configObject2) {
     config = configObject;
+    configV2 = configObject2;
     // app.get("/api/v2/user", user);
     // app.get("/api/v2/schedule", schedule);
     // app.get("/api/v2/broadcast", broadcast);
     // app.get("/api/v2/webcast", webcast);
     // app.get("/api/v2/loop", loop);
     // app.get("/api/v2/special", special);
+    app.get("/api/v2/languageservices", languageServices);
     app.get("/api/v2/clip", clip);
     app.get("/api/v2/episode", episode);
     app.post("/api/v2/loop", saveEmergencyPlayList);
+
     // app.put("/api/v2/loop", loop);
     // app.post("/api/v2/tva", tva);
     app.post("/api/v2/subscribe", subscribe);

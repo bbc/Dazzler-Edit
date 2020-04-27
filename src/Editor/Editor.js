@@ -3,12 +3,15 @@ import PropTypes from "prop-types";
 import classNames from "classnames";
 import { Box } from "@material-ui/core";
 import ExpansionPanel from "@material-ui/core/ExpansionPanel";
-import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
+import InputLabel from "@material-ui/core/InputLabel";
+import MenuItem from "@material-ui/core/MenuItem";
+import FormHelperText from "@material-ui/core/FormHelperText";
+import Select from "@material-ui/core/Select";
+import FormControl from "@material-ui/core/FormControl";
 import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
 import Radio from "@material-ui/core/Radio";
 import RadioGroup from "@material-ui/core/RadioGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
-import FormControl from "@material-ui/core/FormControl";
 import FormLabel from "@material-ui/core/FormLabel";
 import Typography from "@material-ui/core/Typography";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
@@ -30,95 +33,103 @@ import ScheduleView from "../ScheduleView/ScheduleView";
 import ScheduleObject from "../ScheduleObject";
 import Loop from "../Loop/Loop";
 import PlatformDao from "../PlatformDao/PlatformDao";
-import { fetchSchedule, saveSchedule } from "../ScheduleDao/ScheduleDao";
+import {
+  fetchSchedule,
+  saveSchedule,
+  getLanguages,
+} from "../ScheduleDao/ScheduleDao";
 import TimeDisplay from "../TimeDisplay";
 import Refresh from "../Refresh";
 import PushControl from "../PushControl";
 
 const drawerWidth = 240;
 
-const styles = theme => ({
+const styles = (theme) => ({
   root: {
-    display: "flex"
+    display: "flex",
   },
   appBar: {
     transition: theme.transitions.create(["margin", "width"], {
       easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen
-    })
+      duration: theme.transitions.duration.leavingScreen,
+    }),
   },
   appBarShift: {
     width: `calc(100% - ${drawerWidth}px)`,
     marginLeft: drawerWidth,
     transition: theme.transitions.create(["margin", "width"], {
       easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen
-    })
+      duration: theme.transitions.duration.enteringScreen,
+    }),
   },
   appBarTitle: {
     margin: theme.spacing(2),
-    flexGrow: 1
+    flexGrow: 1,
   },
   appBarName: {
     margin: theme.spacing(2),
-    marginLeft: "auto"
+    marginLeft: "auto",
   },
   menuButton: {
     marginLeft: 12,
-    marginRight: 20
+    marginRight: 20,
   },
   hide: {
-    display: "none"
+    display: "none",
   },
   drawer: {
     width: drawerWidth,
-    flexShrink: 0
+    flexShrink: 0,
   },
   drawerPaper: {
-    width: drawerWidth
+    width: drawerWidth,
   },
   drawerHeader: {
     display: "flex",
     alignItems: "center",
     padding: "0 8px",
     ...theme.mixins.toolbar,
-    justifyContent: "flex-end"
+    justifyContent: "flex-end",
   },
   content: {
     flexGrow: 1,
     padding: theme.spacing(3),
     transition: theme.transitions.create("margin", {
       easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen
+      duration: theme.transitions.duration.leavingScreen,
     }),
-    marginLeft: -drawerWidth
+    marginLeft: -drawerWidth,
   },
   contentShift: {
     transition: theme.transitions.create("margin", {
       easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen
+      duration: theme.transitions.duration.enteringScreen,
     }),
-    marginLeft: 0
-  }
+    marginLeft: 0,
+  },
 });
 
 const services = {
   bbc_hindi_tv: {
     sid: "bbc_hindi_tv",
     name: "Hindi",
-    serviceIDRef: "TVHIND01"
+    serviceIDRef: "TVHIND01",
   },
   bbc_marathi_tv: {
     sid: "bbc_marathi_tv",
     name: "Marathi",
-    serviceIDRef: "TVMAR01"
-  }
+    serviceIDRef: "TVMAR01",
+  },
 };
+
+var start = moment().utc().startOf("day");
+var end = moment().utc().add(1, "day");
+start.set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
+end.set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
 
 class Editor extends React.Component {
   constructor(props) {
     super(props);
-
     this.handleScheduleDelete = this.handleScheduleDelete.bind(this);
     this.handleOccurenceDelete = this.handleOccurenceDelete.bind(this);
     this.handleAddLive = this.handleAddLive.bind(this);
@@ -130,7 +141,12 @@ class Editor extends React.Component {
     this.handleDrawerOpen = this.handleDrawerOpen.bind(this);
     this.handleDrawerClose = this.handleDrawerClose.bind(this);
     this.handleDateChange = this.handleDateChange.bind(this);
+    this.handleTo = this.handleTo.bind(this);
+    this.handleFrom = this.handleFrom.bind(this);
+    this.handleDayTo = this.handleDayTo.bind(this);
+    this.handleDayFrom = this.handleDayFrom.bind(this);
     this.handleChangeMode = this.handleChangeMode.bind(this);
+    this.handleChange = this.handleChange.bind(this);
     this.handleRefresh = this.handleRefresh.bind(this);
     this.savePlaylist = this.savePlaylist.bind(this);
     this.clearSchedule = this.clearSchedule.bind(this);
@@ -142,13 +158,17 @@ class Editor extends React.Component {
     this.state = {
       schedule: new ScheduleObject(
         "bbc_hindi_tv",
-        moment()
-          .utc()
-          .startOf("day")
+        moment().utc().startOf("day")
       ),
       mode: "loop",
       scheduleInsertionPoint: 1,
       scheduleModified: false,
+      language: "Hindi",
+      configObj: {
+        Hindi: {
+          sid: "bbc_hindi_tv",
+        },
+      },
       timeToFill: moment.duration(),
       upcomingAvailability: moment.duration("P1D"),
       open: false,
@@ -157,23 +177,41 @@ class Editor extends React.Component {
       loop: [],
       loopDuration: moment.duration(),
       user: { name: "anonymous", auth: true },
-      side: true
+      side: true,
+      languageList: [],
+      from: start,
+      to: end,
     };
   }
 
   componentDidMount() {
-    PlatformDao.getUser(user => {
-      this.setState({ user: user });
-    });
+    try {
+      PlatformDao.getUser((user) => {
+        this.setState({ user: user });
+      });
+
+      getLanguages((response) => {
+        this.setState({
+          languageList: Object.keys(response),
+          configObj: response,
+          schedule: new ScheduleObject(
+            this.state.language,
+            moment().utc().startOf("day")
+          ),
+        });
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   componentDidUpdate(prevProps) {}
 
-  handleRefresh = event => {
+  handleRefresh = (event) => {
     this.setState({ side: this.state.side ? false : true });
   };
 
-  handleChangeMode = event => {
+  handleChangeMode = (event) => {
     this.setState({ mode: event.target.value });
   };
 
@@ -187,7 +225,7 @@ class Editor extends React.Component {
 
   handleAddLive(item) {
     let scheduleObject = new ScheduleObject(
-      this.state.schedule.sid,
+      this.state.configObj[this.state.language].sid,
       this.state.schedule.date,
       this.state.schedule.items
     );
@@ -239,14 +277,14 @@ class Editor extends React.Component {
     return moment.duration();
   }
 
-  handleScheduleRowSelect = index => {
+  handleScheduleRowSelect = (index) => {
     const ttf = this.calculateTimeToFill(this.state.schedule.items, index);
     this.setState({ scheduleInsertionPoint: index, timeToFill: ttf });
   };
 
   handleScheduleDelete(index) {
     let scheduleObject = new ScheduleObject(
-      this.state.schedule.sid,
+      this.state.configObj[this.state.language].sid,
       this.state.schedule.date,
       this.state.schedule.items
     );
@@ -256,7 +294,7 @@ class Editor extends React.Component {
 
   handleOccurenceDelete(index, value) {
     let scheduleObject = new ScheduleObject(
-      this.state.schedule.sid,
+      this.state.configObj[this.state.language].sid,
       this.state.schedule.date,
       this.state.schedule.items
     );
@@ -280,14 +318,14 @@ class Editor extends React.Component {
       upcomingAvailability = moment.duration("P1D");
     }
     this.setState({ upcomingAvailability: upcomingAvailability });
+
     this.updateSchedule(scheduleObject, 1, false);
   }
 
-  handleDateChange = date => {
-    //console.log('handleDateChange', date);
+  handleDateChange = (date) => {
     try {
-      const sid = this.state.schedule.sid;
-      fetchSchedule(sid, moment(date), schedule =>
+      const sid = this.state.configObj[this.state.language].sid;
+      fetchSchedule(sid, moment(date), (schedule) =>
         this.handleNewSchedule(schedule)
       );
     } catch (error) {
@@ -298,7 +336,7 @@ class Editor extends React.Component {
   pasteIntoSchedule(items) {
     let index = this.state.scheduleInsertionPoint;
     let scheduleObject = new ScheduleObject(
-      this.state.schedule.sid,
+      this.state.configObj[this.state.language].sid,
       this.state.schedule.date,
       this.state.schedule.items
     );
@@ -316,11 +354,18 @@ class Editor extends React.Component {
     if (sip === scheduleObject.items.length - 1) {
       sip--; // don't point at the end sentinel
     }
+    // sip should be the gap
+    for (let x of scheduleObject.items) {
+      if (x.insertionType === "gap") {
+        sip = scheduleObject.items.indexOf(x);
+      }
+    }
+
     this.setState({
       schedule: scheduleObject,
       scheduleInsertionPoint: sip,
       scheduleModified: modified,
-      timeToFill: ttf
+      timeToFill: ttf,
     });
   }
 
@@ -330,7 +375,10 @@ class Editor extends React.Component {
 
   clearSchedule() {
     this.updateSchedule(
-      new ScheduleObject(this.state.schedule.sid, this.state.schedule.date),
+      new ScheduleObject(
+        this.state.configObj[this.state.language].sid,
+        this.state.schedule.date
+      ),
       1,
       false
     );
@@ -339,7 +387,7 @@ class Editor extends React.Component {
   testLoop() {
     this.pasteIntoLoop({
       duration: "PT55M",
-      title: "A test item"
+      title: "A test item",
     });
   }
 
@@ -349,7 +397,7 @@ class Editor extends React.Component {
     loop.push({ ...item, insertionType: "" });
     this.setState({
       loop: loop,
-      loopDuration: this.state.loopDuration.add(moment.duration(item.duration))
+      loopDuration: this.state.loopDuration.add(moment.duration(item.duration)),
     });
   }
 
@@ -361,7 +409,7 @@ class Editor extends React.Component {
     try {
       var file = e.target.files[0];
       let reader = new FileReader();
-      reader.onload = e => {
+      reader.onload = (e) => {
         try {
           let items = JSON.parse(e.target.result);
           this.setState({ loop: items });
@@ -383,11 +431,11 @@ class Editor extends React.Component {
     const element = document.createElement("a");
     // const items = JSON.stringify(this.state.loop);
     const file = new Blob([JSON.stringify(this.state.loop)], {
-      type: "application/json"
+      type: "application/json",
     });
     element.href = URL.createObjectURL(file);
     element.download =
-      services[this.state.schedule.sid].name +
+      services[this.state.configObj[this.state.language].sid].name +
       " " +
       this.state.user.name +
       " Loop.json";
@@ -395,7 +443,7 @@ class Editor extends React.Component {
     element.click();
   }
 
-  deleteItemFromLoop = index => {
+  deleteItemFromLoop = (index) => {
     const r = this.state.loop[index];
     let loop = [...this.state.loop];
     loop.splice(index, 1);
@@ -403,7 +451,7 @@ class Editor extends React.Component {
       loop: loop,
       loopDuration: this.state.loopDuration.subtract(
         moment.duration(r.duration)
-      )
+      ),
     });
   };
 
@@ -411,15 +459,122 @@ class Editor extends React.Component {
     //console.log('savePlaylist');
     const This = this; // closure for callback
     saveSchedule(
-      services[this.state.schedule.sid].serviceIDRef,
+      services[this.state.configObj[this.state.language].sid].serviceIDRef,
       this.state.schedule.items,
-      function() {
+      function () {
         This.setState({ scheduleModified: false });
       },
-      function(e) {
+      function (e) {
         console.log(e);
       }
     );
+  };
+
+  handleChange = (event) => {
+    this.setState({ language: event.target.value }, () => {
+      const sid = this.state.configObj[this.state.language].sid;
+      this.reloadSchedule();
+      this.handleRefresh();
+    });
+  };
+
+  handleFrom = (direction) => {
+    let { from, to } = this.state;
+
+    try {
+      switch (direction) {
+        case "back":
+          if (moment(to).diff(moment(from), "hours") < 24) {
+            this.setState({ from: moment(from).subtract(6, "hours") });
+            if (moment(from).subtract(6, "hours").hour() === 0) {
+              this.handleDateChange(moment(from).subtract(6, "hours"));
+            }
+          }
+          break;
+
+        case "forward":
+          if (!moment(from).isSameOrAfter(moment(to))) {
+            this.setState({ from: moment(from).add(6, "hours") });
+            if (moment(from).add(6, "hours").hour() === 0) {
+              this.handleDateChange(moment(from).add(6, "hours"));
+            }
+          }
+          break;
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  handleTo = (direction) => {
+    let { to, from } = this.state;
+    try {
+      switch (direction) {
+        case "back":
+          if (!moment(to).isSameOrBefore(moment(from))) {
+            this.setState({ to: moment(to).subtract(6, "hours") });
+          }
+          break;
+
+        case "forward":
+          if (moment(to).isBefore(moment(from).add(24, "hour"), "hour")) {
+            this.setState({ to: moment(to).add(6, "hours") });
+          }
+          break;
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  handleDayTo = (direction) => {
+    let { to, from } = this.state;
+
+    try {
+      switch (direction) {
+        case "back":
+          if (moment(to).isAfter(moment(from), "day")) {
+            this.setState({ to: moment(to).subtract(1, "day") });
+          }
+          break;
+        case "forward":
+          if (moment(to).isBefore(moment(from).add(24, "hour"), "hour")) {
+            this.setState({ to: moment(to).add(1, "day") });
+          }
+          break;
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  handleDayFrom = (direction) => {
+    let { to, from } = this.state;
+    console.log("from1", from);
+    try {
+      switch (direction) {
+        case "back":
+          console.log(
+            moment(from).subtract(24, "hour").diff(moment(to), "hours")
+          );
+          // if (moment(to).diff(moment(from), "hours") < 24) {
+          if (
+            moment(to).diff(moment(from).subtract(24, "hour"), "hours") <= 24
+          ) {
+            this.setState({ from: moment(from).subtract(1, "day") });
+            this.handleDateChange(moment(from).subtract(1, "day"));
+          }
+          break;
+        case "forward":
+          if (moment(from).isBefore(moment(to), "day")) {
+            this.setState({ from: moment(from).add(1, "day") });
+            this.handleDateChange(moment(from).add(1, "day"));
+          }
+          break;
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   // available episodes need to be available.
@@ -434,6 +589,7 @@ class Editor extends React.Component {
   // upcoming episodes need to be still available to the end of the day being scheduled
 
   render() {
+    let { from, to } = this.state;
     const mustBeAvailableBy = moment.utc().format();
     const mustBeAvailableUntil = moment
       .utc(this.state.schedule.date)
@@ -446,14 +602,14 @@ class Editor extends React.Component {
       .format();
 
     const { classes } = this.props;
-    const { open } = this.state;
+    const { open, languageList, language } = this.state;
     //console.log('Editor.render');
     return (
       <div className={classes.root}>
         <AppBar
           position="fixed"
           className={classNames(classes.appBar, {
-            [classes.appBarShift]: open
+            [classes.appBarShift]: open,
           })}
         >
           <Toolbar disableGutters={!open}>
@@ -465,8 +621,25 @@ class Editor extends React.Component {
             >
               <MenuIcon />
             </IconButton>
+
+            <Select
+              id="demo-simple-select-outlined"
+              labelId="demo-simple-select-outlined-label"
+              style={{ fontSize: 17, color: "white" }}
+              value={language}
+              onChange={this.handleChange}
+            >
+              {languageList.map((item) => {
+                return (
+                  <MenuItem value={item} style={{ fontSize: 17 }}>
+                    {" "}
+                    {item}
+                  </MenuItem>
+                );
+              })}
+            </Select>
             <Typography variant="h6" color="inherit" noWrap>
-              {services[this.state.schedule.sid].name}
+              {/* {services[this.state.configObj[this.state.language].sid].name} */}
             </Typography>
             <Typography
               align="center"
@@ -500,7 +673,7 @@ class Editor extends React.Component {
         ></Drawer>
         <main
           className={classNames(classes.content, {
-            [classes.contentShift]: open
+            [classes.contentShift]: open,
           })}
         >
           <div className={classes.drawerHeader} />
@@ -553,7 +726,7 @@ class Editor extends React.Component {
 
                 <Live
                   date={this.state.schedule.date.utc().format("YYYY-MM-DD")}
-                  sid={this.state.schedule.sid}
+                  sid={this.state.configObj[language].sid}
                   handleClick={this.handleAddLive}
                 />
               </ExpansionPanel>
@@ -573,7 +746,7 @@ class Editor extends React.Component {
                   availability={"available"}
                   mustBeAvailableBy={mustBeAvailableBy}
                   mustBeAvailableUntil={mustBeAvailableUntil}
-                  sid={this.state.schedule.sid}
+                  sid={this.state.configObj[language].sid}
                   handleClick={this.handleAddClipOrEpisode}
                 />
               </ExpansionPanel>
@@ -592,7 +765,7 @@ class Editor extends React.Component {
                   availability={"P1D"}
                   mustBeAvailableBy={upcomingMustBeAvailableBy}
                   mustBeAvailableUntil={upcomingMustBeAvailableUntil}
-                  sid={this.state.schedule.sid}
+                  sid={this.state.configObj[language].sid}
                   handleClick={this.handleAddClipOrEpisode}
                   // resultsFilter={this.filterUpcomingEpisodes}
                 />
@@ -609,7 +782,7 @@ class Editor extends React.Component {
                 <Clips
                   flip={this.state.side}
                   type="web"
-                  sid={this.state.schedule.sid}
+                  sid={this.state.configObj[language].sid}
                   handleClick={this.handleAddClipOrEpisode}
                 />
               </ExpansionPanel>
@@ -623,7 +796,7 @@ class Editor extends React.Component {
                 </ExpansionPanelSummary>
 
                 <Specials
-                  sid={this.state.schedule.sid}
+                  sid={this.state.configObj[language].sid}
                   handleClick={this.handleAddClipOrEpisode}
                 />
               </ExpansionPanel>
@@ -652,6 +825,12 @@ class Editor extends React.Component {
                 enabled={this.state.scheduleModified ? false : true}
                 scheduleDate={this.state.schedule.date}
                 onDateChange={this.handleDateChange}
+                handleFrom={this.handleFrom}
+                handleTo={this.handleTo}
+                handleDayTo={this.handleDayTo}
+                handleDayFrom={this.handleDayFrom}
+                from={from}
+                to={to}
               />
               <ScheduleView
                 onRowSelected={this.handleScheduleRowSelect}
@@ -660,6 +839,8 @@ class Editor extends React.Component {
                 data={this.state.schedule.items}
                 row={this.state.scheduleInsertionPoint}
                 lastUpdated=""
+                from={from}
+                to={to}
               />
               <ScheduleToolbar
                 saveEnabled={this.state.user.auth}
@@ -678,7 +859,7 @@ class Editor extends React.Component {
 
 Editor.propTypes = {
   classes: PropTypes.object.isRequired,
-  theme: PropTypes.object.isRequired
+  theme: PropTypes.object.isRequired,
 };
 
 export default withStyles(styles, { withTheme: true })(Editor);
