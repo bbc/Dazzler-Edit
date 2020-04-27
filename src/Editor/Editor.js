@@ -554,7 +554,13 @@ class Editor extends React.Component {
     try {
       switch (direction) {
         case "back":
-          if (moment(to).diff(moment(from), "hours") < 24) {
+          console.log(
+            moment(from).subtract(24, "hour").diff(moment(to), "hours")
+          );
+          // if (moment(to).diff(moment(from), "hours") < 24) {
+          if (
+            moment(to).diff(moment(from).subtract(24, "hour"), "hours") <= 24
+          ) {
             this.setState({ from: moment(from).subtract(1, "day") });
             this.handleDateChange(moment(from).subtract(1, "day"));
           }

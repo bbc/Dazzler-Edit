@@ -18,7 +18,7 @@ class ScheduleObject {
           startTime: moment(start),
           duration: "P1D",
           insertionType: "gap",
-          title: "gap4",
+          title: "gap",
         },
         {
           startTime: moment(start).add(1, "days"),
@@ -136,7 +136,7 @@ class ScheduleObject {
     );
     if (duration.asMilliseconds() >= 0) {
       this.items.splice(index, 0, {
-        title: "gap5",
+        title: "gap",
         startTime: gapStart,
         duration: duration.toISOString(),
         insertionType: "gap",
@@ -290,7 +290,7 @@ class ScheduleObject {
   addGapAtPoint(index, endTime) {
     const next = this.items[index + 1].startTime;
     this.items.splice(index + 1, 0, {
-      title: "gap1",
+      title: "gap",
       startTime: endTime,
       duration: moment.duration(next.diff(endTime)).toISOString(),
       insertionType: "gap",
@@ -350,7 +350,7 @@ class ScheduleObject {
       const next = s[i + 1].startTime;
       if (end.isBefore(next)) {
         gaps.push({
-          title: "gap2",
+          title: "gap",
           startTime: end,
           duration: moment.duration(next.diff(end)).toISOString(),
           insertionType: "gap",
@@ -434,7 +434,7 @@ class ScheduleObject {
           );
 
           schedule.splice(i, 0, {
-            title: "gap3",
+            title: "gap",
             startTime: newStart,
             duration: newDuration.toISOString(),
             insertionType: "gap",
