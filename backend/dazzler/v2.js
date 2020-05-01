@@ -5,8 +5,11 @@ const https = require("https");
 const aws = require("aws-sdk");
 const auth = require("./auth");
 const notifications = require("./notifications");
+//node wont read ~\.aws\config     ???????
+aws.config.update({ region: "eu-west-1" });
 
 const s3 = new aws.S3({ apiVersion: "2006-03-01" });
+const sqs = new aws.SQS({ apiVersion: "2012-11-05" });
 
 let config;
 let configV2;
@@ -18,6 +21,7 @@ if (process.env.ES_HOST) {
 } else {
   host = "localhost:8443";
 }
+
 ax = axios.create({
   httpsAgent: new https.Agent({
     rejectUnauthorized: false,
@@ -158,6 +162,7 @@ const episode = async (req, res) => {
     "sonata.episode.release_date.date",
     "pips.programme_availability.available_versions.available_version",
     "sonata.episode.availabilities.av_pv13_pa4",
+    "pips.episode.crid.uri",
   ];
   const sid = req.query.sid || config.default_sid;
   const mid = config[sid].mid;
@@ -235,6 +240,7 @@ const episode = async (req, res) => {
         release_date: se.release_date.date,
         title: se.aggregatedTitle,
         pid: hit._source.pips.episode.pid,
+        uri: hit._source.pips.episode.crid.uri,
         vpid: version.pid,
         versionCrid: version.crid.uri,
         duration: duration.toISOString(),
@@ -361,6 +367,104 @@ const languageServices = async function (req, res) {
   }
 };
 
+const queryepisode = async function (req, res) {
+  try {
+    let episode = JSON.parse(req.body);
+
+    var s3params = {
+      Bucket: process.env.BUCKET,
+    };
+    episode.forEach((item) => {
+      s3params.Key = `${item.asset.vpid}.mp4`;
+      s3.headObject(s3params, function (err, data) {
+        if (err) {
+          if (err.message === null) {
+            console.log(`Episode ${item.asset.vpid} doesn't exist`);
+            sendSQSMessage(item);
+          } else {
+            console.error(err);
+          }
+        } else {
+          //success
+          console.log("Episode exists");
+          console.log(data);
+        }
+      });
+    });
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const sendSQSMessage = async function (item) {
+  try {
+    const sqsparams = {
+      QueueUrl: process.env.QueueUrl,
+    };
+    const uri = await getEpisodeUri(item);
+    sqsparams.MessageBody = JSON.stringify({
+      content_version_id: `pips-pid-${item.asset.vpid}`,
+      profile_id: process.env.ProfileId,
+      uri: uri,
+      event_name: "INSERT",
+    });
+    sqs.sendMessage(sqsparams, function (err, data) {
+      if (err) {
+        console.log(err, err.stack);
+      } else {
+        console.log(data);
+      }
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const getEpisodeUri = async function (item) {
+  const params = {
+    headers: { "Content-Type": "application/json" },
+  };
+  const _source = [
+    "pips.programme_availability.available_versions.available_version.availabilities.ondemand.filepath.uri",
+  ];
+
+  const query = {
+    match: {
+      "pips.episode.pid": item.asset.pid,
+    },
+  };
+
+  const data = { _source, query };
+
+  try {
+    const answer = await ax.post(
+      `https://${host}/episode/_search`,
+      data,
+      params
+    );
+
+    const result =
+      answer.data.hits.hits[0]._source.pips.programme_availability
+        .available_versions.available_version[0].availabilities.ondemand;
+    if (
+      !result ||
+      !JSON.stringify(result).includes("av_pv13_pa4") ||
+      !JSON.stringify(result).includes("av_pv10_pa4")
+    ) {
+      throw new Error(
+        "Not found in Elastic Search or pv13 and pv10 URI doesn't exist"
+      );
+    }
+
+    let wantedURI = result.filter((item) =>
+      item.filepath.uri.includes("av_pv13_pa4")
+    )[0].filepath.uri;
+    return wantedURI;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 module.exports = {
   init(app, configObject, configObject2) {
     config = configObject;
@@ -375,6 +479,7 @@ module.exports = {
     app.get("/api/v2/clip", clip);
     app.get("/api/v2/episode", episode);
     app.post("/api/v2/loop", saveEmergencyPlayList);
+    app.post("/api/v2/queryepisode", queryepisode);
 
     // app.put("/api/v2/loop", loop);
     // app.post("/api/v2/tva", tva);

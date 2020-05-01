@@ -457,12 +457,14 @@ class Editor extends React.Component {
 
   savePlaylist = () => {
     //console.log('savePlaylist');
-    const This = this; // closure for callback
+
+    // const This = this; // closure for callback
     saveSchedule(
       services[this.state.configObj[this.state.language].sid].serviceIDRef,
       this.state.schedule.items,
-      function () {
-        This.setState({ scheduleModified: false });
+      () => {
+        console.log("closure", this);
+        this.setState({ scheduleModified: false });
       },
       function (e) {
         console.log(e);
@@ -486,7 +488,10 @@ class Editor extends React.Component {
         case "back":
           if (moment(to).diff(moment(from), "hours") < 24) {
             this.setState({ from: moment(from).subtract(6, "hours") });
-            if (moment(from).subtract(6, "hours").hour() === 0) {
+
+            if (
+              moment(from).isAfter(moment(from).subtract(6, "hours"), "day")
+            ) {
               this.handleDateChange(moment(from).subtract(6, "hours"));
             }
           }
@@ -550,7 +555,7 @@ class Editor extends React.Component {
 
   handleDayFrom = (direction) => {
     let { to, from } = this.state;
-    console.log("from1", from);
+
     try {
       switch (direction) {
         case "back":

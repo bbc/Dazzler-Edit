@@ -18,13 +18,13 @@ export default function EpisodeList({
   sort = "title",
   sortDirection = "desc",
   flip = false,
-  onAddClicked = function() {
+  onAddClicked = function () {
     console.log("add clicked");
   },
-  onPageLoaded = function(page, rowsPerPage, total) {
+  onPageLoaded = function (page, rowsPerPage, total) {
     console.log("page changed", page, rowsPerPage, total);
   },
-  search
+  search,
 }) {
   const [currentPage, setCurrentPage] = useState(0);
   const [currentRowsPerPage, setCurrentRowsPerPage] = useState(5);
@@ -36,7 +36,7 @@ export default function EpisodeList({
   useEffect(() => {
     window.addEventListener(
       "message",
-      event => {
+      (event) => {
         console.log(event);
       },
       false
@@ -88,7 +88,7 @@ export default function EpisodeList({
 
   return (
     <TableBody>
-      {rows.map(row => (
+      {rows.map((row) => (
         <TableRow
           key={row.pid}
           className={row.insertionType}
@@ -123,5 +123,5 @@ export default function EpisodeList({
 
 EpisodeList.propTypes = {
   page: PropTypes.number.isRequired,
-  rowsPerPage: PropTypes.number.isRequired
+  rowsPerPage: PropTypes.number.isRequired,
 };
