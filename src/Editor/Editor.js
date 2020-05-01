@@ -457,12 +457,14 @@ class Editor extends React.Component {
 
   savePlaylist = () => {
     //console.log('savePlaylist');
-    const This = this; // closure for callback
+
+    // const This = this; // closure for callback
     saveSchedule(
       services[this.state.configObj[this.state.language].sid].serviceIDRef,
       this.state.schedule.items,
-      function () {
-        This.setState({ scheduleModified: false });
+      () => {
+        console.log("closure", this);
+        this.setState({ scheduleModified: false });
       },
       function (e) {
         console.log(e);

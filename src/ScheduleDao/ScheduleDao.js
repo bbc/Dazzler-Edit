@@ -187,11 +187,37 @@ class ScheduleDao {
         .catch((error) => {
           err(error);
         });
+      ScheduleDao.episodeCheck(data);
     } catch (error) {
       err();
     }
   }
 
+  static episodeCheck(data) {
+    try {
+      //Filtering episodes and then extracting vpid
+      let episode = new Set(
+        data.filter((item) => {
+          if (!item.asset || !item.asset.availability.actual_start) {
+            return false;
+          } else {
+            return item.asset.entityType === "episode";
+          }
+        })
+      );
+      if (episode.size > 0) {
+        axios({
+          method: "post",
+          url: URLPrefix + "/api/v2/queryepisode",
+          data: Array.from(episode),
+        }).catch((error) => {
+          console.error(error);
+        });
+      }
+    } catch (error) {
+      console.error("FAILURE", error);
+    }
+  }
   static makeScheduleEvent(serviceIDRef, broadcast) {
     const duration = broadcast.duration;
     const startDateTime = moment.utc(broadcast.startTime);

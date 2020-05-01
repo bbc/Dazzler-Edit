@@ -86,6 +86,7 @@ class AssetDao {
           items.push({
             duration: moment.duration(episode.duration).toISOString(),
             pid: episode.pid,
+            uri: episode.uri,
             release_date: episode.release_date,
             title: episode.title,
             versionCrid: episode.versionCrid,
