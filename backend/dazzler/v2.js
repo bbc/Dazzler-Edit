@@ -399,7 +399,7 @@ const queryepisode = async function (req, res) {
 const sendSQSMessage = async function (item) {
   try {
     const sqsparams = {
-      QueueUrl: process.env.QueueUrl,
+      QueueUrl: process.env.ASSET_PUBLISH_QUEUE,
     };
     const uri = await getEpisodeUri(item);
     sqsparams.MessageBody = JSON.stringify({
