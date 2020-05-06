@@ -20,6 +20,10 @@ if (process.env.ES_HOST) {
   host = process.env.ES_HOST;
 } else {
   host = "localhost:8443";
+  process.env.BUCKET = "ws-dazzler-assets-test";
+  process.env.ASSET_PUBLISH_QUEUE =
+    "https://sqs.eu-west-1.amazonaws.com/205979497597/Media-Syndication-Queue";
+  process.env.ProfileId = "pips-map_id-av_pv13_pa4";
 }
 
 ax = axios.create({
@@ -465,6 +469,41 @@ const getEpisodeUri = async function (item) {
   }
 };
 
+const tvaS3 = async (req, res) => {
+  const sid = req.query.sid || config.default_sid;
+
+  if (req.body.includes(`serviceIDRef="${config[sid].serviceIDRef}"`)) {
+    let user = "dazzler"; // assume local
+    if (req.header("sslclientcertsubject")) {
+      const subject = auth.parseSSLsubject(req);
+      user = subject.emailAddress;
+    }
+    if (auth.isAuthorised(user)) {
+      var params = {
+        Body: req.body,
+        Bucket: process.env.BUCKET,
+        Key: `${sid}/schedule/schedule.xml`,
+        ContentType: "application/xml",
+      };
+      try {
+        await s3.putObject(params).promise();
+        res.send("Schedule Saved");
+        console.log("schedule saved");
+      } catch (e) {
+        console.log("error ", e);
+        res.status(404).send("error");
+      }
+    } else {
+      const message = user + " is not authorised to save schedules";
+      console.log(message);
+      res.status(403).send(message);
+    }
+  } else {
+    console.log("Hindi only please");
+    res.status(403).send("Hindi only please");
+  }
+};
+
 module.exports = {
   init(app, configObject, configObject2) {
     config = configObject;
@@ -482,7 +521,7 @@ module.exports = {
     app.post("/api/v2/queryepisode", queryepisode);
 
     // app.put("/api/v2/loop", loop);
-    // app.post("/api/v2/tva", tva);
+    app.post("/api/v2/tvaS3", tvaS3);
     app.post("/api/v2/subscribe", subscribe);
   },
 };

@@ -146,7 +146,6 @@ class ScheduleDao {
         console.log(e);
       });
   }
-
   static saveSchedule(serviceIDRef, data, cb, err) {
     try {
       const first = data[0];
@@ -178,7 +177,7 @@ class ScheduleDao {
 
       axios({
         method: "post",
-        url: URLPrefix + "/api/v1/tva",
+        url: URLPrefix + "/api/v2/tvaS3",
         data: tva,
       })
         .then((response) => {
