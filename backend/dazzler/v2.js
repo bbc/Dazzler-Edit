@@ -20,10 +20,6 @@ if (process.env.ES_HOST) {
   host = process.env.ES_HOST;
 } else {
   host = "localhost:8443";
-  process.env.BUCKET = "ws-dazzler-assets-test";
-  process.env.ASSET_PUBLISH_QUEUE =
-    "https://sqs.eu-west-1.amazonaws.com/205979497597/Media-Syndication-Queue";
-  process.env.ProfileId = "pips-map_id-av_pv13_pa4";
 }
 
 ax = axios.create({
