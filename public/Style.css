@@ -9,7 +9,7 @@
 .tooltip .tooltiptext {
   visibility: hidden;
   width: 50%;
-  height: 5%;
+  height: 7%;
   background-color: #0066ff;
   color: #fff;
   text-align: center;
@@ -60,3 +60,19 @@
   margin-left: 90%;
 }
 
+.unavailable {
+  background-color: red;
+}
+
+.noStart {
+  background-color: #a9a9a9;
+}
+
+.current {
+  background-color: #9dc8ea;
+}
+
+.body {
+  width: 80%;
+  height: 80%;
+}

@@ -5,22 +5,23 @@ import "moment-duration-format";
 import TableBody from "@material-ui/core/TableBody";
 import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
-import AssetDao from "../AssetDaoV1";
+import AssetDao from "../AssetDaoV2";
 
 export default function ClipList({
   sid,
   type,
   page = 0,
   rowsPerPage = 5,
-  onAddClicked = function() {
+  onAddClicked = function () {
     console.log("add clicked");
   },
-  onPageLoaded = function(page, rowsPerPage, total) {
+  onPageLoaded = function (page, rowsPerPage, total) {
     console.log("page changed", page, rowsPerPage, total);
   },
-  sort,
-  sort_direction,
-  search
+  sort = "title",
+  sort_direction = "desc",
+  flip = false,
+  search,
 }) {
   const [currentPage, setCurrentPage] = React.useState(-1);
   const [currentRowsPerPage, setCurrentRowsPerPage] = React.useState(5);
@@ -30,10 +31,12 @@ export default function ClipList({
     "desc"
   );
   const [rows, setRows] = React.useState([]);
+  const [side, setSide] = React.useState(true);
 
   // statements in the body of the function are called on rendering!!!
 
   if (
+    flip === side &&
     page === currentPage &&
     rowsPerPage === currentRowsPerPage &&
     sort_direction === currentSortDirection &&
@@ -52,35 +55,35 @@ export default function ClipList({
       sort,
       sort_direction,
       (items, total) => {
+        console.log("ITEMS IS", items);
         console.log("got clip data for", type, total, items);
         setRows(items);
-        setCurrentPage(page);
-        setCurrentRowsPerPage(rowsPerPage);
-        setcurrentSortDirection(sort_direction);
-        setCurrentSearch(search);
-        setcurrentType(type);
-
         onPageLoaded(currentPage, currentRowsPerPage, total);
       },
       search
     );
+    setCurrentPage(page);
+    setCurrentRowsPerPage(rowsPerPage);
+    setcurrentSortDirection(sort_direction);
+    setCurrentSearch(search);
+    setSide(flip);
+    setcurrentType(type);
   }
 
   return (
     <TableBody>
-      {rows.map(row => (
+      {rows.map((row) => (
         <TableRow key={row.pid} className={row.insertionType}>
           <TableCell component="th" scope="row">
             <div className="tooltip">
-              {" "}
               {row.title}
               <span className="tooltiptext">PID = {row.pid}</span>
             </div>
           </TableCell>
-          <TableCell align="right">
-            {moment(row.updated_time).format("DD-MM-YYYY")}
+          <TableCell align="center">
+            {moment(row.last_modified).format("DD-MM-YYYY")}
           </TableCell>
-          <TableCell align="right">
+          <TableCell align="center">
             {moment.duration(row.duration).format("hh:mm:ss", { trim: false })}
           </TableCell>
           <TableCell align="right">
@@ -101,5 +104,5 @@ export default function ClipList({
 
 ClipList.propTypes = {
   page: PropTypes.number.isRequired,
-  rowsPerPage: PropTypes.number.isRequired
+  rowsPerPage: PropTypes.number.isRequired,
 };

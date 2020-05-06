@@ -23,7 +23,7 @@ export const styles = theme => ({
     minWidth: 250
   },
   tableWrapper: {
-    overflowX: "hidden"
+    overflowX: "scroll"
   }
 });
 
@@ -118,7 +118,7 @@ export class Live extends React.Component {
     }
 
     return (
-      <div>
+      <div style={{ marginLeft: "5%" }}>
         {date.format("YYYY-MM-DD")}
         <Paper className={classes.root}>
           <div className={classes.tableWrapper}>
@@ -140,9 +140,7 @@ export class Live extends React.Component {
                           ? row.presentation_title
                           : row.title}
                         <span className="tooltiptext">
-                          {
-                          'PID = '+(row.pid?row.pid.trim():'')
-                          }
+                          {"PID = " + (row.pid ? row.pid.trim() : "")}
                         </span>
                       </div>
                     </TableCell>
@@ -162,19 +160,21 @@ export class Live extends React.Component {
               </TableBody>
               <TableFooter>
                 <TableRow>
-                  <TablePagination
-                    rowsPerPageOptions={[5, 10, 25]}
-                    colSpan={3}
-                    count={totalRows}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    SelectProps={{
-                      native: true
-                    }}
-                    onChangePage={this.handleChangePage}
-                    onChangeRowsPerPage={this.handleChangeRowsPerPage}
-                    ActionsComponent={TablePaginationActionsWrapped}
-                  />
+                  <div style={{ marginLeft: "-7%" }}>
+                    <TablePagination
+                      rowsPerPageOptions={[5, 10, 25]}
+                      colSpan={3}
+                      count={totalRows}
+                      rowsPerPage={rowsPerPage}
+                      page={page}
+                      SelectProps={{
+                        native: true
+                      }}
+                      onChangePage={this.handleChangePage}
+                      onChangeRowsPerPage={this.handleChangeRowsPerPage}
+                      ActionsComponent={TablePaginationActionsWrapped}
+                    />
+                  </div>
                 </TableRow>
               </TableFooter>
             </Table>

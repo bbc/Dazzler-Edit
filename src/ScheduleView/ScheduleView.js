@@ -1,6 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import ScheduleItem from "../ScheduleItem/ScheduleItem";
+import moment from "moment";
 // import moment from "moment";
 
 /*
@@ -27,22 +28,72 @@ class ScheduleView extends React.Component {
     super(props);
     this.handleClick = this.handleClick.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
-    this.state = {};
+    this.checkStatus = this.checkStatus.bind(this);
+
+    this.state = {
+      side: false,
+    };
   }
 
-  handleClick = index => {
+  handleClick = (index) => {
     if (this.props.onRowSelected) this.props.onRowSelected(index);
   };
 
-  handleDelete = index => {
+  handleDelete = (index) => {
     this.props.onDelete(index); // TODO can we use this directly?
+  };
+
+  /* if schedule time is before actual start, item becomes red
+   */
+
+  // checkStatus = item => {
+  //   if (item.asset && item.asset.status == "unavailable") {
+  //     if (
+  //       moment(item.startTime).isAfter(
+  //         moment(item.asset.availability.expected_start)
+  //       )
+  //     ) {
+  //       item.insertionType = "unavailable";
+  //       return "unavailable";
+  //     } else {
+  //       item.insertionType = "noStart";
+  //       return "noStart";
+  //     }
+  //   }
+  // };
+
+  /* If schedule is not available and there is 30 mins left until schedule time,
+  item becomes red*/
+  checkStatus = (item) => {
+    if (item.asset && item.asset.status == "unavailable") {
+      if (
+        moment(item.startTime).isBetween(moment(), moment().add(30, "minutes"))
+      ) {
+        item.insertionType = "unavailable";
+        return "unavailable";
+      } else {
+        item.insertionType = "noStart";
+        return "noStart";
+      }
+    } else {
+      return item.insertionType;
+    }
   };
 
   handleOccurenceDelete = (index, value) => {
     this.props.onOccurenceDelete(index, value); // TODO can we use this directly?
   };
 
-  componentDidMount() {}
+  componentDidMount() {
+    this.interval = setInterval(
+      () => this.setState({ side: this.state.side ? false : true }),
+      30000
+    );
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
 
   componentDidUpdate(prevProps) {
     if (this.props.lastUpdated !== prevProps.lastUpdated) {
@@ -50,6 +101,7 @@ class ScheduleView extends React.Component {
   }
 
   render() {
+    console.log("data is ", this.props.data);
     // let offset = moment().format().substring(19);
     let selectedItem = this.props.row;
     if (selectedItem === -1) {
@@ -75,23 +127,30 @@ class ScheduleView extends React.Component {
           </tr>
         </thead>
         <tbody>
-          {this.props.data.map((item, index) => (
-            <ScheduleItem
-              key={item.insertionType + item.startTime.utc().format()}
-              index={index}
-              live={item.live}
-              insertionType={item.insertionType}
-              selected={selectedItem === index}
-              startTime={item.startTime}
-              title={item.title}
-              duration={item.duration}
-              asset_duration={item.asset ? item.asset.duration : ""}
-              onClick={this.handleClick}
-              onDelete={this.handleDelete}
-              onOccurenceDelete={this.handleOccurenceDelete}
-              data={this.props.data}
-            />
-          ))}
+          {this.props.data.map((item, index) => {
+            if (
+              moment(item.startTime).isSameOrAfter(this.props.from) &&
+              moment(item.startTime).isSameOrBefore(this.props.to)
+            ) {
+              return (
+                <ScheduleItem
+                  key={item.insertionType + item.startTime.utc().format()}
+                  index={index}
+                  live={item.live}
+                  insertionType={this.checkStatus(item)}
+                  selected={selectedItem === index}
+                  startTime={item.startTime}
+                  title={item.title}
+                  duration={item.duration}
+                  asset_duration={item.asset ? item.asset.duration : ""}
+                  onClick={this.handleClick}
+                  onDelete={this.handleDelete}
+                  onOccurenceDelete={this.handleOccurenceDelete}
+                  data={this.props.data}
+                />
+              );
+            }
+          })}
         </tbody>
       </table>
     );
@@ -101,7 +160,7 @@ class ScheduleView extends React.Component {
 ScheduleView.propTypes = {
   data: PropTypes.array.isRequired,
   onDelete: PropTypes.func.isRequired,
-  onRowSelected: PropTypes.func.isRequired
+  onRowSelected: PropTypes.func.isRequired,
 };
 
 export default ScheduleView;

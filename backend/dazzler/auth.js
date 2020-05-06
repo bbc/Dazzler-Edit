@@ -1,7 +1,7 @@
 function isAuthorised(email) {
   if (process.env.AUTHORISED_USERS) {
     const auth = "," + process.env.AUTHORISED_USERS.trim() + ",";
-    console.log('auth', auth, email);
+    console.log("auth", auth, email);
     return auth.toLowerCase().includes(`,${email.trim().toLowerCase()},`);
   } else {
     return true; // allow saving in the local environment
@@ -19,12 +19,12 @@ function parseSSLsubject(req) {
   return data;
 }
 
-const user = function(req, res) {
+const user = function (req, res) {
   if (req.header("sslclientcertsubject")) {
     const subject = parseSSLsubject(req);
     let r = {
       email: subject.emailAddress,
-      auth: isAuthorised(subject.emailAddress)
+      auth: isAuthorised(subject.emailAddress),
     };
     if (subject.hasOwnProperty("CN")) {
       r.name = subject.CN;
@@ -33,7 +33,7 @@ const user = function(req, res) {
   } else {
     res.json({
       name: "anonymous",
-      auth: true
+      auth: false,
     });
   }
 };
@@ -41,5 +41,5 @@ const user = function(req, res) {
 module.exports = {
   isAuthorised,
   user,
-  parseSSLsubject
+  parseSSLsubject,
 };

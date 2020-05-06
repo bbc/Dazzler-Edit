@@ -5,10 +5,14 @@ const https = require("https");
 const aws = require("aws-sdk");
 const auth = require("./auth");
 const notifications = require("./notifications");
+//node wont read ~\.aws\config     ???????
+aws.config.update({ region: "eu-west-1" });
 
 const s3 = new aws.S3({ apiVersion: "2006-03-01" });
+const sqs = new aws.SQS({ apiVersion: "2012-11-05" });
 
 let config;
+let configV2;
 let ax;
 let host;
 
@@ -17,10 +21,11 @@ if (process.env.ES_HOST) {
 } else {
   host = "localhost:8443";
 }
+
 ax = axios.create({
   httpsAgent: new https.Agent({
-    rejectUnauthorized: false
-  })
+    rejectUnauthorized: false,
+  }),
 });
 
 function availableQuery(mid, after, before, search) {
@@ -36,9 +41,9 @@ function availableQuery(mid, after, before, search) {
         {
           range: {
             "sonata.episode.availabilities.av_pv13_pa4.start": {
-              lt: after
-            }
-          }
+              lt: after,
+            },
+          },
         },
         {
           bool: {
@@ -48,24 +53,24 @@ function availableQuery(mid, after, before, search) {
                   must_not: [
                     {
                       exists: {
-                        field: "sonata.episode.availabilities.av_pv13_pa4.end"
-                      }
-                    }
-                  ]
-                }
+                        field: "sonata.episode.availabilities.av_pv13_pa4.end",
+                      },
+                    },
+                  ],
+                },
               },
               {
                 range: {
                   "sonata.episode.availabilities.av_pv13_pa4.end": {
-                    gte: before
-                  }
-                }
-              }
-            ]
-          }
-        }
-      ]
-    }
+                    gte: before,
+                  },
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
   };
 }
 
@@ -77,95 +82,62 @@ function unavailableQuery(mid, after, before, search) {
   return {
     bool: {
       must: [
-        { match: { "pips.master_brand_for.master_brand.mid": mid } },
+        {
+          match: {
+            "pips.episode.master_brand.link.mid": mid,
+          },
+        },
         filter,
+        {
+          bool: {
+            should: [
+              {
+                exists: {
+                  field: "sonata.episode.availabilities.upcoming.start",
+                },
+              },
+              {
+                exists: {
+                  field: "sonata.episode.availabilities.av_pv10_pa4.start",
+                },
+              },
+            ],
+          },
+        },
+        {
+          bool: {
+            should: [
+              {
+                range: {
+                  "sonata.episode.availabilities.upcoming.end": {
+                    gte: "now+1d",
+                  },
+                },
+              },
+              {
+                range: {
+                  "sonata.episode.availabilities.av_pv10_pa4.end": {
+                    gte: "now+1d",
+                  },
+                },
+              },
+            ],
+          },
+        },
         {
           bool: {
             must_not: [
               {
                 exists: {
                   field:
-                    "sonata.episode.availabilities.av_pv13_pa4.actual_start"
-                }
-              }
-            ]
-          }
-        },
-        {
-          range: {
-            "sonata.episode.availabilities.av_pv13_pa4.start": {
-              lt: after
-            }
-          }
-        },
-        {
-          bool: {
-            should: [
-              {
-                bool: {
-                  must_not: [
-                    {
-                      exists: {
-                        field: "sonata.episode.availabilities.av_pv13_pa4.end"
-                      }
-                    }
-                  ]
-                }
+                    "sonata.episode.availabilities.av_pv10_pa4.actual_start",
+                },
               },
-              {
-                range: {
-                  "sonata.episode.availabilities.av_pv13_pa4.end": {
-                    gte: before
-                  }
-                }
-              }
-            ]
-          }
-        }
-      ]
-    }
-  };
-}
-
-function searchQuery(mid, after, before, search) {
-  return {
-    bool: {
-      must: [
-        { match: { "pips.master_brand_for.master_brand.mid": mid } },
-        { match_phrase: { "pips.episode.title.$": search } },
-        {
-          range: {
-            "sonata.episode.availabilities.av_pv13_pa4.start": {
-              lt: after
-            }
-          }
+            ],
+          },
         },
-        {
-          bool: {
-            should: [
-              {
-                bool: {
-                  must_not: [
-                    {
-                      exists: {
-                        field: "sonata.episode.availabilities.av_pv13_pa4.end"
-                      }
-                    }
-                  ]
-                }
-              },
-              {
-                range: {
-                  "sonata.episode.availabilities.av_pv13_pa4.end": {
-                    gte: before
-                  }
-                }
-              }
-            ]
-          }
-        }
-      ]
-    }
+      ],
+    },
   };
 }
 
@@ -182,14 +154,15 @@ function searchQuery(mid, after, before, search) {
 */
 const episode = async (req, res) => {
   const params = {
-    headers: { "Content-Type": "application/json" }
+    headers: { "Content-Type": "application/json" },
   };
   const _source = [
     "pips.episode.pid",
     "sonata.episode.aggregatedTitle",
     "sonata.episode.release_date.date",
     "pips.programme_availability.available_versions.available_version",
-    "sonata.episode.availabilities.av_pv13_pa4"
+    "sonata.episode.availabilities.av_pv13_pa4",
+    "pips.episode.crid.uri",
   ];
   const sid = req.query.sid || config.default_sid;
   const mid = config[sid].mid;
@@ -218,7 +191,7 @@ const episode = async (req, res) => {
     }
     const sortMap = {
       release_date: "sonata.episode.release_date.date",
-      title: "sonata.episode.aggregatedTitle.keyword"
+      title: "sonata.episode.aggregatedTitle.keyword",
     };
     const sort = {};
     sort[sortMap[req.query.sort]] = sortDirection;
@@ -232,25 +205,34 @@ const episode = async (req, res) => {
     );
     const result = answer.data;
     const items = [];
-    result.hits.hits.forEach(hit => {
+    result.hits.hits.forEach((hit) => {
       const se = hit._source.sonata.episode;
       const versions =
         hit._source.pips.programme_availability.available_versions
           .available_version;
       const version = versions[0].version; // TODO pick a version
       const duration = moment.duration(version.duration.$);
+
       const availability = {
-        planned_start: se.availabilities.av_pv13_pa4.start,
-        expected_start: moment
-          .utc(se.availabilities.av_pv13_pa4.start)
-          .add(duration)
-          .add(10, "m")
-          .format()
+        planned_start: se.availabilities
+          ? se.availabilities.av_pv13_pa4.start
+          : versions[0].availabilities.ondemand[0].availability.start,
+        expected_start: se.availabilities
+          ? moment
+              .utc(se.availabilities.av_pv13_pa4.start)
+              .add(duration)
+              .add(10, "m")
+              .format()
+          : moment
+              .utc(versions[0].availabilities.ondemand[0].availability.start)
+              .add(duration)
+              .add(10, "m")
+              .format(),
       };
-      if (se.availabilities.av_pv13_pa4.actual_start) {
+      if (se.availabilities && se.availabilities.av_pv13_pa4.actual_start) {
         availability.actual_start = se.availabilities.av_pv13_pa4.actual_start;
       }
-      if (se.availabilities.av_pv13_pa4.end) {
+      if (se.availabilities && se.availabilities.av_pv13_pa4.end) {
         availability.end = se.availabilities.av_pv13_pa4.end;
       }
       const item = {
@@ -258,10 +240,11 @@ const episode = async (req, res) => {
         release_date: se.release_date.date,
         title: se.aggregatedTitle,
         pid: hit._source.pips.episode.pid,
+        uri: hit._source.pips.episode.crid.uri,
         vpid: version.pid,
         versionCrid: version.crid.uri,
         duration: duration.toISOString(),
-        availability
+        availability,
       };
       items.push(item);
     });
@@ -269,7 +252,7 @@ const episode = async (req, res) => {
       page_size: req.query.page_size,
       page: req.query.page,
       total: result.hits.total,
-      items
+      items,
     });
   } catch (e) {
     console.log(e);
@@ -277,7 +260,67 @@ const episode = async (req, res) => {
   }
 };
 
-const saveEmergencyPlayList = async function(req, res) {
+const clip = async (req, res) => {
+  const params = {
+    headers: { "Content-Type": "application/json" },
+  };
+  const _source = ["pips"];
+  const sid = req.query.sid || config.default_sid;
+  const size = req.query.page_size || 20;
+  let from = 0;
+  if (req.query.page) {
+    from = size * (req.query.page - 1);
+  }
+  let filter;
+  if (req.query.search !== "") {
+    filter = { match: { "pips.clip.title.$": req.query.search } };
+  }
+  const query = {
+    bool: {
+      must: [
+        {
+          exists: {
+            field:
+              "pips.programme_availability.available_versions.available_version",
+          },
+        },
+        filter,
+        { match: { "pips.clip.languages.language.$": config[sid].language } },
+      ],
+    },
+  };
+  const data = { _source, from, size, query };
+  if (req.query.sort) {
+    var sortDirection = "desc";
+    if (req.query.sort_direction === "ascending") {
+      sortDirection = "asc";
+    }
+  }
+
+  const sortMap = {
+    pid: "pips.clip.pid",
+    title: "pips.title_hierarchy.titles.title.$.keyword",
+  };
+
+  const sort = {};
+  sort[sortMap[req.query.sort]] = sortDirection;
+  data.sort = [sort];
+
+  try {
+    const answer = await ax.post(`https://${host}/clip/_search`, data, params);
+    const result = answer.data.hits.hits;
+    const total = answer.data.hits.total;
+    let items = {};
+    items.clips = result.map((hit) => hit._source.pips);
+    items.total = total;
+    res.json(items);
+  } catch (e) {
+    console.log(e);
+    res.status(404).send("error");
+  }
+};
+
+const saveEmergencyPlayList = async function (req, res) {
   let user = "dazzler"; // assume local
   if (req.header("sslclientcertsubject")) {
     const subject = auth.parseSSLsubject(req);
@@ -289,7 +332,7 @@ const saveEmergencyPlayList = async function(req, res) {
       Body: req.body,
       Bucket: process.env.BUCKET,
       Key: `${sid}/emergency-playlist.json`,
-      ContentType: "application/json"
+      ContentType: "application/json",
     };
     try {
       await s3.putObject(params).promise();
@@ -305,7 +348,7 @@ const saveEmergencyPlayList = async function(req, res) {
   }
 };
 
-const subscribe = async function(req, res) {
+const subscribe = async function (req, res) {
   const sid = req.query.sid || config.default_sid;
   try {
     notifications.addSubscription(sid, JSON.parse(req.body));
@@ -316,20 +359,130 @@ const subscribe = async function(req, res) {
   }
 };
 
+const languageServices = async function (req, res) {
+  try {
+    res.json(configV2);
+  } catch (error) {
+    res.status(404).send("error");
+  }
+};
+
+const queryepisode = async function (req, res) {
+  try {
+    let episode = JSON.parse(req.body);
+
+    var s3params = {
+      Bucket: process.env.BUCKET,
+    };
+    episode.forEach((item) => {
+      s3params.Key = `${item.asset.vpid}.mp4`;
+      s3.headObject(s3params, function (err, data) {
+        if (err) {
+          if (err.message === null) {
+            console.log(`Episode ${item.asset.vpid} doesn't exist`);
+            sendSQSMessage(item);
+          } else {
+            console.error(err);
+          }
+        } else {
+          //success
+          console.log("Episode exists");
+          console.log(data);
+        }
+      });
+    });
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const sendSQSMessage = async function (item) {
+  try {
+    const sqsparams = {
+      QueueUrl: process.env.ASSET_PUBLISH_QUEUE,
+    };
+    const uri = await getEpisodeUri(item);
+    sqsparams.MessageBody = JSON.stringify({
+      content_version_id: `pips-pid-${item.asset.vpid}`,
+      profile_id: process.env.ProfileId,
+      uri: uri,
+      event_name: "INSERT",
+    });
+    sqs.sendMessage(sqsparams, function (err, data) {
+      if (err) {
+        console.log(err, err.stack);
+      } else {
+        console.log(data);
+      }
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const getEpisodeUri = async function (item) {
+  const params = {
+    headers: { "Content-Type": "application/json" },
+  };
+  const _source = [
+    "pips.programme_availability.available_versions.available_version.availabilities.ondemand.filepath.uri",
+  ];
+
+  const query = {
+    match: {
+      "pips.episode.pid": item.asset.pid,
+    },
+  };
+
+  const data = { _source, query };
+
+  try {
+    const answer = await ax.post(
+      `https://${host}/episode/_search`,
+      data,
+      params
+    );
+
+    const result =
+      answer.data.hits.hits[0]._source.pips.programme_availability
+        .available_versions.available_version[0].availabilities.ondemand;
+    if (
+      !result ||
+      !JSON.stringify(result).includes("av_pv13_pa4") ||
+      !JSON.stringify(result).includes("av_pv10_pa4")
+    ) {
+      throw new Error(
+        "Not found in Elastic Search or pv13 and pv10 URI doesn't exist"
+      );
+    }
+
+    let wantedURI = result.filter((item) =>
+      item.filepath.uri.includes("av_pv13_pa4")
+    )[0].filepath.uri;
+    return wantedURI;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 module.exports = {
-  init(app, configObject) {
+  init(app, configObject, configObject2) {
     config = configObject;
+    configV2 = configObject2;
     // app.get("/api/v2/user", user);
     // app.get("/api/v2/schedule", schedule);
     // app.get("/api/v2/broadcast", broadcast);
     // app.get("/api/v2/webcast", webcast);
     // app.get("/api/v2/loop", loop);
     // app.get("/api/v2/special", special);
-    // app.get("/api/v2/clip", clip);
+    app.get("/api/v2/languageservices", languageServices);
+    app.get("/api/v2/clip", clip);
     app.get("/api/v2/episode", episode);
     app.post("/api/v2/loop", saveEmergencyPlayList);
+    app.post("/api/v2/queryepisode", queryepisode);
+
     // app.put("/api/v2/loop", loop);
     // app.post("/api/v2/tva", tva);
     app.post("/api/v2/subscribe", subscribe);
-  }
+  },
 };
