@@ -177,7 +177,7 @@ class ScheduleDao {
 
       axios({
         method: "post",
-        url: URLPrefix + "/api/v2/tvaS3",
+        url: URLPrefix + "/api/v1/tva",
         data: tva,
       })
         .then((response) => {
