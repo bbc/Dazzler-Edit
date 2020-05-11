@@ -197,7 +197,11 @@ class ScheduleDao {
       //Filtering episodes and then extracting vpid
       let episode = new Set(
         data.filter((item) => {
-          if (!item.asset || !item.asset.availability.actual_start) {
+          if (
+            !item.asset ||
+            !item.asset.availability ||
+            !item.asset.availability.actual_start
+          ) {
             return false;
           } else {
             return item.asset.entityType === "episode";
