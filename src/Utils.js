@@ -34,7 +34,6 @@ class Group {
       }
     }
   }
-
   get size() {
     return this.data.length;
   }
