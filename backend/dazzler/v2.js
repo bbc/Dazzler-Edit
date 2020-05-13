@@ -374,7 +374,8 @@ const queryepisode = async function (req, res) {
     var s3params = {
       Bucket: process.env.BUCKET,
     };
-    episode.forEach((item) => {
+    episode.forEach((item, index) => {
+      console.log("CALLED", index);
       s3params.Key = `${item.asset.vpid}.mp4`;
       s3.headObject(s3params, function (err, data) {
         if (err) {
@@ -386,7 +387,7 @@ const queryepisode = async function (req, res) {
           }
         } else {
           //success
-          console.log("Episode exists");
+          console.log("Episode exists", index);
           console.log(data);
         }
       });

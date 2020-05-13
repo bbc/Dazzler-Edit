@@ -1,6 +1,7 @@
 import moment from "moment";
 import axios from "axios";
 import ScheduleObject from "../ScheduleObject";
+import { groupSet } from "../Utils";
 
 const URLPrefix =
   process.env.NODE_ENV === "development" ? "http://localhost:8080" : "";
@@ -195,7 +196,7 @@ class ScheduleDao {
   static episodeCheck(data) {
     try {
       //Filtering episodes and then extracting vpid
-      let episode = new Set(
+      let episode = new groupSet(
         data.filter((item) => {
           if (
             !item.asset ||
@@ -212,7 +213,7 @@ class ScheduleDao {
         axios({
           method: "post",
           url: URLPrefix + "/api/v2/queryepisode",
-          data: Array.from(episode),
+          data: Array.from(episode.data),
         }).catch((error) => {
           console.error(error);
         });
