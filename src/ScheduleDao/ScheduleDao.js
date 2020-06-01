@@ -19,8 +19,10 @@ class ScheduleDao {
   }
   static getTitle(item, index) {
     let title = "";
+    console.log("item is", item);
     if (item.hasOwnProperty("clip")) {
       const clip = item.clip[0];
+
       if (clip.title) {
         title = clip.title;
       }
@@ -34,10 +36,12 @@ class ScheduleDao {
         }
         title += episode.presentation_title[0];
       }
+    } else {
+      title = item.broadcast[0].title[0];
     }
-    if (title === "") {
-      title = "Loaded From Schedule " + index;
-    }
+    // if (title === "") {
+    //   title = "Loaded From Schedule " + index;
+    // }
     return title;
   }
 
