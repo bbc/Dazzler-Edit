@@ -132,6 +132,7 @@ class ScheduleDao {
   }
 
   static fetchWebcasts(sid, start, end, page, rowsPerPage, cb) {
+    console.log("SID IN FW IS ", sid);
     axios
       .get(
         `${URLPrefix}/api/v1/webcast?sid=${sid}&start=${start}&end=${end}&page=${

@@ -46,6 +46,23 @@ const config = {
       "world_service_stream_08",
     ],
   },
+  bbc_swahili_tv: {
+    serviceIDRef: "TVMAR01",
+    name: "Swahili",
+    mid: "bbc_swahili_tv",
+    loop_collection: "x",
+    specials_collection: "x",
+    live_brand: "x",
+    clip_language: "swahili",
+    language_tag: "p0368zpn",
+    language: "sw",
+    webcast_channels: [
+      "world_service_stream_05",
+      "world_service_stream_06",
+      "world_service_stream_07",
+      "world_service_stream_08",
+    ],
+  },
 };
 
 const configV2 = {
@@ -76,6 +93,23 @@ const configV2 = {
     clip_language: "marathi",
     language_tag: "x",
     language: "mr",
+    webcast_channels: [
+      "world_service_stream_05",
+      "world_service_stream_06",
+      "world_service_stream_07",
+      "world_service_stream_08",
+    ],
+  },
+  Swahili: {
+    serviceIDRef: "TVMAR01",
+    mid: "bbc_swahili_tv",
+    sid: "bbc_swahili_tv",
+    loop_collection: "p0510sbc",
+    specials_collection: "p0715nv4",
+    live_brand: "w13xttvl",
+    clip_language: "swahili",
+    language_tag: "p0368zpn",
+    language: "sw",
     webcast_channels: [
       "world_service_stream_05",
       "world_service_stream_06",

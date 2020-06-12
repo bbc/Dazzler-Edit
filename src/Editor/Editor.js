@@ -120,6 +120,11 @@ const services = {
     name: "Marathi",
     serviceIDRef: "TVMAR01",
   },
+  bbc_swahili_tv: {
+    sid: "bbc_swahili_tv",
+    name: "Swahili",
+    serviceIDRef: "TVMAR01",
+  },
 };
 
 var start = moment().utc().startOf("day");
@@ -747,7 +752,6 @@ class Editor extends React.Component {
                 </ExpansionPanelSummary>
 
                 <Episode
-                  flip={this.state.side}
                   availability={"available"}
                   mustBeAvailableBy={mustBeAvailableBy}
                   mustBeAvailableUntil={mustBeAvailableUntil}
