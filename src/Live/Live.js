@@ -14,17 +14,17 @@ import "moment-duration-format";
 import { TablePaginationActionsWrapped } from "../TablePaginationActions/TablePaginationActions";
 import { fetchWebcasts } from "../ScheduleDao/ScheduleDao";
 
-export const styles = theme => ({
+export const styles = (theme) => ({
   root: {
     width: "100%",
-    marginTop: theme.spacing(3)
+    marginTop: theme.spacing(3),
   },
   table: {
-    minWidth: 250
+    minWidth: 250,
   },
   tableWrapper: {
-    overflowX: "scroll"
-  }
+    overflowX: "scroll",
+  },
 });
 
 export class Live extends React.Component {
@@ -39,9 +39,7 @@ export class Live extends React.Component {
       rowsPerPage: 5,
       totalRows: 0,
       sid: "",
-      date: moment()
-        .utc()
-        .startOf("day")
+      date: moment().utc().startOf("day"),
     };
   }
 
@@ -51,16 +49,12 @@ export class Live extends React.Component {
 
   componentDidUpdate(prevProps) {
     //get request for webcasts
-    const start = moment(this.props.date)
-      .utc()
-      .format();
-    const end = moment(this.props.date)
-      .add(1, "days")
-      .utc()
-      .format();
+    const start = moment(this.props.date).utc().format();
+    const end = moment(this.props.date).add(1, "days").utc().format();
     if (
       this.state.page !== this.state.previousPage ||
-      this.props.date !== prevProps.date
+      this.props.date !== prevProps.date ||
+      this.state.sid !== this.props.sid
     ) {
       //console.log("have page %d want page %d", this.state.previousPage, this.state.page);
       fetchWebcasts(
@@ -76,7 +70,7 @@ export class Live extends React.Component {
             rows: schedule,
             totalRows: totalRows,
             page: this.state.page,
-            previousPage: this.state.page
+            previousPage: this.state.page,
           });
         }
       );
@@ -88,7 +82,7 @@ export class Live extends React.Component {
     this.setState({ page: page });
   };
 
-  handleChangeRowsPerPage = event => {
+  handleChangeRowsPerPage = (event) => {
     this.setState({ page: 0, rowsPerPage: event.target.value });
   };
 
@@ -131,7 +125,7 @@ export class Live extends React.Component {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {rows.map(row => (
+                {rows.map((row) => (
                   <TableRow key={row.pid}>
                     <TableCell component="th" scope="row">
                       <div className="tooltip">
@@ -168,7 +162,7 @@ export class Live extends React.Component {
                       rowsPerPage={rowsPerPage}
                       page={page}
                       SelectProps={{
-                        native: true
+                        native: true,
                       }}
                       onChangePage={this.handleChangePage}
                       onChangeRowsPerPage={this.handleChangeRowsPerPage}
@@ -186,7 +180,7 @@ export class Live extends React.Component {
 }
 
 Live.propTypes = {
-  classes: PropTypes.object.isRequired
+  classes: PropTypes.object.isRequired,
 };
 
 export default withStyles(styles)(Live);
