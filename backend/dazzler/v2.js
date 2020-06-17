@@ -286,6 +286,7 @@ const clip = async (req, res) => {
         },
         filter,
         { match: { "pips.clip.languages.language.$": config[sid].language } },
+        { match: { "pips.clip.media_type.value": "audio_video" } },
       ],
     },
   };
