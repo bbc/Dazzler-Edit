@@ -40,7 +40,7 @@ function availableQuery(mid, after, before, search) {
         filter,
         {
           range: {
-            "sonata.episode.availabilities.av_pv13_pa4.start": {
+            "availability_summary.av_pv13_pa4.start": {
               lt: after,
             },
           },
@@ -53,7 +53,7 @@ function availableQuery(mid, after, before, search) {
                   must_not: [
                     {
                       exists: {
-                        field: "sonata.episode.availabilities.av_pv13_pa4.end",
+                        field: "availability_summary.av_pv13_pa4.end",
                       },
                     },
                   ],
@@ -61,7 +61,7 @@ function availableQuery(mid, after, before, search) {
               },
               {
                 range: {
-                  "sonata.episode.availabilities.av_pv13_pa4.end": {
+                  "availability_summary.av_pv13_pa4.end": {
                     gte: before,
                   },
                 },
@@ -208,6 +208,7 @@ const episode = async (req, res) => {
     const items = [];
     result.hits.hits.forEach((hit) => {
       const se = hit._source.sonata.episode;
+      const av_s = hit._source.availability_summary
       const versions =
         hit._source.pips.programme_availability.available_versions
           .available_version;
@@ -215,12 +216,12 @@ const episode = async (req, res) => {
       const duration = moment.duration(version.duration.$);
 
       const availability = {
-        planned_start: se.availabilities
-          ? se.availabilities.av_pv13_pa4.start
+        planned_start: av_s
+          ? av_s.av_pv13_pa4.start
           : versions[0].availabilities.ondemand[0].availability.start,
-        expected_start: se.availabilities
+        expected_start: av_s
           ? moment
-              .utc(se.availabilities.av_pv13_pa4.start)
+              .utc(av_s.av_pv13_pa4.start)
               .add(duration)
               .add(10, "m")
               .format()
@@ -230,12 +231,18 @@ const episode = async (req, res) => {
               .add(10, "m")
               .format(),
       };
-      if (se.availabilities && se.availabilities.av_pv13_pa4.actual_start) {
-        availability.actual_start = se.availabilities.av_pv13_pa4.actual_start;
+      if(av_s && av_s.av_pv13_pa4.actual_start){
+        availability.actual_start = 
       }
-      if (se.availabilities && se.availabilities.av_pv13_pa4.end) {
+      if(av_s && av_s.av_pv13_pa4.end){
         availability.end = se.availabilities.av_pv13_pa4.end;
       }
+      // if (se.availabilities && se.availabilities.av_pv13_pa4.actual_start) {
+      //   availability.actual_start = se.availabilities.av_pv13_pa4.actual_start;
+      // }
+      // if (se.availabilities && se.availabilities.av_pv13_pa4.end) {
+      //   availability.end = se.availabilities.av_pv13_pa4.end;
+      // }
       const item = {
         entityType: "episode",
         release_date: se.release_date.date,
