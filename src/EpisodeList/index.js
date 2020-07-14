@@ -60,7 +60,7 @@ export default function EpisodeList({
       availability,
       mustBeAvailableBy,
       mustBeAvailableUntil,
-      page + 1, // nitro is one-based
+      page, // nitro is one-based
       rowsPerPage,
       sort,
       sortDirection,

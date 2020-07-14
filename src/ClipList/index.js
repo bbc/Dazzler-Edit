@@ -50,7 +50,7 @@ export default function ClipList({
     AssetDao.getClips(
       sid,
       type,
-      page + 1, // nitro is one-based
+      page, 
       rowsPerPage,
       sort,
       sort_direction,

@@ -11,7 +11,7 @@ class AssetDao {
     const params = {
       sid,
       type,
-      page: page + 1,
+      page,
       page_size: rowsPerPage,
       sort,
       sort_direction,

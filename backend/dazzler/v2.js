@@ -169,7 +169,8 @@ const episode = async (req, res) => {
   const size = req.query.page_size || 20;
   let from = 0;
   if (req.query.page) {
-    from = size * (req.query.page - 1);
+    from = size * req.query.page;
+    console.log("from is episode ", from)
   }
   const after = req.query.from || "1970-01-01T00:00:00Z";
   const before = req.query.to || moment.utc().add(1, "y");
@@ -269,7 +270,8 @@ const clip = async (req, res) => {
   const size = req.query.page_size || 20;
   let from = 0;
   if (req.query.page) {
-    from = size * (req.query.page - 1);
+    from = size * req.query.page;
+    console.log("from is episode ", from)
   }
   let filter;
   if (req.query.search !== "") {
