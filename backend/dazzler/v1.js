@@ -259,8 +259,9 @@ const saveEmergencyPlayList = async function (req, res) {
 
 const tva = async (req, res) => {
   const sid = req.query.sid || config.default_sid;
-
-  if (req.body.includes(`serviceIDRef="${config[sid].serviceIDRef}"`)) {
+  const serviceID = req.query.serviceID
+  console.log("serviceID is", serviceID)
+  if (req.body.includes(`serviceIDRef="${serviceID}"`)) {
     let user = "dazzler"; // assume local
     if (req.header("sslclientcertsubject")) {
       const subject = auth.parseSSLsubject(req);
@@ -275,8 +276,8 @@ const tva = async (req, res) => {
       res.status(403).send(message);
     }
   } else {
-    console.log("Hindi only please");
-    res.status(403).send("Hindi only please");
+    console.log(`${serviceID} only please`);
+    res.status(403).send(`${serviceID} only please`);
   }
 };
 
