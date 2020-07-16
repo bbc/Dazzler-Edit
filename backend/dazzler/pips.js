@@ -116,6 +116,8 @@ async function clearCollection(pid) {
       const r = await axios.post(base_uri+'/import/tva', data, config);
       return await xml2js(r.data);
     } catch(e) {
+      console.log("POST TVA ERROR");
+      console.log(e);
       return e;
     }
   }
