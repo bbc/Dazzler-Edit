@@ -151,7 +151,7 @@ class Editor extends React.Component {
     this.handleDayTo = this.handleDayTo.bind(this);
     this.handleDayFrom = this.handleDayFrom.bind(this);
     this.handleChangeMode = this.handleChangeMode.bind(this);
-    this.handleChange = this.handleChange.bind(this);
+    this.handleChangeLanguage = this.handleChangeLanguage.bind(this);
     this.handleRefresh = this.handleRefresh.bind(this);
     this.savePlaylist = this.savePlaylist.bind(this);
     this.clearSchedule = this.clearSchedule.bind(this);
@@ -168,10 +168,13 @@ class Editor extends React.Component {
       mode: "loop",
       scheduleInsertionPoint: 1,
       scheduleModified: false,
-      language: "Hindi",
+      language: localStorage.getItem("language") == null ? "Hindi" : localStorage.getItem("language"),
       configObj: {
         Hindi: {
           sid: "bbc_hindi_tv",
+        },
+        Marathi: {
+          sid: "bbc_marathi_tv",
         },
       },
       timeToFill: moment.duration(),
@@ -477,9 +480,10 @@ class Editor extends React.Component {
     );
   };
 
-  handleChange = (event) => {
+  handleChangeLanguage = (event) => {
     this.setState({ language: event.target.value }, () => {
-      const sid = this.state.configObj[this.state.language].sid;
+      localStorage.setItem("language", event.target.value)
+      // const sid = this.state.configObj[this.state.language].sid;
       this.reloadSchedule();
       this.handleRefresh();
     });
@@ -599,6 +603,7 @@ class Editor extends React.Component {
   // upcoming episodes need to be still available to the end of the day being scheduled
 
   render() {
+    console.log("lnaguage is ", this.state.language)
     let { from, to } = this.state;
     const mustBeAvailableBy = moment.utc().format();
     const mustBeAvailableUntil = moment
@@ -637,7 +642,7 @@ class Editor extends React.Component {
               labelId="demo-simple-select-outlined-label"
               style={{ fontSize: 17, color: "white" }}
               value={language}
-              onChange={this.handleChange}
+              onChange={this.handleChangeLanguage}
             >
               {languageList.map((item) => {
                 return (
@@ -735,6 +740,7 @@ class Editor extends React.Component {
                 </ExpansionPanelSummary>
 
                 <Live
+                  flip={this.state.side}
                   date={this.state.schedule.date.utc().format("YYYY-MM-DD")}
                   sid={this.state.configObj[language].sid}
                   handleClick={this.handleAddLive}
@@ -752,6 +758,7 @@ class Editor extends React.Component {
                 </ExpansionPanelSummary>
 
                 <Episode
+                  flip={this.state.side}
                   availability={"available"}
                   mustBeAvailableBy={mustBeAvailableBy}
                   mustBeAvailableUntil={mustBeAvailableUntil}
@@ -771,6 +778,7 @@ class Editor extends React.Component {
                 </ExpansionPanelSummary>
 
                 <Episode
+                  flip={this.state.side}
                   availability={"P1D"}
                   mustBeAvailableBy={upcomingMustBeAvailableBy}
                   mustBeAvailableUntil={upcomingMustBeAvailableUntil}
