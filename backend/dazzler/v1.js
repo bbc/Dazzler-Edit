@@ -9,6 +9,8 @@ const s3 = new aws.S3({
   apiVersion: "2006-03-01",
 });
 
+const valid_services = [ "TVMAR01", "TVHIND01"];
+
 let config;
 
 const schedule = async (req, res) => {
@@ -258,9 +260,13 @@ const saveEmergencyPlayList = async function (req, res) {
 };
 
 const tva = async (req, res) => {
-  const sid = req.query.sid || config.default_sid;
-
-  if (req.body.includes(`serviceIDRef="${config[sid].serviceIDRef}"`)) {
+  let valid_service = false;
+  valid_services.forEach((serviceID) => {
+    if (req.body.includes(`serviceIDRef="${serviceID}"`)) {
+      valid_service = true;
+    }
+  });
+  if (valid_service) {
     let user = "dazzler"; // assume local
     if (req.header("sslclientcertsubject")) {
       const subject = auth.parseSSLsubject(req);
@@ -275,8 +281,8 @@ const tva = async (req, res) => {
       res.status(403).send(message);
     }
   } else {
-    console.log("Hindi only please");
-    res.status(403).send("Hindi only please");
+    console.log('bad service id, only', valid_services, 'allowed');
+    res.status(403).send("Dazzler is only enabled for some services and this isn't one of them");
   }
 };
 
