@@ -824,6 +824,7 @@ class Editor extends React.Component {
                 onClear={this.clearLoop}
                 onUpload={this.uploadLoop}
                 onSave={this.saveLoop}
+                sid={this.state.configObj[language].sid}
               />
             </Box>
             <Box width="44%" flexGrow={1} flexDirection="column">
