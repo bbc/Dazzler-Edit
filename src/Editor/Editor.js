@@ -151,7 +151,7 @@ class Editor extends React.Component {
     this.handleDayTo = this.handleDayTo.bind(this);
     this.handleDayFrom = this.handleDayFrom.bind(this);
     this.handleChangeMode = this.handleChangeMode.bind(this);
-    this.handleChange = this.handleChange.bind(this);
+    this.handleChangeLanguage = this.handleChangeLanguage.bind(this);
     this.handleRefresh = this.handleRefresh.bind(this);
     this.savePlaylist = this.savePlaylist.bind(this);
     this.clearSchedule = this.clearSchedule.bind(this);
@@ -477,9 +477,9 @@ class Editor extends React.Component {
     );
   };
 
-  handleChange = (event) => {
+  handleChangeLanguage = (event) => {
     this.setState({ language: event.target.value }, () => {
-      const sid = this.state.configObj[this.state.language].sid;
+      // const sid = this.state.configObj[this.state.language].sid;
       this.reloadSchedule();
       this.handleRefresh();
     });
@@ -735,6 +735,7 @@ class Editor extends React.Component {
                 </ExpansionPanelSummary>
 
                 <Live
+                  flip={this.state.side}
                   date={this.state.schedule.date.utc().format("YYYY-MM-DD")}
                   sid={this.state.configObj[language].sid}
                   handleClick={this.handleAddLive}
@@ -752,6 +753,7 @@ class Editor extends React.Component {
                 </ExpansionPanelSummary>
 
                 <Episode
+                  flip={this.state.side}
                   availability={"available"}
                   mustBeAvailableBy={mustBeAvailableBy}
                   mustBeAvailableUntil={mustBeAvailableUntil}
@@ -771,6 +773,7 @@ class Editor extends React.Component {
                 </ExpansionPanelSummary>
 
                 <Episode
+                  flip={this.state.side}
                   availability={"P1D"}
                   mustBeAvailableBy={upcomingMustBeAvailableBy}
                   mustBeAvailableUntil={upcomingMustBeAvailableUntil}
