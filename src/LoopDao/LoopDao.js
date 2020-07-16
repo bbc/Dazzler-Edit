@@ -2,10 +2,11 @@ import axios from "axios";
 const URLPrefix =
   process.env.NODE_ENV === "development" ? "http://localhost:8080" : "";
 class LoopDao {
-  static backupPlaylist(loopItems, cb) {
+  static backupPlaylist(loopItems, sid, cb) {
+    const url = `${URLPrefix}/api/v1/loop`;
     axios({
       method: "post",
-      url: URLPrefix + "/api/v1/loop",
+      url: url + `?sid=${sid}`,
       data: loopItems
     })
       .then(response => {

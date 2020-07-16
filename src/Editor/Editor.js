@@ -168,10 +168,13 @@ class Editor extends React.Component {
       mode: "loop",
       scheduleInsertionPoint: 1,
       scheduleModified: false,
-      language: "Hindi",
+      language: localStorage.getItem("language") == null ? "Hindi" : localStorage.getItem("language"),
       configObj: {
         Hindi: {
           sid: "bbc_hindi_tv",
+        },
+        Marathi: {
+          sid: "bbc_marathi_tv",
         },
       },
       timeToFill: moment.duration(),
@@ -479,6 +482,7 @@ class Editor extends React.Component {
 
   handleChangeLanguage = (event) => {
     this.setState({ language: event.target.value }, () => {
+      localStorage.setItem("language", event.target.value)
       // const sid = this.state.configObj[this.state.language].sid;
       this.reloadSchedule();
       this.handleRefresh();
@@ -599,6 +603,7 @@ class Editor extends React.Component {
   // upcoming episodes need to be still available to the end of the day being scheduled
 
   render() {
+    console.log("lnaguage is ", this.state.language)
     let { from, to } = this.state;
     const mustBeAvailableBy = moment.utc().format();
     const mustBeAvailableUntil = moment
@@ -637,7 +642,7 @@ class Editor extends React.Component {
               labelId="demo-simple-select-outlined-label"
               style={{ fontSize: 17, color: "white" }}
               value={language}
-              onChange={this.handleChange}
+              onChange={this.handleChangeLanguage}
             >
               {languageList.map((item) => {
                 return (
@@ -827,6 +832,7 @@ class Editor extends React.Component {
                 onClear={this.clearLoop}
                 onUpload={this.uploadLoop}
                 onSave={this.saveLoop}
+                sid={this.state.configObj[language].sid}
               />
             </Box>
             <Box width="44%" flexGrow={1} flexDirection="column">
