@@ -122,7 +122,7 @@ const configV2 = {
 app.use(
   bodyParser.text({
     type: "*/*",
-    limit: "500kb",
+    limit: "50mb",
   })
 );
 
