@@ -95,6 +95,8 @@ class ScheduleObject {
       // splice in new items
       const newItems = [];
       for (let i = 0; i < numItemsToAdd; i++) {
+        console.log("here");
+        console.log("asset is ", assetsToAdd[i]);
         newItems.push({
           duration: assetsToAdd[i].duration,
           insertionType: assetsToAdd[i].insertionType,

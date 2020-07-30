@@ -35,7 +35,10 @@ import Loop from "../Loop/Loop";
 import PlatformDao from "../PlatformDao/PlatformDao";
 import {
   fetchSchedule,
+  fetchSchedulev2,
   saveSchedule,
+  saveS3Schedule,
+  saveScheduleV2,
   getLanguages,
 } from "../ScheduleDao/ScheduleDao";
 import TimeDisplay from "../TimeDisplay";
@@ -168,7 +171,10 @@ class Editor extends React.Component {
       mode: "loop",
       scheduleInsertionPoint: 1,
       scheduleModified: false,
-      language: localStorage.getItem("language") == null ? "Hindi" : localStorage.getItem("language"),
+      language:
+        localStorage.getItem("language") == null
+          ? "Hindi"
+          : localStorage.getItem("language"),
       configObj: {
         Hindi: {
           sid: "bbc_hindi_tv",
@@ -333,7 +339,7 @@ class Editor extends React.Component {
   handleDateChange = (date) => {
     try {
       const sid = this.state.configObj[this.state.language].sid;
-      fetchSchedule(sid, moment(date), (schedule) =>
+      fetchSchedulev2(sid, moment(date), (schedule) =>
         this.handleNewSchedule(schedule)
       );
     } catch (error) {
@@ -467,11 +473,12 @@ class Editor extends React.Component {
     //console.log('savePlaylist');
 
     // const This = this; // closure for callback
-    saveSchedule(
+    saveS3Schedule(
       services[this.state.configObj[this.state.language].sid].serviceIDRef,
       this.state.schedule.items,
+      this.state.schedule.date,
+      this.state.configObj[this.state.language].sid,
       () => {
-        console.log("closure", this);
         this.setState({ scheduleModified: false });
       },
       function (e) {
@@ -482,7 +489,7 @@ class Editor extends React.Component {
 
   handleChangeLanguage = (event) => {
     this.setState({ language: event.target.value }, () => {
-      localStorage.setItem("language", event.target.value)
+      localStorage.setItem("language", event.target.value);
       // const sid = this.state.configObj[this.state.language].sid;
       this.reloadSchedule();
       this.handleRefresh();
@@ -603,7 +610,7 @@ class Editor extends React.Component {
   // upcoming episodes need to be still available to the end of the day being scheduled
 
   render() {
-    console.log("lnaguage is ", this.state.language)
+    console.log("lnaguage is ", this.state.language);
     let { from, to } = this.state;
     const mustBeAvailableBy = moment.utc().format();
     const mustBeAvailableUntil = moment

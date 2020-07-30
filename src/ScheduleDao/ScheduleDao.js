@@ -103,6 +103,51 @@ class ScheduleDao {
       });
   }
 
+  static fetchSchedulev2(sid, date, cb) {
+    console.log("fsv2");
+    let formattedDate = moment(date).format("DD-MM-YYYY");
+    axios
+      .get(`${URLPrefix}/api/v2/schedulev2?sid=${sid}&date=${formattedDate}`)
+      .then((response) => {
+        console.log("FETCHED ", response);
+        let schedule = [];
+        if (response.data.total > 0) {
+          console.log("it is greater than 0");
+          response.data.item.forEach((item, index) => {
+            console.log("hey", index);
+            {
+              const asset = {
+                startTime: item.startTime,
+                title: item.asset.title,
+                duration: item.asset.duration,
+                versionPid: item.asset.vpid, //broadcast - broadcast of // version object  - version of  [version0.$.pid]
+                versionCrid: item.asset.versionCrid,
+                insertionType: item.asset.live ? "live" : "",
+                live: item.asset.live,
+                pid: item.asset.pid,
+                entityType: item.asset.entity_type,
+              };
+              console.log("asset is ", asset);
+              schedule.push({
+                title: asset.title,
+                startTime: moment(asset.startTime),
+                duration: asset.duration,
+                insertionType: asset.insertionType,
+                asset: asset,
+              });
+            }
+          });
+        }
+        const sched = new ScheduleObject(sid, date);
+        sched.addFixed(schedule);
+        sched.addGaps();
+        sched.sort();
+        cb(sched);
+      })
+      .catch((e) => {
+        console.log("we ahve an error", e);
+      });
+  }
   static window2Item(window) {
     const start = moment(window.scheduled_time.start);
     const end = moment(window.scheduled_time.end);
@@ -198,6 +243,124 @@ class ScheduleDao {
     }
   }
 
+  static saveS3Schedule(serviceIDRef, data, date, sid, cb, err) {
+    let formattedDate = moment(date).format("DD-MM-YYYY");
+    console.log("Date is", formattedDate);
+    let obj = {
+      serviceIDRef: serviceIDRef,
+      date: formattedDate,
+      items: [],
+    };
+    try {
+      //Get end time and remove sentinels and gaps
+      let s3Data = data.filter((e) => {
+        if (e.insertionType !== "sentinel" && e.insertionType !== "gap") {
+          var finish = moment(e.startTime).add(moment.duration(e.duration));
+          e.end = finish.toISOString();
+          return e;
+        }
+      });
+      obj.items = s3Data;
+      console.log("obj is", obj);
+      axios({
+        method: "post",
+        url: `${URLPrefix}/api/v2/s3save?sid=${sid}&date=${formattedDate}`,
+        data: obj,
+      })
+        .then((response) => {
+          cb();
+        })
+        .catch((error) => {
+          err(error);
+        });
+      ScheduleDao.episodeCheck(s3Data);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  static saveScheduleV2(serviceIDRef, data, date, sid, cb, err) {
+    let formattedDate = moment(date).format("DD-MM-YYYY");
+    let obj = {
+      serviceIDRef: serviceIDRef,
+      date: formattedDate,
+      items: [],
+    };
+    try {
+      data.map((item) => {
+        if (item.insertionType !== "sentinel" && item.insertionType !== "gap") {
+          obj.items.push({
+            broadcast: [
+              {
+                live: [
+                  {
+                    $: {
+                      value: item.asset.live,
+                    },
+                  },
+                ],
+                published_time: [
+                  {
+                    $: {
+                      duration: moment
+                        .duration(item.asset.duration)
+                        .format("hh:mm:ss"),
+                      start: moment(item.startTime).toISOString(),
+                      end: moment(item.startTime)
+                        .add(moment.duration(item.asset.duration))
+                        .toISOString(),
+                    },
+                  },
+                ],
+              },
+            ],
+            version: [
+              {
+                crid: [
+                  {
+                    $: {
+                      uri: item.asset.versionCrid,
+                    },
+                  },
+                ],
+                $: {
+                  pid: item.asset.pid,
+                },
+                entity_type: item.asset.entityType,
+                version_of: [
+                  {
+                    link: [
+                      {
+                        $: {
+                          pid: item.asset.pid,
+                        },
+                      },
+                    ],
+                  },
+                ],
+                title: [item.asset.title],
+              },
+            ],
+          });
+        }
+      });
+      console.log("obj is ", obj);
+      console.log("posting");
+      axios({
+        method: "post",
+        url: URLPrefix + `/api/v2/s3save?sid=${sid}&date=${formattedDate}`,
+        data: obj,
+      })
+        .then((response) => {
+          cb(response);
+        })
+        .catch((error) => {
+          err(error);
+        });
+    } catch (error) {
+      console.log(error);
+    }
+  }
   static episodeCheck(data) {
     try {
       //Filtering episodes and then extracting vpid
@@ -260,7 +423,10 @@ class ScheduleDao {
   }
 }
 export const fetchSchedule = ScheduleDao.fetchSchedule;
+export const fetchSchedulev2 = ScheduleDao.fetchSchedulev2;
 export const fetchWebcasts = ScheduleDao.fetchWebcasts;
 export const saveSchedule = ScheduleDao.saveSchedule;
+export const saveS3Schedule = ScheduleDao.saveS3Schedule;
+export const saveScheduleV2 = ScheduleDao.saveScheduleV2;
 export const getLanguages = ScheduleDao.getLanguages;
 export default ScheduleDao;

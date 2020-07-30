@@ -170,7 +170,7 @@ const episode = async (req, res) => {
   let from = 0;
   if (req.query.page) {
     from = size * req.query.page;
-    console.log("from is episode ", from)
+    console.log("from is episode ", from);
   }
   const after = req.query.from || "1970-01-01T00:00:00Z";
   const before = req.query.to || moment.utc().add(1, "y");
@@ -271,7 +271,7 @@ const clip = async (req, res) => {
   let from = 0;
   if (req.query.page) {
     from = size * req.query.page;
-    console.log("from is episode ", from)
+    console.log("from is episode ", from);
   }
   let filter;
   if (req.query.search !== "") {
@@ -469,11 +469,12 @@ const getEpisodeUri = async function (item) {
   }
 };
 
-const tvaS3 = async (req, res) => {
+const s3Save = async (req, res) => {
   const sid = req.query.sid || config.default_sid;
+  const date = req.query.date;
+  let user = "dazzler"; // assume local
 
-  if (req.body.includes(`serviceIDRef="${config[sid].serviceIDRef}"`)) {
-    let user = "dazzler"; // assume local
+  if (req.body.includes(config[sid].serviceIDRef)) {
     if (req.header("sslclientcertsubject")) {
       const subject = auth.parseSSLsubject(req);
       user = subject.emailAddress;
@@ -482,8 +483,8 @@ const tvaS3 = async (req, res) => {
       var params = {
         Body: req.body,
         Bucket: process.env.BUCKET,
-        Key: `${sid}/schedule/schedule.xml`,
-        ContentType: "application/xml",
+        Key: `${sid}/schedule/${date}-schedule.json`,
+        ContentType: "application/json",
       };
       try {
         await s3.putObject(params).promise();
@@ -499,11 +500,45 @@ const tvaS3 = async (req, res) => {
       res.status(403).send(message);
     }
   } else {
-    console.log("Hindi only please");
-    res.status(403).send("Hindi only please");
+    const message = user + " is not authorised to save schedules";
+    console.log(message);
+    res.status(403).send(message);
   }
 };
 
+const schedulev2 = async (req, res) => {
+  try {
+    const sid = req.query.sid || config.default_sid;
+    const date = req.query.date;
+    console.log("key is", `${sid}/schedule/${date}-schedule.json`);
+
+    var params = {
+      Bucket: process.env.BUCKET,
+      Key: `${sid}/schedule/${date}-schedule.json`,
+    };
+    const s = await s3
+      .getObject(params, (err, data) => {
+        if (err) {
+          console.log(err);
+        }
+      })
+      .promise();
+
+    const data = JSON.parse(s.Body.toString("utf8"));
+
+    console.log("data is ", data.items);
+    await res.json({
+      total: data.items.length,
+      item: data.items,
+      sid: sid,
+      date: date,
+    });
+  } catch (e) {
+    res.json({
+      total: 0,
+    });
+  }
+};
 module.exports = {
   init(app, configObject, configObject2) {
     config = configObject;
@@ -519,9 +554,10 @@ module.exports = {
     app.get("/api/v2/episode", episode);
     app.post("/api/v2/loop", saveEmergencyPlayList);
     app.post("/api/v2/queryepisode", queryepisode);
+    app.get("/api/v2/schedulev2", schedulev2);
 
     // app.put("/api/v2/loop", loop);
-    app.post("/api/v2/tvaS3", tvaS3);
+    app.post("/api/v2/s3save", s3Save);
     app.post("/api/v2/subscribe", subscribe);
   },
 };
