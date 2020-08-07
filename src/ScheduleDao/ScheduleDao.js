@@ -104,17 +104,13 @@ class ScheduleDao {
   }
 
   static fetchSchedulev2(sid, date, cb) {
-    console.log("fsv2");
-    let formattedDate = moment(date).format("DD-MM-YYYY");
+    let formattedDate = moment(date).format("YYYY-MM-DD");
     axios
       .get(`${URLPrefix}/api/v2/schedulev2?sid=${sid}&date=${formattedDate}`)
       .then((response) => {
-        console.log("FETCHED ", response);
         let schedule = [];
         if (response.data.total > 0) {
-          console.log("it is greater than 0");
           response.data.item.forEach((item, index) => {
-            console.log("hey", index);
             {
               const asset = {
                 startTime: item.startTime,
@@ -127,7 +123,7 @@ class ScheduleDao {
                 pid: item.asset.pid,
                 entityType: item.asset.entity_type,
               };
-              console.log("asset is ", asset);
+
               schedule.push({
                 title: asset.title,
                 startTime: moment(asset.startTime),
@@ -145,7 +141,7 @@ class ScheduleDao {
         cb(sched);
       })
       .catch((e) => {
-        console.log("we ahve an error", e);
+        console.log(e);
       });
   }
   static window2Item(window) {
@@ -177,7 +173,6 @@ class ScheduleDao {
   }
 
   static fetchWebcasts(sid, start, end, page, rowsPerPage, cb) {
-    console.log("SID IN FW IS ", sid);
     axios
       .get(
         `${URLPrefix}/api/v1/webcast?sid=${sid}&start=${start}&end=${end}&page=${
@@ -244,9 +239,9 @@ class ScheduleDao {
   }
 
   static saveS3Schedule(serviceIDRef, data, date, sid, cb, err) {
-    let formattedDate = moment(date).format("DD-MM-YYYY");
-    console.log("Date is", formattedDate);
+    let formattedDate = moment(date).format("YYYY-MM-DD");
     let obj = {
+      scheduleSource: "Dazzler",
       serviceIDRef: serviceIDRef,
       date: formattedDate,
       items: [],
@@ -261,7 +256,7 @@ class ScheduleDao {
         }
       });
       obj.items = s3Data;
-      console.log("obj is", obj);
+
       axios({
         method: "post",
         url: `${URLPrefix}/api/v2/s3save?sid=${sid}&date=${formattedDate}`,
@@ -280,7 +275,7 @@ class ScheduleDao {
   }
 
   static saveScheduleV2(serviceIDRef, data, date, sid, cb, err) {
-    let formattedDate = moment(date).format("DD-MM-YYYY");
+    let formattedDate = moment(date).format("YYYY-MM-DD");
     let obj = {
       serviceIDRef: serviceIDRef,
       date: formattedDate,
@@ -344,8 +339,7 @@ class ScheduleDao {
           });
         }
       });
-      console.log("obj is ", obj);
-      console.log("posting");
+
       axios({
         method: "post",
         url: URLPrefix + `/api/v2/s3save?sid=${sid}&date=${formattedDate}`,

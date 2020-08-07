@@ -9,7 +9,7 @@ const s3 = new aws.S3({
   apiVersion: "2006-03-01",
 });
 
-const valid_services = [ "TVMAR01", "TVHIND01"];
+const valid_services = ["TVMAR01", "TVHIND01"];
 
 let config;
 
@@ -281,8 +281,12 @@ const tva = async (req, res) => {
       res.status(403).send(message);
     }
   } else {
-    console.log('bad service id, only', valid_services, 'allowed');
-    res.status(403).send("Dazzler is only enabled for some services and this isn't one of them");
+    console.log("bad service id, only", valid_services, "allowed");
+    res
+      .status(403)
+      .send(
+        "Dazzler is only enabled for some services and this isn't one of them"
+      );
   }
 };
 

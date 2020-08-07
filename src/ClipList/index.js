@@ -50,12 +50,11 @@ export default function ClipList({
     AssetDao.getClips(
       sid,
       type,
-      page, 
+      page,
       rowsPerPage,
       sort,
       sort_direction,
       (items, total) => {
-        console.log("ITEMS IS", items);
         console.log("got clip data for", type, total, items);
         setRows(items);
         onPageLoaded(currentPage, currentRowsPerPage, total);

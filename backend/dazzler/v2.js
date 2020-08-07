@@ -473,7 +473,7 @@ const s3Save = async (req, res) => {
   const sid = req.query.sid || config.default_sid;
   const date = req.query.date;
   let user = "dazzler"; // assume local
-
+  console.log("received", req.body);
   if (req.body.includes(config[sid].serviceIDRef)) {
     if (req.header("sslclientcertsubject")) {
       const subject = auth.parseSSLsubject(req);
