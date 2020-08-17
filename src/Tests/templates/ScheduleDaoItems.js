@@ -51,3 +51,37 @@ export const configV2 = {
     ],
   },
 };
+
+export const schedulev2 = {
+  scheduleSource: "Dazzler",
+  serviceIDRef: "TVMAR01",
+  date: "2020-08-06",
+  items: [
+    {
+      duration: "PT20M",
+      insertionType: "",
+      title: "BBC à¤µà¤¿à¤¶à¥à¤µ - 15/07/2020 GMT",
+      asset: {
+        duration: "PT20M",
+        pid: "w3ct06bc",
+        uri: "crid://bbc.co.uk/w/3000525816",
+        release_date: "2020-07-15",
+        title: "BBC à¤µà¤¿à¤¶à¥à¤µ - 15/07/2020 GMT",
+        versionCrid: "crid://bbc.co.uk/w/4000567189",
+        vpid: "w4hqvs3h",
+        live: false,
+        insertionType: "",
+        entityType: "episode",
+        availability: {
+          planned_start: "2020-07-15T00:00:00Z",
+          expected_start: "2020-07-15T00:30:00Z",
+          actual_start: "2020-07-14T14:32:19.941Z",
+        },
+        status: "",
+        action: "",
+      },
+      startTime: "2020-08-06T00:00:00.000Z",
+      end: "2020-08-06T00:20:00.000Z",
+    },
+  ],
+};
