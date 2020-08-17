@@ -173,6 +173,8 @@ class ScheduleDao {
   }
 
   static fetchWebcasts(sid, start, end, page, rowsPerPage, cb) {
+    console.log("aa", start);
+
     axios
       .get(
         `${URLPrefix}/api/v1/webcast?sid=${sid}&start=${start}&end=${end}&page=${
@@ -180,6 +182,7 @@ class ScheduleDao {
         }&page_size=${rowsPerPage}`
       )
       .then((response) => {
+        console.log("BOOOM RESPONSE", JSON.stringify(response));
         const schedule = [];
         if (response.data.total > 0) {
           response.data.items.forEach((window) => {

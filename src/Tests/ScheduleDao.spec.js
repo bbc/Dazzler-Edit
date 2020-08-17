@@ -7,8 +7,13 @@ import {
   saveS3Schedule,
   saveScheduleV2,
   getLanguages,
+  fetchWebcasts,
 } from "../ScheduleDao/ScheduleDao";
-import { configV2, schedulev2 } from "./templates/ScheduleDaoItems";
+import {
+  configV2,
+  schedulev2,
+  webcastResponse,
+} from "./templates/ScheduleDaoItems";
 jest.mock("axios");
 describe("ScheduleDao", () => {
   test("testing getLanguages method fetches the list of all available languages", (done) => {
