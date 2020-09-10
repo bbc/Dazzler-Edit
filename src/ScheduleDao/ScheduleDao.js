@@ -150,6 +150,7 @@ class ScheduleDao {
     const duration = moment.duration(moment(end).diff(start));
     const item = {
       live: true,
+      entityType: "live",
       startTime: start,
       title: "Live programme at " + start.format("HH:mm:ss") + " local",
       duration: duration.toISOString(),
