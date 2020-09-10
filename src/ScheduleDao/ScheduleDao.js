@@ -154,6 +154,7 @@ class ScheduleDao {
       title: "Live programme at " + start.format("HH:mm:ss") + " local",
       duration: duration.toISOString(),
       captureChannel: window.service.sid,
+      pics_raw_data: window.service.sid,
       insertionType: "live",
     };
     for (let i = 0; i < window.window_of.length; i++) {
