@@ -516,14 +516,7 @@ const schedulev2 = async (req, res) => {
       Bucket: process.env.BUCKET,
       Key: `${sid}/schedule/${date}-schedule.json`,
     };
-    const s = await s3
-      .getObject(params, (err, data) => {
-        if (err) {
-          console.log(err);
-        }
-      })
-      .promise();
-
+    const s = await s3.getObject(params).promise();
     const data = JSON.parse(s.Body.toString("utf8"));
 
     console.log("data is ", data.items);
