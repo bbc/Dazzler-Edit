@@ -111,7 +111,6 @@ class ScheduleDao {
         let schedule = [];
         if (response.data.total > 0) {
           response.data.item.forEach((item, index) => {
-            {
               const asset = {
                 startTime: item.startTime,
                 title: item.asset.title,
@@ -131,7 +130,6 @@ class ScheduleDao {
                 insertionType: asset.insertionType,
                 asset: asset,
               });
-            }
           });
         }
         const sched = new ScheduleObject(sid, date);
@@ -197,8 +195,75 @@ class ScheduleDao {
         console.log(e);
       });
   }
-  static saveSchedule(serviceIDRef, data, cb, err) {
-    try {
+
+  function savableItem(item) {
+    return item.insertionType !== "sentinel" && item.insertionType !== "gap";
+  }
+
+  function simpleBroadcastForS3(item) {
+      const finish = moment(e.startTime).add(moment.duration(e.duration));
+      // ES6 return { ...item, end: finish.toISOString() };
+      item.end = finish.toISOString();
+      return item;
+  }
+
+  function SpwLikeBroadcast(item) {
+    return {
+      broadcast: [
+        {
+          live: [
+            {
+              $: {
+                value: item.asset.live,
+              },
+            },
+          ],
+          published_time: [
+            {
+              $: {
+                duration: moment
+                  .duration(item.asset.duration)
+                  .format("hh:mm:ss"),
+                start: moment(item.startTime).toISOString(),
+                end: moment(item.startTime)
+                  .add(moment.duration(item.asset.duration))
+                  .toISOString(),
+              },
+            },
+          ],
+        },
+      ],
+      version: [
+        {
+          crid: [
+            {
+              $: {
+                uri: item.asset.versionCrid,
+              },
+            },
+          ],
+          $: {
+            pid: item.asset.pid,
+          },
+          entity_type: item.asset.entityType,
+          version_of: [
+            {
+              link: [
+                {
+                  $: {
+                    pid: item.asset.pid,
+                  },
+                },
+              ],
+            },
+          ],
+          title: [item.asset.title],
+        },
+      ],
+    };
+  }
+
+  function tvaCompleteSchedule(data) {
       const first = data[0];
       const last = data[data.length - 1];
 
@@ -213,17 +278,19 @@ class ScheduleDao {
       let tva =
         tvaStart +
         "    <ProgramLocationTable>\n" +
-        `      <Schedule start="${start
-          .utc()
-          .format()}" end="${end
-          .utc()
-          .format()}" serviceIDRef="${serviceIDRef}">`;
+        `      <Schedule start="${start.format()}" end="${end.format()}" serviceIDRef="${serviceIDRef}">`;
       for (let i = 0; i < data.length; i++) {
-        if (data[i].insertionType === "gap") continue;
-        if (data[i].insertionType === "sentinel") continue;
-        tva += ScheduleDao.makeScheduleEvent(serviceIDRef, data[i]);
+        if (savableItem(data[i])) {
+          tva += ScheduleDao.makeScheduleEvent(serviceIDRef, data[i]);
+        }
       }
       tva += "\n      </Schedule>\n    </ProgramLocationTable>\n" + tvaEnd;
+      return tva;
+  }
+
+  static saveSchedule(serviceIDRef, data, cb, err) {
+    try {
+      const tva = tvaCompleteSchedule(data);
       console.log("tva", tva);
 
       axios({
@@ -244,24 +311,16 @@ class ScheduleDao {
   }
 
   static saveS3Schedule(serviceIDRef, data, date, sid, cb, err) {
-    let formattedDate = moment(date).format("YYYY-MM-DD");
-    let obj = {
+    // Get end time and remove sentinels and gaps
+    // ES6 const items = data.flatMap((e) => savableItem(e) ? s3Broadcast(e) : []);
+    const items = data.filter((item) => savableItem(item)).map((item) => s3Broadcast(item));
+    const obj = {
       scheduleSource: "Dazzler",
       serviceIDRef: serviceIDRef,
-      date: formattedDate,
-      items: [],
+      date: moment(date).format("YYYY-MM-DD"),
+      items,
     };
     try {
-      //Get end time and remove sentinels and gaps
-      let s3Data = data.filter((e) => {
-        if (e.insertionType !== "sentinel" && e.insertionType !== "gap") {
-          var finish = moment(e.startTime).add(moment.duration(e.duration));
-          e.end = finish.toISOString();
-          return e;
-        }
-      });
-      obj.items = s3Data;
-
       axios({
         method: "post",
         url: `${URLPrefix}/api/v2/s3save?sid=${sid}&date=${formattedDate}`,
@@ -273,78 +332,21 @@ class ScheduleDao {
         .catch((error) => {
           err(error);
         });
-      ScheduleDao.episodeCheck(s3Data);
+      episodeCheck(items);
     } catch (error) {
       console.log(error);
     }
   }
 
   static saveScheduleV2(serviceIDRef, data, date, sid, cb, err) {
-    let formattedDate = moment(date).format("YYYY-MM-DD");
-    let obj = {
+    // ES6 const items = data.flatMap(({item}) => savableItem(item) ? broadcast(item) : []);
+    const items = data.filter((item) => savableItem(item)).map((item) => broadcast(item));
+    const obj = {
       serviceIDRef: serviceIDRef,
-      date: formattedDate,
-      items: [],
+      date: moment(date).format("YYYY-MM-DD"),
+      items,
     };
     try {
-      data.map((item) => {
-        if (item.insertionType !== "sentinel" && item.insertionType !== "gap") {
-          obj.items.push({
-            broadcast: [
-              {
-                live: [
-                  {
-                    $: {
-                      value: item.asset.live,
-                    },
-                  },
-                ],
-                published_time: [
-                  {
-                    $: {
-                      duration: moment
-                        .duration(item.asset.duration)
-                        .format("hh:mm:ss"),
-                      start: moment(item.startTime).toISOString(),
-                      end: moment(item.startTime)
-                        .add(moment.duration(item.asset.duration))
-                        .toISOString(),
-                    },
-                  },
-                ],
-              },
-            ],
-            version: [
-              {
-                crid: [
-                  {
-                    $: {
-                      uri: item.asset.versionCrid,
-                    },
-                  },
-                ],
-                $: {
-                  pid: item.asset.pid,
-                },
-                entity_type: item.asset.entityType,
-                version_of: [
-                  {
-                    link: [
-                      {
-                        $: {
-                          pid: item.asset.pid,
-                        },
-                      },
-                    ],
-                  },
-                ],
-                title: [item.asset.title],
-              },
-            ],
-          });
-        }
-      });
-
       axios({
         method: "post",
         url: URLPrefix + `/api/v2/s3save?sid=${sid}&date=${formattedDate}`,
@@ -360,6 +362,7 @@ class ScheduleDao {
       console.log(error);
     }
   }
+
   static episodeCheck(data) {
     try {
       //Filtering episodes and then extracting vpid
