@@ -372,12 +372,12 @@ const languageServices = async function (req, res) {
 
 const queryepisode = async function (req, res) {
   try {
-    let episode = JSON.parse(req.body);
+    let episodes = JSON.parse(req.body);
 
     var s3params = {
       Bucket: process.env.BUCKET,
     };
-    episode.forEach((item, index) => {
+    episodes.forEach((item, index) => {
       console.log("CALLED", index);
       s3params.Key = `${item.asset.vpid}.mp4`;
       s3.headObject(s3params, function (err, data) {
@@ -460,8 +460,8 @@ const getEpisodeUri = async function (item) {
       );
     }
 
-    let wantedURI = result.filter((item) =>
-      item.filepath.uri.includes("av_pv13_pa4")
+    let wantedURI = result.filter((ondemand) =>
+    ondemand.filepath.uri.includes("av_pv13_pa4")
     )[0].filepath.uri;
     return wantedURI;
   } catch (error) {
