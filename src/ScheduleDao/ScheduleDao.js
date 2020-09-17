@@ -201,7 +201,7 @@ class ScheduleDao {
   }
 
   static simpleBroadcastForS3(item) {
-      const finish = moment(e.startTime).add(moment.duration(e.duration));
+      const finish = moment(item.startTime).add(moment.duration(item.duration));
       // ES6 return { ...item, end: finish.toISOString() };
       item.end = finish.toISOString();
       return item;
