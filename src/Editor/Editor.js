@@ -35,10 +35,7 @@ import Loop from "../Loop/Loop";
 import PlatformDao from "../PlatformDao/PlatformDao";
 import {
   fetchSchedule,
-  fetchSchedulev2,
   saveSchedule,
-  saveS3Schedule,
-  saveScheduleV2,
   getLanguages,
 } from "../ScheduleDao/ScheduleDao";
 import TimeDisplay from "../TimeDisplay";
@@ -339,7 +336,7 @@ class Editor extends React.Component {
   handleDateChange = (date) => {
     try {
       const sid = this.state.configObj[this.state.language].sid;
-      fetchSchedulev2(sid, moment(date), (schedule) =>
+      fetchSchedule(sid, moment(date), (schedule) =>
         this.handleNewSchedule(schedule)
       );
     } catch (error) {
@@ -473,7 +470,7 @@ class Editor extends React.Component {
     //console.log('savePlaylist');
 
     // const This = this; // closure for callback
-    saveS3Schedule(
+    saveSchedule(
       services[this.state.configObj[this.state.language].sid].serviceIDRef,
       this.state.schedule.items,
       this.state.schedule.date,

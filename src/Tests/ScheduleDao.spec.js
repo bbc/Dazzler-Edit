@@ -1,14 +1,6 @@
 import axios from "axios";
 
-import {
-  fetchSchedule,
-  fetchSchedulev2,
-  saveSchedule,
-  saveS3Schedule,
-  saveScheduleV2,
-  getLanguages,
-  fetchWebcasts,
-} from "../ScheduleDao/ScheduleDao";
+import { fetchSchedule, getLanguages } from "../ScheduleDao/ScheduleDao";
 import {
   configV2,
   schedulev2,
@@ -50,6 +42,6 @@ describe("ScheduleDao", () => {
       done();
     }
     axios.get.mockResolvedValue(obj);
-    fetchSchedulev2(sid, date, callback);
+    fetchSchedule(sid, date, callback);
   });
 });

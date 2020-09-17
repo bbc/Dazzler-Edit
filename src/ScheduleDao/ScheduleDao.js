@@ -49,7 +49,7 @@ class ScheduleDao {
     cb(new ScheduleObject(sid, date));
   }
 
-  static fetchSchedule(sid, date, cb) {
+  static fetchSPWSchedule(sid, date, cb) {
     //console.log('fetchSchedule', sid, date.format());
     axios
       .get(
@@ -103,7 +103,7 @@ class ScheduleDao {
       });
   }
 
-  static fetchSchedulev2(sid, date, cb) {
+  static fetchS3Schedule(sid, date, cb) {
     let formattedDate = moment(date).format("YYYY-MM-DD");
     axios
       .get(`${URLPrefix}/api/v2/schedulev2?sid=${sid}&date=${formattedDate}`)
@@ -111,25 +111,25 @@ class ScheduleDao {
         let schedule = [];
         if (response.data.total > 0) {
           response.data.item.forEach((item, index) => {
-              const asset = {
-                startTime: item.startTime,
-                title: item.asset.title,
-                duration: item.asset.duration,
-                versionPid: item.asset.vpid, //broadcast - broadcast of // version object  - version of  [version0.$.pid]
-                versionCrid: item.asset.versionCrid,
-                insertionType: item.asset.live ? "live" : "",
-                live: item.asset.live,
-                pid: item.asset.pid,
-                entityType: item.asset.entity_type,
-              };
+            const asset = {
+              startTime: item.startTime,
+              title: item.asset.title,
+              duration: item.asset.duration,
+              versionPid: item.asset.vpid, //broadcast - broadcast of // version object  - version of  [version0.$.pid]
+              versionCrid: item.asset.versionCrid,
+              insertionType: item.asset.live ? "live" : "",
+              live: item.asset.live,
+              pid: item.asset.pid,
+              entityType: item.asset.entity_type,
+            };
 
-              schedule.push({
-                title: asset.title,
-                startTime: moment(asset.startTime),
-                duration: asset.duration,
-                insertionType: asset.insertionType,
-                asset: asset,
-              });
+            schedule.push({
+              title: asset.title,
+              startTime: moment(asset.startTime),
+              duration: asset.duration,
+              insertionType: asset.insertionType,
+              asset: asset,
+            });
           });
         }
         const sched = new ScheduleObject(sid, date);
@@ -201,10 +201,10 @@ class ScheduleDao {
   }
 
   static simpleBroadcastForS3(item) {
-      const finish = moment(item.startTime).add(moment.duration(item.duration));
-      // ES6 return { ...item, end: finish.toISOString() };
-      item.end = finish.toISOString();
-      return item;
+    const finish = moment(item.startTime).add(moment.duration(item.duration));
+    // ES6 return { ...item, end: finish.toISOString() };
+    item.end = finish.toISOString();
+    return item;
   }
 
   static SpwLikeBroadcast(item) {
@@ -264,31 +264,37 @@ class ScheduleDao {
   }
 
   static tvaCompleteSchedule(data, serviceIDRef) {
-      const first = data[0];
-      const last = data[data.length - 1];
+    const first = data[0];
+    const last = data[data.length - 1];
 
-      const start = moment.utc(first.startTime, "HH:mm:ss");
-      const end = moment
-        .utc(last.startTime, "HH:mm:ss")
-        .add(moment.duration(last.duration));
-      const tvaStart =
-        '<TVAMain xmlns="urn:tva:metadata:2007" xmlns:mpeg7="urn:tva:mpeg7:2005" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xml:lang="en-GB" xsi:schemaLocation="urn:tva:metadata:2007 tva_metadata_3-1_v141.xsd">\n  <ProgramDescription>\n';
-      const tvaEnd = "  </ProgramDescription>\n</TVAMain>";
+    const start = moment.utc(first.startTime, "HH:mm:ss");
+    const end = moment
+      .utc(last.startTime, "HH:mm:ss")
+      .add(moment.duration(last.duration));
+    const tvaStart =
+      '<TVAMain xmlns="urn:tva:metadata:2007" xmlns:mpeg7="urn:tva:mpeg7:2005" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xml:lang="en-GB" xsi:schemaLocation="urn:tva:metadata:2007 tva_metadata_3-1_v141.xsd">\n  <ProgramDescription>\n';
+    const tvaEnd = "  </ProgramDescription>\n</TVAMain>";
 
-      let tva =
-        tvaStart +
-        "    <ProgramLocationTable>\n" +
-        `      <Schedule start="${start.format()}" end="${end.format()}" serviceIDRef="${serviceIDRef}">`;
-      for (let i = 0; i < data.length; i++) {
-        if (ScheduleDao.savableItem(data[i])) {
-          tva += ScheduleDao.makeScheduleEvent(serviceIDRef, data[i]);
-        }
+    let tva =
+      tvaStart +
+      "    <ProgramLocationTable>\n" +
+      `      <Schedule start="${start.format()}" end="${end.format()}" serviceIDRef="${serviceIDRef}">`;
+    for (let i = 0; i < data.length; i++) {
+      if (ScheduleDao.savableItem(data[i])) {
+        tva += ScheduleDao.makeScheduleEvent(serviceIDRef, data[i]);
       }
-      tva += "\n      </Schedule>\n    </ProgramLocationTable>\n" + tvaEnd;
-      return tva;
+    }
+    tva += "\n      </Schedule>\n    </ProgramLocationTable>\n" + tvaEnd;
+    return tva;
+  }
+  static fetchSchedule(sid, date, cb) {
+    ScheduleDao.fetchS3Schedule(sid, date, cb);
+  }
+  static saveSchedule(serviceIDRef, data, date, sid, cb, err) {
+    ScheduleDao.saveS3Schedule(serviceIDRef, data, date, sid, cb, err);
   }
 
-  static saveSchedule(serviceIDRef, data, cb, err) {
+  static saveSPWSchedule(serviceIDRef, data, cb, err) {
     try {
       const tva = ScheduleDao.tvaCompleteSchedule(data, serviceIDRef);
       console.log("tva", tva);
@@ -304,16 +310,19 @@ class ScheduleDao {
         .catch((error) => {
           err(error);
         });
-      ScheduleDao.episodeCheck(data);
+
+      ScheduleDao.episodeBackfillCheck(data);
     } catch (error) {
       err();
     }
   }
-
+  /* S3 schedule format can be found on ''add url''*/
   static saveS3Schedule(serviceIDRef, data, date, sid, cb, err) {
     // Get end time and remove sentinels and gaps
     // ES6 const items = data.flatMap((e) => savableItem(e) ? s3Broadcast(e) : []);
-    const items = data.filter((item) => ScheduleDao.savableItem(item)).map((item) => ScheduleDao.simpleBroadcastForS3(item));
+    const items = data
+      .filter((item) => ScheduleDao.savableItem(item))
+      .map((item) => ScheduleDao.simpleBroadcastForS3(item));
     const obj = {
       scheduleSource: "Dazzler",
       serviceIDRef: serviceIDRef,
@@ -332,38 +341,16 @@ class ScheduleDao {
         .catch((error) => {
           err(error);
         });
-      ScheduleDao.episodeCheck(items);
+      ScheduleDao.episodeBackfillCheck(items);
     } catch (error) {
       console.log(error);
     }
   }
-
-  static saveScheduleV2(serviceIDRef, data, date, sid, cb, err) {
-    // ES6 const items = data.flatMap(({item}) => ScheduleDao.savableItem(item) ? ScheduleDao.SpwLikeBroadcast(item) : []);
-    const items = data.filter((item) => ScheduleDao.savableItem(item)).map((item) => ScheduleDao.SpwLikeBroadcast(item));
-    const obj = {
-      serviceIDRef: serviceIDRef,
-      date: moment(date).format("YYYY-MM-DD"),
-      items,
-    };
-    try {
-      axios({
-        method: "post",
-        url: URLPrefix + `/api/v2/s3save?sid=${sid}&date=${obj.date}`,
-        data: obj,
-      })
-        .then((response) => {
-          cb(response);
-        })
-        .catch((error) => {
-          err(error);
-        });
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  static episodeCheck(data) {
+  /*Method checks to see if episode asset exists in s3 bucket
+   when playlist saved. If episode missing, backfill process
+   begins.
+   */
+  static episodeBackfillCheck(data) {
     try {
       //Filtering episodes and then extracting vpid
       let episode = new groupSet(
@@ -424,11 +411,9 @@ class ScheduleDao {
       `;
   }
 }
+
 export const fetchSchedule = ScheduleDao.fetchSchedule;
-export const fetchSchedulev2 = ScheduleDao.fetchSchedulev2;
 export const fetchWebcasts = ScheduleDao.fetchWebcasts;
 export const saveSchedule = ScheduleDao.saveSchedule;
-export const saveS3Schedule = ScheduleDao.saveS3Schedule;
-export const saveScheduleV2 = ScheduleDao.saveScheduleV2;
 export const getLanguages = ScheduleDao.getLanguages;
 export default ScheduleDao;
