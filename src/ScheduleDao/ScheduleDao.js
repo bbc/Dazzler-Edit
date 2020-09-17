@@ -196,18 +196,18 @@ class ScheduleDao {
       });
   }
 
-  function savableItem(item) {
+  static savableItem(item) {
     return item.insertionType !== "sentinel" && item.insertionType !== "gap";
   }
 
-  function simpleBroadcastForS3(item) {
+  static simpleBroadcastForS3(item) {
       const finish = moment(e.startTime).add(moment.duration(e.duration));
       // ES6 return { ...item, end: finish.toISOString() };
       item.end = finish.toISOString();
       return item;
   }
 
-  function SpwLikeBroadcast(item) {
+  static SpwLikeBroadcast(item) {
     return {
       broadcast: [
         {
@@ -263,7 +263,7 @@ class ScheduleDao {
     };
   }
 
-  function tvaCompleteSchedule(data) {
+  static tvaCompleteSchedule(data) {
       const first = data[0];
       const last = data[data.length - 1];
 
@@ -313,7 +313,7 @@ class ScheduleDao {
   static saveS3Schedule(serviceIDRef, data, date, sid, cb, err) {
     // Get end time and remove sentinels and gaps
     // ES6 const items = data.flatMap((e) => savableItem(e) ? s3Broadcast(e) : []);
-    const items = data.filter((item) => savableItem(item)).map((item) => s3Broadcast(item));
+    const items = data.filter((item) => ScheduleDao.savableItem(item)).map((item) => ScheduleDao.simpleBroadcastForS3(item));
     const obj = {
       scheduleSource: "Dazzler",
       serviceIDRef: serviceIDRef,
@@ -332,15 +332,15 @@ class ScheduleDao {
         .catch((error) => {
           err(error);
         });
-      episodeCheck(items);
+      ScheduleDao.episodeCheck(items);
     } catch (error) {
       console.log(error);
     }
   }
 
   static saveScheduleV2(serviceIDRef, data, date, sid, cb, err) {
-    // ES6 const items = data.flatMap(({item}) => savableItem(item) ? broadcast(item) : []);
-    const items = data.filter((item) => savableItem(item)).map((item) => broadcast(item));
+    // ES6 const items = data.flatMap(({item}) => ScheduleDao.savableItem(item) ? ScheduleDao.SpwLikeBroadcast(item) : []);
+    const items = data.filter((item) => ScheduleDao.savableItem(item)).map((item) => ScheduleDao.SpwLikeBroadcast(item));
     const obj = {
       serviceIDRef: serviceIDRef,
       date: moment(date).format("YYYY-MM-DD"),
