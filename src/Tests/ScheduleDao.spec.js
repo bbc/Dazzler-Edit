@@ -36,7 +36,6 @@ describe("ScheduleDao", () => {
     const sid = "bbc_marathi_tv";
     const date = "2020-08-06";
     function callback(data) {
-      console.log(data);
       expect(data.items[0].insertionType).toEqual("sentinel");
       expect(data.items[1].insertionType).toEqual("gap");
       done();
