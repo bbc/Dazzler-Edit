@@ -263,7 +263,7 @@ class ScheduleDao {
     };
   }
 
-  static tvaCompleteSchedule(data) {
+  static tvaCompleteSchedule(data, serviceIDRef) {
       const first = data[0];
       const last = data[data.length - 1];
 
@@ -280,7 +280,7 @@ class ScheduleDao {
         "    <ProgramLocationTable>\n" +
         `      <Schedule start="${start.format()}" end="${end.format()}" serviceIDRef="${serviceIDRef}">`;
       for (let i = 0; i < data.length; i++) {
-        if (savableItem(data[i])) {
+        if (ScheduleDao.savableItem(data[i])) {
           tva += ScheduleDao.makeScheduleEvent(serviceIDRef, data[i]);
         }
       }
@@ -290,7 +290,7 @@ class ScheduleDao {
 
   static saveSchedule(serviceIDRef, data, cb, err) {
     try {
-      const tva = tvaCompleteSchedule(data);
+      const tva = ScheduleDao.tvaCompleteSchedule(data, serviceIDRef);
       console.log("tva", tva);
 
       axios({
