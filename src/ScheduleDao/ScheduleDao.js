@@ -349,7 +349,7 @@ class ScheduleDao {
     try {
       axios({
         method: "post",
-        url: URLPrefix + `/api/v2/s3save?sid=${sid}&date=${formattedDate}`,
+        url: URLPrefix + `/api/v2/s3save?sid=${sid}&date=${obj.date}`,
         data: obj,
       })
         .then((response) => {
