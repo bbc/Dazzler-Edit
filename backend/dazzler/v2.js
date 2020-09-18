@@ -639,41 +639,51 @@ const getScheduleFromSPW = async (sid, date) => {
   } catch (e) {
     console.log(e);
   }
-  let items = schedule.item.filter((item) => item.broadcast.published_time.start.startsWith(date));
+  let items = schedule.item.filter((item) => {
+	const pt = item.broadcast[0].published_time[0].$;
+        if(pt) {
+		return pt.start.startsWith(date)
+ 	}
+        return false;
+  });
   items = items.map((item) => {
+    const broadcast = item.broadcast[0];
+    const version = item.version[0];
     const common = {
-      title: item.broadcast.title,
-      start: item.broadcast.published_time.start,
-      end: item.broadcast.published_time.start,
-      live: item.broadcast.live === 'true',
+      title: broadcast.title[0],
+      start: broadcast.published_time[0].$.start,
+      end: broadcast.published_time[0].$.end,
+      live: broadcast.live === 'true',
       broadcast_of: {
-        pid: item.broadcast.broadcast_of.link.pid,
-        crid: item.version.crid.uri,
+        pid: broadcast.broadcast_of[0].link[0].$.pid,
+        crid: version.crid[0].$.uri,
       },
     };
     if (common.live) {
       return {
-        ...common, source: item.broadcast.pics_raw_data,
+        ...common, source: broadcast.pics_raw_data,
       }
     }
     return {
       ...common,
       version: {
-        pid: item.version.pid,
-        version_of: item.version.version_of.link.pid,
-        duration: moment.duration(item.version.duration).toString(),
-        entity_type: item.broadcast.broadcast_of.link.rel.replace('pips-meta:', ''),
+        pid: version.$.pid,
+        version_of: version.version_of[0].link[0].$.pid,
+        duration: moment.duration(version.duration[0]).toString(),
+        entity_type: version.version_of[0].link[0].$.rel.replace('pips-meta:', ''),
       }
     };
   });
-  return {
+  const r = {
     scheduleSource: "PIPS",
     sid,     
-    serviceIDRef: schedule.service.bds_service_ref,
-    start: items[0].published_time.start,
-    end: items[items.length-1].published_time.end,
+    serviceIDRef: schedule.service[0].$.bds_service_ref,
+    start: items[0].start,
+    end: items[items.length-1].end,
     items,
   }; 
+  console.log(r);
+  return r;
 }
 
 const tvaScheduleEvent = (serviceIDRef, item) => {
@@ -723,12 +733,15 @@ const saveScheduleAsTVA = async (sid, data) => {
 const getSchedule = async (req, res) => {
   const sid = req.query.sid || config.default_sid;
   const date = req.query.date;
-  const source = process.env.SCHEDULE_SOURCE || 's3';
+  const source = process.env.SCHEDULE_SOURCE || 'pips';
+  let r;
   if (source === 'pips') {
-    res.json(getScheduleFromSPW(sid, date));
+    r = await getScheduleFromSPW(sid, date);
   } else {
-    res.json(getScheduleFromS3(sid, date));
+    r = await getScheduleFromS3(sid, date);
   }
+  console.log('getSchedule', JSON.stringify(r));
+  res.json(r);
 }
 
 const saveSchedule = async (req, res) => {
