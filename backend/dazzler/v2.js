@@ -4,7 +4,10 @@ const axios = require("axios");
 const https = require("https");
 const aws = require("aws-sdk");
 const auth = require("./auth");
+const spw = require("./spw");
+const pips = require("./pips");
 const notifications = require("./notifications");
+//const { resolve } = require("path");
 //node wont read ~\.aws\config     ???????
 aws.config.update({ region: "eu-west-1" });
 
@@ -532,12 +535,234 @@ const schedulev2 = async (req, res) => {
     });
   }
 };
+
+/*
+  sample schedule in flight:
+  {       
+    "scheduleSource": "Dazzler",
+    "sid": "bbc_hindi_tv",
+    "serviceIDRef": "TVHIND01",
+    "start": "2020-09-17T00:00:00.000Z",
+    "end": "2020-09-18T00:00:00.000Z",
+    "items": [ ... ]
+  }
+  writing a schedule can be items for part of a day, reading is always 24 hours
+  sample clip/episode schedule item
+  {
+      "title": "BBC DUNIYA SHOW",
+      "start": "2020-09-18T00:00:00.000Z",
+      "end": "2020-09-18T00:18:00.000Z",
+      "live": false,
+      "broadcast_of": { "pid": "p08rt28m", "crid": "crid..." },
+      "version": {
+        "pid": "p08rt28m",
+        "version_of": "p08rt28k",
+        "duration": "PT18M",
+        "entity_type": "clip"
+      }
+  }
+  sample live schedule item
+  {
+      "title": "BBC DUNIYA SHOW",
+      "start": "2020-09-18T00:00:00.000Z",
+      "end": "2020-09-18T00:18:00.000Z",
+      "live": true,
+      "broadcast_of": { "pid": "p08rt28m", "crid": "crid..." },
+      "source": "world_service_stream_08"
+  }
+*/
+
+const getScheduleFromS3 = async (sid, date) => {
+  const key = `${sid}/schedule/${date}-schedule.json`;
+  console.log("key is", key);
+  try {
+    const s = await s3.getObject({
+      Bucket: process.env.BUCKET,
+      Key: key,
+    }).promise();
+    return JSON.parse(s.Body.toString("utf8"));
+  } catch (e) {
+    console.log(e);
+  }
+  return {
+    scheduleSource: "Dazzler",
+    sid,
+    serviceIDRef: config[sid].serviceIDRef,
+    start: `${date}T00:00:00.000Z`,
+    end: moment.utc(date).add(1, 'days').format,
+    items: [ ],
+  };
+}
+
+const saveOneDayOfScheduleToS3 = async (sid, date, data) => {
+  var params = {
+    Body: data,
+    Bucket: process.env.BUCKET,
+    Key: `${sid}/schedule/${date}-schedule.json`,
+    ContentType: "application/json",
+  };
+  try {
+    await s3.putObject(params).promise();
+    const message = "Schedule Saved";
+    console.log(message);
+    return message;
+  } catch (e) {
+    console.log("error ", e);
+  }
+}
+
+const saveScheduleToS3 = async (sid, date, data) => {
+  if(data.items.length === 0) {
+    console.log(`empty schedule for ${sid} on ${date}, nothing saved`);
+    return;
+  }
+  const start = moment.utc(date).format();
+  const end = moment(start).add(1, 'days').format();
+  const first = data.items[0].start;
+  const last = data.items[data.items.length-1].end;
+  if (first === start && last === end) {
+    // full day schedule
+    return saveOneDayOfScheduleToS3(sid, date, data);
+  }
+  // partial - we need to merge this with the current schedule, if it exists
+  const existing = getScheduleFromS3(sid, date);
+  const before = existing.filter((item) => item.end < first );
+  const after = existing.filter((item) => item.start > last );
+  const schedule = { ...data, items: [...before, ...data.items, ...after] };
+  return saveOneDayOfScheduleToS3(sid, date, schedule);
+}
+
+const getScheduleFromSPW = async (sid, date) => {
+  let schedule = [];
+  try {
+    schedule = (await spw.request(sid, date));
+  } catch (e) {
+    console.log(e);
+  }
+  let items = schedule.item.filter((item) => item.broadcast.published_time.start.startsWith(date));
+  items = items.map((item) => {
+    const common = {
+      title: item.broadcast.title,
+      start: item.broadcast.published_time.start,
+      end: item.broadcast.published_time.start,
+      live: item.broadcast.live === 'true',
+      broadcast_of: {
+        pid: item.broadcast.broadcast_of.link.pid,
+        crid: item.version.crid.uri,
+      },
+    };
+    if (common.live) {
+      return {
+        ...common, source: item.broadcast.pics_raw_data,
+      }
+    }
+    return {
+      ...common,
+      version: {
+        pid: item.version.pid,
+        version_of: item.version.version_of.link.pid,
+        duration: moment.duration(item.version.duration).toString(),
+        entity_type: item.broadcast.broadcast_of.link.rel.replace('pips-meta:', ''),
+      }
+    };
+  });
+  return {
+    scheduleSource: "PIPS",
+    sid,     
+    serviceIDRef: schedule.service.bds_service_ref,
+    start: items[0].published_time.start,
+    end: items[items.length-1].published_time.end,
+    items,
+  }; 
+}
+
+const tvaScheduleEvent = (serviceIDRef, item) => {
+  const duration = item.duration;
+  const startDateTime = moment.utc(item.start);
+  let imi = "imi:dazzler:" + serviceIDRef + "/" + startDateTime.unix();
+  return ` 
+      <ScheduleEvent>
+        <Program crid="${item.broadcast_of.crid}"/>
+          <BroadcasterRawData>${item.live?item.source:''}</BroadcasterRawData>
+          <InstanceMetadataId>${imi}</InstanceMetadataId>
+          <InstanceDescription>
+            <AVAttributes>
+              <AudioAttributes><MixType href="urn:mpeg:mpeg7:cs:AudioPresentationCS:2001:3"><Name>Stereo</Name></MixType></AudioAttributes>
+              <VideoAttributes><AspectRatio>16:9</AspectRatio><Color type="color"/></VideoAttributes>
+            </AVAttributes>
+            <Title>${item.title}</Title>
+          </InstanceDescription>
+          <PublishedStartTime>${startDateTime
+            .utc()
+            .format()}</PublishedStartTime>
+          <PublishedDuration>${duration}</PublishedDuration>
+          <Live value="${item.live ? "true" : "false"}"/>
+          <Repeat value="${item.live ? "false" : "true"}"/>
+          <Free value="true"/>
+      </ScheduleEvent>
+    `;
+}
+
+const tvaSchedule = ({ serviceIDRef, start, end, items }) => {
+  let tva = '<TVAMain xmlns="urn:tva:metadata:2007" xmlns:mpeg7="urn:tva:mpeg7:2005" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xml:lang="en-GB" xsi:schemaLocation="urn:tva:metadata:2007 tva_metadata_3-1_v141.xsd">';
+  tva += '<ProgramDescription><ProgramLocationTable>';
+  tva += `<Schedule start="${start}" end="${end}" serviceIDRef="${serviceIDRef}">`;
+  for (let i = 0; i < items.length; i++) {
+    tva +=  tvaScheduleEvent(serviceIDRef, items[i]);
+  }
+  tva += '</Schedule></ProgramLocationTable></ProgramDescription></TVAMain>';
+  return tva;
+}
+
+const saveScheduleAsTVA = async (sid, data) => {
+  const tva = tvaSchedule(data);
+  const r = await pips.postTVA(tva);
+  return r.data;
+}
+
+const getSchedule = async (req, res) => {
+  const sid = req.query.sid || config.default_sid;
+  const date = req.query.date;
+  const source = process.env.SCHEDULE_SOURCE || 's3';
+  if (source === 'pips') {
+    res.json(getScheduleFromSPW(sid, date));
+  } else {
+    res.json(getScheduleFromS3(sid, date));
+  }
+}
+
+const saveSchedule = async (req, res) => {
+  const sid = req.query.sid || config.default_sid;
+  let user = 'dazzler';
+  if (req.header("sslclientcertsubject")) {
+    const subject = auth.parseSSLsubject(req);
+    user = subject.emailAddress;
+  }
+  if (auth.isAuthorised(user)) {
+    const destination = process.env.SCHEDULE_DESTINATION || 's3';
+    let response;
+    if (destination === 'pips') {
+      response = saveScheduleAsTVA(sid, req.body);
+    } else {
+      response = saveScheduleToS3(sid, req.body);
+    }
+    if (response) {
+      res.json(response);
+    } else {
+      res.status(404).send("error");
+    }
+  } else {
+    const message = `${user} is not authorised to save ${sid} schedules`;
+    console.log(message);
+    res.status(403).send(message);
+  }
+}
+
 module.exports = {
   init(app, configObject, configObject2) {
     config = configObject;
     configV2 = configObject2;
     // app.get("/api/v2/user", user);
-    // app.get("/api/v2/schedule", schedule);
     // app.get("/api/v2/broadcast", broadcast);
     // app.get("/api/v2/webcast", webcast);
     // app.get("/api/v2/loop", loop);
@@ -549,6 +774,9 @@ module.exports = {
     app.post("/api/v2/queryepisode", queryepisode);
     app.get("/api/v2/schedulev2", schedulev2);
 
+    app.get("/api/v2/schedule", getSchedule);
+    app.post("/api/v2/schedule", saveSchedule);
+ 
     // app.put("/api/v2/loop", loop);
     app.post("/api/v2/s3save", s3Save);
     app.post("/api/v2/subscribe", subscribe);
