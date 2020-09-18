@@ -596,7 +596,7 @@ const getScheduleFromS3 = async (sid, date) => {
 
 const saveOneDayOfScheduleToS3 = async (sid, date, data) => {
   var params = {
-    Body: data,
+    Body: JSON.stringify(data),
     Bucket: process.env.BUCKET,
     Key: `${sid}/schedule/${date}-schedule.json`,
     ContentType: "application/json",
@@ -605,18 +605,19 @@ const saveOneDayOfScheduleToS3 = async (sid, date, data) => {
     await s3.putObject(params).promise();
     const message = "Schedule Saved";
     console.log(message);
-    return message;
+    return data;
   } catch (e) {
     console.log("error ", e);
   }
 }
 
-const saveScheduleToS3 = async (sid, date, data) => {
+const saveScheduleToS3 = async (data) => {
+  const sid = data.sid;
   if(data.items.length === 0) {
     console.log(`empty schedule for ${sid} on ${date}, nothing saved`);
     return;
   }
-  const start = moment.utc(date).format();
+  const start = moment.utc(data.start).startOf('day').format();
   const end = moment(start).add(1, 'days').format();
   const first = data.items[0].start;
   const last = data.items[data.items.length-1].end;
@@ -624,12 +625,17 @@ const saveScheduleToS3 = async (sid, date, data) => {
     // full day schedule
     return saveOneDayOfScheduleToS3(sid, date, data);
   }
+  if (last > end) {
+    // TODO more than one day
+  } else {
   // partial - we need to merge this with the current schedule, if it exists
-  const existing = getScheduleFromS3(sid, date);
-  const before = existing.filter((item) => item.end < first );
-  const after = existing.filter((item) => item.start > last );
+  const date = moment.utc(start).format('YYYY-MM-DD');
+  const existing = await getScheduleFromS3(sid, date);
+  const before = existing.items.filter((item) => item.end < first );
+  const after = existing.items.filter((item) => item.start > last );
   const schedule = { ...data, items: [...before, ...data.items, ...after] };
   return saveOneDayOfScheduleToS3(sid, date, schedule);
+  }
 }
 
 const getScheduleFromSPW = async (sid, date) => {
@@ -724,7 +730,7 @@ const tvaSchedule = ({ serviceIDRef, start, end, items }) => {
   return tva;
 }
 
-const saveScheduleAsTVA = async (sid, data) => {
+const saveScheduleAsTVA = async (data) => {
   const tva = tvaSchedule(data);
   const r = await pips.postTVA(tva);
   return r.data;
@@ -733,7 +739,7 @@ const saveScheduleAsTVA = async (sid, data) => {
 const getSchedule = async (req, res) => {
   const sid = req.query.sid || config.default_sid;
   const date = req.query.date;
-  const source = process.env.SCHEDULE_SOURCE || 'pips';
+  const source = process.env.SCHEDULE_SOURCE || 's3';
   let r;
   if (source === 'pips') {
     r = await getScheduleFromSPW(sid, date);
@@ -755,14 +761,14 @@ const saveSchedule = async (req, res) => {
     const destination = process.env.SCHEDULE_DESTINATION || 's3';
     let response;
     if (destination === 'pips') {
-      response = saveScheduleAsTVA(sid, req.body);
+      response = saveScheduleAsTVA(JSON.parse(req.body));
     } else {
-      response = saveScheduleToS3(sid, req.body);
+      response = saveScheduleToS3(JSON.parse(req.body));
     }
     if (response) {
       res.json(response);
     } else {
-      res.status(404).send("error");
+      res.status(500).send("error");
     }
   } else {
     const message = `${user} is not authorised to save ${sid} schedules`;
