@@ -17,8 +17,8 @@ const schedule = async (req, res) => {
   try {
     const sid = req.query.sid || config.default_sid;
     const date = req.query.date;
-    const schedule = await spw.request(sid, date);
-    const s = schedule.item;
+    const r = await spw.request(sid, date);
+    const s = r.item;
     let pids = [];
     for (let i = 0; i < s.length; i++) {
       const link = s[i].version[0].version_of[0].link[0].$;
@@ -355,7 +355,7 @@ function add_version_crids_to_episodes(results) {
 module.exports = {
   init(app, configObject, config2Object) {
     config = configObject;
-    configV2 = config2Object;
+    // configV2 = config2Object;
     app.get("/api/v1/user", auth.user);
     app.get("/api/v1/schedule", schedule);
     app.get("/api/v1/broadcast", broadcast);
