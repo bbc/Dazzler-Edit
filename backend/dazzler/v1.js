@@ -27,7 +27,11 @@ const schedule = async (req, res) => {
       }
     }
     if (pids.length > 0) {
-      await nitro.addClips(s, pids);
+      var i,j,chunk = 50;
+      for (i=0,j=pids.length; i<j; i+=chunk) {
+          const temparray = pids.slice(i,i+chunk);
+          await nitro.addClips(s, temparray);
+      }
     }
     // work around circular dependencies
     let o = {};
@@ -281,11 +285,11 @@ const tva = async (req, res) => {
       res.status(403).send(message);
     }
   } else {
-    console.log("bad service id, only", valid_services, "allowed");
+    console.log('bad service id, only', valid_services, 'allowed');
     res
       .status(403)
       .send(
-        "Dazzler is only enabled for some services and this isn't one of them"
+        'Dazzler is only enabled for some services and this isn\'t one of them'
       );
   }
 };
