@@ -611,14 +611,25 @@ const saveOneDayOfScheduleToS3 = async (sid, date, data) => {
   }
 }
 
+const mergeOneDayOfScheduleToS3 = async (sid, date, data) => {
+  const first = data.items[0].start;
+  const last = data.items[data.items.length-1].end;
+  const existing = await getScheduleFromS3(sid, date);
+  const before = existing.items.filter((item) => item.end < first );
+  const after = existing.items.filter((item) => item.start > last );
+  const schedule = { ...data, items: [...before, ...data.items, ...after] };
+  return saveOneDayOfScheduleToS3(sid, date, schedule);
+}
+
 const saveScheduleToS3 = async (data) => {
   const sid = data.sid;
+  const start = moment.utc(data.start).startOf('day').format();
+  const end = moment(start).add(1, 'days').format();
+  const date = moment.utc(start).format('YYYY-MM-DD');
   if(data.items.length === 0) {
     console.log(`empty schedule for ${sid} on ${date}, nothing saved`);
     return;
   }
-  const start = moment.utc(data.start).startOf('day').format();
-  const end = moment(start).add(1, 'days').format();
   const first = data.items[0].start;
   const last = data.items[data.items.length-1].end;
   if (first === start && last === end) {
@@ -626,15 +637,23 @@ const saveScheduleToS3 = async (data) => {
     return saveOneDayOfScheduleToS3(sid, date, data);
   }
   if (last > end) {
-    // TODO more than one day
+    // more than one day
+    const day = moment.utc(date);
+    const lastday = moment.utc(last).startOf('day');
+    while (day <= lastday) {
+      const d = day.format('YYYY-MM-DD');
+      const items = data.items.filter((item) => item.start.startsWith(d));
+      await mergeOneDayOfScheduleToS3(sid, d, {
+        ...data,
+        start: items[0].start,
+        end: items[items.length-1].end,
+        items,
+      });
+      day.add(1, 'days');
+    }
   } else {
-  // partial - we need to merge this with the current schedule, if it exists
-  const date = moment.utc(start).format('YYYY-MM-DD');
-  const existing = await getScheduleFromS3(sid, date);
-  const before = existing.items.filter((item) => item.end < first );
-  const after = existing.items.filter((item) => item.start > last );
-  const schedule = { ...data, items: [...before, ...data.items, ...after] };
-  return saveOneDayOfScheduleToS3(sid, date, schedule);
+    // partial - we need to merge this with the current schedule, if it exists
+    return mergeOneDayOfScheduleToS3(sid, date, data);
   }
 }
 
