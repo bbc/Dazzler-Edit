@@ -342,7 +342,6 @@ class ScheduleObject {
       }
     }
 
-    console.log("SIS", s);
     // add gap records
     let gaps = [];
     for (let i = 0; i < s.length - 1; i++) {

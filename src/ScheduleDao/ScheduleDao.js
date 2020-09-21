@@ -44,52 +44,38 @@ class ScheduleDao {
     // }
     return title;
   }
-
-  static fetchSchedule1(sid, date, cb) {
-    cb(new ScheduleObject(sid, date));
-  }
-
   static fetchSchedule(sid, date, cb) {
-    //console.log('fetchSchedule', sid, date.format());
+    let formattedDate = moment(date).format("YYYY-MM-DD");
     axios
-      .get(
-        `${URLPrefix}/api/v1/schedule?sid=${sid}&date=${date
-          .utc()
-          .startOf("day")
-          .format("YYYY-MM-DD")}`
-      )
+      .get(`${URLPrefix}/api/v2/schedule?sid=${sid}&date=${formattedDate}`)
       .then((response) => {
+        console.log("response is", response);
         let schedule = [];
-        if (response.data.total > 0) {
-          response.data.item.forEach((item, index) => {
-            if (
-              // moment(date).format("DD-MM-YYYY") ===
-              // moment(item.broadcast[0].published_time[0].$.start).format(
-              //   "DD-MM-YYYY"
-              // )
-              1 == 1
-            ) {
-              const broadcast = item.broadcast[0];
-              const published_time = broadcast.published_time[0].$;
-              const live = broadcast.live[0].$.value === "true";
-              const asset = {
-                title: ScheduleDao.getTitle(item, index),
-                duration: moment
-                  .duration(published_time.duration)
-                  .toISOString(),
-                versionPid: item.version[0].$.pid, //broadcast - broadcast of // version object  - version of  [version0.$.pid]
-                versionCrid: item.version[0].crid[0].$.uri,
-                insertionType: live ? "live" : "",
-                pid: item.version[0].version_of[0].link[0].$.pid,
-              };
-              schedule.push({
-                title: asset.title,
-                startTime: moment(published_time.start),
-                duration: asset.duration,
-                insertionType: asset.insertionType,
-                asset: asset,
-              });
-            }
+        if (response.data.items.length > 0) {
+          response.data.items.forEach((item, index) => {
+            console.log("item is ", item);
+            const asset = {
+              startTime: item.start,
+              title: item.title,
+              duration: item.version.duration,
+              versionPid: item.version.pid, //broadcast - broadcast of // version object  - version of  [version0.$.pid]
+              versionCrid: item.broadcast_of.crid,
+              insertionType: item.live ? "live" : "",
+              live: item.live,
+              pid: item.broadcast_of.pid,
+              entityType: item.version.entity_type,
+            };
+
+            console.log("asset is,", asset);
+
+            schedule.push({
+              title: asset.title,
+              startTime: moment(asset.startTime),
+              duration: asset.duration,
+              insertionType: asset.insertionType,
+              asset: asset,
+            });
+            console.log("schedule is ", schedule);
           });
         }
         const sched = new ScheduleObject(sid, date);
@@ -102,17 +88,18 @@ class ScheduleDao {
         console.log(e);
       });
   }
-
   static window2Item(window) {
     const start = moment(window.scheduled_time.start);
     const end = moment(window.scheduled_time.end);
     const duration = moment.duration(moment(end).diff(start));
     const item = {
       live: true,
+      entityType: "live",
       startTime: start,
       title: "Live programme at " + start.format("HH:mm:ss") + " local",
       duration: duration.toISOString(),
       captureChannel: window.service.sid,
+      pics_raw_data: window.service.sid,
       insertionType: "live",
     };
     for (let i = 0; i < window.window_of.length; i++) {
@@ -132,7 +119,6 @@ class ScheduleDao {
   }
 
   static fetchWebcasts(sid, start, end, page, rowsPerPage, cb) {
-    console.log("SID IN FW IS ", sid);
     axios
       .get(
         `${URLPrefix}/api/v1/webcast?sid=${sid}&start=${start}&end=${end}&page=${
@@ -140,6 +126,7 @@ class ScheduleDao {
         }&page_size=${rowsPerPage}`
       )
       .then((response) => {
+        console.log("BOOOM RESPONSE", JSON.stringify(response));
         const schedule = [];
         if (response.data.total > 0) {
           response.data.items.forEach((window) => {
@@ -152,53 +139,67 @@ class ScheduleDao {
         console.log(e);
       });
   }
-  static saveSchedule(serviceIDRef, data, cb, err) {
+
+  static savableItem(item) {
+    return item.insertionType !== "sentinel" && item.insertionType !== "gap";
+  }
+
+  static createBroadcastItem(item) {
+    console.log("item is ", item);
+    const finish = moment(item.startTime).add(moment.duration(item.duration));
+    const newItem = {
+      title: item.title,
+      start: item.startTime,
+      end: finish,
+      live: item.asset.live,
+      broadcast_of: { pid: item.asset.vpid, crid: item.asset.versionCrid },
+      version: {
+        pid: item.asset.vpid,
+        version_of: item.asset.pid,
+        duration: item.asset.duration,
+        entity_type: item.asset.entityType,
+      },
+    };
+
+    return newItem;
+  }
+
+  static saveSchedule(serviceIDRef, data, date, sid, cb, err) {
+    // Get end time and remove sentinels and gaps
+    // ES6 const items = data.flatMap((e) => savableItem(e) ? s3Broadcast(e) : []);
+    const items = data
+      .filter((item) => ScheduleDao.savableItem(item))
+      .map((item) => ScheduleDao.createBroadcastItem(item));
+    const obj = {
+      scheduleSource: "Dazzler",
+      sid: sid,
+      serviceIDRef: serviceIDRef,
+      start: moment(date).toISOString(),
+      end: moment(date).add(1, "day").toISOString(),
+      items,
+    };
     try {
-      const first = data[0];
-      const last = data[data.length - 1];
-
-      const start = moment.utc(first.startTime, "HH:mm:ss");
-      const end = moment
-        .utc(last.startTime, "HH:mm:ss")
-        .add(moment.duration(last.duration));
-      const tvaStart =
-        '<TVAMain xmlns="urn:tva:metadata:2007" xmlns:mpeg7="urn:tva:mpeg7:2005" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xml:lang="en-GB" xsi:schemaLocation="urn:tva:metadata:2007 tva_metadata_3-1_v141.xsd">\n  <ProgramDescription>\n';
-      const tvaEnd = "  </ProgramDescription>\n</TVAMain>";
-
-      let tva =
-        tvaStart +
-        "    <ProgramLocationTable>\n" +
-        `      <Schedule start="${start
-          .utc()
-          .format()}" end="${end
-          .utc()
-          .format()}" serviceIDRef="${serviceIDRef}">`;
-      for (let i = 0; i < data.length; i++) {
-        if (data[i].insertionType === "gap") continue;
-        if (data[i].insertionType === "sentinel") continue;
-        tva += ScheduleDao.makeScheduleEvent(serviceIDRef, data[i]);
-      }
-      tva += "\n      </Schedule>\n    </ProgramLocationTable>\n" + tvaEnd;
-      console.log("tva", tva);
-
       axios({
         method: "post",
-        url: URLPrefix + "/api/v1/tva",
-        data: tva,
+        url: `${URLPrefix}/api/v2/schedule?sid=${sid}`,
+        data: obj,
       })
         .then((response) => {
-          cb(response);
+          cb();
         })
         .catch((error) => {
           err(error);
         });
-      ScheduleDao.episodeCheck(data);
+      ScheduleDao.episodeBackfillCheck(items);
     } catch (error) {
-      err();
+      console.log(error);
     }
   }
-
-  static episodeCheck(data) {
+  /*Method checks to see if episode asset exists in s3 bucket
+   when playlist saved. If episode missing, backfill process
+   begins.
+   */
+  static episodeBackfillCheck(data) {
     try {
       //Filtering episodes and then extracting vpid
       let episode = new groupSet(
@@ -227,38 +228,8 @@ class ScheduleDao {
       console.error("FAILURE", error);
     }
   }
-  static makeScheduleEvent(serviceIDRef, broadcast) {
-    const duration = broadcast.duration;
-    const startDateTime = moment.utc(broadcast.startTime);
-    let imi = "imi:dazzler:" + serviceIDRef + "/" + startDateTime.unix();
-
-    return ` 
-        <ScheduleEvent>
-          <Program crid="${broadcast.asset.versionCrid}"/>
-            <BroadcasterRawData>${
-              broadcast.asset.captureChannel
-                ? broadcast.asset.captureChannel
-                : ""
-            }</BroadcasterRawData>
-            <InstanceMetadataId>${imi}</InstanceMetadataId>
-            <InstanceDescription>
-              <AVAttributes>
-                <AudioAttributes><MixType href="urn:mpeg:mpeg7:cs:AudioPresentationCS:2001:3"><Name>Stereo</Name></MixType></AudioAttributes>
-                <VideoAttributes><AspectRatio>16:9</AspectRatio><Color type="color"/></VideoAttributes>
-              </AVAttributes>
-              <Title>${broadcast.title}</Title>
-            </InstanceDescription>
-            <PublishedStartTime>${startDateTime
-              .utc()
-              .format()}</PublishedStartTime>
-            <PublishedDuration>${duration}</PublishedDuration>
-            <Live value="${broadcast.asset.live ? "true" : "false"}"/>
-            <Repeat value="false"/>
-            <Free value="true"/>
-        </ScheduleEvent>
-      `;
-  }
 }
+
 export const fetchSchedule = ScheduleDao.fetchSchedule;
 export const fetchWebcasts = ScheduleDao.fetchWebcasts;
 export const saveSchedule = ScheduleDao.saveSchedule;

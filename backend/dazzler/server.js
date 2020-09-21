@@ -35,7 +35,7 @@ const config = {
     mid: "bbc_marathi_tv",
     loop_collection: "p0510sbc",
     specials_collection: "p0715nv4",
-    live_brand: "w13xttvl",
+    live_brand: "w13xttr2",
     clip_language: "marathi",
     language_tag: "x",
     language: "mr",

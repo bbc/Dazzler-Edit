@@ -8,16 +8,16 @@ class AssetDao {
   static get(path, params, cb) {
     axios
       .get(`${URLPrefix}/api/v1/${path}`, { params })
-      .then(response => {
+      .then((response) => {
         const items = [];
         if (response.data.items) {
-          response.data.items.forEach(clip => {
+          response.data.items.forEach((clip) => {
             items.push(this.clip2Item(clip));
           });
         }
         cb(items, response.data.total);
       })
-      .catch(e => {
+      .catch((e) => {
         console.log(e);
       });
   }
@@ -31,7 +31,7 @@ class AssetDao {
       sort_direction,
       page,
       page_size: rowsPerPage,
-      search: search
+      search: search,
     };
     this.get("clip", params, cb);
   }
@@ -54,9 +54,9 @@ class AssetDao {
     const url = `${URLPrefix}/api/v1/episode?sid=${sid}&page=${page}&page_size=${rowsPerPage}&availability=${availability}&sort=${sort}&sort_direction=${sort_direction}`;
     axios
       .get(url)
-      .then(response => {
+      .then((response) => {
         const items = [];
-        response.data.items.forEach(episode => {
+        response.data.items.forEach((episode) => {
           const version = episode.available_versions.version[0]; // TODO pick a version
           items.push({
             title: episode.title || episode.presentation_title,
@@ -67,12 +67,12 @@ class AssetDao {
             insertionType: "",
             versionCrid: version.crid,
             vpid: version.pid,
-            entityType: "episode"
+            entityType: "episode",
           });
         });
         cb(items, response.data.total);
       })
-      .catch(e => {
+      .catch((e) => {
         console.log(url);
         console.log(e);
       });
@@ -88,7 +88,7 @@ class AssetDao {
       versionCrid: version.crid,
       pid: clip.pid,
       vpid: version.pid,
-      entityType: "clip"
+      entityType: "clip",
     };
   }
 

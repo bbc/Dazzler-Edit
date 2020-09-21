@@ -168,7 +168,10 @@ class Editor extends React.Component {
       mode: "loop",
       scheduleInsertionPoint: 1,
       scheduleModified: false,
-      language: localStorage.getItem("language") == null ? "Hindi" : localStorage.getItem("language"),
+      language:
+        localStorage.getItem("language") == null
+          ? "Hindi"
+          : localStorage.getItem("language"),
       configObj: {
         Hindi: {
           sid: "bbc_hindi_tv",
@@ -470,8 +473,9 @@ class Editor extends React.Component {
     saveSchedule(
       services[this.state.configObj[this.state.language].sid].serviceIDRef,
       this.state.schedule.items,
+      this.state.schedule.date,
+      this.state.configObj[this.state.language].sid,
       () => {
-        console.log("closure", this);
         this.setState({ scheduleModified: false });
       },
       function (e) {
@@ -482,7 +486,7 @@ class Editor extends React.Component {
 
   handleChangeLanguage = (event) => {
     this.setState({ language: event.target.value }, () => {
-      localStorage.setItem("language", event.target.value)
+      localStorage.setItem("language", event.target.value);
       // const sid = this.state.configObj[this.state.language].sid;
       this.reloadSchedule();
       this.handleRefresh();
@@ -603,7 +607,7 @@ class Editor extends React.Component {
   // upcoming episodes need to be still available to the end of the day being scheduled
 
   render() {
-    console.log("lnaguage is ", this.state.language)
+    console.log("lnaguage is ", this.state.language);
     let { from, to } = this.state;
     const mustBeAvailableBy = moment.utc().format();
     const mustBeAvailableUntil = moment
