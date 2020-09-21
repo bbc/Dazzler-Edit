@@ -65,6 +65,9 @@ class ScheduleDao {
               pid: item.broadcast_of.pid,
               entityType: item.version.entity_type,
             };
+            if (item.live) {
+              asset.source = item.stream;
+            }
 
             console.log("asset is,", asset);
 
@@ -160,6 +163,10 @@ class ScheduleDao {
         entity_type: item.asset.entityType,
       },
     };
+    if (item.asset.live) {
+      newItem.source = item.asset.pics_raw_data;
+    }
+    console.log("new item is ", newItem);
 
     return newItem;
   }
