@@ -1,0 +1,3352 @@
+{
+  "scheduleSource": "Dazzler",
+  "serviceIDRef": "TVHIND01",
+  "date": "2020-09-17",
+  "items": [
+    {
+      "title": "BBC DUNIYA SHOW",
+      "startTime": "2020-09-17T00:00:00.000Z",
+      "duration": "PT18M",
+      "insertionType": "",
+      "asset": {
+        "title": "BBC DUNIYA SHOW",
+        "duration": "PT18M",
+        "versionPid": "p08rpj2f",
+        "versionCrid": "crid://bbc.co.uk/p/250915254",
+        "insertionType": "",
+        "pid": "p08rpj2c"
+      },
+      "end": "2020-09-17T00:18:00.000Z"
+    },
+    {
+      "title": "BBC DUNIYA SHOW",
+      "startTime": "2020-09-17T00:18:00.000Z",
+      "duration": "PT18M",
+      "insertionType": "",
+      "asset": {
+        "title": "BBC DUNIYA SHOW",
+        "duration": "PT18M",
+        "versionPid": "p08rpj2f",
+        "versionCrid": "crid://bbc.co.uk/p/250915254",
+        "insertionType": "",
+        "pid": "p08rpj2c"
+      },
+      "end": "2020-09-17T00:36:00.000Z"
+    },
+    {
+      "title": "BBC DUNIYA SHOW",
+      "startTime": "2020-09-17T00:36:00.000Z",
+      "duration": "PT18M",
+      "insertionType": "",
+      "asset": {
+        "title": "BBC DUNIYA SHOW",
+        "duration": "PT18M",
+        "versionPid": "p08rpj2f",
+        "versionCrid": "crid://bbc.co.uk/p/250915254",
+        "insertionType": "",
+        "pid": "p08rpj2c"
+      },
+      "end": "2020-09-17T00:54:00.000Z"
+    },
+    {
+      "title": "BBC DUNIYA SHOW",
+      "startTime": "2020-09-17T00:54:00.000Z",
+      "duration": "PT18M",
+      "insertionType": "",
+      "asset": {
+        "title": "BBC DUNIYA SHOW",
+        "duration": "PT18M",
+        "versionPid": "p08rpj2f",
+        "versionCrid": "crid://bbc.co.uk/p/250915254",
+        "insertionType": "",
+        "pid": "p08rpj2c"
+      },
+      "end": "2020-09-17T01:12:00.000Z"
+    },
+    {
+      "title": "BBC DUNIYA SHOW",
+      "startTime": "2020-09-17T01:12:00.000Z",
+      "duration": "PT18M",
+      "insertionType": "",
+      "asset": {
+        "title": "BBC DUNIYA SHOW",
+        "duration": "PT18M",
+        "versionPid": "p08rpj2f",
+        "versionCrid": "crid://bbc.co.uk/p/250915254",
+        "insertionType": "",
+        "pid": "p08rpj2c"
+      },
+      "end": "2020-09-17T01:30:00.000Z"
+    },
+    {
+      "title": "भारत चीन तनाव पर अब चीन की तरफ से क्या जवाब आया?",
+      "startTime": "2020-09-17T01:30:00.000Z",
+      "duration": "PT3M42S",
+      "insertionType": "",
+      "asset": {
+        "title": "भारत चीन तनाव पर अब चीन की तरफ से क्या जवाब आया?",
+        "duration": "PT3M42S",
+        "versionPid": "p08rnnnr",
+        "versionCrid": "crid://bbc.co.uk/p/250889877",
+        "insertionType": "",
+        "pid": "p08rnnnh"
+      },
+      "end": "2020-09-17T01:33:42.000Z"
+    },
+    {
+      "title": "कोरोना वायरस के मामले में क्या भारत अमरीका को भी पीछे छोड़ देगा?",
+      "startTime": "2020-09-17T01:33:42.000Z",
+      "duration": "PT2M22S",
+      "insertionType": "",
+      "asset": {
+        "title": "कोरोना वायरस के मामले में क्या भारत अमरीका को भी पीछे छोड़ देगा?",
+        "duration": "PT2M22S",
+        "versionPid": "p08rnnd8",
+        "versionCrid": "crid://bbc.co.uk/p/250889613",
+        "insertionType": "",
+        "pid": "p08rnncs"
+      },
+      "end": "2020-09-17T01:36:04.000Z"
+    },
+    {
+      "title": "क्या UPSC परीक्षा में मुसलमानों को ज़्यादा मौके मिलते हैं?",
+      "startTime": "2020-09-17T01:36:04.000Z",
+      "duration": "PT8M47S",
+      "insertionType": "",
+      "asset": {
+        "title": "क्या UPSC परीक्षा में मुसलमानों को ज़्यादा मौके मिलते हैं?",
+        "duration": "PT8M47S",
+        "versionPid": "p08rmmsv",
+        "versionCrid": "crid://bbc.co.uk/p/250859250",
+        "insertionType": "",
+        "pid": "p08rmmss"
+      },
+      "end": "2020-09-17T01:44:51.000Z"
+    },
+    {
+      "title": "इसराइल से दोस्ती क्यों कर रहे हैं मुस्लिम देश?",
+      "startTime": "2020-09-17T01:44:51.000Z",
+      "duration": "PT8M5S",
+      "insertionType": "",
+      "asset": {
+        "title": "इसराइल से दोस्ती क्यों कर रहे हैं मुस्लिम देश?",
+        "duration": "PT8M5S",
+        "versionPid": "p08rmmsd",
+        "versionCrid": "crid://bbc.co.uk/p/250859236",
+        "insertionType": "",
+        "pid": "p08rmms8"
+      },
+      "end": "2020-09-17T01:52:56.000Z"
+    },
+    {
+      "title": "भारतीय सेना किस तरह की तैयारियों में जुटी है?",
+      "startTime": "2020-09-17T01:52:56.000Z",
+      "duration": "PT2M54S",
+      "insertionType": "",
+      "asset": {
+        "title": "भारतीय सेना किस तरह की तैयारियों में जुटी है?",
+        "duration": "PT2M54S",
+        "versionPid": "p08rmmp3",
+        "versionCrid": "crid://bbc.co.uk/p/250859134",
+        "insertionType": "",
+        "pid": "p08rmmp1"
+      },
+      "end": "2020-09-17T01:55:50.000Z"
+    },
+    {
+      "title": "भारत-चीन सीमा विवाद: क्या चीन अब रुख नरम कर रहा है?",
+      "startTime": "2020-09-17T01:55:50.000Z",
+      "duration": "PT4M59S",
+      "insertionType": "",
+      "asset": {
+        "title": "भारत-चीन सीमा विवाद: क्या चीन अब रुख नरम कर रहा है?",
+        "duration": "PT4M59S",
+        "versionPid": "p08rknz1",
+        "versionCrid": "crid://bbc.co.uk/p/250800790",
+        "insertionType": "",
+        "pid": "p08rhylr"
+      },
+      "end": "2020-09-17T02:00:49.000Z"
+    },
+    {
+      "title": "अमरीका पर आखिरी बार हमला करने वाले जापान के बमों की कहानी",
+      "startTime": "2020-09-17T02:00:49.000Z",
+      "duration": "PT8M56S",
+      "insertionType": "",
+      "asset": {
+        "title": "अमरीका पर आखिरी बार हमला करने वाले जापान के बमों की कहानी",
+        "duration": "PT8M56S",
+        "versionPid": "p08rhyll",
+        "versionCrid": "crid://bbc.co.uk/p/250749503",
+        "insertionType": "",
+        "pid": "p08rhylh"
+      },
+      "end": "2020-09-17T02:09:45.000Z"
+    },
+    {
+      "title": "यूएई के बाद इसराइल और बहरीन के बीच भी ऐतिहासिक समझौता",
+      "startTime": "2020-09-17T02:09:45.000Z",
+      "duration": "PT3M48S",
+      "insertionType": "",
+      "asset": {
+        "title": "यूएई के बाद इसराइल और बहरीन के बीच भी ऐतिहासिक समझौता",
+        "duration": "PT3M48S",
+        "versionPid": "p08rhyld",
+        "versionCrid": "crid://bbc.co.uk/p/250749496",
+        "insertionType": "",
+        "pid": "p08rhyl9"
+      },
+      "end": "2020-09-17T02:13:33.000Z"
+    },
+    {
+      "title": "यूपी में स्पेशल सिक्योरिटी फ़ोर्स के गठन पर उठे सवाल",
+      "startTime": "2020-09-17T02:13:33.000Z",
+      "duration": "PT6M3S",
+      "insertionType": "",
+      "asset": {
+        "title": "यूपी में स्पेशल सिक्योरिटी फ़ोर्स के गठन पर उठे सवाल",
+        "duration": "PT6M3S",
+        "versionPid": "p08rhyl3",
+        "versionCrid": "crid://bbc.co.uk/p/250749487",
+        "insertionType": "",
+        "pid": "p08rhyl0"
+      },
+      "end": "2020-09-17T02:19:36.000Z"
+    },
+    {
+      "title": "कोरोना वायरस: फ़ेस मास्क ज़रूरत के साथ ख़तरा भी बने",
+      "startTime": "2020-09-17T02:19:36.000Z",
+      "duration": "PT4M29S",
+      "insertionType": "",
+      "asset": {
+        "title": "कोरोना वायरस: फ़ेस मास्क ज़रूरत के साथ ख़तरा भी बने",
+        "duration": "PT4M29S",
+        "versionPid": "p08rhyj4",
+        "versionCrid": "crid://bbc.co.uk/p/250749426",
+        "insertionType": "",
+        "pid": "p08rhyhz"
+      },
+      "end": "2020-09-17T02:24:05.000Z"
+    },
+    {
+      "title": "उमर ख़ालिद को क्यों किया गया गिरफ़्तार?",
+      "startTime": "2020-09-17T02:24:05.000Z",
+      "duration": "PT5M30S",
+      "insertionType": "",
+      "asset": {
+        "title": "उमर ख़ालिद को क्यों किया गया गिरफ़्तार?",
+        "duration": "PT5M30S",
+        "versionPid": "p08rf1kt",
+        "versionCrid": "crid://bbc.co.uk/p/250662988",
+        "insertionType": "",
+        "pid": "p08rf1kr"
+      },
+      "end": "2020-09-17T02:29:35.000Z"
+    },
+    {
+      "title": "इसराइल की अरब देशों से दोस्ती कितनी अहम",
+      "startTime": "2020-09-17T02:29:35.000Z",
+      "duration": "PT2M11S",
+      "insertionType": "",
+      "asset": {
+        "title": "इसराइल की अरब देशों से दोस्ती कितनी अहम",
+        "duration": "PT2M11S",
+        "versionPid": "p08rp52p",
+        "versionCrid": "crid://bbc.co.uk/p/250904691",
+        "insertionType": "",
+        "pid": "p08rp52j"
+      },
+      "end": "2020-09-17T02:31:46.000Z"
+    },
+    {
+      "title": "पीरियड्स के दौरान छुट्टी को लेकर क्या है महिलाओं की राय",
+      "startTime": "2020-09-17T02:31:46.000Z",
+      "duration": "PT2M52S",
+      "insertionType": "",
+      "asset": {
+        "title": "पीरियड्स के दौरान छुट्टी को लेकर क्या है महिलाओं की राय",
+        "duration": "PT2M52S",
+        "versionPid": "p08rp51r",
+        "versionCrid": "crid://bbc.co.uk/p/250904662",
+        "insertionType": "",
+        "pid": "p08rp51h"
+      },
+      "end": "2020-09-17T02:34:38.000Z"
+    },
+    {
+      "title": "इसराइल से दोस्ती क्यों कर रहे हैं मुस्लिम देश?",
+      "startTime": "2020-09-17T02:34:38.000Z",
+      "duration": "PT8M5S",
+      "insertionType": "",
+      "asset": {
+        "title": "इसराइल से दोस्ती क्यों कर रहे हैं मुस्लिम देश?",
+        "duration": "PT8M5S",
+        "versionPid": "p08rmmsd",
+        "versionCrid": "crid://bbc.co.uk/p/250859236",
+        "insertionType": "",
+        "pid": "p08rmms8"
+      },
+      "end": "2020-09-17T02:42:43.000Z"
+    },
+    {
+      "title": "वैज्ञानिकों को मिले शुक्र ग्रह पर 'जीवन के सुबूत'",
+      "startTime": "2020-09-17T02:42:43.000Z",
+      "duration": "PT1M49S",
+      "insertionType": "",
+      "asset": {
+        "title": "वैज्ञानिकों को मिले शुक्र ग्रह पर 'जीवन के सुबूत'",
+        "duration": "PT1M49S",
+        "versionPid": "p08rlbr1",
+        "versionCrid": "crid://bbc.co.uk/p/250820755",
+        "insertionType": "",
+        "pid": "p08rlbqr"
+      },
+      "end": "2020-09-17T02:44:32.000Z"
+    },
+    {
+      "title": "यूएई के बाद इसराइल और बहरीन के बीच भी ऐतिहासिक समझौता",
+      "startTime": "2020-09-17T02:44:32.000Z",
+      "duration": "PT3M48S",
+      "insertionType": "",
+      "asset": {
+        "title": "यूएई के बाद इसराइल और बहरीन के बीच भी ऐतिहासिक समझौता",
+        "duration": "PT3M48S",
+        "versionPid": "p08rhyld",
+        "versionCrid": "crid://bbc.co.uk/p/250749496",
+        "insertionType": "",
+        "pid": "p08rhyl9"
+      },
+      "end": "2020-09-17T02:48:20.000Z"
+    },
+    {
+      "title": "अमरीका चुनाव: हिंदुओं को लुभाने की कोशिश",
+      "startTime": "2020-09-17T02:48:20.000Z",
+      "duration": "PT2M36S",
+      "insertionType": "",
+      "asset": {
+        "title": "अमरीका चुनाव: हिंदुओं को लुभाने की कोशिश",
+        "duration": "PT2M36S",
+        "versionPid": "p08rgfx7",
+        "versionCrid": "crid://bbc.co.uk/p/250704634",
+        "insertionType": "",
+        "pid": "p08rg5q6"
+      },
+      "end": "2020-09-17T02:50:56.000Z"
+    },
+    {
+      "title": "तुर्की के राष्ट्रपति अर्दोआन ने अब किस देश को दी धमकी?",
+      "startTime": "2020-09-17T02:50:56.000Z",
+      "duration": "PT4M19S",
+      "insertionType": "",
+      "asset": {
+        "title": "तुर्की के राष्ट्रपति अर्दोआन ने अब किस देश को दी धमकी?",
+        "duration": "PT4M19S",
+        "versionPid": "p08rf1c8",
+        "versionCrid": "crid://bbc.co.uk/p/250662785",
+        "insertionType": "",
+        "pid": "p08rf1c6"
+      },
+      "end": "2020-09-17T02:55:15.000Z"
+    },
+    {
+      "title": "रूस की कोरोना वैक्सीन का ख़्वाब भारत के बिना कैसे अधूरा है?",
+      "startTime": "2020-09-17T02:55:15.000Z",
+      "duration": "PT6M31S",
+      "insertionType": "",
+      "asset": {
+        "title": "रूस की कोरोना वैक्सीन का ख़्वाब भारत के बिना कैसे अधूरा है?",
+        "duration": "PT6M31S",
+        "versionPid": "p08rb9m2",
+        "versionCrid": "crid://bbc.co.uk/p/250581342",
+        "insertionType": "",
+        "pid": "p08rb9m0"
+      },
+      "end": "2020-09-17T03:01:46.000Z"
+    },
+    {
+      "title": "नस्लभेद के ख़िलाफ़ सिख सुपरहीरो!",
+      "startTime": "2020-09-17T03:01:46.000Z",
+      "duration": "PT1M39S",
+      "insertionType": "",
+      "asset": {
+        "title": "नस्लभेद के ख़िलाफ़ सिख सुपरहीरो!",
+        "duration": "PT1M39S",
+        "versionPid": "p08r6yzh",
+        "versionCrid": "crid://bbc.co.uk/p/250481752",
+        "insertionType": "",
+        "pid": "p08r6yzf"
+      },
+      "end": "2020-09-17T03:03:25.000Z"
+    },
+    {
+      "title": "अमरीका में जंगल की आग से झुलस रहे हैं 12 राज्य",
+      "startTime": "2020-09-17T03:03:25.000Z",
+      "duration": "PT1M52S",
+      "insertionType": "",
+      "asset": {
+        "title": "अमरीका में जंगल की आग से झुलस रहे हैं 12 राज्य",
+        "duration": "PT1M52S",
+        "versionPid": "p08r6yct",
+        "versionCrid": "crid://bbc.co.uk/p/250481173",
+        "insertionType": "",
+        "pid": "p08r6ycm"
+      },
+      "end": "2020-09-17T03:05:17.000Z"
+    },
+    {
+      "title": "ग्रीस और तुर्की के बीच युद्ध जैसे हालात पैदा होने की वजह",
+      "startTime": "2020-09-17T03:05:17.000Z",
+      "duration": "PT12M11S",
+      "insertionType": "",
+      "asset": {
+        "title": "ग्रीस और तुर्की के बीच युद्ध जैसे हालात पैदा होने की वजह",
+        "duration": "PT12M11S",
+        "versionPid": "p08r5x7n",
+        "versionCrid": "crid://bbc.co.uk/p/250450292",
+        "insertionType": "",
+        "pid": "p08r5x7h"
+      },
+      "end": "2020-09-17T03:17:28.000Z"
+    },
+    {
+      "title": "इटली में काले लोगों को क्या-क्या झेलना पड़ रहा है",
+      "startTime": "2020-09-17T03:17:28.000Z",
+      "duration": "PT3M1S",
+      "insertionType": "",
+      "asset": {
+        "title": "इटली में काले लोगों को क्या-क्या झेलना पड़ रहा है",
+        "duration": "PT3M1S",
+        "versionPid": "p08r5sxk",
+        "versionCrid": "crid://bbc.co.uk/p/250447096",
+        "insertionType": "",
+        "pid": "p08r5sxc"
+      },
+      "end": "2020-09-17T03:20:29.000Z"
+    },
+    {
+      "title": "कोरोना काल में रेव पार्टियां बन रही हैं मुसीबत",
+      "startTime": "2020-09-17T03:20:29.000Z",
+      "duration": "PT2M46S",
+      "insertionType": "",
+      "asset": {
+        "title": "कोरोना काल में रेव पार्टियां बन रही हैं मुसीबत",
+        "duration": "PT2M46S",
+        "versionPid": "p08r5sx6",
+        "versionCrid": "crid://bbc.co.uk/p/250447085",
+        "insertionType": "",
+        "pid": "p08r5sx4"
+      },
+      "end": "2020-09-17T03:23:15.000Z"
+    },
+    {
+      "title": "रफ़ाल फ़ाइटर जेट में क्या-क्या खूबियां हैं?",
+      "startTime": "2020-09-17T03:23:15.000Z",
+      "duration": "PT2M3S",
+      "insertionType": "",
+      "asset": {
+        "title": "रफ़ाल फ़ाइटर जेट में क्या-क्या खूबियां हैं?",
+        "duration": "PT2M3S",
+        "versionPid": "p08r2ny4",
+        "versionCrid": "crid://bbc.co.uk/p/250353897",
+        "insertionType": "",
+        "pid": "p08r2ny2"
+      },
+      "end": "2020-09-17T03:25:18.000Z"
+    },
+    {
+      "title": "अमरीका में लाखों की नौकरी छोड़ भारत में खेती करने वाला शख़्स",
+      "startTime": "2020-09-17T03:25:18.000Z",
+      "duration": "PT1M42S",
+      "insertionType": "",
+      "asset": {
+        "title": "अमरीका में लाखों की नौकरी छोड़ भारत में खेती करने वाला शख़्स",
+        "duration": "PT1M42S",
+        "versionPid": "p08r1kk0",
+        "versionCrid": "crid://bbc.co.uk/p/250320847",
+        "insertionType": "",
+        "pid": "p08r1kjw"
+      },
+      "end": "2020-09-17T03:27:00.000Z"
+    },
+    {
+      "title": "भारत चीन तनाव पर अब चीन की तरफ से क्या जवाब आया?",
+      "startTime": "2020-09-17T03:27:00.000Z",
+      "duration": "PT3M42S",
+      "insertionType": "",
+      "asset": {
+        "title": "भारत चीन तनाव पर अब चीन की तरफ से क्या जवाब आया?",
+        "duration": "PT3M42S",
+        "versionPid": "p08rnnnr",
+        "versionCrid": "crid://bbc.co.uk/p/250889877",
+        "insertionType": "",
+        "pid": "p08rnnnh"
+      },
+      "end": "2020-09-17T03:30:42.000Z"
+    },
+    {
+      "title": "कोरोना वायरस के मामले में क्या भारत अमरीका को भी पीछे छोड़ देगा?",
+      "startTime": "2020-09-17T03:30:42.000Z",
+      "duration": "PT2M22S",
+      "insertionType": "",
+      "asset": {
+        "title": "कोरोना वायरस के मामले में क्या भारत अमरीका को भी पीछे छोड़ देगा?",
+        "duration": "PT2M22S",
+        "versionPid": "p08rnnd8",
+        "versionCrid": "crid://bbc.co.uk/p/250889613",
+        "insertionType": "",
+        "pid": "p08rnncs"
+      },
+      "end": "2020-09-17T03:33:04.000Z"
+    },
+    {
+      "title": "पीरियड्स को लेकर महिला खिलाड़ियों की चुनौतियां",
+      "startTime": "2020-09-17T03:33:04.000Z",
+      "duration": "PT3M25S",
+      "insertionType": "",
+      "asset": {
+        "title": "पीरियड्स को लेकर महिला खिलाड़ियों की चुनौतियां",
+        "duration": "PT3M25S",
+        "versionPid": "p08rp473",
+        "versionCrid": "crid://bbc.co.uk/p/250903867",
+        "insertionType": "",
+        "pid": "p08rp46z"
+      },
+      "end": "2020-09-17T03:36:29.000Z"
+    },
+    {
+      "title": "कोरोना: नौकरी का नया कॉन्सेप्ट",
+      "startTime": "2020-09-17T03:36:29.000Z",
+      "duration": "PT1M40S",
+      "insertionType": "",
+      "asset": {
+        "title": "कोरोना: नौकरी का नया कॉन्सेप्ट",
+        "duration": "PT1M40S",
+        "versionPid": "p08rp4wx",
+        "versionCrid": "crid://bbc.co.uk/p/250904512",
+        "insertionType": "",
+        "pid": "p08rp4wc"
+      },
+      "end": "2020-09-17T03:38:09.000Z"
+    },
+    {
+      "title": "राजस्थान में चंबल नदी में नाव पलटने से बड़ा हादसा",
+      "startTime": "2020-09-17T03:38:09.000Z",
+      "duration": "PT1M20S",
+      "insertionType": "",
+      "asset": {
+        "title": "राजस्थान में चंबल नदी में नाव पलटने से बड़ा हादसा",
+        "duration": "PT1M20S",
+        "versionPid": "p08rmmry",
+        "versionCrid": "crid://bbc.co.uk/p/250859222",
+        "insertionType": "",
+        "pid": "p08rmmrw"
+      },
+      "end": "2020-09-17T03:39:29.000Z"
+    },
+    {
+      "title": "भारतीय सेना किस तरह की तैयारियों में जुटी है?",
+      "startTime": "2020-09-17T03:39:29.000Z",
+      "duration": "PT2M54S",
+      "insertionType": "",
+      "asset": {
+        "title": "भारतीय सेना किस तरह की तैयारियों में जुटी है?",
+        "duration": "PT2M54S",
+        "versionPid": "p08rmmp3",
+        "versionCrid": "crid://bbc.co.uk/p/250859134",
+        "insertionType": "",
+        "pid": "p08rmmp1"
+      },
+      "end": "2020-09-17T03:42:23.000Z"
+    },
+    {
+      "title": "पंजाब के सीएम ने एक बच्चे को पांच लाख का 'इनाम' क्यों दिया",
+      "startTime": "2020-09-17T03:42:23.000Z",
+      "duration": "PT1M49S",
+      "insertionType": "",
+      "asset": {
+        "title": "पंजाब के सीएम ने एक बच्चे को पांच लाख का 'इनाम' क्यों दिया",
+        "duration": "PT1M49S",
+        "versionPid": "p08rld11",
+        "versionCrid": "crid://bbc.co.uk/p/250821995",
+        "insertionType": "",
+        "pid": "p08rld0y"
+      },
+      "end": "2020-09-17T03:44:12.000Z"
+    },
+    {
+      "title": "चीन में अब पटरी पर लौट रही है ज़िंदगी",
+      "startTime": "2020-09-17T03:44:12.000Z",
+      "duration": "PT2M3S",
+      "insertionType": "",
+      "asset": {
+        "title": "चीन में अब पटरी पर लौट रही है ज़िंदगी",
+        "duration": "PT2M3S",
+        "versionPid": "p08rlbqh",
+        "versionCrid": "crid://bbc.co.uk/p/250820738",
+        "insertionType": "",
+        "pid": "p08rlbq9"
+      },
+      "end": "2020-09-17T03:46:15.000Z"
+    },
+    {
+      "title": "बिहार के नए माउंटेन मैन, जिन्होंने पहाड़ काटकर नहर बना दी",
+      "startTime": "2020-09-17T03:46:15.000Z",
+      "duration": "PT5M24S",
+      "insertionType": "",
+      "asset": {
+        "title": "बिहार के नए माउंटेन मैन, जिन्होंने पहाड़ काटकर नहर बना दी",
+        "duration": "PT5M24S",
+        "versionPid": "p08rkkcb",
+        "versionCrid": "crid://bbc.co.uk/p/250797328",
+        "insertionType": "",
+        "pid": "p08rkkc4"
+      },
+      "end": "2020-09-17T03:51:39.000Z"
+    },
+    {
+      "title": "ऑटो ड्राइविंग ने बदल दी इन महिलाओं की ज़िंदगी",
+      "startTime": "2020-09-17T03:51:39.000Z",
+      "duration": "PT3M42S",
+      "insertionType": "",
+      "asset": {
+        "title": "ऑटो ड्राइविंग ने बदल दी इन महिलाओं की ज़िंदगी",
+        "duration": "PT3M42S",
+        "versionPid": "p08rkj5z",
+        "versionCrid": "crid://bbc.co.uk/p/250796200",
+        "insertionType": "",
+        "pid": "p08rkj5x"
+      },
+      "end": "2020-09-17T03:55:21.000Z"
+    },
+    {
+      "title": "भारत-चीन सीमा विवाद: क्या चीन अब रुख नरम कर रहा है?",
+      "startTime": "2020-09-17T03:55:21.000Z",
+      "duration": "PT4M59S",
+      "insertionType": "",
+      "asset": {
+        "title": "भारत-चीन सीमा विवाद: क्या चीन अब रुख नरम कर रहा है?",
+        "duration": "PT4M59S",
+        "versionPid": "p08rknz1",
+        "versionCrid": "crid://bbc.co.uk/p/250800790",
+        "insertionType": "",
+        "pid": "p08rhylr"
+      },
+      "end": "2020-09-17T04:00:20.000Z"
+    },
+    {
+      "title": "यूपी में स्पेशल सिक्योरिटी फ़ोर्स के गठन पर उठे सवाल",
+      "startTime": "2020-09-17T04:00:20.000Z",
+      "duration": "PT6M3S",
+      "insertionType": "",
+      "asset": {
+        "title": "यूपी में स्पेशल सिक्योरिटी फ़ोर्स के गठन पर उठे सवाल",
+        "duration": "PT6M3S",
+        "versionPid": "p08rhyl3",
+        "versionCrid": "crid://bbc.co.uk/p/250749487",
+        "insertionType": "",
+        "pid": "p08rhyl0"
+      },
+      "end": "2020-09-17T04:06:23.000Z"
+    },
+    {
+      "title": "पाकिस्तान: महिला से गैंगरेप को लेकर आक्रोश",
+      "startTime": "2020-09-17T04:06:23.000Z",
+      "duration": "PT1M50S",
+      "insertionType": "",
+      "asset": {
+        "title": "पाकिस्तान: महिला से गैंगरेप को लेकर आक्रोश",
+        "duration": "PT1M50S",
+        "versionPid": "p08rg5zr",
+        "versionCrid": "crid://bbc.co.uk/p/250697024",
+        "insertionType": "",
+        "pid": "p08rg5zp"
+      },
+      "end": "2020-09-17T04:08:13.000Z"
+    },
+    {
+      "title": "अमरीका चुनाव: हिंदुओं को लुभाने की कोशिश",
+      "startTime": "2020-09-17T04:08:13.000Z",
+      "duration": "PT2M36S",
+      "insertionType": "",
+      "asset": {
+        "title": "अमरीका चुनाव: हिंदुओं को लुभाने की कोशिश",
+        "duration": "PT2M36S",
+        "versionPid": "p08rgfx7",
+        "versionCrid": "crid://bbc.co.uk/p/250704634",
+        "insertionType": "",
+        "pid": "p08rg5q6"
+      },
+      "end": "2020-09-17T04:10:49.000Z"
+    },
+    {
+      "title": "कोरोना वैक्सीन का ट्रायल फिर शुरू, भारत पर क्या पड़ेगा असर?",
+      "startTime": "2020-09-17T04:10:49.000Z",
+      "duration": "PT2M5S",
+      "insertionType": "",
+      "asset": {
+        "title": "कोरोना वैक्सीन का ट्रायल फिर शुरू, भारत पर क्या पड़ेगा असर?",
+        "duration": "PT2M5S",
+        "versionPid": "p08rf1bk",
+        "versionCrid": "crid://bbc.co.uk/p/250662763",
+        "insertionType": "",
+        "pid": "p08rf1bh"
+      },
+      "end": "2020-09-17T04:12:54.000Z"
+    },
+    {
+      "title": "चीन अरुणाचल प्रदेश से पीछे क्यों हट गया था?",
+      "startTime": "2020-09-17T04:12:54.000Z",
+      "duration": "PT6M2S",
+      "insertionType": "",
+      "asset": {
+        "title": "चीन अरुणाचल प्रदेश से पीछे क्यों हट गया था?",
+        "duration": "PT6M2S",
+        "versionPid": "p08rd44r",
+        "versionCrid": "crid://bbc.co.uk/p/250635675",
+        "insertionType": "",
+        "pid": "p08rd44p"
+      },
+      "end": "2020-09-17T04:18:56.000Z"
+    },
+    {
+      "title": "कोरोना काल में लूट से पहले लुटेरों ने हाथ सैनिटाइज किए, फिर तान दिया तमंचा",
+      "startTime": "2020-09-17T04:18:56.000Z",
+      "duration": "PT2M20S",
+      "insertionType": "",
+      "asset": {
+        "title": "कोरोना काल में लूट से पहले लुटेरों ने हाथ सैनिटाइज किए, फिर तान दिया तमंचा",
+        "duration": "PT2M20S",
+        "versionPid": "p08r8dkr",
+        "versionCrid": "crid://bbc.co.uk/p/250524602",
+        "insertionType": "",
+        "pid": "p08r8dkp"
+      },
+      "end": "2020-09-17T04:21:16.000Z"
+    },
+    {
+      "title": "अमरीका पर आखिरी बार हमला करने वाले जापान के बमों की कहानी",
+      "startTime": "2020-09-17T04:21:16.000Z",
+      "duration": "PT8M56S",
+      "insertionType": "",
+      "asset": {
+        "title": "अमरीका पर आखिरी बार हमला करने वाले जापान के बमों की कहानी",
+        "duration": "PT8M56S",
+        "versionPid": "p08rhyll",
+        "versionCrid": "crid://bbc.co.uk/p/250749503",
+        "insertionType": "",
+        "pid": "p08rhylh"
+      },
+      "end": "2020-09-17T04:30:12.000Z"
+    },
+    {
+      "title": "पाकिस्तान के ख़िलाफ़ 'आज़ाद पख़्तूनिस्तान' की बुनियाद रखने वाला 'अकेला योद्धा'",
+      "startTime": "2020-09-17T04:30:12.000Z",
+      "duration": "PT13M30S",
+      "insertionType": "",
+      "asset": {
+        "title": "पाकिस्तान के ख़िलाफ़ 'आज़ाद पख़्तूनिस्तान' की बुनियाद रखने वाला 'अकेला योद्धा'",
+        "duration": "PT13M30S",
+        "versionPid": "p08r8f00",
+        "versionCrid": "crid://bbc.co.uk/p/250525013",
+        "insertionType": "",
+        "pid": "p08r8dzw"
+      },
+      "end": "2020-09-17T04:43:42.000Z"
+    },
+    {
+      "title": "भारत-पाकिस्तान 1965 के युद्ध में कौन जीता था?",
+      "startTime": "2020-09-17T04:43:42.000Z",
+      "duration": "PT13M27S",
+      "insertionType": "",
+      "asset": {
+        "title": "भारत-पाकिस्तान 1965 के युद्ध में कौन जीता था?",
+        "duration": "PT13M27S",
+        "versionPid": "p08r1kpj",
+        "versionCrid": "crid://bbc.co.uk/p/250320987",
+        "insertionType": "",
+        "pid": "p08r1kpg"
+      },
+      "end": "2020-09-17T04:57:09.000Z"
+    },
+    {
+      "title": "प्रणब दा, जिन्हें पीएम ना बन पाने की कसक हमेशा रही",
+      "startTime": "2020-09-17T04:57:09.000Z",
+      "duration": "PT14M",
+      "insertionType": "",
+      "asset": {
+        "title": "प्रणब दा, जिन्हें पीएम ना बन पाने की कसक हमेशा रही",
+        "duration": "PT14M",
+        "versionPid": "p08q3zgt",
+        "versionCrid": "crid://bbc.co.uk/p/249469333",
+        "insertionType": "",
+        "pid": "p08q3zgr"
+      },
+      "end": "2020-09-17T05:11:09.000Z"
+    },
+    {
+      "title": "भारत-चीन युद्ध के बाद जब तीन हज़ार चीनी मूल के लोगों को कैद कर लिया गया",
+      "startTime": "2020-09-17T05:11:09.000Z",
+      "duration": "PT23M12S",
+      "insertionType": "",
+      "asset": {
+        "title": "भारत-चीन युद्ध के बाद जब तीन हज़ार चीनी मूल के लोगों को कैद कर लिया गया",
+        "duration": "PT23M12S",
+        "versionPid": "p08qlyzf",
+        "versionCrid": "crid://bbc.co.uk/p/249915721",
+        "insertionType": "",
+        "pid": "p08qlyzb"
+      },
+      "end": "2020-09-17T05:34:21.000Z"
+    },
+    {
+      "title": "इसराइल की अरब देशों से दोस्ती कितनी अहम",
+      "startTime": "2020-09-17T05:34:21.000Z",
+      "duration": "PT2M11S",
+      "insertionType": "",
+      "asset": {
+        "title": "इसराइल की अरब देशों से दोस्ती कितनी अहम",
+        "duration": "PT2M11S",
+        "versionPid": "p08rp52p",
+        "versionCrid": "crid://bbc.co.uk/p/250904691",
+        "insertionType": "",
+        "pid": "p08rp52j"
+      },
+      "end": "2020-09-17T05:36:32.000Z"
+    },
+    {
+      "title": "पीरियड्स के दौरान छुट्टी को लेकर क्या है महिलाओं की राय",
+      "startTime": "2020-09-17T05:36:32.000Z",
+      "duration": "PT2M52S",
+      "insertionType": "",
+      "asset": {
+        "title": "पीरियड्स के दौरान छुट्टी को लेकर क्या है महिलाओं की राय",
+        "duration": "PT2M52S",
+        "versionPid": "p08rp51r",
+        "versionCrid": "crid://bbc.co.uk/p/250904662",
+        "insertionType": "",
+        "pid": "p08rp51h"
+      },
+      "end": "2020-09-17T05:39:24.000Z"
+    },
+    {
+      "title": "इसराइल से दोस्ती क्यों कर रहे हैं मुस्लिम देश?",
+      "startTime": "2020-09-17T05:39:24.000Z",
+      "duration": "PT8M5S",
+      "insertionType": "",
+      "asset": {
+        "title": "इसराइल से दोस्ती क्यों कर रहे हैं मुस्लिम देश?",
+        "duration": "PT8M5S",
+        "versionPid": "p08rmmsd",
+        "versionCrid": "crid://bbc.co.uk/p/250859236",
+        "insertionType": "",
+        "pid": "p08rmms8"
+      },
+      "end": "2020-09-17T05:47:29.000Z"
+    },
+    {
+      "title": "वैज्ञानिकों को मिले शुक्र ग्रह पर 'जीवन के सुबूत'",
+      "startTime": "2020-09-17T05:47:29.000Z",
+      "duration": "PT1M49S",
+      "insertionType": "",
+      "asset": {
+        "title": "वैज्ञानिकों को मिले शुक्र ग्रह पर 'जीवन के सुबूत'",
+        "duration": "PT1M49S",
+        "versionPid": "p08rlbr1",
+        "versionCrid": "crid://bbc.co.uk/p/250820755",
+        "insertionType": "",
+        "pid": "p08rlbqr"
+      },
+      "end": "2020-09-17T05:49:18.000Z"
+    },
+    {
+      "title": "यूएई के बाद इसराइल और बहरीन के बीच भी ऐतिहासिक समझौता",
+      "startTime": "2020-09-17T05:49:18.000Z",
+      "duration": "PT3M48S",
+      "insertionType": "",
+      "asset": {
+        "title": "यूएई के बाद इसराइल और बहरीन के बीच भी ऐतिहासिक समझौता",
+        "duration": "PT3M48S",
+        "versionPid": "p08rhyld",
+        "versionCrid": "crid://bbc.co.uk/p/250749496",
+        "insertionType": "",
+        "pid": "p08rhyl9"
+      },
+      "end": "2020-09-17T05:53:06.000Z"
+    },
+    {
+      "title": "अमरीका चुनाव: हिंदुओं को लुभाने की कोशिश",
+      "startTime": "2020-09-17T05:53:06.000Z",
+      "duration": "PT2M36S",
+      "insertionType": "",
+      "asset": {
+        "title": "अमरीका चुनाव: हिंदुओं को लुभाने की कोशिश",
+        "duration": "PT2M36S",
+        "versionPid": "p08rgfx7",
+        "versionCrid": "crid://bbc.co.uk/p/250704634",
+        "insertionType": "",
+        "pid": "p08rg5q6"
+      },
+      "end": "2020-09-17T05:55:42.000Z"
+    },
+    {
+      "title": "तुर्की के राष्ट्रपति अर्दोआन ने अब किस देश को दी धमकी?",
+      "startTime": "2020-09-17T05:55:42.000Z",
+      "duration": "PT4M19S",
+      "insertionType": "",
+      "asset": {
+        "title": "तुर्की के राष्ट्रपति अर्दोआन ने अब किस देश को दी धमकी?",
+        "duration": "PT4M19S",
+        "versionPid": "p08rf1c8",
+        "versionCrid": "crid://bbc.co.uk/p/250662785",
+        "insertionType": "",
+        "pid": "p08rf1c6"
+      },
+      "end": "2020-09-17T06:00:01.000Z"
+    },
+    {
+      "title": "रूस की कोरोना वैक्सीन का ख़्वाब भारत के बिना कैसे अधूरा है?",
+      "startTime": "2020-09-17T06:00:01.000Z",
+      "duration": "PT6M31S",
+      "insertionType": "",
+      "asset": {
+        "title": "रूस की कोरोना वैक्सीन का ख़्वाब भारत के बिना कैसे अधूरा है?",
+        "duration": "PT6M31S",
+        "versionPid": "p08rb9m2",
+        "versionCrid": "crid://bbc.co.uk/p/250581342",
+        "insertionType": "",
+        "pid": "p08rb9m0"
+      },
+      "end": "2020-09-17T06:06:32.000Z"
+    },
+    {
+      "title": "नस्लभेद के ख़िलाफ़ सिख सुपरहीरो!",
+      "startTime": "2020-09-17T06:06:32.000Z",
+      "duration": "PT1M39S",
+      "insertionType": "",
+      "asset": {
+        "title": "नस्लभेद के ख़िलाफ़ सिख सुपरहीरो!",
+        "duration": "PT1M39S",
+        "versionPid": "p08r6yzh",
+        "versionCrid": "crid://bbc.co.uk/p/250481752",
+        "insertionType": "",
+        "pid": "p08r6yzf"
+      },
+      "end": "2020-09-17T06:08:11.000Z"
+    },
+    {
+      "title": "अमरीका में जंगल की आग से झुलस रहे हैं 12 राज्य",
+      "startTime": "2020-09-17T06:08:11.000Z",
+      "duration": "PT1M52S",
+      "insertionType": "",
+      "asset": {
+        "title": "अमरीका में जंगल की आग से झुलस रहे हैं 12 राज्य",
+        "duration": "PT1M52S",
+        "versionPid": "p08r6yct",
+        "versionCrid": "crid://bbc.co.uk/p/250481173",
+        "insertionType": "",
+        "pid": "p08r6ycm"
+      },
+      "end": "2020-09-17T06:10:03.000Z"
+    },
+    {
+      "title": "ग्रीस और तुर्की के बीच युद्ध जैसे हालात पैदा होने की वजह",
+      "startTime": "2020-09-17T06:10:03.000Z",
+      "duration": "PT12M11S",
+      "insertionType": "",
+      "asset": {
+        "title": "ग्रीस और तुर्की के बीच युद्ध जैसे हालात पैदा होने की वजह",
+        "duration": "PT12M11S",
+        "versionPid": "p08r5x7n",
+        "versionCrid": "crid://bbc.co.uk/p/250450292",
+        "insertionType": "",
+        "pid": "p08r5x7h"
+      },
+      "end": "2020-09-17T06:22:14.000Z"
+    },
+    {
+      "title": "इटली में काले लोगों को क्या-क्या झेलना पड़ रहा है",
+      "startTime": "2020-09-17T06:22:14.000Z",
+      "duration": "PT3M1S",
+      "insertionType": "",
+      "asset": {
+        "title": "इटली में काले लोगों को क्या-क्या झेलना पड़ रहा है",
+        "duration": "PT3M1S",
+        "versionPid": "p08r5sxk",
+        "versionCrid": "crid://bbc.co.uk/p/250447096",
+        "insertionType": "",
+        "pid": "p08r5sxc"
+      },
+      "end": "2020-09-17T06:25:15.000Z"
+    },
+    {
+      "title": "कोरोना काल में रेव पार्टियां बन रही हैं मुसीबत",
+      "startTime": "2020-09-17T06:25:15.000Z",
+      "duration": "PT2M46S",
+      "insertionType": "",
+      "asset": {
+        "title": "कोरोना काल में रेव पार्टियां बन रही हैं मुसीबत",
+        "duration": "PT2M46S",
+        "versionPid": "p08r5sx6",
+        "versionCrid": "crid://bbc.co.uk/p/250447085",
+        "insertionType": "",
+        "pid": "p08r5sx4"
+      },
+      "end": "2020-09-17T06:28:01.000Z"
+    },
+    {
+      "title": "अमरीका में लाखों की नौकरी छोड़ भारत में खेती करने वाला शख़्स",
+      "startTime": "2020-09-17T06:28:01.000Z",
+      "duration": "PT1M42S",
+      "insertionType": "",
+      "asset": {
+        "title": "अमरीका में लाखों की नौकरी छोड़ भारत में खेती करने वाला शख़्स",
+        "duration": "PT1M42S",
+        "versionPid": "p08r1kk0",
+        "versionCrid": "crid://bbc.co.uk/p/250320847",
+        "insertionType": "",
+        "pid": "p08r1kjw"
+      },
+      "end": "2020-09-17T06:29:43.000Z"
+    },
+    {
+      "title": "COVER STORY: पीरियड्स पर झिझक क्यों?",
+      "startTime": "2020-09-17T06:29:43.000Z",
+      "duration": "PT7M41S",
+      "insertionType": "",
+      "asset": {
+        "title": "COVER STORY: पीरियड्स पर झिझक क्यों?",
+        "duration": "PT7M41S",
+        "versionPid": "p08rpcxf",
+        "versionCrid": "crid://bbc.co.uk/p/250911255",
+        "insertionType": "",
+        "pid": "p08rpcx7"
+      },
+      "end": "2020-09-17T06:37:24.000Z"
+    },
+    {
+      "title": "Cover Story: महाविनाश की ओर बढ़ रही है दुनिया?",
+      "startTime": "2020-09-17T06:37:24.000Z",
+      "duration": "PT7M52S",
+      "insertionType": "",
+      "asset": {
+        "title": "Cover Story: महाविनाश की ओर बढ़ रही है दुनिया?",
+        "duration": "PT7M52S",
+        "versionPid": "p08rl9ph",
+        "versionCrid": "crid://bbc.co.uk/p/250819745",
+        "insertionType": "",
+        "pid": "p08rl9p8"
+      },
+      "end": "2020-09-17T06:45:16.000Z"
+    },
+    {
+      "title": "COVER STORY: अमरीकी चुनाव में हिंदू वोट की लड़ाई",
+      "startTime": "2020-09-17T06:45:16.000Z",
+      "duration": "PT8M6S",
+      "insertionType": "",
+      "asset": {
+        "title": "COVER STORY: अमरीकी चुनाव में हिंदू वोट की लड़ाई",
+        "duration": "PT8M6S",
+        "versionPid": "p08rgghj",
+        "versionCrid": "crid://bbc.co.uk/p/250705201",
+        "insertionType": "",
+        "pid": "p08rgghd"
+      },
+      "end": "2020-09-17T06:53:22.000Z"
+    },
+    {
+      "title": "COVER STORY:क्या तालिबान से बनेगी बात?",
+      "startTime": "2020-09-17T06:53:22.000Z",
+      "duration": "PT7M49S",
+      "insertionType": "",
+      "asset": {
+        "title": "COVER STORY:क्या तालिबान से बनेगी बात?",
+        "duration": "PT7M49S",
+        "versionPid": "p08r6zwl",
+        "versionCrid": "crid://bbc.co.uk/p/250482623",
+        "insertionType": "",
+        "pid": "p08r6zwf"
+      },
+      "end": "2020-09-17T07:01:11.000Z"
+    },
+    {
+      "title": "कोरोनाकाल में भारत में बढ़ते बाल विवाह",
+      "startTime": "2020-09-17T07:01:11.000Z",
+      "duration": "PT7M50S",
+      "insertionType": "",
+      "asset": {
+        "title": "कोरोनाकाल में भारत में बढ़ते बाल विवाह",
+        "duration": "PT7M50S",
+        "versionPid": "p08r361z",
+        "versionCrid": "crid://bbc.co.uk/p/250369392",
+        "insertionType": "",
+        "pid": "p08r361r"
+      },
+      "end": "2020-09-17T07:09:01.000Z"
+    },
+    {
+      "title": "COVER STORY: बीबीसी को मिले सुराग, लीबिया हमले में यूएई का हाथ",
+      "startTime": "2020-09-17T07:09:01.000Z",
+      "duration": "PT7M56S",
+      "insertionType": "",
+      "asset": {
+        "title": "COVER STORY: बीबीसी को मिले सुराग, लीबिया हमले में यूएई का हाथ",
+        "duration": "PT7M56S",
+        "versionPid": "p08qzkpq",
+        "versionCrid": "crid://bbc.co.uk/p/250261412",
+        "insertionType": "",
+        "pid": "p08qzkpl"
+      },
+      "end": "2020-09-17T07:16:57.000Z"
+    },
+    {
+      "title": "COVER STORY: ऐसे बन रही है कोरोना की वैक्सीन",
+      "startTime": "2020-09-17T07:16:57.000Z",
+      "duration": "PT7M49S",
+      "insertionType": "",
+      "asset": {
+        "title": "COVER STORY: ऐसे बन रही है कोरोना की वैक्सीन",
+        "duration": "PT7M49S",
+        "versionPid": "p08qwp3k",
+        "versionCrid": "crid://bbc.co.uk/p/250175319",
+        "insertionType": "",
+        "pid": "p08qwp3f"
+      },
+      "end": "2020-09-17T07:24:46.000Z"
+    },
+    {
+      "title": "COVER STORY : Migrant Crisis से कितना बदला यूरोप",
+      "startTime": "2020-09-17T07:24:46.000Z",
+      "duration": "PT7M55S",
+      "insertionType": "",
+      "asset": {
+        "title": "COVER STORY : Migrant Crisis से कितना बदला यूरोप",
+        "duration": "PT7M55S",
+        "versionPid": "p08qsqwb",
+        "versionCrid": "crid://bbc.co.uk/p/250087645",
+        "insertionType": "",
+        "pid": "p08qsqw3"
+      },
+      "end": "2020-09-17T07:32:41.000Z"
+    },
+    {
+      "title": "इसराइल की अरब देशों से दोस्ती कितनी अहम",
+      "startTime": "2020-09-17T07:32:41.000Z",
+      "duration": "PT2M11S",
+      "insertionType": "",
+      "asset": {
+        "title": "इसराइल की अरब देशों से दोस्ती कितनी अहम",
+        "duration": "PT2M11S",
+        "versionPid": "p08rp52p",
+        "versionCrid": "crid://bbc.co.uk/p/250904691",
+        "insertionType": "",
+        "pid": "p08rp52j"
+      },
+      "end": "2020-09-17T07:34:52.000Z"
+    },
+    {
+      "title": "पीरियड्स के दौरान छुट्टी को लेकर क्या है महिलाओं की राय",
+      "startTime": "2020-09-17T07:34:52.000Z",
+      "duration": "PT2M52S",
+      "insertionType": "",
+      "asset": {
+        "title": "पीरियड्स के दौरान छुट्टी को लेकर क्या है महिलाओं की राय",
+        "duration": "PT2M52S",
+        "versionPid": "p08rp51r",
+        "versionCrid": "crid://bbc.co.uk/p/250904662",
+        "insertionType": "",
+        "pid": "p08rp51h"
+      },
+      "end": "2020-09-17T07:37:44.000Z"
+    },
+    {
+      "title": "कोरोना वायरस के मामले में क्या भारत अमरीका को भी पीछे छोड़ देगा?",
+      "startTime": "2020-09-17T07:37:44.000Z",
+      "duration": "PT2M22S",
+      "insertionType": "",
+      "asset": {
+        "title": "कोरोना वायरस के मामले में क्या भारत अमरीका को भी पीछे छोड़ देगा?",
+        "duration": "PT2M22S",
+        "versionPid": "p08rnnd8",
+        "versionCrid": "crid://bbc.co.uk/p/250889613",
+        "insertionType": "",
+        "pid": "p08rnncs"
+      },
+      "end": "2020-09-17T07:40:06.000Z"
+    },
+    {
+      "title": "भारत चीन तनाव पर अब चीन की तरफ से क्या जवाब आया?",
+      "startTime": "2020-09-17T07:40:06.000Z",
+      "duration": "PT3M42S",
+      "insertionType": "",
+      "asset": {
+        "title": "भारत चीन तनाव पर अब चीन की तरफ से क्या जवाब आया?",
+        "duration": "PT3M42S",
+        "versionPid": "p08rnnnr",
+        "versionCrid": "crid://bbc.co.uk/p/250889877",
+        "insertionType": "",
+        "pid": "p08rnnnh"
+      },
+      "end": "2020-09-17T07:43:48.000Z"
+    },
+    {
+      "title": "पीरियड्स को लेकर महिला खिलाड़ियों की चुनौतियां",
+      "startTime": "2020-09-17T07:43:48.000Z",
+      "duration": "PT3M25S",
+      "insertionType": "",
+      "asset": {
+        "title": "पीरियड्स को लेकर महिला खिलाड़ियों की चुनौतियां",
+        "duration": "PT3M25S",
+        "versionPid": "p08rp473",
+        "versionCrid": "crid://bbc.co.uk/p/250903867",
+        "insertionType": "",
+        "pid": "p08rp46z"
+      },
+      "end": "2020-09-17T07:47:13.000Z"
+    },
+    {
+      "title": "इसराइल से दोस्ती क्यों कर रहे हैं मुस्लिम देश?",
+      "startTime": "2020-09-17T07:47:13.000Z",
+      "duration": "PT8M5S",
+      "insertionType": "",
+      "asset": {
+        "title": "इसराइल से दोस्ती क्यों कर रहे हैं मुस्लिम देश?",
+        "duration": "PT8M5S",
+        "versionPid": "p08rmmsd",
+        "versionCrid": "crid://bbc.co.uk/p/250859236",
+        "insertionType": "",
+        "pid": "p08rmms8"
+      },
+      "end": "2020-09-17T07:55:18.000Z"
+    },
+    {
+      "title": "क्या UPSC परीक्षा में मुसलमानों को ज़्यादा मौके मिलते हैं?",
+      "startTime": "2020-09-17T07:55:18.000Z",
+      "duration": "PT8M47S",
+      "insertionType": "",
+      "asset": {
+        "title": "क्या UPSC परीक्षा में मुसलमानों को ज़्यादा मौके मिलते हैं?",
+        "duration": "PT8M47S",
+        "versionPid": "p08rmmsv",
+        "versionCrid": "crid://bbc.co.uk/p/250859250",
+        "insertionType": "",
+        "pid": "p08rmmss"
+      },
+      "end": "2020-09-17T08:04:05.000Z"
+    },
+    {
+      "title": "भारतीय सेना किस तरह की तैयारियों में जुटी है?",
+      "startTime": "2020-09-17T08:04:05.000Z",
+      "duration": "PT2M54S",
+      "insertionType": "",
+      "asset": {
+        "title": "भारतीय सेना किस तरह की तैयारियों में जुटी है?",
+        "duration": "PT2M54S",
+        "versionPid": "p08rmmp3",
+        "versionCrid": "crid://bbc.co.uk/p/250859134",
+        "insertionType": "",
+        "pid": "p08rmmp1"
+      },
+      "end": "2020-09-17T08:06:59.000Z"
+    },
+    {
+      "title": "Cover Story: महाविनाश की ओर बढ़ रही है दुनिया?",
+      "startTime": "2020-09-17T08:06:59.000Z",
+      "duration": "PT7M52S",
+      "insertionType": "",
+      "asset": {
+        "title": "Cover Story: महाविनाश की ओर बढ़ रही है दुनिया?",
+        "duration": "PT7M52S",
+        "versionPid": "p08rl9ph",
+        "versionCrid": "crid://bbc.co.uk/p/250819745",
+        "insertionType": "",
+        "pid": "p08rl9p8"
+      },
+      "end": "2020-09-17T08:14:51.000Z"
+    },
+    {
+      "title": "ऑटो ड्राइविंग ने बदल दी इन महिलाओं की ज़िंदगी",
+      "startTime": "2020-09-17T08:14:51.000Z",
+      "duration": "PT3M42S",
+      "insertionType": "",
+      "asset": {
+        "title": "ऑटो ड्राइविंग ने बदल दी इन महिलाओं की ज़िंदगी",
+        "duration": "PT3M42S",
+        "versionPid": "p08rkj5z",
+        "versionCrid": "crid://bbc.co.uk/p/250796200",
+        "insertionType": "",
+        "pid": "p08rkj5x"
+      },
+      "end": "2020-09-17T08:18:33.000Z"
+    },
+    {
+      "title": "भारत-चीन सीमा विवाद: क्या चीन अब रुख नरम कर रहा है?",
+      "startTime": "2020-09-17T08:18:33.000Z",
+      "duration": "PT4M59S",
+      "insertionType": "",
+      "asset": {
+        "title": "भारत-चीन सीमा विवाद: क्या चीन अब रुख नरम कर रहा है?",
+        "duration": "PT4M59S",
+        "versionPid": "p08rknz1",
+        "versionCrid": "crid://bbc.co.uk/p/250800790",
+        "insertionType": "",
+        "pid": "p08rhylr"
+      },
+      "end": "2020-09-17T08:23:32.000Z"
+    },
+    {
+      "title": "यूएई के बाद इसराइल और बहरीन के बीच भी ऐतिहासिक समझौता",
+      "startTime": "2020-09-17T08:23:32.000Z",
+      "duration": "PT3M48S",
+      "insertionType": "",
+      "asset": {
+        "title": "यूएई के बाद इसराइल और बहरीन के बीच भी ऐतिहासिक समझौता",
+        "duration": "PT3M48S",
+        "versionPid": "p08rhyld",
+        "versionCrid": "crid://bbc.co.uk/p/250749496",
+        "insertionType": "",
+        "pid": "p08rhyl9"
+      },
+      "end": "2020-09-17T08:27:20.000Z"
+    },
+    {
+      "title": "तुर्की के राष्ट्रपति अर्दोआन ने अब किस देश को दी धमकी?",
+      "startTime": "2020-09-17T08:27:20.000Z",
+      "duration": "PT4M19S",
+      "insertionType": "",
+      "asset": {
+        "title": "तुर्की के राष्ट्रपति अर्दोआन ने अब किस देश को दी धमकी?",
+        "duration": "PT4M19S",
+        "versionPid": "p08rf1c8",
+        "versionCrid": "crid://bbc.co.uk/p/250662785",
+        "insertionType": "",
+        "pid": "p08rf1c6"
+      },
+      "end": "2020-09-17T08:31:39.000Z"
+    },
+    {
+      "title": "पीरियड्स के दौरान छुट्टी को लेकर क्या है महिलाओं की राय",
+      "startTime": "2020-09-17T08:31:39.000Z",
+      "duration": "PT2M52S",
+      "insertionType": "",
+      "asset": {
+        "title": "पीरियड्स के दौरान छुट्टी को लेकर क्या है महिलाओं की राय",
+        "duration": "PT2M52S",
+        "versionPid": "p08rp51r",
+        "versionCrid": "crid://bbc.co.uk/p/250904662",
+        "insertionType": "",
+        "pid": "p08rp51h"
+      },
+      "end": "2020-09-17T08:34:31.000Z"
+    },
+    {
+      "title": "पीरियड्स को लेकर महिला खिलाड़ियों की चुनौतियां",
+      "startTime": "2020-09-17T08:34:31.000Z",
+      "duration": "PT3M25S",
+      "insertionType": "",
+      "asset": {
+        "title": "पीरियड्स को लेकर महिला खिलाड़ियों की चुनौतियां",
+        "duration": "PT3M25S",
+        "versionPid": "p08rp473",
+        "versionCrid": "crid://bbc.co.uk/p/250903867",
+        "insertionType": "",
+        "pid": "p08rp46z"
+      },
+      "end": "2020-09-17T08:37:56.000Z"
+    },
+    {
+      "title": "भारत चीन तनाव पर अब चीन की तरफ से क्या जवाब आया?",
+      "startTime": "2020-09-17T08:37:56.000Z",
+      "duration": "PT3M42S",
+      "insertionType": "",
+      "asset": {
+        "title": "भारत चीन तनाव पर अब चीन की तरफ से क्या जवाब आया?",
+        "duration": "PT3M42S",
+        "versionPid": "p08rnnnr",
+        "versionCrid": "crid://bbc.co.uk/p/250889877",
+        "insertionType": "",
+        "pid": "p08rnnnh"
+      },
+      "end": "2020-09-17T08:41:38.000Z"
+    },
+    {
+      "title": "कोरोना वायरस के मामले में क्या भारत अमरीका को भी पीछे छोड़ देगा?",
+      "startTime": "2020-09-17T08:41:38.000Z",
+      "duration": "PT2M22S",
+      "insertionType": "",
+      "asset": {
+        "title": "कोरोना वायरस के मामले में क्या भारत अमरीका को भी पीछे छोड़ देगा?",
+        "duration": "PT2M22S",
+        "versionPid": "p08rnnd8",
+        "versionCrid": "crid://bbc.co.uk/p/250889613",
+        "insertionType": "",
+        "pid": "p08rnncs"
+      },
+      "end": "2020-09-17T08:44:00.000Z"
+    },
+    {
+      "title": "क्या UPSC परीक्षा में मुसलमानों को ज़्यादा मौके मिलते हैं?",
+      "startTime": "2020-09-17T08:44:00.000Z",
+      "duration": "PT8M47S",
+      "insertionType": "",
+      "asset": {
+        "title": "क्या UPSC परीक्षा में मुसलमानों को ज़्यादा मौके मिलते हैं?",
+        "duration": "PT8M47S",
+        "versionPid": "p08rmmsv",
+        "versionCrid": "crid://bbc.co.uk/p/250859250",
+        "insertionType": "",
+        "pid": "p08rmmss"
+      },
+      "end": "2020-09-17T08:52:47.000Z"
+    },
+    {
+      "title": "इसराइल से दोस्ती क्यों कर रहे हैं मुस्लिम देश?",
+      "startTime": "2020-09-17T08:52:47.000Z",
+      "duration": "PT8M5S",
+      "insertionType": "",
+      "asset": {
+        "title": "इसराइल से दोस्ती क्यों कर रहे हैं मुस्लिम देश?",
+        "duration": "PT8M5S",
+        "versionPid": "p08rmmsd",
+        "versionCrid": "crid://bbc.co.uk/p/250859236",
+        "insertionType": "",
+        "pid": "p08rmms8"
+      },
+      "end": "2020-09-17T09:00:52.000Z"
+    },
+    {
+      "title": "राजस्थान में चंबल नदी में नाव पलटने से बड़ा हादसा",
+      "startTime": "2020-09-17T09:00:52.000Z",
+      "duration": "PT1M20S",
+      "insertionType": "",
+      "asset": {
+        "title": "राजस्थान में चंबल नदी में नाव पलटने से बड़ा हादसा",
+        "duration": "PT1M20S",
+        "versionPid": "p08rmmry",
+        "versionCrid": "crid://bbc.co.uk/p/250859222",
+        "insertionType": "",
+        "pid": "p08rmmrw"
+      },
+      "end": "2020-09-17T09:02:12.000Z"
+    },
+    {
+      "title": "भारतीय सेना किस तरह की तैयारियों में जुटी है?",
+      "startTime": "2020-09-17T09:02:12.000Z",
+      "duration": "PT2M54S",
+      "insertionType": "",
+      "asset": {
+        "title": "भारतीय सेना किस तरह की तैयारियों में जुटी है?",
+        "duration": "PT2M54S",
+        "versionPid": "p08rmmp3",
+        "versionCrid": "crid://bbc.co.uk/p/250859134",
+        "insertionType": "",
+        "pid": "p08rmmp1"
+      },
+      "end": "2020-09-17T09:05:06.000Z"
+    },
+    {
+      "title": "चीन में अब पटरी पर लौट रही है ज़िंदगी",
+      "startTime": "2020-09-17T09:05:06.000Z",
+      "duration": "PT2M3S",
+      "insertionType": "",
+      "asset": {
+        "title": "चीन में अब पटरी पर लौट रही है ज़िंदगी",
+        "duration": "PT2M3S",
+        "versionPid": "p08rlbqh",
+        "versionCrid": "crid://bbc.co.uk/p/250820738",
+        "insertionType": "",
+        "pid": "p08rlbq9"
+      },
+      "end": "2020-09-17T09:07:09.000Z"
+    },
+    {
+      "title": "बिहार के नए माउंटेन मैन, जिन्होंने पहाड़ काटकर नहर बना दी",
+      "startTime": "2020-09-17T09:07:09.000Z",
+      "duration": "PT5M24S",
+      "insertionType": "",
+      "asset": {
+        "title": "बिहार के नए माउंटेन मैन, जिन्होंने पहाड़ काटकर नहर बना दी",
+        "duration": "PT5M24S",
+        "versionPid": "p08rkkcb",
+        "versionCrid": "crid://bbc.co.uk/p/250797328",
+        "insertionType": "",
+        "pid": "p08rkkc4"
+      },
+      "end": "2020-09-17T09:12:33.000Z"
+    },
+    {
+      "title": "ऑटो ड्राइविंग ने बदल दी इन महिलाओं की ज़िंदगी",
+      "startTime": "2020-09-17T09:12:33.000Z",
+      "duration": "PT3M42S",
+      "insertionType": "",
+      "asset": {
+        "title": "ऑटो ड्राइविंग ने बदल दी इन महिलाओं की ज़िंदगी",
+        "duration": "PT3M42S",
+        "versionPid": "p08rkj5z",
+        "versionCrid": "crid://bbc.co.uk/p/250796200",
+        "insertionType": "",
+        "pid": "p08rkj5x"
+      },
+      "end": "2020-09-17T09:16:15.000Z"
+    },
+    {
+      "title": "भारत-चीन सीमा विवाद: क्या चीन अब रुख नरम कर रहा है?",
+      "startTime": "2020-09-17T09:16:15.000Z",
+      "duration": "PT4M59S",
+      "insertionType": "",
+      "asset": {
+        "title": "भारत-चीन सीमा विवाद: क्या चीन अब रुख नरम कर रहा है?",
+        "duration": "PT4M59S",
+        "versionPid": "p08rknz1",
+        "versionCrid": "crid://bbc.co.uk/p/250800790",
+        "insertionType": "",
+        "pid": "p08rhylr"
+      },
+      "end": "2020-09-17T09:21:14.000Z"
+    },
+    {
+      "title": "यूपी में स्पेशल सिक्योरिटी फ़ोर्स के गठन पर उठे सवाल",
+      "startTime": "2020-09-17T09:21:14.000Z",
+      "duration": "PT6M3S",
+      "insertionType": "",
+      "asset": {
+        "title": "यूपी में स्पेशल सिक्योरिटी फ़ोर्स के गठन पर उठे सवाल",
+        "duration": "PT6M3S",
+        "versionPid": "p08rhyl3",
+        "versionCrid": "crid://bbc.co.uk/p/250749487",
+        "insertionType": "",
+        "pid": "p08rhyl0"
+      },
+      "end": "2020-09-17T09:27:17.000Z"
+    },
+    {
+      "title": "पाकिस्तान: महिला से गैंगरेप को लेकर आक्रोश",
+      "startTime": "2020-09-17T09:27:17.000Z",
+      "duration": "PT1M50S",
+      "insertionType": "",
+      "asset": {
+        "title": "पाकिस्तान: महिला से गैंगरेप को लेकर आक्रोश",
+        "duration": "PT1M50S",
+        "versionPid": "p08rg5zr",
+        "versionCrid": "crid://bbc.co.uk/p/250697024",
+        "insertionType": "",
+        "pid": "p08rg5zp"
+      },
+      "end": "2020-09-17T09:29:07.000Z"
+    },
+    {
+      "title": "अमरीका चुनाव: हिंदुओं को लुभाने की कोशिश",
+      "startTime": "2020-09-17T09:29:07.000Z",
+      "duration": "PT2M36S",
+      "insertionType": "",
+      "asset": {
+        "title": "अमरीका चुनाव: हिंदुओं को लुभाने की कोशिश",
+        "duration": "PT2M36S",
+        "versionPid": "p08rgfx7",
+        "versionCrid": "crid://bbc.co.uk/p/250704634",
+        "insertionType": "",
+        "pid": "p08rg5q6"
+      },
+      "end": "2020-09-17T09:31:43.000Z"
+    },
+    {
+      "title": "इसराइल की अरब देशों से दोस्ती कितनी अहम",
+      "startTime": "2020-09-17T09:31:43.000Z",
+      "duration": "PT2M11S",
+      "insertionType": "",
+      "asset": {
+        "title": "इसराइल की अरब देशों से दोस्ती कितनी अहम",
+        "duration": "PT2M11S",
+        "versionPid": "p08rp52p",
+        "versionCrid": "crid://bbc.co.uk/p/250904691",
+        "insertionType": "",
+        "pid": "p08rp52j"
+      },
+      "end": "2020-09-17T09:33:54.000Z"
+    },
+    {
+      "title": "पीरियड्स के दौरान छुट्टी को लेकर क्या है महिलाओं की राय",
+      "startTime": "2020-09-17T09:33:54.000Z",
+      "duration": "PT2M52S",
+      "insertionType": "",
+      "asset": {
+        "title": "पीरियड्स के दौरान छुट्टी को लेकर क्या है महिलाओं की राय",
+        "duration": "PT2M52S",
+        "versionPid": "p08rp51r",
+        "versionCrid": "crid://bbc.co.uk/p/250904662",
+        "insertionType": "",
+        "pid": "p08rp51h"
+      },
+      "end": "2020-09-17T09:36:46.000Z"
+    },
+    {
+      "title": "कोरोना वायरस के मामले में क्या भारत अमरीका को भी पीछे छोड़ देगा?",
+      "startTime": "2020-09-17T09:36:46.000Z",
+      "duration": "PT2M22S",
+      "insertionType": "",
+      "asset": {
+        "title": "कोरोना वायरस के मामले में क्या भारत अमरीका को भी पीछे छोड़ देगा?",
+        "duration": "PT2M22S",
+        "versionPid": "p08rnnd8",
+        "versionCrid": "crid://bbc.co.uk/p/250889613",
+        "insertionType": "",
+        "pid": "p08rnncs"
+      },
+      "end": "2020-09-17T09:39:08.000Z"
+    },
+    {
+      "title": "भारत चीन तनाव पर अब चीन की तरफ से क्या जवाब आया?",
+      "startTime": "2020-09-17T09:39:08.000Z",
+      "duration": "PT3M42S",
+      "insertionType": "",
+      "asset": {
+        "title": "भारत चीन तनाव पर अब चीन की तरफ से क्या जवाब आया?",
+        "duration": "PT3M42S",
+        "versionPid": "p08rnnnr",
+        "versionCrid": "crid://bbc.co.uk/p/250889877",
+        "insertionType": "",
+        "pid": "p08rnnnh"
+      },
+      "end": "2020-09-17T09:42:50.000Z"
+    },
+    {
+      "title": "इसराइल से दोस्ती क्यों कर रहे हैं मुस्लिम देश?",
+      "startTime": "2020-09-17T09:42:50.000Z",
+      "duration": "PT8M5S",
+      "insertionType": "",
+      "asset": {
+        "title": "इसराइल से दोस्ती क्यों कर रहे हैं मुस्लिम देश?",
+        "duration": "PT8M5S",
+        "versionPid": "p08rmmsd",
+        "versionCrid": "crid://bbc.co.uk/p/250859236",
+        "insertionType": "",
+        "pid": "p08rmms8"
+      },
+      "end": "2020-09-17T09:50:55.000Z"
+    },
+    {
+      "title": "क्या UPSC परीक्षा में मुसलमानों को ज़्यादा मौके मिलते हैं?",
+      "startTime": "2020-09-17T09:50:55.000Z",
+      "duration": "PT8M47S",
+      "insertionType": "",
+      "asset": {
+        "title": "क्या UPSC परीक्षा में मुसलमानों को ज़्यादा मौके मिलते हैं?",
+        "duration": "PT8M47S",
+        "versionPid": "p08rmmsv",
+        "versionCrid": "crid://bbc.co.uk/p/250859250",
+        "insertionType": "",
+        "pid": "p08rmmss"
+      },
+      "end": "2020-09-17T09:59:42.000Z"
+    },
+    {
+      "title": "भारतीय सेना किस तरह की तैयारियों में जुटी है?",
+      "startTime": "2020-09-17T09:59:42.000Z",
+      "duration": "PT2M54S",
+      "insertionType": "",
+      "asset": {
+        "title": "भारतीय सेना किस तरह की तैयारियों में जुटी है?",
+        "duration": "PT2M54S",
+        "versionPid": "p08rmmp3",
+        "versionCrid": "crid://bbc.co.uk/p/250859134",
+        "insertionType": "",
+        "pid": "p08rmmp1"
+      },
+      "end": "2020-09-17T10:02:36.000Z"
+    },
+    {
+      "title": "Cover Story: महाविनाश की ओर बढ़ रही है दुनिया?",
+      "startTime": "2020-09-17T10:02:36.000Z",
+      "duration": "PT7M52S",
+      "insertionType": "",
+      "asset": {
+        "title": "Cover Story: महाविनाश की ओर बढ़ रही है दुनिया?",
+        "duration": "PT7M52S",
+        "versionPid": "p08rl9ph",
+        "versionCrid": "crid://bbc.co.uk/p/250819745",
+        "insertionType": "",
+        "pid": "p08rl9p8"
+      },
+      "end": "2020-09-17T10:10:28.000Z"
+    },
+    {
+      "title": "ऑटो ड्राइविंग ने बदल दी इन महिलाओं की ज़िंदगी",
+      "startTime": "2020-09-17T10:10:28.000Z",
+      "duration": "PT3M42S",
+      "insertionType": "",
+      "asset": {
+        "title": "ऑटो ड्राइविंग ने बदल दी इन महिलाओं की ज़िंदगी",
+        "duration": "PT3M42S",
+        "versionPid": "p08rkj5z",
+        "versionCrid": "crid://bbc.co.uk/p/250796200",
+        "insertionType": "",
+        "pid": "p08rkj5x"
+      },
+      "end": "2020-09-17T10:14:10.000Z"
+    },
+    {
+      "title": "भारत-चीन सीमा विवाद: क्या चीन अब रुख नरम कर रहा है?",
+      "startTime": "2020-09-17T10:14:10.000Z",
+      "duration": "PT4M59S",
+      "insertionType": "",
+      "asset": {
+        "title": "भारत-चीन सीमा विवाद: क्या चीन अब रुख नरम कर रहा है?",
+        "duration": "PT4M59S",
+        "versionPid": "p08rknz1",
+        "versionCrid": "crid://bbc.co.uk/p/250800790",
+        "insertionType": "",
+        "pid": "p08rhylr"
+      },
+      "end": "2020-09-17T10:19:09.000Z"
+    },
+    {
+      "title": "यूएई के बाद इसराइल और बहरीन के बीच भी ऐतिहासिक समझौता",
+      "startTime": "2020-09-17T10:19:09.000Z",
+      "duration": "PT3M48S",
+      "insertionType": "",
+      "asset": {
+        "title": "यूएई के बाद इसराइल और बहरीन के बीच भी ऐतिहासिक समझौता",
+        "duration": "PT3M48S",
+        "versionPid": "p08rhyld",
+        "versionCrid": "crid://bbc.co.uk/p/250749496",
+        "insertionType": "",
+        "pid": "p08rhyl9"
+      },
+      "end": "2020-09-17T10:22:57.000Z"
+    },
+    {
+      "title": "तुर्की के राष्ट्रपति अर्दोआन ने अब किस देश को दी धमकी?",
+      "startTime": "2020-09-17T10:22:57.000Z",
+      "duration": "PT4M19S",
+      "insertionType": "",
+      "asset": {
+        "title": "तुर्की के राष्ट्रपति अर्दोआन ने अब किस देश को दी धमकी?",
+        "duration": "PT4M19S",
+        "versionPid": "p08rf1c8",
+        "versionCrid": "crid://bbc.co.uk/p/250662785",
+        "insertionType": "",
+        "pid": "p08rf1c6"
+      },
+      "end": "2020-09-17T10:27:16.000Z"
+    },
+    {
+      "title": "अच्छी सेहत के लिए किस तेल से खाना पकाना सही है",
+      "startTime": "2020-09-17T10:27:16.000Z",
+      "duration": "PT4M18S",
+      "insertionType": "",
+      "asset": {
+        "title": "अच्छी सेहत के लिए किस तेल से खाना पकाना सही है",
+        "duration": "PT4M18S",
+        "versionPid": "p08rb9lk",
+        "versionCrid": "crid://bbc.co.uk/p/250581326",
+        "insertionType": "",
+        "pid": "p08rb9lh"
+      },
+      "end": "2020-09-17T10:31:34.000Z"
+    },
+    {
+      "title": "पाकिस्तान के ख़िलाफ़ 'आज़ाद पख़्तूनिस्तान' की बुनियाद रखने वाला 'अकेला योद्धा'",
+      "startTime": "2020-09-17T10:31:34.000Z",
+      "duration": "PT13M30S",
+      "insertionType": "",
+      "asset": {
+        "title": "पाकिस्तान के ख़िलाफ़ 'आज़ाद पख़्तूनिस्तान' की बुनियाद रखने वाला 'अकेला योद्धा'",
+        "duration": "PT13M30S",
+        "versionPid": "p08r8f00",
+        "versionCrid": "crid://bbc.co.uk/p/250525013",
+        "insertionType": "",
+        "pid": "p08r8dzw"
+      },
+      "end": "2020-09-17T10:45:04.000Z"
+    },
+    {
+      "title": "विवेचना: चीनियों ने भारतीय युद्धबंदियों को एक बूंद पानी भी नहीं दिया था",
+      "startTime": "2020-09-17T10:45:04.000Z",
+      "duration": "PT13M30S",
+      "insertionType": "",
+      "asset": {
+        "title": "विवेचना: चीनियों ने भारतीय युद्धबंदियों को एक बूंद पानी भी नहीं दिया था",
+        "duration": "PT13M30S",
+        "versionPid": "p08r85ww",
+        "versionCrid": "crid://bbc.co.uk/p/250518189",
+        "insertionType": "",
+        "pid": "p08r85wr"
+      },
+      "end": "2020-09-17T10:58:34.000Z"
+    },
+    {
+      "title": "भारत-पाकिस्तान 1965 के युद्ध में कौन जीता था?",
+      "startTime": "2020-09-17T10:58:34.000Z",
+      "duration": "PT13M27S",
+      "insertionType": "",
+      "asset": {
+        "title": "भारत-पाकिस्तान 1965 के युद्ध में कौन जीता था?",
+        "duration": "PT13M27S",
+        "versionPid": "p08r1kpj",
+        "versionCrid": "crid://bbc.co.uk/p/250320987",
+        "insertionType": "",
+        "pid": "p08r1kpg"
+      },
+      "end": "2020-09-17T11:12:01.000Z"
+    },
+    {
+      "title": "भारत चीन की वो जंग जहां भारतीय सैनिकों ने चीनी सैनिकों को पछाड़ा था",
+      "startTime": "2020-09-17T11:12:01.000Z",
+      "duration": "PT13M9S",
+      "insertionType": "",
+      "asset": {
+        "title": "भारत चीन की वो जंग जहां भारतीय सैनिकों ने चीनी सैनिकों को पछाड़ा था",
+        "duration": "PT13M9S",
+        "versionPid": "p08qyv8m",
+        "versionCrid": "crid://bbc.co.uk/p/250239863",
+        "insertionType": "",
+        "pid": "p08qyv8k"
+      },
+      "end": "2020-09-17T11:25:10.000Z"
+    },
+    {
+      "title": "समंदर का सबसे जांबाज़ पंछी अब समुद्री डाकुओं और चोरों को पकड़वाएगा",
+      "startTime": "2020-09-17T11:25:10.000Z",
+      "duration": "PT4M59S",
+      "insertionType": "",
+      "asset": {
+        "title": "समंदर का सबसे जांबाज़ पंछी अब समुद्री डाकुओं और चोरों को पकड़वाएगा",
+        "duration": "PT4M59S",
+        "versionPid": "p08qv6fs",
+        "versionCrid": "crid://bbc.co.uk/p/250131430",
+        "insertionType": "",
+        "pid": "p08qv6fp"
+      },
+      "end": "2020-09-17T11:30:09.000Z"
+    },
+    {
+      "title": "इसराइल की अरब देशों से दोस्ती कितनी अहम",
+      "startTime": "2020-09-17T11:30:09.000Z",
+      "duration": "PT2M11S",
+      "insertionType": "",
+      "asset": {
+        "title": "इसराइल की अरब देशों से दोस्ती कितनी अहम",
+        "duration": "PT2M11S",
+        "versionPid": "p08rp52p",
+        "versionCrid": "crid://bbc.co.uk/p/250904691",
+        "insertionType": "",
+        "pid": "p08rp52j"
+      },
+      "end": "2020-09-17T11:32:20.000Z"
+    },
+    {
+      "title": "पीरियड्स के दौरान छुट्टी को लेकर क्या है महिलाओं की राय",
+      "startTime": "2020-09-17T11:32:20.000Z",
+      "duration": "PT2M52S",
+      "insertionType": "",
+      "asset": {
+        "title": "पीरियड्स के दौरान छुट्टी को लेकर क्या है महिलाओं की राय",
+        "duration": "PT2M52S",
+        "versionPid": "p08rp51r",
+        "versionCrid": "crid://bbc.co.uk/p/250904662",
+        "insertionType": "",
+        "pid": "p08rp51h"
+      },
+      "end": "2020-09-17T11:35:12.000Z"
+    },
+    {
+      "title": "इसराइल से दोस्ती क्यों कर रहे हैं मुस्लिम देश?",
+      "startTime": "2020-09-17T11:35:12.000Z",
+      "duration": "PT8M5S",
+      "insertionType": "",
+      "asset": {
+        "title": "इसराइल से दोस्ती क्यों कर रहे हैं मुस्लिम देश?",
+        "duration": "PT8M5S",
+        "versionPid": "p08rmmsd",
+        "versionCrid": "crid://bbc.co.uk/p/250859236",
+        "insertionType": "",
+        "pid": "p08rmms8"
+      },
+      "end": "2020-09-17T11:43:17.000Z"
+    },
+    {
+      "title": "वैज्ञानिकों को मिले शुक्र ग्रह पर 'जीवन के सुबूत'",
+      "startTime": "2020-09-17T11:43:17.000Z",
+      "duration": "PT1M49S",
+      "insertionType": "",
+      "asset": {
+        "title": "वैज्ञानिकों को मिले शुक्र ग्रह पर 'जीवन के सुबूत'",
+        "duration": "PT1M49S",
+        "versionPid": "p08rlbr1",
+        "versionCrid": "crid://bbc.co.uk/p/250820755",
+        "insertionType": "",
+        "pid": "p08rlbqr"
+      },
+      "end": "2020-09-17T11:45:06.000Z"
+    },
+    {
+      "title": "कोरोना वायरस: फ़ेस मास्क ज़रूरत के साथ ख़तरा भी बने",
+      "startTime": "2020-09-17T11:45:06.000Z",
+      "duration": "PT4M29S",
+      "insertionType": "",
+      "asset": {
+        "title": "कोरोना वायरस: फ़ेस मास्क ज़रूरत के साथ ख़तरा भी बने",
+        "duration": "PT4M29S",
+        "versionPid": "p08rhyj4",
+        "versionCrid": "crid://bbc.co.uk/p/250749426",
+        "insertionType": "",
+        "pid": "p08rhyhz"
+      },
+      "end": "2020-09-17T11:49:35.000Z"
+    },
+    {
+      "title": "अमरीका पर आखिरी बार हमला करने वाले जापान के बमों की कहानी",
+      "startTime": "2020-09-17T11:49:35.000Z",
+      "duration": "PT8M56S",
+      "insertionType": "",
+      "asset": {
+        "title": "अमरीका पर आखिरी बार हमला करने वाले जापान के बमों की कहानी",
+        "duration": "PT8M56S",
+        "versionPid": "p08rhyll",
+        "versionCrid": "crid://bbc.co.uk/p/250749503",
+        "insertionType": "",
+        "pid": "p08rhylh"
+      },
+      "end": "2020-09-17T11:58:31.000Z"
+    },
+    {
+      "title": "यूएई के बाद इसराइल और बहरीन के बीच भी ऐतिहासिक समझौता",
+      "startTime": "2020-09-17T11:58:31.000Z",
+      "duration": "PT3M48S",
+      "insertionType": "",
+      "asset": {
+        "title": "यूएई के बाद इसराइल और बहरीन के बीच भी ऐतिहासिक समझौता",
+        "duration": "PT3M48S",
+        "versionPid": "p08rhyld",
+        "versionCrid": "crid://bbc.co.uk/p/250749496",
+        "insertionType": "",
+        "pid": "p08rhyl9"
+      },
+      "end": "2020-09-17T12:02:19.000Z"
+    },
+    {
+      "title": "अमरीका चुनाव: हिंदुओं को लुभाने की कोशिश",
+      "startTime": "2020-09-17T12:02:19.000Z",
+      "duration": "PT2M36S",
+      "insertionType": "",
+      "asset": {
+        "title": "अमरीका चुनाव: हिंदुओं को लुभाने की कोशिश",
+        "duration": "PT2M36S",
+        "versionPid": "p08rgfx7",
+        "versionCrid": "crid://bbc.co.uk/p/250704634",
+        "insertionType": "",
+        "pid": "p08rg5q6"
+      },
+      "end": "2020-09-17T12:04:55.000Z"
+    },
+    {
+      "title": "रूस की कोरोना वैक्सीन का ख़्वाब भारत के बिना कैसे अधूरा है?",
+      "startTime": "2020-09-17T12:04:55.000Z",
+      "duration": "PT6M31S",
+      "insertionType": "",
+      "asset": {
+        "title": "रूस की कोरोना वैक्सीन का ख़्वाब भारत के बिना कैसे अधूरा है?",
+        "duration": "PT6M31S",
+        "versionPid": "p08rb9m2",
+        "versionCrid": "crid://bbc.co.uk/p/250581342",
+        "insertionType": "",
+        "pid": "p08rb9m0"
+      },
+      "end": "2020-09-17T12:11:26.000Z"
+    },
+    {
+      "title": "अच्छी सेहत के लिए किस तेल से खाना पकाना सही है",
+      "startTime": "2020-09-17T12:11:26.000Z",
+      "duration": "PT4M18S",
+      "insertionType": "",
+      "asset": {
+        "title": "अच्छी सेहत के लिए किस तेल से खाना पकाना सही है",
+        "duration": "PT4M18S",
+        "versionPid": "p08rb9lk",
+        "versionCrid": "crid://bbc.co.uk/p/250581326",
+        "insertionType": "",
+        "pid": "p08rb9lh"
+      },
+      "end": "2020-09-17T12:15:44.000Z"
+    },
+    {
+      "title": "अमरीका में जंगल की आग से झुलस रहे हैं 12 राज्य",
+      "startTime": "2020-09-17T12:15:44.000Z",
+      "duration": "PT1M52S",
+      "insertionType": "",
+      "asset": {
+        "title": "अमरीका में जंगल की आग से झुलस रहे हैं 12 राज्य",
+        "duration": "PT1M52S",
+        "versionPid": "p08r6yct",
+        "versionCrid": "crid://bbc.co.uk/p/250481173",
+        "insertionType": "",
+        "pid": "p08r6ycm"
+      },
+      "end": "2020-09-17T12:17:36.000Z"
+    },
+    {
+      "title": "ग्रीस और तुर्की के बीच युद्ध जैसे हालात पैदा होने की वजह",
+      "startTime": "2020-09-17T12:17:36.000Z",
+      "duration": "PT12M11S",
+      "insertionType": "",
+      "asset": {
+        "title": "ग्रीस और तुर्की के बीच युद्ध जैसे हालात पैदा होने की वजह",
+        "duration": "PT12M11S",
+        "versionPid": "p08r5x7n",
+        "versionCrid": "crid://bbc.co.uk/p/250450292",
+        "insertionType": "",
+        "pid": "p08r5x7h"
+      },
+      "end": "2020-09-17T12:29:47.000Z"
+    },
+    {
+      "title": "HIN//CHEETAH/OOV/1926/6/8",
+      "startTime": "2020-09-17T12:29:47.000Z",
+      "duration": "PT33S",
+      "insertionType": "",
+      "asset": {
+        "title": "HIN//CHEETAH/OOV/1926/6/8",
+        "duration": "PT33S",
+        "versionPid": "p08myn76",
+        "versionCrid": "crid://bbc.co.uk/p/247463490",
+        "insertionType": "",
+        "pid": "p08myn71"
+      },
+      "end": "2020-09-17T12:30:20.000Z"
+    },
+    {
+      "title": "COVER STORY: पीरियड्स पर झिझक क्यों?",
+      "startTime": "2020-09-17T12:30:20.000Z",
+      "duration": "PT7M41S",
+      "insertionType": "",
+      "asset": {
+        "title": "COVER STORY: पीरियड्स पर झिझक क्यों?",
+        "duration": "PT7M41S",
+        "versionPid": "p08rpcxf",
+        "versionCrid": "crid://bbc.co.uk/p/250911255",
+        "insertionType": "",
+        "pid": "p08rpcx7"
+      },
+      "end": "2020-09-17T12:38:01.000Z"
+    },
+    {
+      "title": "Cover Story: महाविनाश की ओर बढ़ रही है दुनिया?",
+      "startTime": "2020-09-17T12:38:01.000Z",
+      "duration": "PT7M52S",
+      "insertionType": "",
+      "asset": {
+        "title": "Cover Story: महाविनाश की ओर बढ़ रही है दुनिया?",
+        "duration": "PT7M52S",
+        "versionPid": "p08rl9ph",
+        "versionCrid": "crid://bbc.co.uk/p/250819745",
+        "insertionType": "",
+        "pid": "p08rl9p8"
+      },
+      "end": "2020-09-17T12:45:53.000Z"
+    },
+    {
+      "title": "COVER STORY:क्या तालिबान से बनेगी बात?",
+      "startTime": "2020-09-17T12:45:53.000Z",
+      "duration": "PT7M49S",
+      "insertionType": "",
+      "asset": {
+        "title": "COVER STORY:क्या तालिबान से बनेगी बात?",
+        "duration": "PT7M49S",
+        "versionPid": "p08r6zwl",
+        "versionCrid": "crid://bbc.co.uk/p/250482623",
+        "insertionType": "",
+        "pid": "p08r6zwf"
+      },
+      "end": "2020-09-17T12:53:42.000Z"
+    },
+    {
+      "title": "COVER STORY: बीबीसी को मिले सुराग, लीबिया हमले में यूएई का हाथ",
+      "startTime": "2020-09-17T12:53:42.000Z",
+      "duration": "PT7M56S",
+      "insertionType": "",
+      "asset": {
+        "title": "COVER STORY: बीबीसी को मिले सुराग, लीबिया हमले में यूएई का हाथ",
+        "duration": "PT7M56S",
+        "versionPid": "p08qzkpq",
+        "versionCrid": "crid://bbc.co.uk/p/250261412",
+        "insertionType": "",
+        "pid": "p08qzkpl"
+      },
+      "end": "2020-09-17T13:01:38.000Z"
+    },
+    {
+      "title": "COVER STORY: ऐसे बन रही है कोरोना की वैक्सीन",
+      "startTime": "2020-09-17T13:01:38.000Z",
+      "duration": "PT7M49S",
+      "insertionType": "",
+      "asset": {
+        "title": "COVER STORY: ऐसे बन रही है कोरोना की वैक्सीन",
+        "duration": "PT7M49S",
+        "versionPid": "p08qwp3k",
+        "versionCrid": "crid://bbc.co.uk/p/250175319",
+        "insertionType": "",
+        "pid": "p08qwp3f"
+      },
+      "end": "2020-09-17T13:09:27.000Z"
+    },
+    {
+      "title": "COVER STORY : Migrant Crisis से कितना बदला यूरोप",
+      "startTime": "2020-09-17T13:09:27.000Z",
+      "duration": "PT7M55S",
+      "insertionType": "",
+      "asset": {
+        "title": "COVER STORY : Migrant Crisis से कितना बदला यूरोप",
+        "duration": "PT7M55S",
+        "versionPid": "p08qsqwb",
+        "versionCrid": "crid://bbc.co.uk/p/250087645",
+        "insertionType": "",
+        "pid": "p08qsqw3"
+      },
+      "end": "2020-09-17T13:17:22.000Z"
+    },
+    {
+      "title": "COVER STORY: बच्चों में ऐसे पता लगाएं कोरोना",
+      "startTime": "2020-09-17T13:17:22.000Z",
+      "duration": "PT7M36S",
+      "insertionType": "",
+      "asset": {
+        "title": "COVER STORY: बच्चों में ऐसे पता लगाएं कोरोना",
+        "duration": "PT7M36S",
+        "versionPid": "p08qkftl",
+        "versionCrid": "crid://bbc.co.uk/p/249870404",
+        "insertionType": "",
+        "pid": "p08qkftj"
+      },
+      "end": "2020-09-17T13:24:58.000Z"
+    },
+    {
+      "title": "बिहार के नए माउंटेन मैन, जिन्होंने पहाड़ काटकर नहर बना दी",
+      "startTime": "2020-09-17T13:24:58.000Z",
+      "duration": "PT5M24S",
+      "insertionType": "",
+      "asset": {
+        "title": "बिहार के नए माउंटेन मैन, जिन्होंने पहाड़ काटकर नहर बना दी",
+        "duration": "PT5M24S",
+        "versionPid": "p08rkkcb",
+        "versionCrid": "crid://bbc.co.uk/p/250797328",
+        "insertionType": "",
+        "pid": "p08rkkc4"
+      },
+      "end": "2020-09-17T13:30:22.000Z"
+    },
+    {
+      "title": "इसराइल की अरब देशों से दोस्ती कितनी अहम",
+      "startTime": "2020-09-17T13:30:22.000Z",
+      "duration": "PT2M11S",
+      "insertionType": "",
+      "asset": {
+        "title": "इसराइल की अरब देशों से दोस्ती कितनी अहम",
+        "duration": "PT2M11S",
+        "versionPid": "p08rp52p",
+        "versionCrid": "crid://bbc.co.uk/p/250904691",
+        "insertionType": "",
+        "pid": "p08rp52j"
+      },
+      "end": "2020-09-17T13:32:33.000Z"
+    },
+    {
+      "title": "पीरियड्स के दौरान छुट्टी को लेकर क्या है महिलाओं की राय",
+      "startTime": "2020-09-17T13:32:33.000Z",
+      "duration": "PT2M52S",
+      "insertionType": "",
+      "asset": {
+        "title": "पीरियड्स के दौरान छुट्टी को लेकर क्या है महिलाओं की राय",
+        "duration": "PT2M52S",
+        "versionPid": "p08rp51r",
+        "versionCrid": "crid://bbc.co.uk/p/250904662",
+        "insertionType": "",
+        "pid": "p08rp51h"
+      },
+      "end": "2020-09-17T13:35:25.000Z"
+    },
+    {
+      "title": "भारत चीन तनाव पर अब चीन की तरफ से क्या जवाब आया?",
+      "startTime": "2020-09-17T13:35:25.000Z",
+      "duration": "PT3M42S",
+      "insertionType": "",
+      "asset": {
+        "title": "भारत चीन तनाव पर अब चीन की तरफ से क्या जवाब आया?",
+        "duration": "PT3M42S",
+        "versionPid": "p08rnnnr",
+        "versionCrid": "crid://bbc.co.uk/p/250889877",
+        "insertionType": "",
+        "pid": "p08rnnnh"
+      },
+      "end": "2020-09-17T13:39:07.000Z"
+    },
+    {
+      "title": "क्या UPSC परीक्षा में मुसलमानों को ज़्यादा मौके मिलते हैं?",
+      "startTime": "2020-09-17T13:39:07.000Z",
+      "duration": "PT8M47S",
+      "insertionType": "",
+      "asset": {
+        "title": "क्या UPSC परीक्षा में मुसलमानों को ज़्यादा मौके मिलते हैं?",
+        "duration": "PT8M47S",
+        "versionPid": "p08rmmsv",
+        "versionCrid": "crid://bbc.co.uk/p/250859250",
+        "insertionType": "",
+        "pid": "p08rmmss"
+      },
+      "end": "2020-09-17T13:47:54.000Z"
+    },
+    {
+      "title": "इसराइल से दोस्ती क्यों कर रहे हैं मुस्लिम देश?",
+      "startTime": "2020-09-17T13:47:54.000Z",
+      "duration": "PT8M5S",
+      "insertionType": "",
+      "asset": {
+        "title": "इसराइल से दोस्ती क्यों कर रहे हैं मुस्लिम देश?",
+        "duration": "PT8M5S",
+        "versionPid": "p08rmmsd",
+        "versionCrid": "crid://bbc.co.uk/p/250859236",
+        "insertionType": "",
+        "pid": "p08rmms8"
+      },
+      "end": "2020-09-17T13:55:59.000Z"
+    },
+    {
+      "title": "भारतीय सेना किस तरह की तैयारियों में जुटी है?",
+      "startTime": "2020-09-17T13:55:59.000Z",
+      "duration": "PT2M54S",
+      "insertionType": "",
+      "asset": {
+        "title": "भारतीय सेना किस तरह की तैयारियों में जुटी है?",
+        "duration": "PT2M54S",
+        "versionPid": "p08rmmp3",
+        "versionCrid": "crid://bbc.co.uk/p/250859134",
+        "insertionType": "",
+        "pid": "p08rmmp1"
+      },
+      "end": "2020-09-17T13:58:53.000Z"
+    },
+    {
+      "title": "पंजाब के सीएम ने एक बच्चे को पांच लाख का 'इनाम' क्यों दिया",
+      "startTime": "2020-09-17T13:58:53.000Z",
+      "duration": "PT1M49S",
+      "insertionType": "",
+      "asset": {
+        "title": "पंजाब के सीएम ने एक बच्चे को पांच लाख का 'इनाम' क्यों दिया",
+        "duration": "PT1M49S",
+        "versionPid": "p08rld11",
+        "versionCrid": "crid://bbc.co.uk/p/250821995",
+        "insertionType": "",
+        "pid": "p08rld0y"
+      },
+      "end": "2020-09-17T14:00:42.000Z"
+    },
+    {
+      "title": "वैज्ञानिकों को मिले शुक्र ग्रह पर 'जीवन के सुबूत'",
+      "startTime": "2020-09-17T14:00:42.000Z",
+      "duration": "PT1M49S",
+      "insertionType": "",
+      "asset": {
+        "title": "वैज्ञानिकों को मिले शुक्र ग्रह पर 'जीवन के सुबूत'",
+        "duration": "PT1M49S",
+        "versionPid": "p08rlbr1",
+        "versionCrid": "crid://bbc.co.uk/p/250820755",
+        "insertionType": "",
+        "pid": "p08rlbqr"
+      },
+      "end": "2020-09-17T14:02:31.000Z"
+    },
+    {
+      "title": "भारत-चीन सीमा विवाद: क्या चीन अब रुख नरम कर रहा है?",
+      "startTime": "2020-09-17T14:02:31.000Z",
+      "duration": "PT4M59S",
+      "insertionType": "",
+      "asset": {
+        "title": "भारत-चीन सीमा विवाद: क्या चीन अब रुख नरम कर रहा है?",
+        "duration": "PT4M59S",
+        "versionPid": "p08rknz1",
+        "versionCrid": "crid://bbc.co.uk/p/250800790",
+        "insertionType": "",
+        "pid": "p08rhylr"
+      },
+      "end": "2020-09-17T14:07:30.000Z"
+    },
+    {
+      "title": "अमरीका पर आखिरी बार हमला करने वाले जापान के बमों की कहानी",
+      "startTime": "2020-09-17T14:07:30.000Z",
+      "duration": "PT8M56S",
+      "insertionType": "",
+      "asset": {
+        "title": "अमरीका पर आखिरी बार हमला करने वाले जापान के बमों की कहानी",
+        "duration": "PT8M56S",
+        "versionPid": "p08rhyll",
+        "versionCrid": "crid://bbc.co.uk/p/250749503",
+        "insertionType": "",
+        "pid": "p08rhylh"
+      },
+      "end": "2020-09-17T14:16:26.000Z"
+    },
+    {
+      "title": "उमर ख़ालिद को क्यों किया गया गिरफ़्तार?",
+      "startTime": "2020-09-17T14:16:26.000Z",
+      "duration": "PT5M30S",
+      "insertionType": "",
+      "asset": {
+        "title": "उमर ख़ालिद को क्यों किया गया गिरफ़्तार?",
+        "duration": "PT5M30S",
+        "versionPid": "p08rf1kt",
+        "versionCrid": "crid://bbc.co.uk/p/250662988",
+        "insertionType": "",
+        "pid": "p08rf1kr"
+      },
+      "end": "2020-09-17T14:21:56.000Z"
+    },
+    {
+      "title": "कोरोना वैक्सीन का ट्रायल फिर शुरू, भारत पर क्या पड़ेगा असर?",
+      "startTime": "2020-09-17T14:21:56.000Z",
+      "duration": "PT2M5S",
+      "insertionType": "",
+      "asset": {
+        "title": "कोरोना वैक्सीन का ट्रायल फिर शुरू, भारत पर क्या पड़ेगा असर?",
+        "duration": "PT2M5S",
+        "versionPid": "p08rf1bk",
+        "versionCrid": "crid://bbc.co.uk/p/250662763",
+        "insertionType": "",
+        "pid": "p08rf1bh"
+      },
+      "end": "2020-09-17T14:24:01.000Z"
+    },
+    {
+      "title": "कोरोना महामारी ने शराब पीने की आदत बदल दी?",
+      "startTime": "2020-09-17T14:24:01.000Z",
+      "duration": "PT6M30S",
+      "insertionType": "",
+      "asset": {
+        "title": "कोरोना महामारी ने शराब पीने की आदत बदल दी?",
+        "duration": "PT6M30S",
+        "versionPid": "p08rbhnf",
+        "versionCrid": "crid://bbc.co.uk/p/250587150",
+        "insertionType": "",
+        "pid": "p08rbhnc"
+      },
+      "end": "2020-09-17T14:30:31.000Z"
+    },
+    {
+      "title": "पियानो बजाने में मास्टर है ये बच्चा",
+      "startTime": "2020-09-17T14:30:31.000Z",
+      "duration": "PT1M50S",
+      "insertionType": "",
+      "asset": {
+        "title": "पियानो बजाने में मास्टर है ये बच्चा",
+        "duration": "PT1M50S",
+        "versionPid": "p08qg2mt",
+        "versionCrid": "crid://bbc.co.uk/p/249770283",
+        "insertionType": "",
+        "pid": "p08qg2mj"
+      },
+      "end": "2020-09-17T14:32:21.000Z"
+    },
+    {
+      "title": "इसराइल की अरब देशों से दोस्ती कितनी अहम",
+      "startTime": "2020-09-17T14:32:21.000Z",
+      "duration": "PT2M11S",
+      "insertionType": "",
+      "asset": {
+        "title": "इसराइल की अरब देशों से दोस्ती कितनी अहम",
+        "duration": "PT2M11S",
+        "versionPid": "p08rp52p",
+        "versionCrid": "crid://bbc.co.uk/p/250904691",
+        "insertionType": "",
+        "pid": "p08rp52j"
+      },
+      "end": "2020-09-17T14:34:32.000Z"
+    },
+    {
+      "title": "पीरियड्स के दौरान छुट्टी को लेकर क्या है महिलाओं की राय",
+      "startTime": "2020-09-17T14:34:32.000Z",
+      "duration": "PT2M52S",
+      "insertionType": "",
+      "asset": {
+        "title": "पीरियड्स के दौरान छुट्टी को लेकर क्या है महिलाओं की राय",
+        "duration": "PT2M52S",
+        "versionPid": "p08rp51r",
+        "versionCrid": "crid://bbc.co.uk/p/250904662",
+        "insertionType": "",
+        "pid": "p08rp51h"
+      },
+      "end": "2020-09-17T14:37:24.000Z"
+    },
+    {
+      "title": "इसराइल से दोस्ती क्यों कर रहे हैं मुस्लिम देश?",
+      "startTime": "2020-09-17T14:37:24.000Z",
+      "duration": "PT8M5S",
+      "insertionType": "",
+      "asset": {
+        "title": "इसराइल से दोस्ती क्यों कर रहे हैं मुस्लिम देश?",
+        "duration": "PT8M5S",
+        "versionPid": "p08rmmsd",
+        "versionCrid": "crid://bbc.co.uk/p/250859236",
+        "insertionType": "",
+        "pid": "p08rmms8"
+      },
+      "end": "2020-09-17T14:45:29.000Z"
+    },
+    {
+      "title": "वैज्ञानिकों को मिले शुक्र ग्रह पर 'जीवन के सुबूत'",
+      "startTime": "2020-09-17T14:45:29.000Z",
+      "duration": "PT1M49S",
+      "insertionType": "",
+      "asset": {
+        "title": "वैज्ञानिकों को मिले शुक्र ग्रह पर 'जीवन के सुबूत'",
+        "duration": "PT1M49S",
+        "versionPid": "p08rlbr1",
+        "versionCrid": "crid://bbc.co.uk/p/250820755",
+        "insertionType": "",
+        "pid": "p08rlbqr"
+      },
+      "end": "2020-09-17T14:47:18.000Z"
+    },
+    {
+      "title": "कोरोना वायरस: फ़ेस मास्क ज़रूरत के साथ ख़तरा भी बने",
+      "startTime": "2020-09-17T14:47:18.000Z",
+      "duration": "PT4M29S",
+      "insertionType": "",
+      "asset": {
+        "title": "कोरोना वायरस: फ़ेस मास्क ज़रूरत के साथ ख़तरा भी बने",
+        "duration": "PT4M29S",
+        "versionPid": "p08rhyj4",
+        "versionCrid": "crid://bbc.co.uk/p/250749426",
+        "insertionType": "",
+        "pid": "p08rhyhz"
+      },
+      "end": "2020-09-17T14:51:47.000Z"
+    },
+    {
+      "title": "अमरीका पर आखिरी बार हमला करने वाले जापान के बमों की कहानी",
+      "startTime": "2020-09-17T14:51:47.000Z",
+      "duration": "PT8M56S",
+      "insertionType": "",
+      "asset": {
+        "title": "अमरीका पर आखिरी बार हमला करने वाले जापान के बमों की कहानी",
+        "duration": "PT8M56S",
+        "versionPid": "p08rhyll",
+        "versionCrid": "crid://bbc.co.uk/p/250749503",
+        "insertionType": "",
+        "pid": "p08rhylh"
+      },
+      "end": "2020-09-17T15:00:43.000Z"
+    },
+    {
+      "title": "यूएई के बाद इसराइल और बहरीन के बीच भी ऐतिहासिक समझौता",
+      "startTime": "2020-09-17T15:00:43.000Z",
+      "duration": "PT3M48S",
+      "insertionType": "",
+      "asset": {
+        "title": "यूएई के बाद इसराइल और बहरीन के बीच भी ऐतिहासिक समझौता",
+        "duration": "PT3M48S",
+        "versionPid": "p08rhyld",
+        "versionCrid": "crid://bbc.co.uk/p/250749496",
+        "insertionType": "",
+        "pid": "p08rhyl9"
+      },
+      "end": "2020-09-17T15:04:31.000Z"
+    },
+    {
+      "title": "अमरीका चुनाव: हिंदुओं को लुभाने की कोशिश",
+      "startTime": "2020-09-17T15:04:31.000Z",
+      "duration": "PT2M36S",
+      "insertionType": "",
+      "asset": {
+        "title": "अमरीका चुनाव: हिंदुओं को लुभाने की कोशिश",
+        "duration": "PT2M36S",
+        "versionPid": "p08rgfx7",
+        "versionCrid": "crid://bbc.co.uk/p/250704634",
+        "insertionType": "",
+        "pid": "p08rg5q6"
+      },
+      "end": "2020-09-17T15:07:07.000Z"
+    },
+    {
+      "title": "रूस की कोरोना वैक्सीन का ख़्वाब भारत के बिना कैसे अधूरा है?",
+      "startTime": "2020-09-17T15:07:07.000Z",
+      "duration": "PT6M31S",
+      "insertionType": "",
+      "asset": {
+        "title": "रूस की कोरोना वैक्सीन का ख़्वाब भारत के बिना कैसे अधूरा है?",
+        "duration": "PT6M31S",
+        "versionPid": "p08rb9m2",
+        "versionCrid": "crid://bbc.co.uk/p/250581342",
+        "insertionType": "",
+        "pid": "p08rb9m0"
+      },
+      "end": "2020-09-17T15:13:38.000Z"
+    },
+    {
+      "title": "अच्छी सेहत के लिए किस तेल से खाना पकाना सही है",
+      "startTime": "2020-09-17T15:13:38.000Z",
+      "duration": "PT4M18S",
+      "insertionType": "",
+      "asset": {
+        "title": "अच्छी सेहत के लिए किस तेल से खाना पकाना सही है",
+        "duration": "PT4M18S",
+        "versionPid": "p08rb9lk",
+        "versionCrid": "crid://bbc.co.uk/p/250581326",
+        "insertionType": "",
+        "pid": "p08rb9lh"
+      },
+      "end": "2020-09-17T15:17:56.000Z"
+    },
+    {
+      "title": "अमरीका में जंगल की आग से झुलस रहे हैं 12 राज्य",
+      "startTime": "2020-09-17T15:17:56.000Z",
+      "duration": "PT1M52S",
+      "insertionType": "",
+      "asset": {
+        "title": "अमरीका में जंगल की आग से झुलस रहे हैं 12 राज्य",
+        "duration": "PT1M52S",
+        "versionPid": "p08r6yct",
+        "versionCrid": "crid://bbc.co.uk/p/250481173",
+        "insertionType": "",
+        "pid": "p08r6ycm"
+      },
+      "end": "2020-09-17T15:19:48.000Z"
+    },
+    {
+      "title": "ग्रीस और तुर्की के बीच युद्ध जैसे हालात पैदा होने की वजह",
+      "startTime": "2020-09-17T15:19:48.000Z",
+      "duration": "PT12M11S",
+      "insertionType": "",
+      "asset": {
+        "title": "ग्रीस और तुर्की के बीच युद्ध जैसे हालात पैदा होने की वजह",
+        "duration": "PT12M11S",
+        "versionPid": "p08r5x7n",
+        "versionCrid": "crid://bbc.co.uk/p/250450292",
+        "insertionType": "",
+        "pid": "p08r5x7h"
+      },
+      "end": "2020-09-17T15:31:59.000Z"
+    },
+    {
+      "title": "पीरियड्स के दौरान छुट्टी को लेकर क्या है महिलाओं की राय",
+      "startTime": "2020-09-17T15:31:59.000Z",
+      "duration": "PT2M52S",
+      "insertionType": "",
+      "asset": {
+        "title": "पीरियड्स के दौरान छुट्टी को लेकर क्या है महिलाओं की राय",
+        "duration": "PT2M52S",
+        "versionPid": "p08rp51r",
+        "versionCrid": "crid://bbc.co.uk/p/250904662",
+        "insertionType": "",
+        "pid": "p08rp51h"
+      },
+      "end": "2020-09-17T15:34:51.000Z"
+    },
+    {
+      "title": "पीरियड्स को लेकर महिला खिलाड़ियों की चुनौतियां",
+      "startTime": "2020-09-17T15:34:51.000Z",
+      "duration": "PT3M25S",
+      "insertionType": "",
+      "asset": {
+        "title": "पीरियड्स को लेकर महिला खिलाड़ियों की चुनौतियां",
+        "duration": "PT3M25S",
+        "versionPid": "p08rp473",
+        "versionCrid": "crid://bbc.co.uk/p/250903867",
+        "insertionType": "",
+        "pid": "p08rp46z"
+      },
+      "end": "2020-09-17T15:38:16.000Z"
+    },
+    {
+      "title": "भारत चीन तनाव पर अब चीन की तरफ से क्या जवाब आया?",
+      "startTime": "2020-09-17T15:38:16.000Z",
+      "duration": "PT3M42S",
+      "insertionType": "",
+      "asset": {
+        "title": "भारत चीन तनाव पर अब चीन की तरफ से क्या जवाब आया?",
+        "duration": "PT3M42S",
+        "versionPid": "p08rnnnr",
+        "versionCrid": "crid://bbc.co.uk/p/250889877",
+        "insertionType": "",
+        "pid": "p08rnnnh"
+      },
+      "end": "2020-09-17T15:41:58.000Z"
+    },
+    {
+      "title": "कोरोना वायरस के मामले में क्या भारत अमरीका को भी पीछे छोड़ देगा?",
+      "startTime": "2020-09-17T15:41:58.000Z",
+      "duration": "PT2M22S",
+      "insertionType": "",
+      "asset": {
+        "title": "कोरोना वायरस के मामले में क्या भारत अमरीका को भी पीछे छोड़ देगा?",
+        "duration": "PT2M22S",
+        "versionPid": "p08rnnd8",
+        "versionCrid": "crid://bbc.co.uk/p/250889613",
+        "insertionType": "",
+        "pid": "p08rnncs"
+      },
+      "end": "2020-09-17T15:44:20.000Z"
+    },
+    {
+      "title": "क्या UPSC परीक्षा में मुसलमानों को ज़्यादा मौके मिलते हैं?",
+      "startTime": "2020-09-17T15:44:20.000Z",
+      "duration": "PT8M47S",
+      "insertionType": "",
+      "asset": {
+        "title": "क्या UPSC परीक्षा में मुसलमानों को ज़्यादा मौके मिलते हैं?",
+        "duration": "PT8M47S",
+        "versionPid": "p08rmmsv",
+        "versionCrid": "crid://bbc.co.uk/p/250859250",
+        "insertionType": "",
+        "pid": "p08rmmss"
+      },
+      "end": "2020-09-17T15:53:07.000Z"
+    },
+    {
+      "title": "इसराइल से दोस्ती क्यों कर रहे हैं मुस्लिम देश?",
+      "startTime": "2020-09-17T15:53:07.000Z",
+      "duration": "PT8M5S",
+      "insertionType": "",
+      "asset": {
+        "title": "इसराइल से दोस्ती क्यों कर रहे हैं मुस्लिम देश?",
+        "duration": "PT8M5S",
+        "versionPid": "p08rmmsd",
+        "versionCrid": "crid://bbc.co.uk/p/250859236",
+        "insertionType": "",
+        "pid": "p08rmms8"
+      },
+      "end": "2020-09-17T16:01:12.000Z"
+    },
+    {
+      "title": "राजस्थान में चंबल नदी में नाव पलटने से बड़ा हादसा",
+      "startTime": "2020-09-17T16:01:12.000Z",
+      "duration": "PT1M20S",
+      "insertionType": "",
+      "asset": {
+        "title": "राजस्थान में चंबल नदी में नाव पलटने से बड़ा हादसा",
+        "duration": "PT1M20S",
+        "versionPid": "p08rmmry",
+        "versionCrid": "crid://bbc.co.uk/p/250859222",
+        "insertionType": "",
+        "pid": "p08rmmrw"
+      },
+      "end": "2020-09-17T16:02:32.000Z"
+    },
+    {
+      "title": "भारतीय सेना किस तरह की तैयारियों में जुटी है?",
+      "startTime": "2020-09-17T16:02:32.000Z",
+      "duration": "PT2M54S",
+      "insertionType": "",
+      "asset": {
+        "title": "भारतीय सेना किस तरह की तैयारियों में जुटी है?",
+        "duration": "PT2M54S",
+        "versionPid": "p08rmmp3",
+        "versionCrid": "crid://bbc.co.uk/p/250859134",
+        "insertionType": "",
+        "pid": "p08rmmp1"
+      },
+      "end": "2020-09-17T16:05:26.000Z"
+    },
+    {
+      "title": "चीन में अब पटरी पर लौट रही है ज़िंदगी",
+      "startTime": "2020-09-17T16:05:26.000Z",
+      "duration": "PT2M3S",
+      "insertionType": "",
+      "asset": {
+        "title": "चीन में अब पटरी पर लौट रही है ज़िंदगी",
+        "duration": "PT2M3S",
+        "versionPid": "p08rlbqh",
+        "versionCrid": "crid://bbc.co.uk/p/250820738",
+        "insertionType": "",
+        "pid": "p08rlbq9"
+      },
+      "end": "2020-09-17T16:07:29.000Z"
+    },
+    {
+      "title": "बिहार के नए माउंटेन मैन, जिन्होंने पहाड़ काटकर नहर बना दी",
+      "startTime": "2020-09-17T16:07:29.000Z",
+      "duration": "PT5M24S",
+      "insertionType": "",
+      "asset": {
+        "title": "बिहार के नए माउंटेन मैन, जिन्होंने पहाड़ काटकर नहर बना दी",
+        "duration": "PT5M24S",
+        "versionPid": "p08rkkcb",
+        "versionCrid": "crid://bbc.co.uk/p/250797328",
+        "insertionType": "",
+        "pid": "p08rkkc4"
+      },
+      "end": "2020-09-17T16:12:53.000Z"
+    },
+    {
+      "title": "ऑटो ड्राइविंग ने बदल दी इन महिलाओं की ज़िंदगी",
+      "startTime": "2020-09-17T16:12:53.000Z",
+      "duration": "PT3M42S",
+      "insertionType": "",
+      "asset": {
+        "title": "ऑटो ड्राइविंग ने बदल दी इन महिलाओं की ज़िंदगी",
+        "duration": "PT3M42S",
+        "versionPid": "p08rkj5z",
+        "versionCrid": "crid://bbc.co.uk/p/250796200",
+        "insertionType": "",
+        "pid": "p08rkj5x"
+      },
+      "end": "2020-09-17T16:16:35.000Z"
+    },
+    {
+      "title": "भारत-चीन सीमा विवाद: क्या चीन अब रुख नरम कर रहा है?",
+      "startTime": "2020-09-17T16:16:35.000Z",
+      "duration": "PT4M59S",
+      "insertionType": "",
+      "asset": {
+        "title": "भारत-चीन सीमा विवाद: क्या चीन अब रुख नरम कर रहा है?",
+        "duration": "PT4M59S",
+        "versionPid": "p08rknz1",
+        "versionCrid": "crid://bbc.co.uk/p/250800790",
+        "insertionType": "",
+        "pid": "p08rhylr"
+      },
+      "end": "2020-09-17T16:21:34.000Z"
+    },
+    {
+      "title": "यूपी में स्पेशल सिक्योरिटी फ़ोर्स के गठन पर उठे सवाल",
+      "startTime": "2020-09-17T16:21:34.000Z",
+      "duration": "PT6M3S",
+      "insertionType": "",
+      "asset": {
+        "title": "यूपी में स्पेशल सिक्योरिटी फ़ोर्स के गठन पर उठे सवाल",
+        "duration": "PT6M3S",
+        "versionPid": "p08rhyl3",
+        "versionCrid": "crid://bbc.co.uk/p/250749487",
+        "insertionType": "",
+        "pid": "p08rhyl0"
+      },
+      "end": "2020-09-17T16:27:37.000Z"
+    },
+    {
+      "title": "पाकिस्तान: महिला से गैंगरेप को लेकर आक्रोश",
+      "startTime": "2020-09-17T16:27:37.000Z",
+      "duration": "PT1M50S",
+      "insertionType": "",
+      "asset": {
+        "title": "पाकिस्तान: महिला से गैंगरेप को लेकर आक्रोश",
+        "duration": "PT1M50S",
+        "versionPid": "p08rg5zr",
+        "versionCrid": "crid://bbc.co.uk/p/250697024",
+        "insertionType": "",
+        "pid": "p08rg5zp"
+      },
+      "end": "2020-09-17T16:29:27.000Z"
+    },
+    {
+      "title": "पाकिस्तान के ख़िलाफ़ 'आज़ाद पख़्तूनिस्तान' की बुनियाद रखने वाला 'अकेला योद्धा'",
+      "startTime": "2020-09-17T16:29:27.000Z",
+      "duration": "PT13M30S",
+      "insertionType": "",
+      "asset": {
+        "title": "पाकिस्तान के ख़िलाफ़ 'आज़ाद पख़्तूनिस्तान' की बुनियाद रखने वाला 'अकेला योद्धा'",
+        "duration": "PT13M30S",
+        "versionPid": "p08r8f00",
+        "versionCrid": "crid://bbc.co.uk/p/250525013",
+        "insertionType": "",
+        "pid": "p08r8dzw"
+      },
+      "end": "2020-09-17T16:42:57.000Z"
+    },
+    {
+      "title": "विवेचना: चीनियों ने भारतीय युद्धबंदियों को एक बूंद पानी भी नहीं दिया था",
+      "startTime": "2020-09-17T16:42:57.000Z",
+      "duration": "PT13M30S",
+      "insertionType": "",
+      "asset": {
+        "title": "विवेचना: चीनियों ने भारतीय युद्धबंदियों को एक बूंद पानी भी नहीं दिया था",
+        "duration": "PT13M30S",
+        "versionPid": "p08r85ww",
+        "versionCrid": "crid://bbc.co.uk/p/250518189",
+        "insertionType": "",
+        "pid": "p08r85wr"
+      },
+      "end": "2020-09-17T16:56:27.000Z"
+    },
+    {
+      "title": "भारत-पाकिस्तान 1965 के युद्ध में कौन जीता था?",
+      "startTime": "2020-09-17T16:56:27.000Z",
+      "duration": "PT13M27S",
+      "insertionType": "",
+      "asset": {
+        "title": "भारत-पाकिस्तान 1965 के युद्ध में कौन जीता था?",
+        "duration": "PT13M27S",
+        "versionPid": "p08r1kpj",
+        "versionCrid": "crid://bbc.co.uk/p/250320987",
+        "insertionType": "",
+        "pid": "p08r1kpg"
+      },
+      "end": "2020-09-17T17:09:54.000Z"
+    },
+    {
+      "title": "भारत चीन की वो जंग जहां भारतीय सैनिकों ने चीनी सैनिकों को पछाड़ा था",
+      "startTime": "2020-09-17T17:09:54.000Z",
+      "duration": "PT13M9S",
+      "insertionType": "",
+      "asset": {
+        "title": "भारत चीन की वो जंग जहां भारतीय सैनिकों ने चीनी सैनिकों को पछाड़ा था",
+        "duration": "PT13M9S",
+        "versionPid": "p08qyv8m",
+        "versionCrid": "crid://bbc.co.uk/p/250239863",
+        "insertionType": "",
+        "pid": "p08qyv8k"
+      },
+      "end": "2020-09-17T17:23:03.000Z"
+    },
+    {
+      "title": "समंदर का सबसे जांबाज़ पंछी अब समुद्री डाकुओं और चोरों को पकड़वाएगा",
+      "startTime": "2020-09-17T17:23:03.000Z",
+      "duration": "PT4M59S",
+      "insertionType": "",
+      "asset": {
+        "title": "समंदर का सबसे जांबाज़ पंछी अब समुद्री डाकुओं और चोरों को पकड़वाएगा",
+        "duration": "PT4M59S",
+        "versionPid": "p08qv6fs",
+        "versionCrid": "crid://bbc.co.uk/p/250131430",
+        "insertionType": "",
+        "pid": "p08qv6fp"
+      },
+      "end": "2020-09-17T17:28:02.000Z"
+    },
+    {
+      "title": "अटल टनल: 10 हज़ार फ़ुट की ऊंचाई पर बनी दुनिया की सबसे लंबी सुरंग",
+      "startTime": "2020-09-17T17:28:02.000Z",
+      "duration": "PT2M1S",
+      "insertionType": "",
+      "asset": {
+        "title": "अटल टनल: 10 हज़ार फ़ुट की ऊंचाई पर बनी दुनिया की सबसे लंबी सुरंग",
+        "duration": "PT2M1S",
+        "versionPid": "p08r5x8k",
+        "versionCrid": "crid://bbc.co.uk/p/250450320",
+        "insertionType": "",
+        "pid": "p08r5x8d"
+      },
+      "end": "2020-09-17T17:30:03.000Z"
+    },
+    {
+      "title": "इसराइल की अरब देशों से दोस्ती कितनी अहम",
+      "startTime": "2020-09-17T17:30:03.000Z",
+      "duration": "PT2M11S",
+      "insertionType": "",
+      "asset": {
+        "title": "इसराइल की अरब देशों से दोस्ती कितनी अहम",
+        "duration": "PT2M11S",
+        "versionPid": "p08rp52p",
+        "versionCrid": "crid://bbc.co.uk/p/250904691",
+        "insertionType": "",
+        "pid": "p08rp52j"
+      },
+      "end": "2020-09-17T17:32:14.000Z"
+    },
+    {
+      "title": "पीरियड्स के दौरान छुट्टी को लेकर क्या है महिलाओं की राय",
+      "startTime": "2020-09-17T17:32:14.000Z",
+      "duration": "PT2M52S",
+      "insertionType": "",
+      "asset": {
+        "title": "पीरियड्स के दौरान छुट्टी को लेकर क्या है महिलाओं की राय",
+        "duration": "PT2M52S",
+        "versionPid": "p08rp51r",
+        "versionCrid": "crid://bbc.co.uk/p/250904662",
+        "insertionType": "",
+        "pid": "p08rp51h"
+      },
+      "end": "2020-09-17T17:35:06.000Z"
+    },
+    {
+      "title": "कोरोना वायरस के मामले में क्या भारत अमरीका को भी पीछे छोड़ देगा?",
+      "startTime": "2020-09-17T17:35:06.000Z",
+      "duration": "PT2M22S",
+      "insertionType": "",
+      "asset": {
+        "title": "कोरोना वायरस के मामले में क्या भारत अमरीका को भी पीछे छोड़ देगा?",
+        "duration": "PT2M22S",
+        "versionPid": "p08rnnd8",
+        "versionCrid": "crid://bbc.co.uk/p/250889613",
+        "insertionType": "",
+        "pid": "p08rnncs"
+      },
+      "end": "2020-09-17T17:37:28.000Z"
+    },
+    {
+      "title": "इसराइल से दोस्ती क्यों कर रहे हैं मुस्लिम देश?",
+      "startTime": "2020-09-17T17:37:28.000Z",
+      "duration": "PT8M5S",
+      "insertionType": "",
+      "asset": {
+        "title": "इसराइल से दोस्ती क्यों कर रहे हैं मुस्लिम देश?",
+        "duration": "PT8M5S",
+        "versionPid": "p08rmmsd",
+        "versionCrid": "crid://bbc.co.uk/p/250859236",
+        "insertionType": "",
+        "pid": "p08rmms8"
+      },
+      "end": "2020-09-17T17:45:33.000Z"
+    },
+    {
+      "title": "वैज्ञानिकों को मिले शुक्र ग्रह पर 'जीवन के सुबूत'",
+      "startTime": "2020-09-17T17:45:33.000Z",
+      "duration": "PT1M49S",
+      "insertionType": "",
+      "asset": {
+        "title": "वैज्ञानिकों को मिले शुक्र ग्रह पर 'जीवन के सुबूत'",
+        "duration": "PT1M49S",
+        "versionPid": "p08rlbr1",
+        "versionCrid": "crid://bbc.co.uk/p/250820755",
+        "insertionType": "",
+        "pid": "p08rlbqr"
+      },
+      "end": "2020-09-17T17:47:22.000Z"
+    },
+    {
+      "title": "यूएई के बाद इसराइल और बहरीन के बीच भी ऐतिहासिक समझौता",
+      "startTime": "2020-09-17T17:47:22.000Z",
+      "duration": "PT3M48S",
+      "insertionType": "",
+      "asset": {
+        "title": "यूएई के बाद इसराइल और बहरीन के बीच भी ऐतिहासिक समझौता",
+        "duration": "PT3M48S",
+        "versionPid": "p08rhyld",
+        "versionCrid": "crid://bbc.co.uk/p/250749496",
+        "insertionType": "",
+        "pid": "p08rhyl9"
+      },
+      "end": "2020-09-17T17:51:10.000Z"
+    },
+    {
+      "title": "अमरीका पर आखिरी बार हमला करने वाले जापान के बमों की कहानी",
+      "startTime": "2020-09-17T17:51:10.000Z",
+      "duration": "PT8M56S",
+      "insertionType": "",
+      "asset": {
+        "title": "अमरीका पर आखिरी बार हमला करने वाले जापान के बमों की कहानी",
+        "duration": "PT8M56S",
+        "versionPid": "p08rhyll",
+        "versionCrid": "crid://bbc.co.uk/p/250749503",
+        "insertionType": "",
+        "pid": "p08rhylh"
+      },
+      "end": "2020-09-17T18:00:06.000Z"
+    },
+    {
+      "title": "अमरीका चुनाव: हिंदुओं को लुभाने की कोशिश",
+      "startTime": "2020-09-17T18:00:06.000Z",
+      "duration": "PT2M36S",
+      "insertionType": "",
+      "asset": {
+        "title": "अमरीका चुनाव: हिंदुओं को लुभाने की कोशिश",
+        "duration": "PT2M36S",
+        "versionPid": "p08rgfx7",
+        "versionCrid": "crid://bbc.co.uk/p/250704634",
+        "insertionType": "",
+        "pid": "p08rg5q6"
+      },
+      "end": "2020-09-17T18:02:42.000Z"
+    },
+    {
+      "title": "तुर्की के राष्ट्रपति अर्दोआन ने अब किस देश को दी धमकी?",
+      "startTime": "2020-09-17T18:02:42.000Z",
+      "duration": "PT4M19S",
+      "insertionType": "",
+      "asset": {
+        "title": "तुर्की के राष्ट्रपति अर्दोआन ने अब किस देश को दी धमकी?",
+        "duration": "PT4M19S",
+        "versionPid": "p08rf1c8",
+        "versionCrid": "crid://bbc.co.uk/p/250662785",
+        "insertionType": "",
+        "pid": "p08rf1c6"
+      },
+      "end": "2020-09-17T18:07:01.000Z"
+    },
+    {
+      "title": "रूस की कोरोना वैक्सीन का ख़्वाब भारत के बिना कैसे अधूरा है?",
+      "startTime": "2020-09-17T18:07:01.000Z",
+      "duration": "PT6M31S",
+      "insertionType": "",
+      "asset": {
+        "title": "रूस की कोरोना वैक्सीन का ख़्वाब भारत के बिना कैसे अधूरा है?",
+        "duration": "PT6M31S",
+        "versionPid": "p08rb9m2",
+        "versionCrid": "crid://bbc.co.uk/p/250581342",
+        "insertionType": "",
+        "pid": "p08rb9m0"
+      },
+      "end": "2020-09-17T18:13:32.000Z"
+    },
+    {
+      "title": "नस्लभेद के ख़िलाफ़ सिख सुपरहीरो!",
+      "startTime": "2020-09-17T18:13:32.000Z",
+      "duration": "PT1M39S",
+      "insertionType": "",
+      "asset": {
+        "title": "नस्लभेद के ख़िलाफ़ सिख सुपरहीरो!",
+        "duration": "PT1M39S",
+        "versionPid": "p08r6yzh",
+        "versionCrid": "crid://bbc.co.uk/p/250481752",
+        "insertionType": "",
+        "pid": "p08r6yzf"
+      },
+      "end": "2020-09-17T18:15:11.000Z"
+    },
+    {
+      "title": "अमरीका में जंगल की आग से झुलस रहे हैं 12 राज्य",
+      "startTime": "2020-09-17T18:15:11.000Z",
+      "duration": "PT1M52S",
+      "insertionType": "",
+      "asset": {
+        "title": "अमरीका में जंगल की आग से झुलस रहे हैं 12 राज्य",
+        "duration": "PT1M52S",
+        "versionPid": "p08r6yct",
+        "versionCrid": "crid://bbc.co.uk/p/250481173",
+        "insertionType": "",
+        "pid": "p08r6ycm"
+      },
+      "end": "2020-09-17T18:17:03.000Z"
+    },
+    {
+      "title": "ग्रीस और तुर्की के बीच युद्ध जैसे हालात पैदा होने की वजह",
+      "startTime": "2020-09-17T18:17:03.000Z",
+      "duration": "PT12M11S",
+      "insertionType": "",
+      "asset": {
+        "title": "ग्रीस और तुर्की के बीच युद्ध जैसे हालात पैदा होने की वजह",
+        "duration": "PT12M11S",
+        "versionPid": "p08r5x7n",
+        "versionCrid": "crid://bbc.co.uk/p/250450292",
+        "insertionType": "",
+        "pid": "p08r5x7h"
+      },
+      "end": "2020-09-17T18:29:14.000Z"
+    },
+    {
+      "title": "ऐसा रेस्त्रां जिसे सिर्फ़ ट्रांसजेंडर चलाते हैं",
+      "startTime": "2020-09-17T18:29:14.000Z",
+      "duration": "PT48S",
+      "insertionType": "",
+      "asset": {
+        "title": "ऐसा रेस्त्रां जिसे सिर्फ़ ट्रांसजेंडर चलाते हैं",
+        "duration": "PT48S",
+        "versionPid": "p08qyv4x",
+        "versionCrid": "crid://bbc.co.uk/p/250239748",
+        "insertionType": "",
+        "pid": "p08qyv4s"
+      },
+      "end": "2020-09-17T18:30:02.000Z"
+    },
+    {
+      "title": "BBC DUNIYA SHOW",
+      "startTime": "2020-09-17T18:30:02.000Z",
+      "duration": "PT18M",
+      "insertionType": "",
+      "asset": {
+        "title": "BBC DUNIYA SHOW",
+        "duration": "PT18M",
+        "versionPid": "p08rt28m",
+        "versionCrid": "crid://bbc.co.uk/p/251021156",
+        "insertionType": "",
+        "pid": "p08rt28k"
+      },
+      "end": "2020-09-17T18:48:02.000Z"
+    },
+    {
+      "title": "BBC DUNIYA SHOW",
+      "startTime": "2020-09-17T18:48:02.000Z",
+      "duration": "PT18M",
+      "insertionType": "",
+      "asset": {
+        "title": "BBC DUNIYA SHOW",
+        "duration": "PT18M",
+        "versionPid": "p08rt28m",
+        "versionCrid": "crid://bbc.co.uk/p/251021156",
+        "insertionType": "",
+        "pid": "p08rt28k"
+      },
+      "end": "2020-09-17T19:06:02.000Z"
+    },
+    {
+      "title": "BBC DUNIYA SHOW",
+      "startTime": "2020-09-17T19:06:02.000Z",
+      "duration": "PT18M",
+      "insertionType": "",
+      "asset": {
+        "title": "BBC DUNIYA SHOW",
+        "duration": "PT18M",
+        "versionPid": "p08rt28m",
+        "versionCrid": "crid://bbc.co.uk/p/251021156",
+        "insertionType": "",
+        "pid": "p08rt28k"
+      },
+      "end": "2020-09-17T19:24:02.000Z"
+    },
+    {
+      "title": "BBC DUNIYA SHOW",
+      "startTime": "2020-09-17T19:24:02.000Z",
+      "duration": "PT18M",
+      "insertionType": "",
+      "asset": {
+        "title": "BBC DUNIYA SHOW",
+        "duration": "PT18M",
+        "versionPid": "p08rt28m",
+        "versionCrid": "crid://bbc.co.uk/p/251021156",
+        "insertionType": "",
+        "pid": "p08rt28k"
+      },
+      "end": "2020-09-17T19:42:02.000Z"
+    },
+    {
+      "title": "BBC DUNIYA SHOW",
+      "startTime": "2020-09-17T19:42:02.000Z",
+      "duration": "PT18M",
+      "insertionType": "",
+      "asset": {
+        "title": "BBC DUNIYA SHOW",
+        "duration": "PT18M",
+        "versionPid": "p08rt28m",
+        "versionCrid": "crid://bbc.co.uk/p/251021156",
+        "insertionType": "",
+        "pid": "p08rt28k"
+      },
+      "end": "2020-09-17T20:00:02.000Z"
+    },
+    {
+      "title": "BBC DUNIYA SHOW",
+      "startTime": "2020-09-17T20:00:02.000Z",
+      "duration": "PT18M",
+      "insertionType": "",
+      "asset": {
+        "title": "BBC DUNIYA SHOW",
+        "duration": "PT18M",
+        "versionPid": "p08rt28m",
+        "versionCrid": "crid://bbc.co.uk/p/251021156",
+        "insertionType": "",
+        "pid": "p08rt28k"
+      },
+      "end": "2020-09-17T20:18:02.000Z"
+    },
+    {
+      "title": "BBC DUNIYA SHOW",
+      "startTime": "2020-09-17T20:18:02.000Z",
+      "duration": "PT18M",
+      "insertionType": "",
+      "asset": {
+        "title": "BBC DUNIYA SHOW",
+        "duration": "PT18M",
+        "versionPid": "p08rt28m",
+        "versionCrid": "crid://bbc.co.uk/p/251021156",
+        "insertionType": "",
+        "pid": "p08rt28k"
+      },
+      "end": "2020-09-17T20:36:02.000Z"
+    },
+    {
+      "title": "BBC DUNIYA SHOW",
+      "startTime": "2020-09-17T20:36:02.000Z",
+      "duration": "PT18M",
+      "insertionType": "",
+      "asset": {
+        "title": "BBC DUNIYA SHOW",
+        "duration": "PT18M",
+        "versionPid": "p08rt28m",
+        "versionCrid": "crid://bbc.co.uk/p/251021156",
+        "insertionType": "",
+        "pid": "p08rt28k"
+      },
+      "end": "2020-09-17T20:54:02.000Z"
+    },
+    {
+      "title": "BBC DUNIYA SHOW",
+      "startTime": "2020-09-17T20:54:02.000Z",
+      "duration": "PT18M",
+      "insertionType": "",
+      "asset": {
+        "title": "BBC DUNIYA SHOW",
+        "duration": "PT18M",
+        "versionPid": "p08rt28m",
+        "versionCrid": "crid://bbc.co.uk/p/251021156",
+        "insertionType": "",
+        "pid": "p08rt28k"
+      },
+      "end": "2020-09-17T21:12:02.000Z"
+    },
+    {
+      "title": "BBC DUNIYA SHOW",
+      "startTime": "2020-09-17T21:12:02.000Z",
+      "duration": "PT18M",
+      "insertionType": "",
+      "asset": {
+        "title": "BBC DUNIYA SHOW",
+        "duration": "PT18M",
+        "versionPid": "p08rt28m",
+        "versionCrid": "crid://bbc.co.uk/p/251021156",
+        "insertionType": "",
+        "pid": "p08rt28k"
+      },
+      "end": "2020-09-17T21:30:02.000Z"
+    },
+    {
+      "title": "BBC DUNIYA SHOW",
+      "startTime": "2020-09-17T21:30:02.000Z",
+      "duration": "PT18M",
+      "insertionType": "",
+      "asset": {
+        "title": "BBC DUNIYA SHOW",
+        "duration": "PT18M",
+        "versionPid": "p08rt28m",
+        "versionCrid": "crid://bbc.co.uk/p/251021156",
+        "insertionType": "",
+        "pid": "p08rt28k"
+      },
+      "end": "2020-09-17T21:48:02.000Z"
+    },
+    {
+      "title": "BBC DUNIYA SHOW",
+      "startTime": "2020-09-17T21:48:02.000Z",
+      "duration": "PT18M",
+      "insertionType": "",
+      "asset": {
+        "title": "BBC DUNIYA SHOW",
+        "duration": "PT18M",
+        "versionPid": "p08rt28m",
+        "versionCrid": "crid://bbc.co.uk/p/251021156",
+        "insertionType": "",
+        "pid": "p08rt28k"
+      },
+      "end": "2020-09-17T22:06:02.000Z"
+    },
+    {
+      "title": "BBC DUNIYA SHOW",
+      "startTime": "2020-09-17T22:06:02.000Z",
+      "duration": "PT18M",
+      "insertionType": "",
+      "asset": {
+        "title": "BBC DUNIYA SHOW",
+        "duration": "PT18M",
+        "versionPid": "p08rt28m",
+        "versionCrid": "crid://bbc.co.uk/p/251021156",
+        "insertionType": "",
+        "pid": "p08rt28k"
+      },
+      "end": "2020-09-17T22:24:02.000Z"
+    },
+    {
+      "title": "BBC DUNIYA SHOW",
+      "startTime": "2020-09-17T22:24:02.000Z",
+      "duration": "PT18M",
+      "insertionType": "",
+      "asset": {
+        "title": "BBC DUNIYA SHOW",
+        "duration": "PT18M",
+        "versionPid": "p08rt28m",
+        "versionCrid": "crid://bbc.co.uk/p/251021156",
+        "insertionType": "",
+        "pid": "p08rt28k"
+      },
+      "end": "2020-09-17T22:42:02.000Z"
+    },
+    {
+      "title": "BBC DUNIYA SHOW",
+      "startTime": "2020-09-17T22:42:02.000Z",
+      "duration": "PT18M",
+      "insertionType": "",
+      "asset": {
+        "title": "BBC DUNIYA SHOW",
+        "duration": "PT18M",
+        "versionPid": "p08rt28m",
+        "versionCrid": "crid://bbc.co.uk/p/251021156",
+        "insertionType": "",
+        "pid": "p08rt28k"
+      },
+      "end": "2020-09-17T23:00:02.000Z"
+    },
+    {
+      "title": "BBC DUNIYA SHOW",
+      "startTime": "2020-09-17T23:00:02.000Z",
+      "duration": "PT18M",
+      "insertionType": "",
+      "asset": {
+        "title": "BBC DUNIYA SHOW",
+        "duration": "PT18M",
+        "versionPid": "p08rt28m",
+        "versionCrid": "crid://bbc.co.uk/p/251021156",
+        "insertionType": "",
+        "pid": "p08rt28k"
+      },
+      "end": "2020-09-17T23:18:02.000Z"
+    },
+    {
+      "title": "BBC DUNIYA SHOW",
+      "startTime": "2020-09-17T23:18:02.000Z",
+      "duration": "PT18M",
+      "insertionType": "",
+      "asset": {
+        "title": "BBC DUNIYA SHOW",
+        "duration": "PT18M",
+        "versionPid": "p08rt28m",
+        "versionCrid": "crid://bbc.co.uk/p/251021156",
+        "insertionType": "",
+        "pid": "p08rt28k"
+      },
+      "end": "2020-09-17T23:36:02.000Z"
+    },
+    {
+      "title": "BBC DUNIYA SHOW",
+      "startTime": "2020-09-17T23:36:02.000Z",
+      "duration": "PT18M",
+      "insertionType": "",
+      "asset": {
+        "title": "BBC DUNIYA SHOW",
+        "duration": "PT18M",
+        "versionPid": "p08rt28m",
+        "versionCrid": "crid://bbc.co.uk/p/251021156",
+        "insertionType": "",
+        "pid": "p08rt28k"
+      },
+      "end": "2020-09-17T23:54:02.000Z"
+    },
+    {
+      "title": "कोरोनाकाल: खस्ताहाल अर्थव्यवस्था की इन पर पड़ रही है ज़्यादा मार",
+      "startTime": "2020-09-17T23:54:02.000Z",
+      "duration": "PT3M26S",
+      "insertionType": "",
+      "asset": {
+        "title": "कोरोनाकाल: खस्ताहाल अर्थव्यवस्था की इन पर पड़ रही है ज़्यादा मार",
+        "duration": "PT3M26S",
+        "versionPid": "p08rsw49",
+        "versionCrid": "crid://bbc.co.uk/p/251015256",
+        "insertionType": "",
+        "pid": "p08rsw45"
+      },
+      "end": "2020-09-17T23:57:28.000Z"
+    },
+    {
+      "title": "कोविड-19 के नए इलाज की उम्मीद",
+      "startTime": "2020-09-17T23:57:28.000Z",
+      "duration": "PT2M13S",
+      "insertionType": "",
+      "asset": {
+        "title": "कोविड-19 के नए इलाज की उम्मीद",
+        "duration": "PT2M13S",
+        "versionPid": "p08rswcd",
+        "versionCrid": "crid://bbc.co.uk/p/251015476",
+        "insertionType": "",
+        "pid": "p08rswc8"
+      },
+      "end": "2020-09-17T23:59:41.000Z"
+    },
+    {
+      "title": "HIN/CHILENEW OOV/1701/12/3",
+      "startTime": "2020-09-17T23:59:41.000Z",
+      "duration": "PT19S",
+      "insertionType": "",
+      "asset": {
+        "title": "HIN/CHILENEW OOV/1701/12/3",
+        "duration": "PT19S",
+        "versionPid": "p086fbzm",
+        "versionCrid": "crid://bbc.co.uk/p/234972177",
+        "insertionType": "",
+        "pid": "p086fbzk"
+      },
+      "end": "2020-09-18T00:00:00.000Z"
+    }
+  ]
+}

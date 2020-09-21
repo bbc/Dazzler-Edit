@@ -44,84 +44,29 @@ class ScheduleDao {
     // }
     return title;
   }
-
-  static fetchSchedule1(sid, date, cb) {
-    cb(new ScheduleObject(sid, date));
-  }
-
-  static fetchSPWSchedule(sid, date, cb) {
-    //console.log('fetchSchedule', sid, date.format());
-    axios
-      .get(
-        `${URLPrefix}/api/v1/schedule?sid=${sid}&date=${date
-          .utc()
-          .startOf("day")
-          .format("YYYY-MM-DD")}`
-      )
-      .then((response) => {
-        let schedule = [];
-        if (response.data.total > 0) {
-          response.data.item.forEach((item, index) => {
-            if (
-              // moment(date).format("DD-MM-YYYY") ===
-              // moment(item.broadcast[0].published_time[0].$.start).format(
-              //   "DD-MM-YYYY"
-              // )
-              1 == 1
-            ) {
-              const broadcast = item.broadcast[0];
-              const published_time = broadcast.published_time[0].$;
-              const live = broadcast.live[0].$.value === "true";
-              const asset = {
-                title: ScheduleDao.getTitle(item, index),
-                duration: moment
-                  .duration(published_time.duration)
-                  .toISOString(),
-                versionPid: item.version[0].$.pid, //broadcast - broadcast of // version object  - version of  [version0.$.pid]
-                versionCrid: item.version[0].crid[0].$.uri,
-                insertionType: live ? "live" : "",
-                pid: item.version[0].version_of[0].link[0].$.pid,
-              };
-              schedule.push({
-                title: asset.title,
-                startTime: moment(published_time.start),
-                duration: asset.duration,
-                insertionType: asset.insertionType,
-                asset: asset,
-              });
-            }
-          });
-        }
-        const sched = new ScheduleObject(sid, date);
-        sched.addFixed(schedule);
-        sched.addGaps();
-        sched.sort();
-        cb(sched);
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-  }
-
-  static fetchS3Schedule(sid, date, cb) {
+  static fetchSchedule(sid, date, cb) {
     let formattedDate = moment(date).format("YYYY-MM-DD");
     axios
-      .get(`${URLPrefix}/api/v2/schedulev2?sid=${sid}&date=${formattedDate}`)
+      .get(`${URLPrefix}/api/v2/schedule?sid=${sid}&date=${formattedDate}`)
       .then((response) => {
+        console.log("response is", response);
         let schedule = [];
-        if (response.data.total > 0) {
-          response.data.item.forEach((item, index) => {
+        if (response.data.items.length > 0) {
+          response.data.items.forEach((item, index) => {
+            console.log("item is ", item);
             const asset = {
-              startTime: item.startTime,
-              title: item.asset.title,
-              duration: item.asset.duration,
-              versionPid: item.asset.vpid, //broadcast - broadcast of // version object  - version of  [version0.$.pid]
-              versionCrid: item.asset.versionCrid,
-              insertionType: item.asset.live ? "live" : "",
-              live: item.asset.live,
-              pid: item.asset.pid,
-              entityType: item.asset.entity_type,
+              startTime: item.start,
+              title: item.title,
+              duration: item.version.duration,
+              versionPid: item.version.pid, //broadcast - broadcast of // version object  - version of  [version0.$.pid]
+              versionCrid: item.broadcast_of.crid,
+              insertionType: item.live ? "live" : "",
+              live: item.live,
+              pid: item.broadcast_of.pid,
+              entityType: item.version.entity_type,
             };
+
+            console.log("asset is,", asset);
 
             schedule.push({
               title: asset.title,
@@ -130,6 +75,7 @@ class ScheduleDao {
               insertionType: asset.insertionType,
               asset: asset,
             });
+            console.log("schedule is ", schedule);
           });
         }
         const sched = new ScheduleObject(sid, date);
@@ -173,8 +119,6 @@ class ScheduleDao {
   }
 
   static fetchWebcasts(sid, start, end, page, rowsPerPage, cb) {
-    console.log("aa", start);
-
     axios
       .get(
         `${URLPrefix}/api/v1/webcast?sid=${sid}&start=${start}&end=${end}&page=${
@@ -200,139 +144,44 @@ class ScheduleDao {
     return item.insertionType !== "sentinel" && item.insertionType !== "gap";
   }
 
-  static simpleBroadcastForS3(item) {
+  static createBroadcastItem(item) {
+    console.log("item is ", item);
     const finish = moment(item.startTime).add(moment.duration(item.duration));
-    // ES6 return { ...item, end: finish.toISOString() };
-    item.end = finish.toISOString();
-    return item;
-  }
-
-  static SpwLikeBroadcast(item) {
-    return {
-      broadcast: [
-        {
-          live: [
-            {
-              $: {
-                value: item.asset.live,
-              },
-            },
-          ],
-          published_time: [
-            {
-              $: {
-                duration: moment
-                  .duration(item.asset.duration)
-                  .format("hh:mm:ss"),
-                start: moment(item.startTime).toISOString(),
-                end: moment(item.startTime)
-                  .add(moment.duration(item.asset.duration))
-                  .toISOString(),
-              },
-            },
-          ],
-        },
-      ],
-      version: [
-        {
-          crid: [
-            {
-              $: {
-                uri: item.asset.versionCrid,
-              },
-            },
-          ],
-          $: {
-            pid: item.asset.pid,
-          },
-          entity_type: item.asset.entityType,
-          version_of: [
-            {
-              link: [
-                {
-                  $: {
-                    pid: item.asset.pid,
-                  },
-                },
-              ],
-            },
-          ],
-          title: [item.asset.title],
-        },
-      ],
+    const newItem = {
+      title: item.title,
+      start: item.startTime,
+      end: finish,
+      live: item.asset.live,
+      broadcast_of: { pid: item.asset.vpid, crid: item.asset.versionCrid },
+      version: {
+        pid: item.asset.vpid,
+        version_of: item.asset.pid,
+        duration: item.asset.duration,
+        entity_type: item.asset.entityType,
+      },
     };
+
+    return newItem;
   }
 
-  static tvaCompleteSchedule(data, serviceIDRef) {
-    const first = data[0];
-    const last = data[data.length - 1];
-
-    const start = moment.utc(first.startTime, "HH:mm:ss");
-    const end = moment
-      .utc(last.startTime, "HH:mm:ss")
-      .add(moment.duration(last.duration));
-    const tvaStart =
-      '<TVAMain xmlns="urn:tva:metadata:2007" xmlns:mpeg7="urn:tva:mpeg7:2005" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xml:lang="en-GB" xsi:schemaLocation="urn:tva:metadata:2007 tva_metadata_3-1_v141.xsd">\n  <ProgramDescription>\n';
-    const tvaEnd = "  </ProgramDescription>\n</TVAMain>";
-
-    let tva =
-      tvaStart +
-      "    <ProgramLocationTable>\n" +
-      `      <Schedule start="${start.format()}" end="${end.format()}" serviceIDRef="${serviceIDRef}">`;
-    for (let i = 0; i < data.length; i++) {
-      if (ScheduleDao.savableItem(data[i])) {
-        tva += ScheduleDao.makeScheduleEvent(serviceIDRef, data[i]);
-      }
-    }
-    tva += "\n      </Schedule>\n    </ProgramLocationTable>\n" + tvaEnd;
-    return tva;
-  }
-  static fetchSchedule(sid, date, cb) {
-    ScheduleDao.fetchS3Schedule(sid, date, cb);
-  }
   static saveSchedule(serviceIDRef, data, date, sid, cb, err) {
-    ScheduleDao.saveS3Schedule(serviceIDRef, data, date, sid, cb, err);
-  }
-
-  static saveSPWSchedule(serviceIDRef, data, cb, err) {
-    try {
-      const tva = ScheduleDao.tvaCompleteSchedule(data, serviceIDRef);
-      console.log("tva", tva);
-
-      axios({
-        method: "post",
-        url: URLPrefix + "/api/v1/tva",
-        data: tva,
-      })
-        .then((response) => {
-          cb(response);
-        })
-        .catch((error) => {
-          err(error);
-        });
-
-      ScheduleDao.episodeBackfillCheck(data);
-    } catch (error) {
-      err();
-    }
-  }
-  /* S3 schedule format can be found on ''add url''*/
-  static saveS3Schedule(serviceIDRef, data, date, sid, cb, err) {
     // Get end time and remove sentinels and gaps
     // ES6 const items = data.flatMap((e) => savableItem(e) ? s3Broadcast(e) : []);
     const items = data
       .filter((item) => ScheduleDao.savableItem(item))
-      .map((item) => ScheduleDao.simpleBroadcastForS3(item));
+      .map((item) => ScheduleDao.createBroadcastItem(item));
     const obj = {
       scheduleSource: "Dazzler",
+      sid: sid,
       serviceIDRef: serviceIDRef,
-      date: moment(date).format("YYYY-MM-DD"),
+      start: moment(date).toISOString(),
+      end: moment(date).add(1, "day").toISOString(),
       items,
     };
     try {
       axios({
         method: "post",
-        url: `${URLPrefix}/api/v2/s3save?sid=${sid}&date=${obj.date}`,
+        url: `${URLPrefix}/api/v2/schedule?sid=${sid}`,
         data: obj,
       })
         .then((response) => {
@@ -378,37 +227,6 @@ class ScheduleDao {
     } catch (error) {
       console.error("FAILURE", error);
     }
-  }
-  static makeScheduleEvent(serviceIDRef, broadcast) {
-    const duration = broadcast.duration;
-    const startDateTime = moment.utc(broadcast.startTime);
-    let imi = "imi:dazzler:" + serviceIDRef + "/" + startDateTime.unix();
-
-    return ` 
-        <ScheduleEvent>
-          <Program crid="${broadcast.asset.versionCrid}"/>
-            <BroadcasterRawData>${
-              broadcast.asset.captureChannel
-                ? broadcast.asset.captureChannel
-                : ""
-            }</BroadcasterRawData>
-            <InstanceMetadataId>${imi}</InstanceMetadataId>
-            <InstanceDescription>
-              <AVAttributes>
-                <AudioAttributes><MixType href="urn:mpeg:mpeg7:cs:AudioPresentationCS:2001:3"><Name>Stereo</Name></MixType></AudioAttributes>
-                <VideoAttributes><AspectRatio>16:9</AspectRatio><Color type="color"/></VideoAttributes>
-              </AVAttributes>
-              <Title>${broadcast.title}</Title>
-            </InstanceDescription>
-            <PublishedStartTime>${startDateTime
-              .utc()
-              .format()}</PublishedStartTime>
-            <PublishedDuration>${duration}</PublishedDuration>
-            <Live value="${broadcast.asset.live ? "true" : "false"}"/>
-            <Repeat value="false"/>
-            <Free value="true"/>
-        </ScheduleEvent>
-      `;
   }
 }
 

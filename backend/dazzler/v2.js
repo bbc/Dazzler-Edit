@@ -464,7 +464,7 @@ const getEpisodeUri = async function (item) {
     }
 
     let wantedURI = result.filter((ondemand) =>
-    ondemand.filepath.uri.includes("av_pv13_pa4")
+      ondemand.filepath.uri.includes("av_pv13_pa4")
     )[0].filepath.uri;
     return wantedURI;
   } catch (error) {
@@ -576,10 +576,12 @@ const getScheduleFromS3 = async (sid, date) => {
   const key = `${sid}/schedule/${date}-schedule.json`;
   console.log("key is", key);
   try {
-    const s = await s3.getObject({
-      Bucket: process.env.BUCKET,
-      Key: key,
-    }).promise();
+    const s = await s3
+      .getObject({
+        Bucket: process.env.BUCKET,
+        Key: key,
+      })
+      .promise();
     return JSON.parse(s.Body.toString("utf8"));
   } catch (e) {
     console.log(e);
@@ -589,10 +591,10 @@ const getScheduleFromS3 = async (sid, date) => {
     sid,
     serviceIDRef: config[sid].serviceIDRef,
     start: `${date}T00:00:00.000Z`,
-    end: moment.utc(date).add(1, 'days').format,
-    items: [ ],
+    end: moment.utc(date).add(1, "days").format,
+    items: [],
   };
-}
+};
 
 const saveOneDayOfScheduleToS3 = async (sid, date, data) => {
   var params = {
@@ -609,67 +611,70 @@ const saveOneDayOfScheduleToS3 = async (sid, date, data) => {
   } catch (e) {
     console.log("error ", e);
   }
-}
+};
 
+//update start and end in this schedule from the old
 const mergeOneDayOfScheduleToS3 = async (sid, date, data) => {
   const first = data.items[0].start;
-  const last = data.items[data.items.length-1].end;
+  const last = data.items[data.items.length - 1].end;
   const existing = await getScheduleFromS3(sid, date);
-  const before = existing.items.filter((item) => item.end < first );
-  const after = existing.items.filter((item) => item.start > last );
+  const before = existing.items.filter((item) => item.end < first);
+  const after = existing.items.filter((item) => item.start > last);
   const schedule = { ...data, items: [...before, ...data.items, ...after] };
   return saveOneDayOfScheduleToS3(sid, date, schedule);
-}
+};
 
 const saveScheduleToS3 = async (data) => {
   const sid = data.sid;
-  const start = moment.utc(data.start).startOf('day').format();
-  const end = moment(start).add(1, 'days').format();
-  const date = moment.utc(start).format('YYYY-MM-DD');
-  if(data.items.length === 0) {
+  const start = moment.utc(data.start).startOf("day").format();
+  const end = moment(start).add(1, "days").format();
+  const date = moment.utc(start).format("YYYY-MM-DD");
+  if (data.items.length === 0) {
     console.log(`empty schedule for ${sid} on ${date}, nothing saved`);
     return;
   }
   const first = data.items[0].start;
-  const last = data.items[data.items.length-1].end;
+  const last = data.items[data.items.length - 1].end;
   if (first === start && last === end) {
     // full day schedule
+    console.log("one day");
     return saveOneDayOfScheduleToS3(sid, date, data);
   }
   if (last > end) {
     // more than one day
+    console.log("more than one day");
     const day = moment.utc(date);
-    const lastday = moment.utc(last).startOf('day');
+    const lastday = moment.utc(last).startOf("day");
     while (day <= lastday) {
-      const d = day.format('YYYY-MM-DD');
+      const d = day.format("YYYY-MM-DD");
       const items = data.items.filter((item) => item.start.startsWith(d));
       await mergeOneDayOfScheduleToS3(sid, d, {
         ...data,
         start: items[0].start,
-        end: items[items.length-1].end,
+        end: items[items.length - 1].end,
         items,
       });
-      day.add(1, 'days');
+      day.add(1, "days");
     }
   } else {
     // partial - we need to merge this with the current schedule, if it exists
     return mergeOneDayOfScheduleToS3(sid, date, data);
   }
-}
+};
 
 const getScheduleFromSPW = async (sid, date) => {
   let schedule = [];
   try {
-    schedule = (await spw.request(sid, date));
+    schedule = await spw.request(sid, date);
   } catch (e) {
     console.log(e);
   }
   let items = schedule.item.filter((item) => {
-	const pt = item.broadcast[0].published_time[0].$;
-        if(pt) {
-		return pt.start.startsWith(date)
- 	}
-        return false;
+    const pt = item.broadcast[0].published_time[0].$;
+    if (pt) {
+      return pt.start.startsWith(date);
+    }
+    return false;
   });
   items = items.map((item) => {
     const broadcast = item.broadcast[0];
@@ -678,7 +683,7 @@ const getScheduleFromSPW = async (sid, date) => {
       title: broadcast.title[0],
       start: broadcast.published_time[0].$.start,
       end: broadcast.published_time[0].$.end,
-      live: broadcast.live === 'true',
+      live: broadcast.live === "true",
       broadcast_of: {
         pid: broadcast.broadcast_of[0].link[0].$.pid,
         crid: version.crid[0].$.uri,
@@ -686,8 +691,9 @@ const getScheduleFromSPW = async (sid, date) => {
     };
     if (common.live) {
       return {
-        ...common, source: broadcast.pics_raw_data,
-      }
+        ...common,
+        source: broadcast.pics_raw_data,
+      };
     }
     return {
       ...common,
@@ -695,21 +701,24 @@ const getScheduleFromSPW = async (sid, date) => {
         pid: version.$.pid,
         version_of: version.version_of[0].link[0].$.pid,
         duration: moment.duration(version.duration[0]).toString(),
-        entity_type: version.version_of[0].link[0].$.rel.replace('pips-meta:', ''),
-      }
+        entity_type: version.version_of[0].link[0].$.rel.replace(
+          "pips-meta:",
+          ""
+        ),
+      },
     };
   });
   const r = {
     scheduleSource: "PIPS",
-    sid,     
+    sid,
     serviceIDRef: schedule.service[0].$.bds_service_ref,
     start: items[0].start,
-    end: items[items.length-1].end,
+    end: items[items.length - 1].end,
     items,
-  }; 
+  };
   console.log(r);
   return r;
-}
+};
 
 const tvaScheduleEvent = (serviceIDRef, item) => {
   const duration = item.duration;
@@ -718,7 +727,9 @@ const tvaScheduleEvent = (serviceIDRef, item) => {
   return ` 
       <ScheduleEvent>
         <Program crid="${item.broadcast_of.crid}"/>
-          <BroadcasterRawData>${item.live?item.source:''}</BroadcasterRawData>
+          <BroadcasterRawData>${
+            item.live ? item.source : ""
+          }</BroadcasterRawData>
           <InstanceMetadataId>${imi}</InstanceMetadataId>
           <InstanceDescription>
             <AVAttributes>
@@ -736,50 +747,51 @@ const tvaScheduleEvent = (serviceIDRef, item) => {
           <Free value="true"/>
       </ScheduleEvent>
     `;
-}
+};
 
 const tvaSchedule = ({ serviceIDRef, start, end, items }) => {
-  let tva = '<TVAMain xmlns="urn:tva:metadata:2007" xmlns:mpeg7="urn:tva:mpeg7:2005" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xml:lang="en-GB" xsi:schemaLocation="urn:tva:metadata:2007 tva_metadata_3-1_v141.xsd">';
-  tva += '<ProgramDescription><ProgramLocationTable>';
+  let tva =
+    '<TVAMain xmlns="urn:tva:metadata:2007" xmlns:mpeg7="urn:tva:mpeg7:2005" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xml:lang="en-GB" xsi:schemaLocation="urn:tva:metadata:2007 tva_metadata_3-1_v141.xsd">';
+  tva += "<ProgramDescription><ProgramLocationTable>";
   tva += `<Schedule start="${start}" end="${end}" serviceIDRef="${serviceIDRef}">`;
   for (let i = 0; i < items.length; i++) {
-    tva +=  tvaScheduleEvent(serviceIDRef, items[i]);
+    tva += tvaScheduleEvent(serviceIDRef, items[i]);
   }
-  tva += '</Schedule></ProgramLocationTable></ProgramDescription></TVAMain>';
+  tva += "</Schedule></ProgramLocationTable></ProgramDescription></TVAMain>";
   return tva;
-}
+};
 
 const saveScheduleAsTVA = async (data) => {
   const tva = tvaSchedule(data);
   const r = await pips.postTVA(tva);
   return r.data;
-}
+};
 
 const getSchedule = async (req, res) => {
   const sid = req.query.sid || config.default_sid;
   const date = req.query.date;
-  const source = process.env.SCHEDULE_SOURCE || 's3';
+  const source = process.env.SCHEDULE_SOURCE || "s3";
   let r;
-  if (source === 'pips') {
+  if (source === "pips") {
     r = await getScheduleFromSPW(sid, date);
   } else {
     r = await getScheduleFromS3(sid, date);
   }
-  console.log('getSchedule', JSON.stringify(r));
+  console.log("getSchedule", JSON.stringify(r));
   res.json(r);
-}
+};
 
 const saveSchedule = async (req, res) => {
   const sid = req.query.sid || config.default_sid;
-  let user = 'dazzler';
+  let user = "dazzler";
   if (req.header("sslclientcertsubject")) {
     const subject = auth.parseSSLsubject(req);
     user = subject.emailAddress;
   }
   if (auth.isAuthorised(user)) {
-    const destination = process.env.SCHEDULE_DESTINATION || 's3';
+    const destination = process.env.SCHEDULE_DESTINATION || "s3";
     let response;
-    if (destination === 'pips') {
+    if (destination === "pips") {
       response = saveScheduleAsTVA(JSON.parse(req.body));
     } else {
       response = saveScheduleToS3(JSON.parse(req.body));
@@ -794,7 +806,7 @@ const saveSchedule = async (req, res) => {
     console.log(message);
     res.status(403).send(message);
   }
-}
+};
 
 module.exports = {
   init(app, configObject, configObject2) {
@@ -814,7 +826,7 @@ module.exports = {
 
     app.get("/api/v2/schedule", getSchedule);
     app.post("/api/v2/schedule", saveSchedule);
- 
+
     // app.put("/api/v2/loop", loop);
     app.post("/api/v2/s3save", s3Save);
     app.post("/api/v2/subscribe", subscribe);
