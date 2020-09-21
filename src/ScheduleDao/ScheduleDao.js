@@ -66,7 +66,7 @@ class ScheduleDao {
               entityType: item.version.entity_type,
             };
             if (item.live) {
-              asset.source = item.stream;
+              asset.stream = item.stream;
             }
 
             console.log("asset is,", asset);
@@ -164,7 +164,7 @@ class ScheduleDao {
       },
     };
     if (item.asset.live) {
-      newItem.source = item.asset.pics_raw_data;
+      newItem.stream = item.asset.pics_raw_data;
     }
     console.log("new item is ", newItem);
 

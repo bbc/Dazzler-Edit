@@ -567,7 +567,7 @@ const schedulev2 = async (req, res) => {
       "start": "2020-09-18T00:00:00.000Z",
       "end": "2020-09-18T00:18:00.000Z",
       "live": true,
-      "broadcast_of": { "pid": "p08rt28m", "crid": "crid..." },
+      "broadcast_of": { "pid": "p08rt28m", "crid": "crid..f." },
       "source": "world_service_stream_08"
   }
 */
