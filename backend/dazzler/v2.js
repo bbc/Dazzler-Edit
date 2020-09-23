@@ -631,7 +631,7 @@ const saveScheduleToS3 = async (data) => {
   const date = moment.utc(start).format("YYYY-MM-DD");
   if (data.items.length === 0) {
     console.log(`empty schedule for ${sid} on ${date}, nothing saved`);
-    return;
+    return saveOneDayOfScheduleToS3(sid, date, data);
   }
   const first = data.items[0].start;
   const last = data.items[data.items.length - 1].end;
