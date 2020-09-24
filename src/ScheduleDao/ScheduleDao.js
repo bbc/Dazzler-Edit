@@ -53,7 +53,7 @@ class ScheduleDao {
         let schedule = [];
         if (response.data.items.length > 0) {
           response.data.items.forEach((item, index) => {
-            console.log("item is ", item);
+            console.log("fetch item is ", item);
             const asset = {
               startTime: item.start,
               title: item.title,
@@ -62,7 +62,7 @@ class ScheduleDao {
               versionCrid: item.broadcast_of.crid,
               insertionType: item.live ? "live" : "",
               live: item.live,
-              pid: item.broadcast_of.pid,
+              pid: item.version.version_of,
               entityType: item.version.entity_type,
             };
             if (item.live) {
@@ -148,16 +148,19 @@ class ScheduleDao {
   }
 
   static createBroadcastItem(item) {
-    console.log("item is ", item);
+    console.log("cb item is ", item);
     const finish = moment(item.startTime).add(moment.duration(item.duration));
     const newItem = {
       title: item.title,
       start: item.startTime,
       end: finish,
       live: item.asset.live,
-      broadcast_of: { pid: item.asset.vpid, crid: item.asset.versionCrid },
+      broadcast_of: {
+        pid: item.asset.versionPid,
+        crid: item.asset.versionCrid,
+      },
       version: {
-        pid: item.asset.vpid,
+        pid: item.asset.versionPid,
         version_of: item.asset.pid,
         duration: item.asset.duration,
         entity_type: item.asset.entityType,
