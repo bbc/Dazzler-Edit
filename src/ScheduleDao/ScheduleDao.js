@@ -156,11 +156,11 @@ class ScheduleDao {
       end: finish,
       live: item.asset.live,
       broadcast_of: {
-        pid: item.asset.versionPid,
+        pid: item.asset.versionPid ? item.asset.versionPid : item.asset.vpid,
         crid: item.asset.versionCrid,
       },
       version: {
-        pid: item.asset.versionPid,
+        pid: item.asset.versionPid ? item.asset.versionPid : item.asset.vpid,
         version_of: item.asset.pid,
         duration: item.asset.duration,
         entity_type: item.asset.entityType,
@@ -188,6 +188,7 @@ class ScheduleDao {
       end: moment(date).add(1, "day").toISOString(),
       items,
     };
+    console.log("saving this", obj);
     try {
       axios({
         method: "post",
