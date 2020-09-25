@@ -58,7 +58,7 @@ class ScheduleDao {
               startTime: item.start,
               title: item.title,
               duration: item.version.duration,
-              versionPid: item.version.pid, //broadcast - broadcast of // version object  - version of  [version0.$.pid]
+              vpid: item.version.pid, //broadcast - broadcast of // version object  - version of  [version0.$.pid]
               versionCrid: item.broadcast_of.crid,
               insertionType: item.live ? "live" : "",
               live: item.live,
@@ -156,11 +156,11 @@ class ScheduleDao {
       end: finish,
       live: item.asset.live,
       broadcast_of: {
-        pid: item.asset.versionPid ? item.asset.versionPid : item.asset.vpid,
+        pid: item.asset.vpid,
         crid: item.asset.versionCrid,
       },
       version: {
-        pid: item.asset.versionPid ? item.asset.versionPid : item.asset.vpid,
+        pid: item.asset.vpid,
         version_of: item.asset.pid,
         duration: item.asset.duration,
         entity_type: item.asset.entityType,
