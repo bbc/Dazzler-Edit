@@ -721,7 +721,7 @@ const getScheduleFromSPW = async (sid, date) => {
 };
 
 const tvaScheduleEvent = (serviceIDRef, item) => {
-  const duration = item.duration;
+  const duration = item.version.duration;
   const startDateTime = moment.utc(item.start);
   let imi = "imi:dazzler:" + serviceIDRef + "/" + startDateTime.unix();
   return ` 
