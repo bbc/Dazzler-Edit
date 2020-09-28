@@ -666,58 +666,63 @@ const getScheduleFromSPW = async (sid, date) => {
   let schedule = [];
   try {
     schedule = await spw.request(sid, date);
-  } catch (e) {
-    console.log(e);
-  }
-  let items = schedule.item.filter((item) => {
-    const pt = item.broadcast[0].published_time[0].$;
-    if (pt) {
-      return pt.start.startsWith(date);
-    }
-    return false;
-  });
-  items = items.map((item) => {
-    const broadcast = item.broadcast[0];
-    const version = item.version[0];
-    const common = {
-      title: broadcast.title[0],
-      start: broadcast.published_time[0].$.start,
-      end: broadcast.published_time[0].$.end,
-      live: broadcast.live === "true",
-      broadcast_of: {
-        pid: broadcast.broadcast_of[0].link[0].$.pid,
-        crid: version.crid[0].$.uri,
-      },
-    };
-    if (common.live) {
+
+    let items = schedule.item.filter((item) => {
+      const pt = item.broadcast[0].published_time[0].$;
+      if (pt) {
+        return pt.start.startsWith(date);
+      }
+      return false;
+    });
+    items = items.map((item) => {
+      const broadcast = item.broadcast[0];
+      const version = item.version[0];
+      const common = {
+        title: broadcast.title[0],
+        start: broadcast.published_time[0].$.start,
+        end: broadcast.published_time[0].$.end,
+        live: broadcast.live === "true",
+        broadcast_of: {
+          pid: broadcast.broadcast_of[0].link[0].$.pid,
+          crid: version.crid[0].$.uri,
+        },
+      };
+      if (common.live) {
+        return {
+          ...common,
+          source: broadcast.pics_raw_data,
+        };
+      }
       return {
         ...common,
-        source: broadcast.pics_raw_data,
+        version: {
+          pid: version.$.pid,
+          version_of: version.version_of[0].link[0].$.pid,
+          duration: moment.duration(version.duration[0]).toString(),
+          entity_type: version.version_of[0].link[0].$.rel.replace(
+            "pips-meta:",
+            ""
+          ),
+        },
       };
-    }
-    return {
-      ...common,
-      version: {
-        pid: version.$.pid,
-        version_of: version.version_of[0].link[0].$.pid,
-        duration: moment.duration(version.duration[0]).toString(),
-        entity_type: version.version_of[0].link[0].$.rel.replace(
-          "pips-meta:",
-          ""
-        ),
-      },
+    });
+    const r = {
+      scheduleSource: "PIPS",
+      sid,
+      serviceIDRef: schedule.service[0].$.bds_service_ref,
+      start: items[0].start,
+      end: items[items.length - 1].end,
+      items,
     };
-  });
-  const r = {
-    scheduleSource: "PIPS",
-    sid,
-    serviceIDRef: schedule.service[0].$.bds_service_ref,
-    start: items[0].start,
-    end: items[items.length - 1].end,
-    items,
-  };
-  console.log(r);
-  return r;
+    console.log(r);
+    return r;
+  } catch (e) {
+    r = {
+      total: 0,
+      items: [],
+    };
+    return r;
+  }
 };
 
 const tvaScheduleEvent = (serviceIDRef, item) => {
