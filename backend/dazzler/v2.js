@@ -615,13 +615,13 @@ const saveOneDayOfScheduleToS3 = async (sid, date, data) => {
 
 //update start and end in this schedule from the old
 const mergeOneDayOfScheduleToS3 = async (sid, date, data) => {
-  const first = data.items[0].start;
-  const last = data.items[data.items.length - 1].end;
-  const existing = await getScheduleFromS3(sid, date);
-  const before = existing.items.filter((item) => item.end < first);
-  const after = existing.items.filter((item) => item.start > last);
-  const schedule = { ...data, items: [...before, ...data.items, ...after] };
-  return saveOneDayOfScheduleToS3(sid, date, schedule);
+  // const first = data.items[0].start;
+  // const last = data.items[data.items.length - 1].end;
+  // const existing = await getScheduleFromS3(sid, date);
+  // const before = existing.items.filter((item) => item.end < first);
+  // const after = existing.items.filter((item) => item.start > last);
+  // const schedule = { ...data, items: [...before, ...data.items, ...after] };
+  return saveOneDayOfScheduleToS3(sid, date, data);
 };
 
 const saveScheduleToS3 = async (data) => {
@@ -658,6 +658,7 @@ const saveScheduleToS3 = async (data) => {
     }
   } else {
     // partial - we need to merge this with the current schedule, if it exists
+    console.log("merge schedule");
     return mergeOneDayOfScheduleToS3(sid, date, data);
   }
 };
