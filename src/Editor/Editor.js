@@ -125,6 +125,11 @@ const services = {
     name: "Swahili",
     serviceIDRef: "TVMAR01",
   },
+  bbc_gujarati_tv: {
+    sid: "bbc_gujarati_tv",
+    name: "Gujarati",
+    serviceIDRef: "",
+  },
 };
 
 var start = moment().utc().startOf("day");
@@ -178,6 +183,9 @@ class Editor extends React.Component {
         },
         Marathi: {
           sid: "bbc_marathi_tv",
+        },
+        Gujarati: {
+          sid: "bbc_gujarati_tv",
         },
       },
       timeToFill: moment.duration(),
