@@ -117,6 +117,23 @@ const configV2 = {
       "world_service_stream_08",
     ],
   },
+  Gujarati: {
+    serviceIDRef: "",
+    mid: "bbc_gujarati_tv",
+    sid: "bbc_gujarati_tv",
+    loop_collection: "",
+    specials_collection: "",
+    live_brand: "",
+    clip_language: "gujarati",
+    language_tag: "",
+    language: "",
+    webcast_channels: [
+      "world_service_stream_05",
+      "world_service_stream_06",
+      "world_service_stream_07",
+      "world_service_stream_08",
+    ],
+  },
 };
 
 app.use(
