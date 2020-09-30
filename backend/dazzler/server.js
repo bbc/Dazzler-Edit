@@ -1,6 +1,7 @@
 // https://github.com/bbc/sample-cloud-apps/nodejs-helloworld/src/helloworld/server.js
 const express = require("express");
 const bodyParser = require("body-parser");
+const ChannelsDao = require("./ChannelsDAO");
 
 const app = express();
 var configuration;
@@ -65,6 +66,13 @@ const config = {
   },
 };
 
+const configV2 = () => {
+  try {
+    const config = {};
+    ChannelsDao = new cd();
+    const listOfChannels = cd.listOfChannels();
+  } catch (error) {}
+};
 const configV2 = {
   Hindi: {
     serviceIDRef: "TVHIND01",
