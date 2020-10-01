@@ -109,29 +109,6 @@ const styles = (theme) => ({
   },
 });
 
-const services = {
-  bbc_hindi_tv: {
-    sid: "bbc_hindi_tv",
-    name: "Hindi",
-    serviceIDRef: "TVHIND01",
-  },
-  bbc_marathi_tv: {
-    sid: "bbc_marathi_tv",
-    name: "Marathi",
-    serviceIDRef: "TVMAR01",
-  },
-  bbc_swahili_tv: {
-    sid: "bbc_swahili_tv",
-    name: "Swahili",
-    serviceIDRef: "TVMAR01",
-  },
-  bbc_gujarati_tv: {
-    sid: "bbc_gujarati_tv",
-    name: "Gujarati",
-    serviceIDRef: "",
-  },
-};
-
 var start = moment().utc().startOf("day");
 var end = moment().utc().add(1, "day");
 start.set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
@@ -173,19 +150,10 @@ class Editor extends React.Component {
       mode: "loop",
       scheduleInsertionPoint: 1,
       scheduleModified: false,
-      language:
-        localStorage.getItem("language") == null
-          ? "Hindi"
-          : localStorage.getItem("language"),
+      language: "Hindi",
       configObj: {
         Hindi: {
           sid: "bbc_hindi_tv",
-        },
-        Marathi: {
-          sid: "bbc_marathi_tv",
-        },
-        Gujarati: {
-          sid: "bbc_gujarati_tv",
         },
       },
       timeToFill: moment.duration(),
@@ -213,11 +181,13 @@ class Editor extends React.Component {
         this.setState({
           languageList: Object.keys(response),
           configObj: response,
+          language: localStorage.getItem("language") || "Hindi",
           schedule: new ScheduleObject(
             this.state.language,
             moment().utc().startOf("day")
           ),
         });
+        this.handleRefresh();
       });
     } catch (error) {
       console.log(error);
@@ -454,7 +424,7 @@ class Editor extends React.Component {
     });
     element.href = URL.createObjectURL(file);
     element.download =
-      services[this.state.configObj[this.state.language].sid].name +
+      [this.state.configObj[this.state.language].sid].name +
       " " +
       this.state.user.name +
       " Loop.json";
@@ -479,7 +449,7 @@ class Editor extends React.Component {
 
     // const This = this; // closure for callback
     saveSchedule(
-      services[this.state.configObj[this.state.language].sid].serviceIDRef,
+      [this.state.configObj[this.state.language].sid].serviceIDRef,
       this.state.schedule.items,
       this.state.schedule.date,
       this.state.configObj[this.state.language].sid,
@@ -615,7 +585,6 @@ class Editor extends React.Component {
   // upcoming episodes need to be still available to the end of the day being scheduled
 
   render() {
-    console.log("lnaguage is ", this.state.language);
     let { from, to } = this.state;
     const mustBeAvailableBy = moment.utc().format();
     const mustBeAvailableUntil = moment
@@ -666,7 +635,7 @@ class Editor extends React.Component {
               })}
             </Select>
             <Typography variant="h6" color="inherit" noWrap>
-              {/* {services[this.state.configObj[this.state.language].sid].name} */}
+              {/* {[this.state.configObj[this.state.language].sid].name} */}
             </Typography>
             <Typography
               align="center"
