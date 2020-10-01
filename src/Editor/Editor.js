@@ -181,12 +181,13 @@ class Editor extends React.Component {
         this.setState({
           languageList: Object.keys(response),
           configObj: response,
-          // language: localStorage.getItem("language") || "Hindi",
+          language: localStorage.getItem("language") || "Hindi",
           schedule: new ScheduleObject(
             this.state.language,
             moment().utc().startOf("day")
           ),
         });
+        this.handleRefresh();
       });
     } catch (error) {
       console.log(error);
