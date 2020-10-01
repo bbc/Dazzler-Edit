@@ -11,6 +11,7 @@ class ScheduleDao {
     try {
       let url = `${URLPrefix}/api/v2/languageservices`;
       axios.get(url).then((response) => {
+        console.log("we have", response);
         cb(response.data);
       });
     } catch (error) {
@@ -129,7 +130,6 @@ class ScheduleDao {
         }&page_size=${rowsPerPage}`
       )
       .then((response) => {
-        console.log("BOOOM RESPONSE", JSON.stringify(response));
         const schedule = [];
         if (response.data.total > 0) {
           response.data.items.forEach((window) => {

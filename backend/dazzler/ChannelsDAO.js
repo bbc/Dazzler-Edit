@@ -13,39 +13,47 @@ class ChannelsDAO {
     };
   }
 
-  getListOfChannels() {
-    try {
-      const { dynamodb, params } = this;
+  getChannels() {
+    const { dynamodb, params } = this;
+    return new Promise((resolve, reject) => {
       dynamodb.scan(params, function (err, data) {
         if (err) {
           console.log(err, err.stack);
+          reject(err);
         } else {
-          console.log(JSON.stringify(data.Items));
-          return Object.keys(data.Items[0]);
+          let config = {};
+          for (let i = 0; i < data.Items.length; i++) {
+            let unit = data.Items[i];
+            config[unit.Name.S] = AWS.DynamoDB.Converter.unmarshall(unit);
+          }
+          resolve(config);
         }
       });
-    } catch (error) {
-      console.log(error);
-    }
+    });
   }
 
   getItem(channel) {
-    const params = {
-      Key: { sid: channel },
-
+    var params = {
       TableName: process.env.DYNAMO_DB,
+      Key: {
+        sid: {
+          S: channel,
+        },
+      },
     };
-    this.dynamodb.getItem(params, function (err, data) {
-      if (err) {
-        console.log(err, err.stack);
-      }
-      if (data) {
-        console.log("it is ", data);
-      }
+    return new Promise((resolve, reject) => {
+      this.dynamodb.getItem(params, function (err, data) {
+        if (err) {
+          console.log(err, err.stack);
+          reject(err);
+        }
+        if (data) {
+          var marshalled = AWS.DynamoDB.Converter.unmarshall(data.Item);
+          resolve(marshalled);
+        }
+      });
     });
   }
 }
 
-const cd = new ChannelsDAO();
-// cd.getListOfChannels();
-cd.getItem("bbc_marathi_tv");
+module.exports = ChannelsDAO;

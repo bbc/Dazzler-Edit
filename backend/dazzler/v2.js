@@ -7,6 +7,7 @@ const auth = require("./auth");
 const spw = require("./spw");
 const pips = require("./pips");
 const notifications = require("./notifications");
+const ChannelDAO = require("./ChannelsDAO");
 //const { resolve } = require("path");
 //node wont read ~\.aws\config     ???????
 aws.config.update({ region: "eu-west-1" });
@@ -367,7 +368,10 @@ const subscribe = async function (req, res) {
 
 const languageServices = async function (req, res) {
   try {
-    res.json(configV2);
+    const cd = new ChannelDAO();
+    cd.getChannels().then((i) => {
+      res.json(i);
+    });
   } catch (error) {
     res.status(404).send("error");
   }
@@ -815,9 +819,8 @@ const saveSchedule = async (req, res) => {
 };
 
 module.exports = {
-  init(app, configObject, configObject2) {
+  init(app, configObject) {
     config = configObject;
-    configV2 = configObject2;
     // app.get("/api/v2/user", user);
     // app.get("/api/v2/broadcast", broadcast);
     // app.get("/api/v2/webcast", webcast);
