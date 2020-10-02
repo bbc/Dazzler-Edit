@@ -514,97 +514,127 @@
           }
         ]
       }
-    }
-  },
-  "Parameters": {
-    "Component": {
-      "Default": "ws-dazzler-edit",
-      "Type": "String",
-      "Description": "The name of the Cosmos Component"
     },
-    "MinSize": {
-      "Default": "1",
-      "Type": "String",
-      "Description": "The minimum number of instances"
+    "dynamoDB": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "TableName": {
+          "Fn::Sub": "Dazzler-Play-${Environment}"
+        },
+        "AttributeDefinitions": {
+          "AttributeName": { "Ref": "HashKeyElementName" },
+          "AttributeType": "S"
+        },
+        "KeySchema": {
+          "AttributeName": { "Ref": "HashKeyElementName" },
+          "KeyType": "HASH"
+        },
+        "ProvisionedThroughput": {
+          "ReadCapacityUnits": { "Ref": "ReadCapacityUnits" },
+          "WriteCapacityUnits": { "Ref": "WriteCapacityUnits" }
+        }
+      }
     },
-    "UpdatePauseTime": {
-      "Default": "PT0S",
-      "Type": "String",
-      "Description": "The time to wait between new instances coming online and the next batch being killed during an ASG update."
-    },
-    "UpdateMinInService": {
-      "Default": "0",
-      "Type": "String",
-      "Description": "The minimum number of instances in service during an ASG update."
-    },
-    "MaxSize": {
-      "Default": "1",
-      "Type": "String",
-      "Description": "The maximum number of instances"
-    },
-    "ImageId": {
-      "Default": "ami-9398d3e0",
-      "Type": "String",
-      "Description": "The AMI to use for this component"
-    },
-    "Environment": {
-      "Default": "test",
-      "ConstraintDescription": "Values must be test or live",
-      "Type": "String",
-      "Description": "The deployment environment",
-      "AllowedValues": ["test", "live"]
-    },
-    "KeyName": {
-      "Default": "cosmos",
-      "Type": "String",
-      "Description": "Name of existing EC2 keypair to enable SSH access to the created instances"
-    },
-    "S3BucketArn": {
-      "Default": "arn:aws:s3:::dazzleredit",
-      "Type": "String",
-      "Description": "The location of the default private storage bucket for all applications."
-    },
-    "UpdateMaxBatchSize": {
-      "Default": "1",
-      "Type": "String",
-      "Description": "The maximum number of instances to be killed at one time during an ASG update."
-    },
-    "InstanceType": {
-      "Default": "t2.micro",
-      "Type": "String",
-      "Description": "The size of the instances"
-    },
-    "CoreInfrastructureStackName": {
-      "Default": "core-infrastructure",
-      "Type": "String",
-      "Description": "Name of the AWS account's core-infrastructure stack. Used to import other network parameters (vpc id, subnets etc)"
-    }
-  },
-  "Mappings": {
-    "OperationsMap": {
-      "DomainNameBaseMap": {
-        "live": "7a576ea3ed7ca599.xhst.bbci.co.uk.",
-        "test": "1c9eb4db7739eb1a.xhst.bbci.co.uk."
+    "Parameters": {
+      "ReadCapacityUnits": {
+        "Default": 10,
+        "Type": "Integer",
+        "Description": "Read Capacity Units"
       },
-      "CopyMediaQueueMap": {
-        "live": "arn:aws:sqs:eu-west-1:205979497597:Media-Syndication-Queue",
-        "test": "arn:aws:sqs:eu-west-1:576677253489:Media-Syndication-Queue"
+      "WriteCapacityUnits": {
+        "Default": 10,
+        "Type": "Integer",
+        "Description": "Write Capacity Units"
       },
-      "CnameEntryMap": {
-        "live": "dazzler",
-        "test": "dazzler.test"
+      "Component": {
+        "Default": "ws-dazzler-edit",
+        "Type": "String",
+        "Description": "The name of the Cosmos Component"
       },
-      "VpcCidrIpMap": {
-        "live": "10.124.64.0/18",
-        "test": "10.98.0.0/18"
+      "MinSize": {
+        "Default": "1",
+        "Type": "String",
+        "Description": "The minimum number of instances"
       },
-      "PlayoutBucketMap": {
-        "live": "ws-dazzler-assets",
-        "test": "ws-dazzler-assets-test"
+      "UpdatePauseTime": {
+        "Default": "PT0S",
+        "Type": "String",
+        "Description": "The time to wait between new instances coming online and the next batch being killed during an ASG update."
       },
-      "ElasticSearchMap": {
-        "live": "vpc-live-pws-es-01-sharq3wijppafqfq2v3isa5ram.eu-west-1.es.amazonaws.com",
-        "test": "vpc-test-pws-es-01-ntq5eu3xhbkw56fc2yi4vt2ndm.eu-west-1.es.amazonaws.com"
+      "UpdateMinInService": {
+        "Default": "0",
+        "Type": "String",
+        "Description": "The minimum number of instances in service during an ASG update."
+      },
+      "MaxSize": {
+        "Default": "1",
+        "Type": "String",
+        "Description": "The maximum number of instances"
+      },
+      "ImageId": {
+        "Default": "ami-9398d3e0",
+        "Type": "String",
+        "Description": "The AMI to use for this component"
+      },
+      "Environment": {
+        "Default": "test",
+        "ConstraintDescription": "Values must be test or live",
+        "Type": "String",
+        "Description": "The deployment environment",
+        "AllowedValues": ["test", "live"]
+      },
+      "KeyName": {
+        "Default": "cosmos",
+        "Type": "String",
+        "Description": "Name of existing EC2 keypair to enable SSH access to the created instances"
+      },
+      "S3BucketArn": {
+        "Default": "arn:aws:s3:::dazzleredit",
+        "Type": "String",
+        "Description": "The location of the default private storage bucket for all applications."
+      },
+      "UpdateMaxBatchSize": {
+        "Default": "1",
+        "Type": "String",
+        "Description": "The maximum number of instances to be killed at one time during an ASG update."
+      },
+      "InstanceType": {
+        "Default": "t2.micro",
+        "Type": "String",
+        "Description": "The size of the instances"
+      },
+      "CoreInfrastructureStackName": {
+        "Default": "core-infrastructure",
+        "Type": "String",
+        "Description": "Name of the AWS account's core-infrastructure stack. Used to import other network parameters (vpc id, subnets etc)"
+      }
+    },
+    "Mappings": {
+      "OperationsMap": {
+        "DomainNameBaseMap": {
+          "live": "7a576ea3ed7ca599.xhst.bbci.co.uk.",
+          "test": "1c9eb4db7739eb1a.xhst.bbci.co.uk."
+        },
+        "CopyMediaQueueMap": {
+          "live": "arn:aws:sqs:eu-west-1:205979497597:Media-Syndication-Queue",
+          "test": "arn:aws:sqs:eu-west-1:576677253489:Media-Syndication-Queue"
+        },
+        "CnameEntryMap": {
+          "live": "dazzler",
+          "test": "dazzler.test"
+        },
+        "VpcCidrIpMap": {
+          "live": "10.124.64.0/18",
+          "test": "10.98.0.0/18"
+        },
+        "PlayoutBucketMap": {
+          "live": "ws-dazzler-assets",
+          "test": "ws-dazzler-assets-test"
+        },
+        "ElasticSearchMap": {
+          "live": "vpc-live-pws-es-01-sharq3wijppafqfq2v3isa5ram.eu-west-1.es.amazonaws.com",
+          "test": "vpc-test-pws-es-01-ntq5eu3xhbkw56fc2yi4vt2ndm.eu-west-1.es.amazonaws.com"
+        }
       }
     }
   }
