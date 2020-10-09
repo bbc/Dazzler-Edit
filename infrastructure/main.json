@@ -254,6 +254,16 @@
         "PolicyDocument": {
           "Statement": [
             {
+              "Action":  [
+                "dynamodb:Get*",
+                "dynamodb:Scan"
+            ],
+              "Resource": {
+                "Fn::Sub": "Dazzler-Play-${Environment}"
+              },
+              "Effect": "Allow"
+            },
+            {
               "Action": ["sts:AssumeRole"],
               "Resource": ["*"],
               "Effect": "Allow"
