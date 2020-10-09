@@ -525,26 +525,7 @@
         ]
       }
     },
-    "dynamoDB": {
-      "Type": "AWS::DynamoDB::Table",
-      "Properties": {
-        "TableName": {
-          "Fn::Sub": "Dazzler-Play-${Environment}"
-        },
-        "AttributeDefinitions": {
-          "AttributeName": { "Ref": "HashKeyElementName" },
-          "AttributeType": "S"
-        },
-        "KeySchema": {
-          "AttributeName": { "Ref": "HashKeyElementName" },
-          "KeyType": "HASH"
-        },
-        "ProvisionedThroughput": {
-          "ReadCapacityUnits": { "Ref": "ReadCapacityUnits" },
-          "WriteCapacityUnits": { "Ref": "WriteCapacityUnits" }
-        }
-      }
-    },
+
     "Parameters": {
       "ReadCapacityUnits": {
         "Default": 10,
