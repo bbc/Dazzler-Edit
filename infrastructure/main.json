@@ -258,9 +258,7 @@
                 "dynamodb:Get*",
                 "dynamodb:Scan"
             ],
-              "Resource": {
-                "Fn::Sub": "Dazzler-Play-${Environment}"
-              },
+              "Resource": "arn:aws:dynamodb:*:*:table/temp",
               "Effect": "Allow"
             },
             {
