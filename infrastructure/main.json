@@ -258,7 +258,7 @@
                 "dynamodb:Get*",
                 "dynamodb:Scan"
             ],
-              "Resource": "arn:aws:dynamodb:*:*:table/temp",
+              "Resource": "*",
               "Effect": "Allow"
             },
             {
