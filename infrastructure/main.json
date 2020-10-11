@@ -254,11 +254,8 @@
         "PolicyDocument": {
           "Statement": [
             {
-              "Action":  [
-                "dynamodb:Get*",
-                "dynamodb:Scan"
-            ],
-              "Resource": "*",
+              "Action": ["dynamodb:Get*", "dynamodb:Scan"],
+              "Resource": "arn:aws:dynamodb:eu-west-1:576677253489:table/temp",
               "Effect": "Allow"
             },
             {
