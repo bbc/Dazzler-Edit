@@ -255,7 +255,9 @@
           "Statement": [
             {
               "Action": ["dynamodb:Get*", "dynamodb:Scan"],
-              "Resource": "arn:aws:dynamodb:eu-west-1:576677253489:table/temp",
+              "Resource": {
+                "Fn::GetAtt": ["dynamodb", "Arn"]
+              },
               "Effect": "Allow"
             },
             {
@@ -518,6 +520,25 @@
             "Fn::GetAtt": ["captureTaskQueue", "QueueName"]
           }
         ]
+      }
+    },
+
+    "dynamoDB": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "TableName": "temp",
+        "AttributeDefinitions": {
+          "AttributeName": { "Ref": "HashKeyElementName" },
+          "AttributeType": "S"
+        },
+        "KeySchema": {
+          "AttributeName": { "Ref": "HashKeyElementName" },
+          "KeyType": "HASH"
+        },
+        "ProvisionedThroughput": {
+          "ReadCapacityUnits": { "Ref": "ReadCapacityUnits" },
+          "WriteCapacityUnits": { "Ref": "WriteCapacityUnits" }
+        }
       }
     },
 
