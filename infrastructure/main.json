@@ -255,9 +255,7 @@
           "Statement": [
             {
               "Action": ["dynamodb:Get*", "dynamodb:Scan"],
-              "Resource": {
-                "Fn::GetAtt": ["dynamodb", "Arn"]
-              },
+              "Resource": "*",
               "Effect": "Allow"
             },
             {
