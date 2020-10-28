@@ -9,6 +9,8 @@ import TableFooter from "@material-ui/core/TableFooter";
 import TablePagination from "@material-ui/core/TablePagination";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
+import Button from "@material-ui/core/Button";
+
 import moment from "moment";
 import "moment-duration-format";
 import { TablePaginationActionsWrapped } from "../TablePaginationActions/TablePaginationActions";
@@ -21,6 +23,10 @@ export const styles = (theme) => ({
   },
   table: {
     minWidth: 250,
+  },
+  button: {
+    margin: theme.spacing(2),
+    marginLeft: "27%",
   },
   tableWrapper: {
     overflowX: "scroll",
@@ -114,7 +120,15 @@ export class Live extends React.Component {
     return (
       <div style={{ marginLeft: "5%" }}>
         {date.format("YYYY-MM-DD")}
-        <button style={{ marginLeft: "30%" }}> Create Dynamic Event</button>
+        {/* <button style={{ marginLeft: "30%" }}> Create Dynamic Event</button> */}
+        <Button
+          color="primary"
+          variant="contained"
+          // onClick={handleClickSave}
+          className={classes.button}
+        >
+          Create Dynamic Live Event
+        </Button>
 
         <Paper className={classes.root}>
           <div className={classes.tableWrapper}>
