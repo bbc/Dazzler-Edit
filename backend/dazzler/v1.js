@@ -27,10 +27,12 @@ const schedule = async (req, res) => {
       }
     }
     if (pids.length > 0) {
-      var i,j,chunk = 50;
-      for (i=0,j=pids.length; i<j; i+=chunk) {
-          const temparray = pids.slice(i,i+chunk);
-          await nitro.addClips(s, temparray);
+      var i,
+        j,
+        chunk = 50;
+      for (i = 0, j = pids.length; i < j; i += chunk) {
+        const temparray = pids.slice(i, i + chunk);
+        await nitro.addClips(s, temparray);
       }
     }
     // work around circular dependencies
@@ -85,7 +87,7 @@ const webcast = async (req, res) => {
   if (req.query.hasOwnProperty("sid")) {
     q.sid = config[req.query.sid].webcast_channels;
     if (!q.hasOwnProperty("descendants_of")) {
-      q.descendants_of = config[req.query.sid].live_brand;
+      q.descendants_of = config[req.query.sid].live_brand[0];
     }
   }
   if (req.query.hasOwnProperty("page")) {
@@ -285,11 +287,11 @@ const tva = async (req, res) => {
       res.status(403).send(message);
     }
   } else {
-    console.log('bad service id, only', valid_services, 'allowed');
+    console.log("bad service id, only", valid_services, "allowed");
     res
       .status(403)
       .send(
-        'Dazzler is only enabled for some services and this isn\'t one of them'
+        "Dazzler is only enabled for some services and this isn't one of them"
       );
   }
 };

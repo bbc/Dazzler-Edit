@@ -19,7 +19,16 @@ const config = {
     mid: "bbc_hindi_tv",
     loop_collection: "p0845svx",
     specials_collection: "p0845sqf",
-    live_brand: "w13xttlw",
+    live_brand: ["w13xtvdr"],
+    /*
+    w13xttlw
+    w13xttx5
+    w13xttxb
+    w13xttz9
+    w13xtvdp
+    w13xtvdq
+    w13xtvdr
+    */
     clip_language: "hindi",
     language_tag: "p0368zp7",
     language: "hi",
@@ -36,7 +45,7 @@ const config = {
     mid: "bbc_marathi_tv",
     loop_collection: "p0510sbc",
     specials_collection: "p0715nv4",
-    live_brand: "w13xttr2",
+    live_brand: ["w13xttr2"],
     clip_language: "marathi",
     language_tag: "x",
     language: "mr",
@@ -53,7 +62,7 @@ const config = {
     mid: "bbc_swahili_tv",
     loop_collection: "x",
     specials_collection: "x",
-    live_brand: "x",
+    live_brand: ["x"],
     clip_language: "swahili",
     language_tag: "p0368zpn",
     language: "sw",
