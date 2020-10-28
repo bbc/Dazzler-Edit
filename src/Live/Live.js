@@ -15,6 +15,7 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import TextField from "@material-ui/core/TextField";
+import FormControl from "@material-ui/core/FormControl";
 
 import moment from "moment";
 import "moment-duration-format";
@@ -55,6 +56,9 @@ export class Live extends React.Component {
       rowsPerPage: 5,
       totalRows: 0,
       sid: "",
+      title: "",
+      from: "",
+      to: "",
       date: moment().utc().startOf("day"),
     };
   }
@@ -93,6 +97,21 @@ export class Live extends React.Component {
     }
   }
 
+  createDynamicEvent = (event) => {
+    try {
+      event.preventDefault();
+      this.handleClose();
+      const { from, to, title } = this.state;
+
+      if (from && to) {
+        alert("do something");
+      } else {
+        alert("they're empty");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
   handleClickOpen = () => {
     this.setState({ open: true });
   };
@@ -157,46 +176,67 @@ export class Live extends React.Component {
             Create Dynamic Live Event
           </DialogTitle>
           <DialogContent>
-            <form className={classes.formControl} noValidate autoComplete="off">
-              <TextField id="standard-basic" label="Title" />
+            <form
+              className={classes.formControl}
+              noValidate
+              autoComplete="off"
+              onSubmit={this.createDynamicEvent}
+            >
+              <TextField
+                id="standard-basic"
+                label="Title"
+                onChange={(event) => {
+                  event.preventDefault();
+                  this.setState({ title: event.target.value });
+                }}
+              />
               <div style={{ marginTop: "15%" }}>
-                <TextField
-                  id="time"
-                  label="From"
-                  type="time"
-                  defaultValue="07:30"
-                  className={classes.textField}
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  inputProps={{
-                    step: 300, // 5 min
-                  }}
-                />
+                <FormControl required className={classes.formControl}>
+                  <TextField
+                    id="time"
+                    label="From"
+                    type="time"
+                    onChange={(event) => {
+                      event.preventDefault();
+                      this.setState({ from: event.target.value });
+                    }}
+                    className={classes.textField}
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    inputProps={{
+                      step: 300, // 5 min
+                    }}
+                  />
+                </FormControl>
               </div>
               <div style={{ marginTop: "15%" }}>
-                <TextField
-                  id="time"
-                  label="To"
-                  type="time"
-                  defaultValue="07:30"
-                  className={classes.textField}
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  inputProps={{
-                    step: 300, // 5 min
-                  }}
-                />
+                <FormControl required className={classes.formControl}>
+                  <TextField
+                    id="time"
+                    label="To"
+                    type="time"
+                    onChange={(event) => {
+                      event.preventDefault();
+                      this.setState({ to: event.target.value });
+                    }}
+                    className={classes.textField}
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    inputProps={{
+                      step: 300, // 5 min
+                    }}
+                  />
+                </FormControl>
               </div>
+              <DialogActions>
+                <Button variant="contained" color="primary" type="submit">
+                  Create
+                </Button>
+              </DialogActions>
             </form>
           </DialogContent>
-
-          <DialogActions>
-            <Button variant="contained" color="primary">
-              Create
-            </Button>
-          </DialogActions>
         </Dialog>
 
         <Paper className={classes.root}>
