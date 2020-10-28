@@ -10,6 +10,11 @@ import TablePagination from "@material-ui/core/TablePagination";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import Button from "@material-ui/core/Button";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import TextField from "@material-ui/core/TextField";
 
 import moment from "moment";
 import "moment-duration-format";
@@ -31,6 +36,10 @@ export const styles = (theme) => ({
   tableWrapper: {
     overflowX: "scroll",
   },
+  formControl: {
+    margin: theme.spacing(1),
+    minWidth: 120,
+  },
 });
 
 export class Live extends React.Component {
@@ -38,6 +47,7 @@ export class Live extends React.Component {
     super(props);
 
     this.state = {
+      open: false,
       spinner: false,
       rows: [],
       page: 0,
@@ -83,6 +93,14 @@ export class Live extends React.Component {
     }
   }
 
+  handleClickOpen = () => {
+    this.setState({ open: true });
+  };
+
+  handleClose = () => {
+    this.setState({ open: false });
+  };
+
   handleChangePage = (event, page) => {
     console.log("live:handleChangePage", page);
     this.setState({ page: page });
@@ -111,7 +129,7 @@ export class Live extends React.Component {
 
   render() {
     const { classes } = this.props;
-    const { date, rows, rowsPerPage, page, totalRows } = this.state;
+    const { date, rows, rowsPerPage, page, totalRows, open } = this.state;
     let emptyRows = 0;
     if (rows.length < rowsPerPage) {
       emptyRows = rowsPerPage - rows.length;
@@ -124,11 +142,62 @@ export class Live extends React.Component {
         <Button
           color="primary"
           variant="contained"
-          // onClick={handleClickSave}
+          onClick={this.handleClickOpen}
           className={classes.button}
         >
           Create Dynamic Live Event
         </Button>
+        <Dialog
+          open={open}
+          onClose={this.handleClose}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">
+            Create Dynamic Live Event
+          </DialogTitle>
+          <DialogContent>
+            <form className={classes.formControl} noValidate autoComplete="off">
+              <TextField id="standard-basic" label="Title" />
+              <div style={{ marginTop: "15%" }}>
+                <TextField
+                  id="time"
+                  label="From"
+                  type="time"
+                  defaultValue="07:30"
+                  className={classes.textField}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  inputProps={{
+                    step: 300, // 5 min
+                  }}
+                />
+              </div>
+              <div style={{ marginTop: "15%" }}>
+                <TextField
+                  id="time"
+                  label="To"
+                  type="time"
+                  defaultValue="07:30"
+                  className={classes.textField}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  inputProps={{
+                    step: 300, // 5 min
+                  }}
+                />
+              </div>
+            </form>
+          </DialogContent>
+
+          <DialogActions>
+            <Button variant="contained" color="primary">
+              Create
+            </Button>
+          </DialogActions>
+        </Dialog>
 
         <Paper className={classes.root}>
           <div className={classes.tableWrapper}>
