@@ -114,6 +114,8 @@ export class Live extends React.Component {
     return (
       <div style={{ marginLeft: "5%" }}>
         {date.format("YYYY-MM-DD")}
+        <button style={{ marginLeft: "30%" }}> Create Dynamic Event</button>
+
         <Paper className={classes.root}>
           <div className={classes.tableWrapper}>
             <Table className={classes.table}>
