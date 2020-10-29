@@ -162,7 +162,7 @@ class ScheduleDao {
       version: {
         pid: item.asset.vpid,
         version_of: item.asset.pid,
-        duration: item.asset.duration,
+        duration: item.duration,
         entity_type: item.asset.entityType,
       },
     };
