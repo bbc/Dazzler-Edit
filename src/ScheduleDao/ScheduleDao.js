@@ -54,7 +54,7 @@ class ScheduleDao {
         let schedule = [];
         if (response.data.items.length > 0) {
           response.data.items.forEach((item, index) => {
-            console.log("fetch item is ", item);
+            console.log("fetched item is ", item);
             const asset = {
               startTime: item.start,
               title: item.title,
@@ -67,7 +67,7 @@ class ScheduleDao {
               entityType: item.version.entity_type,
             };
             if (item.live) {
-              asset.source = item.stream;
+              asset.source = item.source;
             }
 
             console.log("asset is,", asset);
@@ -77,6 +77,7 @@ class ScheduleDao {
               startTime: moment(asset.startTime),
               duration: asset.duration,
               insertionType: asset.insertionType,
+              source: item.source || "",
               asset: asset,
             });
             console.log("schedule is ", schedule);
@@ -167,7 +168,7 @@ class ScheduleDao {
       },
     };
     if (item.asset.live) {
-      newItem.source = item.asset.pics_raw_data;
+      newItem.source = item.asset.pics_raw_data || item.source;
     }
     console.log("new item is ", newItem);
 
