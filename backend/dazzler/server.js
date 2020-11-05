@@ -1,7 +1,7 @@
 // https://github.com/bbc/sample-cloud-apps/nodejs-helloworld/src/helloworld/server.js
 const express = require("express");
 const bodyParser = require("body-parser");
-const ChannelsDAO = require("./ChannelsDAO");
+const ChannelDAO = require("./ChannelsDAO");
 
 const app = express();
 var configuration;
@@ -11,7 +11,21 @@ if (!process.env.AUTHORISED_USERS) {
   process.env = configuration;
 }
 
-const config = {
+const config = async () => {
+  const cd = new ChannelDAO();
+  return new Promise((resolve, reject) => {
+    cd.getChannels("config")
+      .then((i) => {
+        i.default_sid = "bbc_hindi_tv";
+        resolve(i);
+      })
+      .catch((e) => {
+        reject(e);
+      });
+  });
+};
+
+const defaultConfig = {
   default_sid: "bbc_hindi_tv",
   bbc_hindi_tv: {
     serviceIDRef: "TVHIND01",
@@ -91,3 +105,4 @@ app.get("/status", function (req, res) {
 // We do the "listen" call in index.js - making this module easier to test
 module.exports.app = app;
 module.exports.config = config;
+module.exports.defaultConfig = defaultConfig;

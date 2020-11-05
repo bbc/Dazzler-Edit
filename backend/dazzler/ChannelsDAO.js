@@ -13,7 +13,7 @@ class ChannelsDAO {
     };
   }
 
-  getChannels() {
+  getChannels(type) {
     const { dynamodb, params } = this;
     return new Promise((resolve, reject) => {
       dynamodb.scan(params, function (err, data) {
@@ -24,7 +24,13 @@ class ChannelsDAO {
           let config = {};
           for (let i = 0; i < data.Items.length; i++) {
             let unit = data.Items[i];
-            config[unit.Name.S] = AWS.DynamoDB.Converter.unmarshall(unit);
+
+            if (type) {
+              config[unit.sid.S] = AWS.DynamoDB.Converter.unmarshall(unit);
+              console.log("unit is ", unit);
+            } else {
+              config[unit.Name.S] = AWS.DynamoDB.Converter.unmarshall(unit);
+            }
           }
           resolve(config);
         }

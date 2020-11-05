@@ -271,6 +271,10 @@ const clip = async (req, res) => {
   };
   const _source = ["pips"];
   const sid = req.query.sid || config.default_sid;
+  console.log("sid is ", sid);
+  console.log("config here ", config);
+  console.log(config[sid].language);
+
   const size = req.query.page_size || 20;
   let from = 0;
   if (req.query.page) {
@@ -481,6 +485,7 @@ const s3Save = async (req, res) => {
   const date = req.query.date;
   let user = "dazzler"; // assume local
   console.log("received", req.body);
+  language;
   if (req.body.includes(config[sid].serviceIDRef)) {
     if (req.header("sslclientcertsubject")) {
       const subject = auth.parseSSLsubject(req);
@@ -821,11 +826,7 @@ const saveSchedule = async (req, res) => {
 module.exports = {
   init(app, configObject) {
     config = configObject;
-    // app.get("/api/v2/user", user);
-    // app.get("/api/v2/broadcast", broadcast);
-    // app.get("/api/v2/webcast", webcast);
-    // app.get("/api/v2/loop", loop);
-    // app.get("/api/v2/special", special);
+    console.log("in v2", config);
     app.get("/api/v2/languageservices", languageServices);
     app.get("/api/v2/clip", clip);
     app.get("/api/v2/episode", episode);
