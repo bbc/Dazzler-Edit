@@ -19,7 +19,7 @@ const config = {
     mid: "bbc_hindi_tv",
     loop_collection: "p0845svx",
     specials_collection: "p0845sqf",
-    live_brand: ["w13xtvdq"],
+    live_brand: ["w3ct1cr4"],
     /*
     w13xttlw
     w13xttx5
