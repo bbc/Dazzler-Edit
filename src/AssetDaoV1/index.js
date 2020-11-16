@@ -6,6 +6,7 @@ const URLPrefix =
 
 class AssetDao {
   static get(path, params, cb) {
+    console.log("Hello is ");
     axios
       .get(`${URLPrefix}/api/v1/${path}`, { params })
       .then((response) => {

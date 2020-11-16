@@ -105,6 +105,9 @@ const webcast = async (req, res) => {
 };
 
 const special = async (req, res) => {
+  console.log("here!", req.query.sid);
+
+  console.log("searching this", config[req.query.sid].specials_collection);
   let q = {
     group: config[req.query.sid].specials_collection,
   };
@@ -359,9 +362,9 @@ function add_version_crids_to_episodes(results) {
 }
 
 module.exports = {
-  init(app, configObject, config2Object) {
+  init(app, configObject) {
     config = configObject;
-    // configV2 = config2Object;
+
     app.get("/api/v1/user", auth.user);
     app.get("/api/v1/schedule", schedule);
     app.get("/api/v1/broadcast", broadcast);
