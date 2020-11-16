@@ -283,7 +283,17 @@ const clip = async (req, res) => {
   }
   let filter;
   if (req.query.search !== "") {
-    filter = { match: { "pips.clip.title.$": req.query.search } };
+    filter = {
+      match: {
+        "pips.clip.title.$": {
+          query: req.query.search,
+          operator: "or",
+          analyzer: "search",
+          fuzziness: "2",
+          max_expansions: "2",
+        },
+      },
+    };
   }
   const query = {
     bool: {
