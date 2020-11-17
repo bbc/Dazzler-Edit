@@ -150,12 +150,19 @@ class Editor extends React.Component {
       mode: "loop",
       scheduleInsertionPoint: 1,
       scheduleModified: false,
-      language: "Hindi",
-      configObj: {
-        Hindi: {
-          sid: "bbc_hindi_tv",
-        },
-      },
+      language: localStorage.getItem("language") || "Hindi",
+      configObj: (() => {
+        if (localStorage.getItem("configObj")) {
+          return JSON.parse(localStorage.getItem("configObj"));
+        } else {
+          console.log(localStorage.getItem("configObj"));
+          return {
+            Hindi: {
+              sid: "bbc_hindi_tv",
+            },
+          };
+        }
+      })(),
       timeToFill: moment.duration(),
       upcomingAvailability: moment.duration("P1D"),
       open: false,
@@ -188,6 +195,7 @@ class Editor extends React.Component {
           ),
         });
         this.handleRefresh();
+        localStorage.setItem("configObj", JSON.stringify(response));
       });
     } catch (error) {
       console.log(error);
@@ -465,6 +473,7 @@ class Editor extends React.Component {
   handleChangeLanguage = (event) => {
     this.setState({ language: event.target.value }, () => {
       localStorage.setItem("language", event.target.value);
+
       // const sid = this.state.configObj[this.state.language].sid;
       this.reloadSchedule();
       this.handleRefresh();
