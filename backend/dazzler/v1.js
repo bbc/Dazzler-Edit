@@ -74,6 +74,8 @@ const broadcast = async (req, res) => {
 };
 
 const webcast = async (req, res) => {
+  console.log("req.query", req.query);
+  let testSid = "bbc_hindi_tv";
   let q = {};
   if (req.query.hasOwnProperty("start")) {
     q.start_from = req.query.start;
@@ -85,9 +87,9 @@ const webcast = async (req, res) => {
     q.descendants_of = req.query.brand;
   }
   if (req.query.hasOwnProperty("sid")) {
-    q.sid = config[req.query.sid].webcast_channels;
+    q.sid = config[testSid].webcast_channels;
     if (!q.hasOwnProperty("descendants_of")) {
-      q.descendants_of = config[req.query.sid].live_brand[0];
+      q.descendants_of = config[testSid].live_brand[0];
     }
   }
   if (req.query.hasOwnProperty("page")) {
