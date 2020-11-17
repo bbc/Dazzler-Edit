@@ -57,7 +57,7 @@ function availableQuery(mid, after, before, search) {
                   must_not: [
                     {
                       exists: {
-                        field: "sonata.episode.availabilities.av_pv13_pa4.end",
+                        field: "sonata.episode.availabilities.av_pv10_pa4.end",
                       },
                     },
                   ],
@@ -65,7 +65,7 @@ function availableQuery(mid, after, before, search) {
               },
               {
                 range: {
-                  "sonata.episode.availabilities.av_pv13_pa4.end": {
+                  "sonata.episode.availabilities.av_pv10_pa4.end": {
                     gte: before,
                   },
                 },
@@ -165,7 +165,7 @@ const episode = async (req, res) => {
     "sonata.episode.aggregatedTitle",
     "sonata.episode.release_date.date",
     "pips.programme_availability.available_versions.available_version",
-    "sonata.episode.availabilities.av_pv13_pa4",
+    "sonata.episode.availabilities.av_pv10_pa4",
     "pips.episode.crid.uri",
   ];
   const sid = req.query.sid || config.default_sid;
@@ -208,6 +208,7 @@ const episode = async (req, res) => {
       data,
       params
     );
+    console.log("data is ", JSON.stringify(data));
     const result = answer.data;
     const items = [];
     result.hits.hits.forEach((hit) => {
@@ -220,11 +221,11 @@ const episode = async (req, res) => {
 
       const availability = {
         planned_start: se.availabilities
-          ? se.availabilities.av_pv13_pa4.start
+          ? se.availabilities.av_pv10_pa4.start
           : versions[0].availabilities.ondemand[0].availability.start,
         expected_start: se.availabilities
           ? moment
-              .utc(se.availabilities.av_pv13_pa4.start)
+              .utc(se.availabilities.av_pv10_pa4.start)
               .add(duration)
               .add(10, "m")
               .format()
@@ -234,11 +235,11 @@ const episode = async (req, res) => {
               .add(10, "m")
               .format(),
       };
-      if (se.availabilities && se.availabilities.av_pv13_pa4.actual_start) {
-        availability.actual_start = se.availabilities.av_pv13_pa4.actual_start;
+      if (se.availabilities && se.availabilities.av_pv10_pa4.actual_start) {
+        availability.actual_start = se.availabilities.av_pv10_pa4.actual_start;
       }
-      if (se.availabilities && se.availabilities.av_pv13_pa4.end) {
-        availability.end = se.availabilities.av_pv13_pa4.end;
+      if (se.availabilities && se.availabilities.av_pv10_pa4.end) {
+        availability.end = se.availabilities.av_pv10_pa4.end;
       }
       const item = {
         entityType: "episode",
@@ -472,7 +473,7 @@ const getEpisodeUri = async function (item) {
     }
 
     let wantedURI = result.filter((ondemand) =>
-      ondemand.filepath.uri.includes("av_pv13_pa4")
+      ondemand.filepath.uri.includes("av_pv10_pa4")
     )[0].filepath.uri;
     return wantedURI;
   } catch (error) {
@@ -785,6 +786,7 @@ const saveScheduleAsTVA = async (data) => {
 
 const getSchedule = async (req, res) => {
   const sid = req.query.sid || config.default_sid;
+  console.log("SID is ", sid);
   const date = req.query.date;
   const source = process.env.SCHEDULE_SOURCE || "s3";
   let r;

@@ -46,11 +46,10 @@ class ScheduleDao {
     return title;
   }
   static fetchSchedule(sid, date, cb) {
+    console.log("SSsid is ", sid);
     let formattedDate = moment(date).format("YYYY-MM-DD");
     axios
-      .get(
-        `${URLPrefix}/api/v2/schedule?sid=${"bbc_world_service_tv_africa_east"}&date=${formattedDate}`
-      )
+      .get(`${URLPrefix}/api/v2/schedule?sid=${sid}&date=${formattedDate}`)
       .then((response) => {
         console.log("response is", response);
         let schedule = [];
