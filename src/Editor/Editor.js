@@ -798,8 +798,8 @@ class Editor extends React.Component {
                 </ExpansionPanelSummary>
 
                 <Specials
-                  sid={this.state.configObj[language].sid}
-                  handleClick={this.handleAddClipOrEpisode}
+                // sid={this.state.configObj[language].sid}
+                // handleClick={this.handleAddClipOrEpisode}
                 />
               </ExpansionPanel>
             </Box>
