@@ -777,9 +777,13 @@ class Editor extends React.Component {
                   <Typography className={classes.heading}>Web Clips</Typography>
                 </ExpansionPanelSummary>
 
-                <Clips
+                {/* <Clips
                   flip={this.state.side}
                   type="web"
+                  sid={this.state.configObj[language].sid}
+                  handleClick={this.handleAddClipOrEpisode}
+                /> */}
+                <Specials
                   sid={this.state.configObj[language].sid}
                   handleClick={this.handleAddClipOrEpisode}
                 />
@@ -794,8 +798,8 @@ class Editor extends React.Component {
                 </ExpansionPanelSummary>
 
                 <Specials
-                  sid={this.state.configObj[language].sid}
-                  handleClick={this.handleAddClipOrEpisode}
+                // sid={this.state.configObj[language].sid}
+                // handleClick={this.handleAddClipOrEpisode}
                 />
               </ExpansionPanel>
             </Box>

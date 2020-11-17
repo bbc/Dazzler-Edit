@@ -184,6 +184,7 @@ const episode = async (req, res) => {
   const data = { _source, from, size };
   if (a === "available") {
     data.query = availableQuery(mid, after, before, search);
+    console.log("query is ", JSON.stringify(data.query));
   } else {
     data.query = unavailableQuery(mid, after, before, search);
   }
@@ -208,6 +209,8 @@ const episode = async (req, res) => {
       data,
       params
     );
+
+    console.log("data is ", JSON.stringify(data));
     const result = answer.data;
     const items = [];
     result.hits.hits.forEach((hit) => {
@@ -283,7 +286,17 @@ const clip = async (req, res) => {
   }
   let filter;
   if (req.query.search !== "") {
-    filter = { match: { "pips.clip.title.$": req.query.search } };
+    filter = {
+      match: {
+        "pips.clip.title.$": {
+          query: req.query.search,
+          operator: "or",
+          analyzer: "search",
+          fuzziness: "2",
+          max_expansions: "2",
+        },
+      },
+    };
   }
   const query = {
     bool: {
