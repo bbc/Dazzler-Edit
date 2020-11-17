@@ -44,7 +44,7 @@ function availableQuery(mid, after, before, search) {
         filter,
         {
           range: {
-            "sonata.episode.availabilities.av_pv13_pa4.start": {
+            "sonata.episode.availabilities.av_pv10_pa4.start": {
               lt: after,
             },
           },
@@ -184,7 +184,6 @@ const episode = async (req, res) => {
   const data = { _source, from, size };
   if (a === "available") {
     data.query = availableQuery(mid, after, before, search);
-    console.log("query is ", JSON.stringify(data.query));
   } else {
     data.query = unavailableQuery(mid, after, before, search);
   }
@@ -209,8 +208,6 @@ const episode = async (req, res) => {
       data,
       params
     );
-
-    console.log("data is ", JSON.stringify(data));
     const result = answer.data;
     const items = [];
     result.hits.hits.forEach((hit) => {
@@ -286,17 +283,7 @@ const clip = async (req, res) => {
   }
   let filter;
   if (req.query.search !== "") {
-    filter = {
-      match: {
-        "pips.clip.title.$": {
-          query: req.query.search,
-          operator: "or",
-          analyzer: "search",
-          fuzziness: "2",
-          max_expansions: "2",
-        },
-      },
-    };
+    filter = { match: { "pips.clip.title.$": req.query.search } };
   }
   const query = {
     bool: {
@@ -595,6 +582,7 @@ const schedulev2 = async (req, res) => {
 */
 
 const getScheduleFromS3 = async (sid, date) => {
+  console.log("sid is ", sid);
   const key = `${sid}/schedule/${date}-schedule.json`;
   console.log("key is", key);
   try {
