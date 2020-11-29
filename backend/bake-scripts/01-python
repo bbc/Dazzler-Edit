@@ -6,4 +6,4 @@ easy_install-3.6 urllib3
 easy_install-3.6 jmespath
 easy_install-3.6 boto3
 easy_install-3.6 python-dateutil
-easy_install-3.6 dazzlercapture
+easy_install-3.6 capture_hls
