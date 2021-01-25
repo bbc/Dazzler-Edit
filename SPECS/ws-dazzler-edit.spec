@@ -11,6 +11,7 @@ Source0: src.tar.gz
 Requires: nodejs
 Requires: cloud-httpd24-ssl-services-devs-staff
 Requires: dazzlercapture
+Requires: partner-platform-access-proxy
 BuildRoot: %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 BuildArch: x86_64
 
