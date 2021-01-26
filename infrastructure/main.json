@@ -194,7 +194,7 @@
         "HealthCheck": {
           "HealthyThreshold": "3",
           "Interval": "15",
-          "Target": "HTTP:7080/status/",
+          "Target": "HTTP:7443/status/",
           "Timeout": "10",
           "UnhealthyThreshold": "3"
         },
@@ -613,7 +613,6 @@
       },
       "DomainNameBaseMap": {
         "int": "1c9eb4db7739eb1a.xhst.bbci.co.uk.",
-
         "live": "7a576ea3ed7ca599.xhst.bbci.co.uk."
       }
     }
