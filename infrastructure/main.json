@@ -4,7 +4,7 @@
     "Environment": {
       "Default": "int",
       "Type": "String",
-      "ConstraintDescription": "Values must be test or live",
+      "ConstraintDescription": "Values must be int, test or live",
       "Description": "The deployment environment",
       "AllowedValues": ["int", "test", "live"]
     },
@@ -592,6 +592,7 @@
     "OperationsMap": {
       "CnameEntryMap": {
         "int": "dazzler.int",
+        "test": "dazzler.int",
         "live": "dazzler"
       },
       "PlayoutBucketMap": {
@@ -612,6 +613,7 @@
       },
       "DomainNameBaseMap": {
         "int": "1c9eb4db7739eb1a.xhst.bbci.co.uk.",
+
         "live": "7a576ea3ed7ca599.xhst.bbci.co.uk."
       }
     }
