@@ -1,6 +1,7 @@
 {
   "name": "ws-dazzler-edit",
   "version": "0.1.0",
+
   "files": [
     {
       "src": "build",
