@@ -2,11 +2,11 @@
   "AWSTemplateFormatVersion": "2010-09-09",
   "Parameters": {
     "Environment": {
-      "Default": "int",
+      "Default": "test",
       "Type": "String",
-      "ConstraintDescription": "Values must be int, test or live",
+      "ConstraintDescription": "Values must be test or live",
       "Description": "The deployment environment",
-      "AllowedValues": ["int", "test", "live"]
+      "AllowedValues": ["test", "live"]
     },
     "UpdatePauseTime": {
       "Default": "PT0S",
@@ -194,7 +194,7 @@
         "HealthCheck": {
           "HealthyThreshold": "3",
           "Interval": "15",
-          "Target": "HTTP:7443/status/",
+          "Target": "HTTP:7080/status/",
           "Timeout": "10",
           "UnhealthyThreshold": "3"
         },
@@ -591,28 +591,27 @@
   "Mappings": {
     "OperationsMap": {
       "CnameEntryMap": {
-        "int": "dazzler.int",
-        "test": "dazzler.int",
+        "test": "dazzler.test",
         "live": "dazzler"
       },
       "PlayoutBucketMap": {
-        "int": "ws-dazzler-assets-test",
+        "test": "ws-dazzler-assets-test",
         "live": "ws-dazzler-assets"
       },
       "VpcCidrIpMap": {
-        "int": "10.98.0.0/18",
+        "test": "10.98.0.0/18",
         "live": "10.124.64.0/18"
       },
       "CopyMediaQueueMap": {
-        "int": "arn:aws:sqs:eu-west-1:576677253489:Media-Syndication-Queue",
+        "test": "arn:aws:sqs:eu-west-1:576677253489:Media-Syndication-Queue",
         "live": "arn:aws:sqs:eu-west-1:205979497597:Media-Syndication-Queue"
       },
       "ElasticSearchMap": {
-        "int": "vpc-test-pws-es-01-ntq5eu3xhbkw56fc2yi4vt2ndm.eu-west-1.es.amazonaws.com",
+        "test": "vpc-test-pws-es-01-ntq5eu3xhbkw56fc2yi4vt2ndm.eu-west-1.es.amazonaws.com",
         "live": "vpc-live-pws-es-01-sharq3wijppafqfq2v3isa5ram.eu-west-1.es.amazonaws.com"
       },
       "DomainNameBaseMap": {
-        "int": "1c9eb4db7739eb1a.xhst.bbci.co.uk.",
+        "test": "1c9eb4db7739eb1a.xhst.bbci.co.uk.",
         "live": "7a576ea3ed7ca599.xhst.bbci.co.uk."
       }
     }
