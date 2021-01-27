@@ -9,6 +9,7 @@ Source0: src.tar.gz
 
 
 Requires: nodejs
+require: cloud-httpd24-ssl-no-certs
 Requires: partner-platform-access-proxy
 Requires: dazzlercapture
 
