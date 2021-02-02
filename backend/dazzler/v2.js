@@ -3,7 +3,7 @@ require("moment-duration-format");
 const axios = require("axios");
 const https = require("https");
 const aws = require("aws-sdk");
-const auth = require("./auth");
+const auth = require("./authv2");
 const spw = require("./spw");
 const pips = require("./pips");
 const notifications = require("./notifications");
@@ -830,6 +830,7 @@ module.exports = {
   init(app, configObject) {
     config = configObject;
     console.log("in v2", config);
+    app.get("/api/v2/user", auth.user);
     app.get("/api/v2/languageservices", languageServices);
     app.get("/api/v2/clip", clip);
     app.get("/api/v2/episode", episode);
