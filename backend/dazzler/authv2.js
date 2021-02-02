@@ -15,12 +15,19 @@ const user = function (req, res) {
       email: emailAddress,
       auth: isAuthorised(emailAddress),
     };
+    res.json({
+      name: email,
+      auth: true,
+      email: email,
+    });
     console.log("headers are ", req.headers);
+
     console.log("------------------");
+    res.json(r);
   } else {
     res.json({
       name: "Anonymous",
-      auth: true,
+      auth: false,
     });
   }
 };
