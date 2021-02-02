@@ -23,13 +23,9 @@ function getName(email) {
 const user = function (req, res) {
   if (req.header("bbc-pp-oidc-id-token-email")) {
     let emailAddress = req.header("bbc-pp-oidc-id-token-email");
-    let r = {
-      email: emailAddress,
-      auth: isAuthorised(emailAddress),
-    };
     res.json({
       name: getName(email),
-      auth: true,
+      auth: isAuthorised(emailAddress),
       email: email,
     });
   } else {
