@@ -8,32 +8,24 @@ function isAuthorised(email) {
   }
 }
 
-function parseSSLsubject(req) {
-  var subject = req.header("sslclientcertsubject");
-  var fields = subject.split(",");
-  var data = {};
-  for (var i = 0; i < fields.length; i++) {
-    var [key, val] = fields[i].split("=");
-    data[key] = val;
-  }
-  return data;
-}
-
 const user = function (req, res) {
   if (req.header("bbc-pp-oidc-id-token-email")) {
-    console.log(req.headers);
+    let emailAddress = req.header("bbc-pp-oidc-id-token-email");
+    let r = {
+      email: emailAddress,
+      auth: isAuthorised(emailAddress),
+    };
+    console.log("headers are ", req.headers);
+    console.log("------------------");
   } else {
-    console.log("Nothing to log");
+    res.json({
+      name: "Anonymous",
+      auth: true,
+    });
   }
-
-  res.json({
-    name: "Null",
-    auth: true,
-  });
 };
 
 module.exports = {
   isAuthorised,
   user,
-  parseSSLsubject,
 };

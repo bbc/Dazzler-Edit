@@ -334,9 +334,8 @@ const clip = async (req, res) => {
 
 const saveEmergencyPlayList = async function (req, res) {
   let user = "dazzler"; // assume local
-  if (req.header("sslclientcertsubject")) {
-    const subject = auth.parseSSLsubject(req);
-    user = subject.emailAddress;
+  if (req.header("bbc-pp-oidc-id-token-email")) {
+    user = req.header("bbc-pp-oidc-id-token-email");
   }
   if (auth.isAuthorised(user)) {
     const sid = req.query.sid || config.default_sid;
@@ -488,9 +487,8 @@ const s3Save = async (req, res) => {
   console.log("received", req.body);
   language;
   if (req.body.includes(config[sid].serviceIDRef)) {
-    if (req.header("sslclientcertsubject")) {
-      const subject = auth.parseSSLsubject(req);
-      user = subject.emailAddress;
+    if (req.header("bbc-pp-oidc-id-token-email")) {
+      user = req.header("bbc-pp-oidc-id-token-email");
     }
     if (auth.isAuthorised(user)) {
       var params = {
@@ -802,9 +800,8 @@ const getSchedule = async (req, res) => {
 const saveSchedule = async (req, res) => {
   const sid = req.query.sid || config.default_sid;
   let user = "dazzler";
-  if (req.header("sslclientcertsubject")) {
-    const subject = auth.parseSSLsubject(req);
-    user = subject.emailAddress;
+  if (req.header("bbc-pp-oidc-id-token-email")) {
+    user = req.header("bbc-pp-oidc-id-token-email");
   }
   if (auth.isAuthorised(user)) {
     const destination = process.env.SCHEDULE_DESTINATION || "s3";
