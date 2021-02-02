@@ -11,7 +11,11 @@ function getName(email) {
   try {
     if (email) {
       let name = email.split("@")[0];
-      let formattedName = name.replace(".", " ");
+      let firstName = name.split(".")[0];
+      let lastName = name.split(".")[1];
+      firstName[0].toUpperCase();
+      lastName[0].toUpperCase();
+      let formattedName = firstName + " " + lastName;
       return formattedName;
     }
   } catch (error) {
@@ -22,17 +26,15 @@ function getName(email) {
 
 const user = function (req, res) {
   if (req.header("bbc-pp-oidc-id-token-email")) {
-    console.log("headers --", req.headers);
     let email = req.header("bbc-pp-oidc-id-token-email");
     res.json({
       name: getName(email),
       auth: isAuthorised(email),
       email: email,
     });
-    console.log("headers --", done);
   } else {
     res.json({
-      name: "false",
+      name: "Anonymous",
       auth: false,
     });
   }
