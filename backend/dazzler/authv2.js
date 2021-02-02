@@ -7,6 +7,18 @@ function isAuthorised(email) {
     return true; // allow saving in the local environment
   }
 }
+function getName(email) {
+  try {
+    if (email) {
+      let name = email.split("@")[0];
+      let formattedName = name.replace(".", " ");
+      return formattedName;
+    }
+  } catch (error) {
+    console.log(error);
+    return "";
+  }
+}
 
 const user = function (req, res) {
   if (req.header("bbc-pp-oidc-id-token-email")) {
@@ -16,14 +28,10 @@ const user = function (req, res) {
       auth: isAuthorised(emailAddress),
     };
     res.json({
-      name: email,
+      name: getName(email),
       auth: true,
       email: email,
     });
-    console.log("headers are ", req.headers);
-
-    console.log("------------------");
-    res.json(r);
   } else {
     res.json({
       name: "Anonymous",
