@@ -7,15 +7,20 @@ function isAuthorised(email) {
     return true; // allow saving in the local environment
   }
 }
+
+function formatName(firstName, lastName) {
+  let fName = firstName[0].toUpperCase() + firstName.slice(1);
+  let lName = lastName[0].toUpperCase() + lastName.slice(1);
+  let formattedName = fName + " " + lName;
+  return formattedName;
+}
 function getName(email) {
   try {
     if (email) {
       let name = email.split("@")[0];
       let firstName = name.split(".")[0];
       let lastName = name.split(".")[1];
-      firstName[0].toUpperCase();
-      lastName[0].toUpperCase();
-      let formattedName = firstName + " " + lastName;
+      let formattedName = formatName(firstName, lastName);
       return formattedName;
     }
   } catch (error) {
