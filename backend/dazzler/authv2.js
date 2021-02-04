@@ -9,10 +9,15 @@ function isAuthorised(email) {
 }
 
 function formatName(firstName, lastName) {
-  let fName = firstName[0].toUpperCase() + firstName.slice(1);
-  let lName = lastName[0].toUpperCase() + lastName.slice(1);
-  let formattedName = fName + " " + lName;
-  return formattedName;
+  try {
+    let fName = firstName[0].toUpperCase() + firstName.slice(1);
+    let lName = lastName[0].toUpperCase() + lastName.slice(1);
+    let formattedName = fName + " " + lName;
+    return formattedName;
+  } catch (error) {
+    console.log(error);
+    return "";
+  }
 }
 function getName(email) {
   try {
