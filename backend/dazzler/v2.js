@@ -170,6 +170,7 @@ const episode = async (req, res) => {
   ];
   const sid = req.query.sid || config.default_sid;
   const mid = config[sid].mid;
+  console.log("MID IS ", mid);
   const size = req.query.page_size || 20;
   let from = 0;
   if (req.query.page) {
@@ -188,7 +189,7 @@ const episode = async (req, res) => {
     data.query = unavailableQuery(mid, after, before, search);
   }
 
-  console.log(JSON.stringify(data, 2));
+  console.log("EPISODE!!!!", JSON.stringify(data, 2));
   if (req.query.sort) {
     let sortDirection = "desc";
     if (req.query.sort_direction === "ascending") {
@@ -202,21 +203,26 @@ const episode = async (req, res) => {
     sort[sortMap[req.query.sort]] = sortDirection;
     data.sort = [sort];
   }
+  console.log("episode!!!!", data);
   try {
     const answer = await ax.post(
       `https://${host}/episode/_search`,
       data,
       params
     );
-    console.log("data is ", JSON.stringify(data));
+
     const result = answer.data;
+
     const items = [];
     result.hits.hits.forEach((hit) => {
       const se = hit._source.sonata.episode;
+
       const versions =
         hit._source.pips.programme_availability.available_versions
           .available_version;
+
       const version = versions[0].version; // TODO pick a version
+
       const duration = moment.duration(version.duration.$);
 
       const availability = {
@@ -235,25 +241,29 @@ const episode = async (req, res) => {
               .add(10, "m")
               .format(),
       };
+
       if (se.availabilities && se.availabilities.av_pv10_pa4.actual_start) {
         availability.actual_start = se.availabilities.av_pv10_pa4.actual_start;
       }
       if (se.availabilities && se.availabilities.av_pv10_pa4.end) {
         availability.end = se.availabilities.av_pv10_pa4.end;
       }
+
       const item = {
         entityType: "episode",
-        release_date: se.release_date.date,
+        // release_date: se.release_date.date,
         title: se.aggregatedTitle,
         pid: hit._source.pips.episode.pid,
-        uri: hit._source.pips.episode.crid.uri,
+        // uri: hit._source.pips.episode.crid.uri,
         vpid: version.pid,
-        versionCrid: version.crid.uri,
+        // versionCrid: version.crid.uri,
         duration: duration.toISOString(),
         availability,
       };
+
       items.push(item);
     });
+    console.log("item is ", items);
     res.json({
       page_size: req.query.page_size,
       page: req.query.page,
@@ -317,6 +327,7 @@ const clip = async (req, res) => {
   const sort = {};
   sort[sortMap[req.query.sort]] = sortDirection;
   data.sort = [sort];
+  console.log(data);
 
   try {
     const answer = await ax.post(`https://${host}/clip/_search`, data, params);
@@ -826,7 +837,6 @@ const saveSchedule = async (req, res) => {
 module.exports = {
   init(app, configObject) {
     config = configObject;
-    console.log("in v2", config);
     app.get("/api/v2/user", auth.user);
     app.get("/api/v2/languageservices", languageServices);
     app.get("/api/v2/clip", clip);

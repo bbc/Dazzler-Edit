@@ -87,6 +87,24 @@ const defaultConfig = {
       "world_service_stream_08",
     ],
   },
+
+  bbc_dazzler_tv: {
+    serviceIDRef: "",
+    name: "BritBox",
+    mid: "bbc_dazzler_tv",
+    loop_collection: "x",
+    specials_collection: "x",
+    live_brand: ["x"],
+    clip_language: "englush",
+    language_tag: "",
+    language: "",
+    webcast_channels: [
+      "world_service_stream_05",
+      "world_service_stream_06",
+      "world_service_stream_07",
+      "world_service_stream_08",
+    ],
+  },
 };
 app.use(
   bodyParser.text({
