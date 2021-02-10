@@ -2,7 +2,7 @@
 Name: dazzler-edit
 Version: 0.1.1%{?buildnum:.%{buildnum}}
 Release: 14%{?dist}
-Type: bbc_cert
+Type: bbc_login
 Group: System Environment/Daemons
 License: Internal BBC use only
 Summary: A dazzler-edit application
