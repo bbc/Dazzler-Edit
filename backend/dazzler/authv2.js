@@ -45,7 +45,7 @@ const user = function (req, res) {
   } else {
     res.json({
       name: "Anonymous",
-      auth: false,
+      auth: true,
     });
   }
 };

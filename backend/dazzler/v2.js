@@ -224,6 +224,7 @@ const episode = async (req, res) => {
       const version = versions[0].version; // TODO pick a version
 
       const duration = moment.duration(version.duration.$);
+      console.log("duration is ", version.duration.$);
 
       const availability = {
         planned_start: se.availabilities
@@ -251,12 +252,12 @@ const episode = async (req, res) => {
 
       const item = {
         entityType: "episode",
-        // release_date: se.release_date.date,
+        // release_date: se.release_date.date || "",
         title: se.aggregatedTitle,
         pid: hit._source.pips.episode.pid,
-        // uri: hit._source.pips.episode.crid.uri,
+        // uri: hit._source.pips.episode.crid.uri || "",
         vpid: version.pid,
-        // versionCrid: version.crid.uri,
+        // versionCrid: version.crid.uri || "",
         duration: duration.toISOString(),
         availability,
       };
