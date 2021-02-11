@@ -510,6 +510,41 @@
               "Effect": "Allow"
             },
             {
+              "Action": [
+                "s3:GetObject",
+                "s3:GetObjectAcl",
+                "s3:GetObjectVersion",
+                "s3:PutObject",
+                "s3:PutObjectAcl",
+                "s3:DeleteObject",
+                "s3:DeleteObjectTagging",
+                "s3:DeleteObjectVersionTagging",
+                "s3:GetObjectTagging",
+                "s3:GetObjectVersionTagging",
+                "s3:PutObjectTagging",
+                "s3:PutObjectVersionTagging"
+              ],
+              "Resource": [
+                {
+                  "Fn::Sub": [
+                    "arn:aws:s3:::${bucketName}/*",
+                    {
+                      "bucketName": {
+                        "Fn::FindInMap": [
+                          "OperationsMap",
+                          "BritBoxPlayoutBucketMap",
+                          {
+                            "Ref": "Environment"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ],
+              "Effect": "Allow"
+            },
+            {
               "Action": ["cloudformation:Describe*"],
               "Resource": ["*"],
               "Effect": "Allow"
@@ -595,6 +630,10 @@
         "live": "dazzler"
       },
       "PlayoutBucketMap": {
+        "test": "ws-dazzler-assets-test",
+        "live": "ws-dazzler-assets"
+      },
+      "BritBoxPlayoutBucketMap": {
         "test": "ws-dazzler-assets-test",
         "live": "ws-dazzler-assets"
       },
