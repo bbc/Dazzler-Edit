@@ -194,7 +194,7 @@
         "HealthCheck": {
           "HealthyThreshold": "3",
           "Interval": "15",
-          "Target": "HTTP:7080/status/",
+          "Target": "TCP:7443",
           "Timeout": "10",
           "UnhealthyThreshold": "3"
         },
