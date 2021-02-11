@@ -545,6 +545,32 @@
               "Effect": "Allow"
             },
             {
+              "Action": [
+                "s3:ListBucket",
+                "s3:GetBucketLocation",
+                "s3:GetLifecycleConfiguration"
+              ],
+              "Resource": [
+                {
+                  "Fn::Sub": [
+                    "arn:aws:s3:::${bucketName}",
+                    {
+                      "bucketName": {
+                        "Fn::FindInMap": [
+                          "OperationsMap",
+                          "BritBoxPlayoutBucketMap",
+                          {
+                            "Ref": "Environment"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ],
+              "Effect": "Allow"
+            },
+            {
               "Action": ["cloudformation:Describe*"],
               "Resource": ["*"],
               "Effect": "Allow"
