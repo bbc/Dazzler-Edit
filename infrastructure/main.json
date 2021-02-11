@@ -660,8 +660,8 @@
         "live": "ws-dazzler-assets"
       },
       "BritBoxPlayoutBucketMap": {
-        "test": "ws-dazzler-assets-test",
-        "live": "ws-dazzler-assets"
+        "test": "ws-dazzler-tv",
+        "live": "ws-dazzler-tv-live"
       },
       "VpcCidrIpMap": {
         "test": "10.98.0.0/18",
