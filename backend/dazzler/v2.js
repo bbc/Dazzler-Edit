@@ -353,7 +353,7 @@ const saveEmergencyPlayList = async function (req, res) {
     const sid = req.query.sid || config.default_sid;
     var params = {
       Body: req.body,
-      Bucket: process.env.BUCKET,
+      Bucket: config[sid].schedule_bucket,
       Key: `${sid}/emergency-playlist.json`,
       ContentType: "application/json",
     };
@@ -396,9 +396,11 @@ const languageServices = async function (req, res) {
 const queryepisode = async function (req, res) {
   try {
     let episodes = JSON.parse(req.body);
+    let sid = req.query.sid;
+    console.log("called");
 
     var s3params = {
-      Bucket: process.env.BUCKET,
+      Bucket: config[sid].schedule_bucket,
     };
     episodes.forEach((item, index) => {
       console.log("CALLED", index);
@@ -505,7 +507,7 @@ const s3Save = async (req, res) => {
     if (auth.isAuthorised(user)) {
       var params = {
         Body: req.body,
-        Bucket: process.env.BUCKET,
+        Bucket: config[sid].schedule_bucket,
         Key: `${sid}/schedule/${date}-schedule.json`,
         ContentType: "application/json",
       };
@@ -536,7 +538,7 @@ const schedulev2 = async (req, res) => {
     console.log("key is", `${sid}/schedule/${date}-schedule.json`);
 
     var params = {
-      Bucket: process.env.BUCKET,
+      Bucket: config[sid].schedule_bucket,
       Key: `${sid}/schedule/${date}-schedule.json`,
     };
     const s = await s3.getObject(params).promise();
@@ -596,10 +598,12 @@ const getScheduleFromS3 = async (sid, date) => {
   console.log("sid is ", sid);
   const key = `${sid}/schedule/${date}-schedule.json`;
   console.log("key is", key);
+  console.log("bucket is ", config[sid].schedule_bucket);
+
   try {
     const s = await s3
       .getObject({
-        Bucket: process.env.BUCKET,
+        Bucket: config[sid].schedule_bucket,
         Key: key,
       })
       .promise();
@@ -620,7 +624,7 @@ const getScheduleFromS3 = async (sid, date) => {
 const saveOneDayOfScheduleToS3 = async (sid, date, data) => {
   var params = {
     Body: JSON.stringify(data),
-    Bucket: process.env.BUCKET,
+    Bucket: config[sid].schedule_bucket,
     Key: `${sid}/schedule/${date}-schedule.json`,
     ContentType: "application/json",
   };

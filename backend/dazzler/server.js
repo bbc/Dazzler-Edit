@@ -17,6 +17,7 @@ const config = async () => {
     cd.getChannels("config")
       .then((i) => {
         i.default_sid = "bbc_hindi_tv";
+
         resolve(i);
       })
       .catch((e) => {
