@@ -3,7 +3,7 @@ require("moment-duration-format");
 const axios = require("axios");
 const https = require("https");
 const aws = require("aws-sdk");
-const auth = require("./auth");
+const auth = require("./authv2");
 const spw = require("./spw");
 const pips = require("./pips");
 const notifications = require("./notifications");
@@ -170,6 +170,7 @@ const episode = async (req, res) => {
   ];
   const sid = req.query.sid || config.default_sid;
   const mid = config[sid].mid;
+  console.log("MID IS ", mid);
   const size = req.query.page_size || 20;
   let from = 0;
   if (req.query.page) {
@@ -188,7 +189,7 @@ const episode = async (req, res) => {
     data.query = unavailableQuery(mid, after, before, search);
   }
 
-  console.log(JSON.stringify(data, 2));
+  console.log("EPISODE!!!!", JSON.stringify(data, 2));
   if (req.query.sort) {
     let sortDirection = "desc";
     if (req.query.sort_direction === "ascending") {
@@ -202,22 +203,28 @@ const episode = async (req, res) => {
     sort[sortMap[req.query.sort]] = sortDirection;
     data.sort = [sort];
   }
+  console.log("episode!!!!", data);
   try {
     const answer = await ax.post(
       `https://${host}/episode/_search`,
       data,
       params
     );
-    console.log("data is ", JSON.stringify(data));
+
     const result = answer.data;
+
     const items = [];
     result.hits.hits.forEach((hit) => {
       const se = hit._source.sonata.episode;
+
       const versions =
         hit._source.pips.programme_availability.available_versions
           .available_version;
+
       const version = versions[0].version; // TODO pick a version
+
       const duration = moment.duration(version.duration.$);
+      console.log("duration is ", version.duration.$);
 
       const availability = {
         planned_start: se.availabilities
@@ -235,25 +242,29 @@ const episode = async (req, res) => {
               .add(10, "m")
               .format(),
       };
+
       if (se.availabilities && se.availabilities.av_pv10_pa4.actual_start) {
         availability.actual_start = se.availabilities.av_pv10_pa4.actual_start;
       }
       if (se.availabilities && se.availabilities.av_pv10_pa4.end) {
         availability.end = se.availabilities.av_pv10_pa4.end;
       }
+
       const item = {
         entityType: "episode",
-        release_date: se.release_date.date,
+        // release_date: se.release_date.date || "",
         title: se.aggregatedTitle,
         pid: hit._source.pips.episode.pid,
-        uri: hit._source.pips.episode.crid.uri,
+        // uri: hit._source.pips.episode.crid.uri || "",
         vpid: version.pid,
-        versionCrid: version.crid.uri,
+        // versionCrid: version.crid.uri || "",
         duration: duration.toISOString(),
         availability,
       };
+
       items.push(item);
     });
+    console.log("item is ", items);
     res.json({
       page_size: req.query.page_size,
       page: req.query.page,
@@ -317,6 +328,7 @@ const clip = async (req, res) => {
   const sort = {};
   sort[sortMap[req.query.sort]] = sortDirection;
   data.sort = [sort];
+  console.log(data);
 
   try {
     const answer = await ax.post(`https://${host}/clip/_search`, data, params);
@@ -334,15 +346,14 @@ const clip = async (req, res) => {
 
 const saveEmergencyPlayList = async function (req, res) {
   let user = "dazzler"; // assume local
-  if (req.header("sslclientcertsubject")) {
-    const subject = auth.parseSSLsubject(req);
-    user = subject.emailAddress;
+  if (req.header("bbc-pp-oidc-id-token-email")) {
+    user = req.header("bbc-pp-oidc-id-token-email");
   }
   if (auth.isAuthorised(user)) {
     const sid = req.query.sid || config.default_sid;
     var params = {
       Body: req.body,
-      Bucket: process.env.BUCKET,
+      Bucket: config[sid].schedule_bucket,
       Key: `${sid}/emergency-playlist.json`,
       ContentType: "application/json",
     };
@@ -385,9 +396,11 @@ const languageServices = async function (req, res) {
 const queryepisode = async function (req, res) {
   try {
     let episodes = JSON.parse(req.body);
+    let sid = req.query.sid;
+    console.log("called");
 
     var s3params = {
-      Bucket: process.env.BUCKET,
+      Bucket: config[sid].schedule_bucket,
     };
     episodes.forEach((item, index) => {
       console.log("CALLED", index);
@@ -488,14 +501,13 @@ const s3Save = async (req, res) => {
   console.log("received", req.body);
   language;
   if (req.body.includes(config[sid].serviceIDRef)) {
-    if (req.header("sslclientcertsubject")) {
-      const subject = auth.parseSSLsubject(req);
-      user = subject.emailAddress;
+    if (req.header("bbc-pp-oidc-id-token-email")) {
+      user = req.header("bbc-pp-oidc-id-token-email");
     }
     if (auth.isAuthorised(user)) {
       var params = {
         Body: req.body,
-        Bucket: process.env.BUCKET,
+        Bucket: config[sid].schedule_bucket,
         Key: `${sid}/schedule/${date}-schedule.json`,
         ContentType: "application/json",
       };
@@ -526,7 +538,7 @@ const schedulev2 = async (req, res) => {
     console.log("key is", `${sid}/schedule/${date}-schedule.json`);
 
     var params = {
-      Bucket: process.env.BUCKET,
+      Bucket: config[sid].schedule_bucket,
       Key: `${sid}/schedule/${date}-schedule.json`,
     };
     const s = await s3.getObject(params).promise();
@@ -586,10 +598,12 @@ const getScheduleFromS3 = async (sid, date) => {
   console.log("sid is ", sid);
   const key = `${sid}/schedule/${date}-schedule.json`;
   console.log("key is", key);
+  console.log("bucket is ", config[sid].schedule_bucket);
+
   try {
     const s = await s3
       .getObject({
-        Bucket: process.env.BUCKET,
+        Bucket: config[sid].schedule_bucket,
         Key: key,
       })
       .promise();
@@ -610,7 +624,7 @@ const getScheduleFromS3 = async (sid, date) => {
 const saveOneDayOfScheduleToS3 = async (sid, date, data) => {
   var params = {
     Body: JSON.stringify(data),
-    Bucket: process.env.BUCKET,
+    Bucket: config[sid].schedule_bucket,
     Key: `${sid}/schedule/${date}-schedule.json`,
     ContentType: "application/json",
   };
@@ -802,9 +816,8 @@ const getSchedule = async (req, res) => {
 const saveSchedule = async (req, res) => {
   const sid = req.query.sid || config.default_sid;
   let user = "dazzler";
-  if (req.header("sslclientcertsubject")) {
-    const subject = auth.parseSSLsubject(req);
-    user = subject.emailAddress;
+  if (req.header("bbc-pp-oidc-id-token-email")) {
+    user = req.header("bbc-pp-oidc-id-token-email");
   }
   if (auth.isAuthorised(user)) {
     const destination = process.env.SCHEDULE_DESTINATION || "s3";
@@ -829,7 +842,7 @@ const saveSchedule = async (req, res) => {
 module.exports = {
   init(app, configObject) {
     config = configObject;
-    console.log("in v2", config);
+    app.get("/api/v2/user", auth.user);
     app.get("/api/v2/languageservices", languageServices);
     app.get("/api/v2/clip", clip);
     app.get("/api/v2/episode", episode);

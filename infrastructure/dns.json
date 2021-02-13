@@ -47,7 +47,6 @@
       ]
     },
     "Subdomain": {
-      "AllowedPattern": "^[a-z].*[a-z0-9]$",
       "Type": "String",
       "Description": "The 'Subdomain' value used in the main stack, eg dazzler.test"
     },

@@ -27,7 +27,6 @@ class ChannelsDAO {
 
             if (type) {
               config[unit.sid.S] = AWS.DynamoDB.Converter.unmarshall(unit);
-              console.log("unit is ", unit);
             } else {
               config[unit.Name.S] = AWS.DynamoDB.Converter.unmarshall(unit);
             }

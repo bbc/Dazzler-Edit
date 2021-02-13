@@ -203,7 +203,7 @@ class ScheduleDao {
         .catch((error) => {
           err(error);
         });
-      ScheduleDao.episodeBackfillCheck(items);
+      ScheduleDao.episodeBackfillCheck(items, sid);
     } catch (error) {
       console.log(error);
     }
@@ -212,7 +212,7 @@ class ScheduleDao {
    when playlist saved. If episode missing, backfill process
    begins.
    */
-  static episodeBackfillCheck(data) {
+  static episodeBackfillCheck(data, sid) {
     try {
       //Filtering episodes and then extracting vpid
       let episode = new groupSet(
@@ -231,7 +231,7 @@ class ScheduleDao {
       if (episode.size > 0) {
         axios({
           method: "post",
-          url: URLPrefix + "/api/v2/queryepisode",
+          url: URLPrefix + "/api/v2/queryepisode?sid=" + sid,
           data: Array.from(episode.data),
         }).catch((error) => {
           console.error(error);
