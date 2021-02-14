@@ -817,7 +817,10 @@ const saveSchedule = async (req, res) => {
   const sid = req.query.sid || config.default_sid;
   let user = "dazzler";
   if (req.header("bbc-pp-oidc-id-token-email")) {
+    console.log(("user is", user));
     user = req.header("bbc-pp-oidc-id-token-email");
+  } else {
+    console.log("FAILURE TO GET USER");
   }
   if (auth.isAuthorised(user)) {
     const destination = process.env.SCHEDULE_DESTINATION || "s3";
