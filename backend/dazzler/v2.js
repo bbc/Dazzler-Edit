@@ -3,7 +3,7 @@ require("moment-duration-format");
 const axios = require("axios");
 const https = require("https");
 const aws = require("aws-sdk");
-const auth = require("./authv2");
+const auth = require("./auth");
 const spw = require("./spw");
 const pips = require("./pips");
 const notifications = require("./notifications");
@@ -349,14 +349,15 @@ const clip = async (req, res) => {
 
 const saveEmergencyPlayList = async function (req, res) {
   let user = "dazzler"; // assume local
-  if (req.header("bbc-pp-oidc-id-token-email")) {
-    user = req.header("bbc-pp-oidc-id-token-email");
+  if (req.header("sslclientcertsubject")) {
+    const subject = auth.parseSSLsubject(req);
+    user = subject.emailAddress;
   }
   if (auth.isAuthorised(user)) {
     const sid = req.query.sid || config.default_sid;
     var params = {
       Body: req.body,
-      Bucket: config[sid].schedule_bucket,
+      Bucket: process.env.BUCKET,
       Key: `${sid}/emergency-playlist.json`,
       ContentType: "application/json",
     };
@@ -502,10 +503,10 @@ const s3Save = async (req, res) => {
   const date = req.query.date;
   let user = "dazzler"; // assume local
   console.log("received", req.body);
-  language;
   if (req.body.includes(config[sid].serviceIDRef)) {
-    if (req.header("bbc-pp-oidc-id-token-email")) {
-      user = req.header("bbc-pp-oidc-id-token-email");
+    if (req.header("sslclientcertsubject")) {
+      const subject = auth.parseSSLsubject(req);
+      user = subject.emailAddress;
     }
     if (auth.isAuthorised(user)) {
       var params = {
@@ -819,11 +820,9 @@ const getSchedule = async (req, res) => {
 const saveSchedule = async (req, res) => {
   const sid = req.query.sid || config.default_sid;
   let user = "dazzler";
-  if (req.header("bbc-pp-oidc-id-token-email")) {
-    console.log(("user is", user));
-    user = req.header("bbc-pp-oidc-id-token-email");
-  } else {
-    console.log("FAILURE TO GET USER");
+  if (req.header("sslclientcertsubject")) {
+    const subject = auth.parseSSLsubject(req);
+    user = subject.emailAddress;
   }
   if (auth.isAuthorised(user)) {
     const destination = process.env.SCHEDULE_DESTINATION || "s3";
