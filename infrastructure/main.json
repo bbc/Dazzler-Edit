@@ -1,70 +1,6 @@
 {
-  "AWSTemplateFormatVersion": "2010-09-09",
-  "Parameters": {
-    "Environment": {
-      "Default": "test",
-      "Type": "String",
-      "ConstraintDescription": "Values must be test or live",
-      "Description": "The deployment environment",
-      "AllowedValues": ["test", "live"]
-    },
-    "UpdatePauseTime": {
-      "Default": "PT0S",
-      "Type": "String",
-      "Description": "The time to wait between new instances coming online and the next batch being killed during an ASG update."
-    },
-    "UpdateMinInService": {
-      "Default": "0",
-      "Type": "String",
-      "Description": "The minimum number of instances in service during an ASG update."
-    },
-    "Component": {
-      "Default": "ws-dazzler-edit",
-      "Type": "String",
-      "Description": "The name of the Cosmos Component"
-    },
-    "ImageId": {
-      "Default": "ami-9398d3e0",
-      "Type": "String",
-      "Description": "The AMI to use for this component"
-    },
-    "MinSize": {
-      "Default": "1",
-      "Type": "String",
-      "Description": "The minimum number of instances"
-    },
-    "MaxSize": {
-      "Default": "1",
-      "Type": "String",
-      "Description": "The maximum number of instances"
-    },
-    "KeyName": {
-      "Default": "cosmos",
-      "Type": "String",
-      "Description": "Name of existing EC2 keypair to enable SSH access to the created instances"
-    },
-    "CoreInfrastructureStackName": {
-      "Default": "core-infrastructure",
-      "Type": "String",
-      "Description": "Name of the AWS account's core-infrastructure stack. Used to import other network parameters (vpc id, subnets etc)"
-    },
-    "UpdateMaxBatchSize": {
-      "Default": "1",
-      "Type": "String",
-      "Description": "The maximum number of instances to be killed at one time during an ASG update."
-    },
-    "InstanceType": {
-      "Default": "t2.micro",
-      "Type": "String",
-      "Description": "The size of the instances"
-    },
-    "S3BucketArn": {
-      "Default": "arn:aws:s3:::dazzleredit",
-      "Type": "String",
-      "Description": "The location of the default private storage bucket for all applications."
-    }
-  },
   "Description": "A BBC Component template for Dazzler Edit. Includes autoscaled instances",
+  "AWSTemplateFormatVersion": "2010-09-09",
   "Resources": {
     "ComponentScalingPolicy": {
       "Type": "AWS::AutoScaling::ScalingPolicy",
@@ -79,17 +15,17 @@
     "ComponentAutoScalingGroup": {
       "Type": "AWS::AutoScaling::AutoScalingGroup",
       "Properties": {
-        "AvailabilityZones": ["eu-west-1a", "eu-west-1b", "eu-west-1c"],
+        "HealthCheckGracePeriod": 300,
         "Tags": [
           {
-            "PropagateAtLaunch": true,
+            "Key": "BBCEnvironment",
             "Value": {
               "Ref": "Environment"
             },
-            "Key": "BBCEnvironment"
+            "PropagateAtLaunch": true
           },
           {
-            "PropagateAtLaunch": true,
+            "Key": "Name",
             "Value": {
               "Fn::Join": [
                 "",
@@ -103,24 +39,24 @@
                 ]
               ]
             },
-            "Key": "Name"
+            "PropagateAtLaunch": true
           },
           {
-            "PropagateAtLaunch": true,
-            "Value": "ws-dazzler-edit",
-            "Key": "BBCComponent"
+            "Key": "BBCComponent",
+            "Value": {
+              "Ref": "Component"
+            },
+            "PropagateAtLaunch": true
           },
           {
-            "Value": "ws-dazzler",
+            "Key": "BBCProject",
             "PropagateAtLaunch": true,
-            "Key": "BBCProject"
+            "Value": "ws-dazzler"
           }
         ],
-        "LoadBalancerNames": [
-          {
-            "Ref": "ComponentElasticLoadBalancer"
-          }
-        ],
+        "LaunchConfigurationName": {
+          "Ref": "ComponentLaunchConfiguration"
+        },
         "MinSize": {
           "Ref": "MinSize"
         },
@@ -144,10 +80,12 @@
             }
           }
         ],
-        "LaunchConfigurationName": {
-          "Ref": "ComponentLaunchConfiguration"
-        },
-        "HealthCheckGracePeriod": 300,
+        "LoadBalancerNames": [
+          {
+            "Ref": "ComponentElasticLoadBalancer"
+          }
+        ],
+        "AvailabilityZones": ["eu-west-1a", "eu-west-1b", "eu-west-1c"],
         "HealthCheckType": "ELB"
       },
       "UpdatePolicy": {
@@ -164,37 +102,13 @@
         }
       }
     },
-    "captureTaskQueue": {
-      "Type": "AWS::SQS::Queue",
-      "Properties": {
-        "FifoQueue": true,
-        "QueueName": {
-          "Fn::Join": [
-            "-",
-            [
-              {
-                "Ref": "Environment"
-              },
-              "dazzler-capture-tasks.fifo"
-            ]
-          ]
-        },
-        "ContentBasedDeduplication": true,
-        "Tags": [
-          {
-            "Value": "captureTasks",
-            "Key": "Purpose"
-          }
-        ]
-      }
-    },
     "ComponentElasticLoadBalancer": {
       "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
       "Properties": {
         "HealthCheck": {
           "HealthyThreshold": "3",
           "Interval": "15",
-          "Target": "TCP:7443",
+          "Target": "HTTP:7080/status/",
           "Timeout": "10",
           "UnhealthyThreshold": "3"
         },
@@ -271,42 +185,19 @@
     "LoadBalancerSecurityGroup": {
       "Type": "AWS::EC2::SecurityGroup",
       "Properties": {
+        "GroupDescription": "An ELB group allowing access only to from the corresponding component",
         "SecurityGroupIngress": [
           {
             "ToPort": "443",
             "FromPort": "443",
-            "CidrIp": "0.0.0.0/0",
-            "IpProtocol": "tcp"
+            "IpProtocol": "tcp",
+            "CidrIp": "0.0.0.0/0"
           }
         ],
         "VpcId": {
           "Fn::ImportValue": {
             "Fn::Sub": "${CoreInfrastructureStackName}-VpcId"
           }
-        },
-        "GroupDescription": "An ELB group allowing access only to from the corresponding component"
-      }
-    },
-    "captureTaskQueuePolicy": {
-      "Type": "AWS::SQS::QueuePolicy",
-      "Properties": {
-        "Queues": [
-          {
-            "Fn::GetAtt": ["captureTaskQueue", "QueueName"]
-          }
-        ],
-        "PolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Action": "sqs:sendMessage",
-              "Resource": {
-                "Fn::GetAtt": ["captureTaskQueue", "Arn"]
-              },
-              "Effect": "Allow",
-              "Principal": "*"
-            }
-          ]
         }
       }
     },
@@ -322,8 +213,6 @@
             }
           ]
         },
-        "TTL": "60",
-        "Type": "CNAME",
         "Name": {
           "Fn::Join": [
             ".",
@@ -349,11 +238,13 @@
             ]
           ]
         },
+        "Type": "CNAME",
         "ResourceRecords": [
           {
             "Fn::GetAtt": ["ComponentElasticLoadBalancer", "DNSName"]
           }
-        ]
+        ],
+        "TTL": "60"
       }
     },
     "ComponentPolicy": {
@@ -401,6 +292,7 @@
               "Effect": "Allow"
             },
             {
+              "Effect": "Allow",
               "Action": [
                 "s3:GetObject",
                 "s3:GetObjectAcl",
@@ -424,18 +316,16 @@
                         "Fn::FindInMap": [
                           "OperationsMap",
                           "PlayoutBucketMap",
-                          {
-                            "Ref": "Environment"
-                          }
+                          { "Ref": "Environment" }
                         ]
                       }
                     }
                   ]
                 }
-              ],
-              "Effect": "Allow"
+              ]
             },
             {
+              "Effect": "Allow",
               "Action": [
                 "s3:ListBucket",
                 "s3:GetBucketLocation",
@@ -450,16 +340,13 @@
                         "Fn::FindInMap": [
                           "OperationsMap",
                           "PlayoutBucketMap",
-                          {
-                            "Ref": "Environment"
-                          }
+                          { "Ref": "Environment" }
                         ]
                       }
                     }
                   ]
                 }
-              ],
-              "Effect": "Allow"
+              ]
             },
             {
               "Action": [
@@ -491,80 +378,13 @@
                   "Fn::Join": [
                     "",
                     [
-                      {
-                        "Ref": "S3BucketArn"
-                      },
+                      { "Ref": "S3BucketArn" },
                       "/",
-                      {
-                        "Ref": "Component"
-                      },
+                      { "Ref": "Component" },
                       "/",
-                      {
-                        "Ref": "Environment"
-                      },
+                      { "Ref": "Environment" },
                       "/logs/*"
                     ]
-                  ]
-                }
-              ],
-              "Effect": "Allow"
-            },
-            {
-              "Action": [
-                "s3:GetObject",
-                "s3:GetObjectAcl",
-                "s3:GetObjectVersion",
-                "s3:PutObject",
-                "s3:PutObjectAcl",
-                "s3:DeleteObject",
-                "s3:DeleteObjectTagging",
-                "s3:DeleteObjectVersionTagging",
-                "s3:GetObjectTagging",
-                "s3:GetObjectVersionTagging",
-                "s3:PutObjectTagging",
-                "s3:PutObjectVersionTagging"
-              ],
-              "Resource": [
-                {
-                  "Fn::Sub": [
-                    "arn:aws:s3:::${bucketName}/*",
-                    {
-                      "bucketName": {
-                        "Fn::FindInMap": [
-                          "OperationsMap",
-                          "BritBoxPlayoutBucketMap",
-                          {
-                            "Ref": "Environment"
-                          }
-                        ]
-                      }
-                    }
-                  ]
-                }
-              ],
-              "Effect": "Allow"
-            },
-            {
-              "Action": [
-                "s3:ListBucket",
-                "s3:GetBucketLocation",
-                "s3:GetLifecycleConfiguration"
-              ],
-              "Resource": [
-                {
-                  "Fn::Sub": [
-                    "arn:aws:s3:::${bucketName}",
-                    {
-                      "bucketName": {
-                        "Fn::FindInMap": [
-                          "OperationsMap",
-                          "BritBoxPlayoutBucketMap",
-                          {
-                            "Ref": "Environment"
-                          }
-                        ]
-                      }
-                    }
                   ]
                 }
               ],
@@ -647,37 +467,174 @@
           ]
         }
       }
-    }
-  },
-  "Mappings": {
-    "OperationsMap": {
-      "CnameEntryMap": {
-        "test": "dazzler.test",
-        "live": "dazzler"
+    },
+    "captureTaskQueue": {
+      "Type": "AWS::SQS::Queue",
+      "Properties": {
+        "QueueName": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Ref": "Environment"
+              },
+              "dazzler-capture-tasks.fifo"
+            ]
+          ]
+        },
+        "FifoQueue": true,
+        "ContentBasedDeduplication": true,
+        "Tags": [
+          {
+            "Key": "Purpose",
+            "Value": "captureTasks"
+          }
+        ]
+      }
+    },
+    "captureTaskQueuePolicy": {
+      "Type": "AWS::SQS::QueuePolicy",
+      "Properties": {
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": "*",
+              "Action": "sqs:sendMessage",
+              "Resource": {
+                "Fn::GetAtt": ["captureTaskQueue", "Arn"]
+              }
+            }
+          ]
+        },
+        "Queues": [
+          {
+            "Fn::GetAtt": ["captureTaskQueue", "QueueName"]
+          }
+        ]
+      }
+    },
+    "dynamoDB": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "TableName": {
+          "Fn::Sub": "Dazzler-Play-${Environment}"
+        },
+        "AttributeDefinitions": {
+          "AttributeName": { "Ref": "HashKeyElementName" },
+          "AttributeType": "S"
+        },
+        "KeySchema": {
+          "AttributeName": { "Ref": "HashKeyElementName" },
+          "KeyType": "HASH"
+        },
+        "ProvisionedThroughput": {
+          "ReadCapacityUnits": { "Ref": "ReadCapacityUnits" },
+          "WriteCapacityUnits": { "Ref": "WriteCapacityUnits" }
+        }
+      }
+    },
+    "Parameters": {
+      "ReadCapacityUnits": {
+        "Default": 10,
+        "Type": "Integer",
+        "Description": "Read Capacity Units"
       },
-      "PlayoutBucketMap": {
-        "test": "ws-dazzler-assets-test",
-        "live": "ws-dazzler-assets"
+      "WriteCapacityUnits": {
+        "Default": 10,
+        "Type": "Integer",
+        "Description": "Write Capacity Units"
       },
-      "BritBoxPlayoutBucketMap": {
-        "test": "ws-dazzler-tv",
-        "live": "ws-dazzler-tv-live"
+      "Component": {
+        "Default": "ws-dazzler-edit",
+        "Type": "String",
+        "Description": "The name of the Cosmos Component"
       },
-      "VpcCidrIpMap": {
-        "test": "10.98.0.0/18",
-        "live": "10.124.64.0/18"
+      "MinSize": {
+        "Default": "1",
+        "Type": "String",
+        "Description": "The minimum number of instances"
       },
-      "CopyMediaQueueMap": {
-        "test": "arn:aws:sqs:eu-west-1:576677253489:Media-Syndication-Queue",
-        "live": "arn:aws:sqs:eu-west-1:205979497597:Media-Syndication-Queue"
+      "UpdatePauseTime": {
+        "Default": "PT0S",
+        "Type": "String",
+        "Description": "The time to wait between new instances coming online and the next batch being killed during an ASG update."
       },
-      "ElasticSearchMap": {
-        "test": "vpc-test-pws-es-01-ntq5eu3xhbkw56fc2yi4vt2ndm.eu-west-1.es.amazonaws.com",
-        "live": "vpc-live-pws-es-01-sharq3wijppafqfq2v3isa5ram.eu-west-1.es.amazonaws.com"
+      "UpdateMinInService": {
+        "Default": "0",
+        "Type": "String",
+        "Description": "The minimum number of instances in service during an ASG update."
       },
-      "DomainNameBaseMap": {
-        "test": "1c9eb4db7739eb1a.xhst.bbci.co.uk.",
-        "live": "7a576ea3ed7ca599.xhst.bbci.co.uk."
+      "MaxSize": {
+        "Default": "1",
+        "Type": "String",
+        "Description": "The maximum number of instances"
+      },
+      "ImageId": {
+        "Default": "ami-9398d3e0",
+        "Type": "String",
+        "Description": "The AMI to use for this component"
+      },
+      "Environment": {
+        "Default": "test",
+        "ConstraintDescription": "Values must be test or live",
+        "Type": "String",
+        "Description": "The deployment environment",
+        "AllowedValues": ["test", "live"]
+      },
+      "KeyName": {
+        "Default": "cosmos",
+        "Type": "String",
+        "Description": "Name of existing EC2 keypair to enable SSH access to the created instances"
+      },
+      "S3BucketArn": {
+        "Default": "arn:aws:s3:::dazzleredit",
+        "Type": "String",
+        "Description": "The location of the default private storage bucket for all applications."
+      },
+      "UpdateMaxBatchSize": {
+        "Default": "1",
+        "Type": "String",
+        "Description": "The maximum number of instances to be killed at one time during an ASG update."
+      },
+      "InstanceType": {
+        "Default": "t2.micro",
+        "Type": "String",
+        "Description": "The size of the instances"
+      },
+      "CoreInfrastructureStackName": {
+        "Default": "core-infrastructure",
+        "Type": "String",
+        "Description": "Name of the AWS account's core-infrastructure stack. Used to import other network parameters (vpc id, subnets etc)"
+      }
+    },
+    "Mappings": {
+      "OperationsMap": {
+        "DomainNameBaseMap": {
+          "live": "7a576ea3ed7ca599.xhst.bbci.co.uk.",
+          "test": "1c9eb4db7739eb1a.xhst.bbci.co.uk."
+        },
+        "CopyMediaQueueMap": {
+          "live": "arn:aws:sqs:eu-west-1:205979497597:Media-Syndication-Queue",
+          "test": "arn:aws:sqs:eu-west-1:576677253489:Media-Syndication-Queue"
+        },
+        "CnameEntryMap": {
+          "live": "dazzler",
+          "test": "dazzler.test"
+        },
+        "VpcCidrIpMap": {
+          "live": "10.124.64.0/18",
+          "test": "10.98.0.0/18"
+        },
+        "PlayoutBucketMap": {
+          "live": "ws-dazzler-assets",
+          "test": "ws-dazzler-assets-test"
+        },
+        "ElasticSearchMap": {
+          "live": "vpc-live-pws-es-01-sharq3wijppafqfq2v3isa5ram.eu-west-1.es.amazonaws.com",
+          "test": "vpc-test-pws-es-01-ntq5eu3xhbkw56fc2yi4vt2ndm.eu-west-1.es.amazonaws.com"
+        }
       }
     }
   }
