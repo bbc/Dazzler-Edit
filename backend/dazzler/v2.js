@@ -33,6 +33,7 @@ ax = axios.create({
 });
 
 function availableQuery(mid, after, before, search) {
+  console.log("mid!", mid);
   let filter;
   if (search !== "") {
     filter = { match: { "pips.episode.title.$": search } };
@@ -170,6 +171,8 @@ const episode = async (req, res) => {
   ];
   const sid = req.query.sid || config.default_sid;
   const mid = config[sid].mid;
+  console.log("config", config);
+  console.log("mid is", mid);
   console.log("MID IS ", mid);
   const size = req.query.page_size || 20;
   let from = 0;
