@@ -462,6 +462,19 @@
               "Effect": "Allow"
             },
             {
+              "Action": ["dynamodb:Scan", "dynamodb:GetItem"],
+              "Resource": {
+                "Fn::FindInMap": [
+                  "OperationsMap",
+                  "dynamoDBTable",
+                  {
+                    "Ref": "Environment"
+                  }
+                ]
+              },
+              "Effect": "Allow"
+            },
+            {
               "Action": [
                 "s3:GetBucketLocation",
                 "s3:GetBucketNotification",
@@ -658,6 +671,10 @@
       "PlayoutBucketMap": {
         "test": "ws-dazzler-assets-test",
         "live": "ws-dazzler-assets"
+      },
+      "dynamoDBTable": {
+        "test": "arn:aws:dynamodb:eu-west-1:576677253489:table/temp",
+        "live": "arn:aws:dynamodb:eu-west-1:205979497597:table/temp"
       },
       "BritBoxPlayoutBucketMap": {
         "test": "ws-dazzler-tv",

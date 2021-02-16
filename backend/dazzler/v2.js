@@ -281,69 +281,79 @@ const episode = async (req, res) => {
 };
 
 const clip = async (req, res) => {
-  const params = {
-    headers: { "Content-Type": "application/json" },
-  };
-  const _source = ["pips"];
-  const sid = req.query.sid || config.default_sid;
-  console.log("sid is ", sid);
-  console.log("config here ", config);
-  console.log(config[sid].language);
-
-  const size = req.query.page_size || 20;
-  let from = 0;
-  if (req.query.page) {
-    from = size * req.query.page;
-    console.log("from is episode ", from);
-  }
-  let filter;
-  if (req.query.search !== "") {
-    filter = { match: { "pips.clip.title.$": req.query.search } };
-  }
-  const query = {
-    bool: {
-      must: [
-        {
-          exists: {
-            field:
-              "pips.programme_availability.available_versions.available_version",
-          },
-        },
-        filter,
-        { match: { "pips.clip.languages.language.$": config[sid].language } },
-        { match: { "pips.clip.media_type.value": "audio_video" } },
-      ],
-    },
-  };
-  const data = { _source, from, size, query };
-  if (req.query.sort) {
-    var sortDirection = "desc";
-    if (req.query.sort_direction === "ascending") {
-      sortDirection = "asc";
-    }
-  }
-
-  const sortMap = {
-    pid: "pips.clip.pid",
-    title: "pips.title_hierarchy.titles.title.$.keyword",
-  };
-
-  const sort = {};
-  sort[sortMap[req.query.sort]] = sortDirection;
-  data.sort = [sort];
-  console.log(data);
-
   try {
-    const answer = await ax.post(`https://${host}/clip/_search`, data, params);
-    const result = answer.data.hits.hits;
-    const total = answer.data.hits.total;
-    let items = {};
-    items.clips = result.map((hit) => hit._source.pips);
-    items.total = total;
-    res.json(items);
-  } catch (e) {
-    console.log(e);
-    res.status(404).send("error");
+    console.log("in clip");
+    const params = {
+      headers: { "Content-Type": "application/json" },
+    };
+    const _source = ["pips"];
+    const sid = req.query.sid || config.default_sid;
+    console.log("sid is clip", sid);
+    console.log("config here ", config);
+    console.log(config[sid].language);
+
+    const size = req.query.page_size || 20;
+    let from = 0;
+    if (req.query.page) {
+      from = size * req.query.page;
+      console.log("from is episode ", from);
+    }
+    let filter;
+    if (req.query.search !== "") {
+      filter = { match: { "pips.clip.title.$": req.query.search } };
+    }
+    const query = {
+      bool: {
+        must: [
+          {
+            exists: {
+              field:
+                "pips.programme_availability.available_versions.available_version",
+            },
+          },
+          filter,
+          { match: { "pips.clip.languages.language.$": config[sid].language } },
+          { match: { "pips.clip.media_type.value": "audio_video" } },
+        ],
+      },
+    };
+    const data = { _source, from, size, query };
+    if (req.query.sort) {
+      var sortDirection = "desc";
+      if (req.query.sort_direction === "ascending") {
+        sortDirection = "asc";
+      }
+    }
+
+    const sortMap = {
+      pid: "pips.clip.pid",
+      title: "pips.title_hierarchy.titles.title.$.keyword",
+    };
+
+    const sort = {};
+    sort[sortMap[req.query.sort]] = sortDirection;
+    data.sort = [sort];
+    console.log(data);
+
+    try {
+      const answer = await ax.post(
+        `https://${host}/clip/_search`,
+        data,
+        params
+      );
+      const result = answer.data.hits.hits;
+      const total = answer.data.hits.total;
+      let items = {};
+      items.clips = result.map((hit) => hit._source.pips);
+      items.total = total;
+      res.json(items);
+    } catch (e) {
+      console.log(e);
+      res.status(404).send("error");
+    }
+  } catch (error) {
+    console.log("error in clip");
+    console.log("error");
   }
 };
 
