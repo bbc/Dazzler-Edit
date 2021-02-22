@@ -158,53 +158,59 @@ function unavailableQuery(mid, after, before, search) {
  to ISO8601
 */
 const episode = async (req, res) => {
-  const params = {
-    headers: { "Content-Type": "application/json" },
-  };
-  const _source = [
-    "pips.episode.pid",
-    "sonata.episode.aggregatedTitle",
-    "sonata.episode.release_date.date",
-    "pips.programme_availability.available_versions.available_version",
-    "sonata.episode.availabilities.av_pv10_pa4",
-    "pips.episode.crid.uri",
-  ];
-  const sid = req.query.sid || config.default_sid;
-  const mid = config[sid].mid;
-  console.log("config", config);
-  console.log("mid is", mid);
-  console.log("MID IS ", mid);
-  const size = req.query.page_size || 20;
-  let from = 0;
-  if (req.query.page) {
-    from = size * req.query.page;
-    console.log("from is episode ", from);
-  }
-  const after = req.query.from || "1970-01-01T00:00:00Z";
-  const before = req.query.to || moment.utc().add(1, "y");
-  const a = req.query.availability || "available";
-  const search = req.query.search;
-  console.log("from", after, "to", before);
-  const data = { _source, from, size };
-  if (a === "available") {
-    data.query = availableQuery(mid, after, before, search);
-  } else {
-    data.query = unavailableQuery(mid, after, before, search);
-  }
-
-  console.log("EPISODE!!!!", JSON.stringify(data, 2));
-  if (req.query.sort) {
-    let sortDirection = "desc";
-    if (req.query.sort_direction === "ascending") {
-      sortDirection = "asc";
-    }
-    const sortMap = {
-      release_date: "sonata.episode.release_date.date",
-      title: "sonata.episode.aggregatedTitle.keyword",
+  try {
+    console.log("detect - in episode");
+    const params = {
+      headers: { "Content-Type": "application/json" },
     };
-    const sort = {};
-    sort[sortMap[req.query.sort]] = sortDirection;
-    data.sort = [sort];
+    const _source = [
+      "pips.episode.pid",
+      "sonata.episode.aggregatedTitle",
+      "sonata.episode.release_date.date",
+      "pips.programme_availability.available_versions.available_version",
+      "sonata.episode.availabilities.av_pv10_pa4",
+      "pips.episode.crid.uri",
+    ];
+    const sid = req.query.sid || config.default_sid;
+    const mid = config[sid].mid;
+    console.log("config", config);
+    console.log("mid is", mid);
+    console.log("MID IS ", mid);
+    const size = req.query.page_size || 20;
+    let from = 0;
+    if (req.query.page) {
+      from = size * req.query.page;
+      console.log("from is episode ", from);
+    }
+    const after = req.query.from || "1970-01-01T00:00:00Z";
+    const before = req.query.to || moment.utc().add(1, "y");
+    const a = req.query.availability || "available";
+    const search = req.query.search;
+    console.log("from", after, "to", before);
+    const data = { _source, from, size };
+    if (a === "available") {
+      data.query = availableQuery(mid, after, before, search);
+    } else {
+      data.query = unavailableQuery(mid, after, before, search);
+    }
+
+    console.log("EPISODE!!!!", JSON.stringify(data, 2));
+    if (req.query.sort) {
+      let sortDirection = "desc";
+      if (req.query.sort_direction === "ascending") {
+        sortDirection = "asc";
+      }
+      const sortMap = {
+        release_date: "sonata.episode.release_date.date",
+        title: "sonata.episode.aggregatedTitle.keyword",
+      };
+      const sort = {};
+      sort[sortMap[req.query.sort]] = sortDirection;
+      data.sort = [sort];
+    }
+  } catch (error) {
+    console.log("detect epispode error");
+    console.log(error);
   }
   console.log("episode!!!!", data);
   try {
@@ -255,16 +261,18 @@ const episode = async (req, res) => {
 
       const item = {
         entityType: "episode",
-        // release_date: se.release_date.date || "",
         title: se.aggregatedTitle,
         pid: hit._source.pips.episode.pid,
-        // uri: hit._source.pips.episode.crid.uri || "",
+
         vpid: version.pid,
-        // versionCrid: version.crid.uri || "",
         duration: duration.toISOString(),
         availability,
       };
-
+      if (se.release_date) {
+        item.release_date = se.release_date.date;
+        item.uri = hit._source.pips.episode.crid.uri;
+        item.versionCrid = version.crid.uri;
+      }
       items.push(item);
     });
     console.log("item is ", items);
@@ -276,12 +284,14 @@ const episode = async (req, res) => {
     });
   } catch (e) {
     console.log(e);
+    console.log("detect axios episode error");
     res.status(404).send("error");
   }
 };
 
 const clip = async (req, res) => {
   try {
+    console.log("detect - in clip");
     console.log("in clip");
     const params = {
       headers: { "Content-Type": "application/json" },
@@ -349,38 +359,47 @@ const clip = async (req, res) => {
       res.json(items);
     } catch (e) {
       console.log(e);
+      console.log("detect - axios error");
       res.status(404).send("error");
     }
   } catch (error) {
-    console.log("error in clip");
+    console.log("detect error in clip");
     console.log("error");
+    console.log(error);
   }
 };
 
 const saveEmergencyPlayList = async function (req, res) {
-  let user = "dazzler"; // assume local
-  if (req.header("bbc-pp-oidc-id-token-email")) {
-    user = req.header("bbc-pp-oidc-id-token-email");
-  }
-  if (auth.isAuthorised(user)) {
-    const sid = req.query.sid || config.default_sid;
-    var params = {
-      Body: req.body,
-      Bucket: config[sid].schedule_bucket,
-      Key: `${sid}/emergency-playlist.json`,
-      ContentType: "application/json",
-    };
-    try {
-      await s3.putObject(params).promise();
-      res.send("saved");
-    } catch (e) {
-      console.log("error ", e);
-      res.status(404).send("error");
+  try {
+    console.log("detect in emergency platylist");
+
+    let user = "dazzler"; // assume local
+    if (req.header("bbc-pp-oidc-id-token-email")) {
+      user = req.header("bbc-pp-oidc-id-token-email");
     }
-  } else {
-    const message = user + " is not authorised to save schedules";
-    console.log(message);
-    res.status(403).send(message);
+    if (auth.isAuthorised(user)) {
+      const sid = req.query.sid || config.default_sid;
+      var params = {
+        Body: req.body,
+        Bucket: config[sid].schedule_bucket,
+        Key: `${sid}/emergency-playlist.json`,
+        ContentType: "application/json",
+      };
+      try {
+        await s3.putObject(params).promise();
+        res.send("saved");
+      } catch (e) {
+        console.log("detect - error ", e);
+        res.status(404).send("error");
+      }
+    } else {
+      const message = user + " is not authorised to save schedules";
+      console.log(message);
+      res.status(403).send(message);
+    }
+  } catch (error) {
+    console.log(error);
+    console.log("detect - save emergency playlist error");
   }
 };
 
@@ -402,6 +421,7 @@ const languageServices = async function (req, res) {
       res.json(i);
     });
   } catch (error) {
+    console.log("detect - language service error");
     res.status(404).send("error");
   }
 };
@@ -410,6 +430,7 @@ const queryepisode = async function (req, res) {
   try {
     let episodes = JSON.parse(req.body);
     let sid = req.query.sid;
+    console.log("detect - query episode called");
     console.log("called");
 
     var s3params = {
@@ -434,12 +455,14 @@ const queryepisode = async function (req, res) {
       });
     });
   } catch (error) {
+    console.log("detect - query episode error");
     console.error(error);
   }
 };
 
 const sendSQSMessage = async function (item) {
   try {
+    console.log("detect - in send sqs message");
     const sqsparams = {
       QueueUrl: process.env.ASSET_PUBLISH_QUEUE,
     };
@@ -459,10 +482,12 @@ const sendSQSMessage = async function (item) {
     });
   } catch (error) {
     console.log(error);
+    console.log("detect - in send sqs error");
   }
 };
 
 const getEpisodeUri = async function (item) {
+  console.log("detect in getepisode uri");
   const params = {
     headers: { "Content-Type": "application/json" },
   };
@@ -508,6 +533,7 @@ const getEpisodeUri = async function (item) {
 };
 
 const s3Save = async (req, res) => {
+  console.log("detect in get s3 save");
   const sid = req.query.sid || config.default_sid;
   const date = req.query.date;
   let user = "dazzler"; // assume local
@@ -530,6 +556,7 @@ const s3Save = async (req, res) => {
         console.log("schedule saved");
       } catch (e) {
         console.log("error ", e);
+        console.log("detect - error saving schedule");
         res.status(404).send("error");
       }
     } else {
@@ -540,6 +567,7 @@ const s3Save = async (req, res) => {
   } else {
     const message = user + " is not authorised to save schedules";
     console.log(message);
+
     res.status(403).send(message);
   }
 };
@@ -558,13 +586,16 @@ const schedulev2 = async (req, res) => {
     const data = JSON.parse(s.Body.toString("utf8"));
 
     console.log("data is ", data.items);
+    console.log("detect - waiting");
     await res.json({
       total: data.items.length,
       item: data.items,
       sid: sid,
       date: date,
     });
+    console.log("detect - received");
   } catch (e) {
+    console.log("detect - error getting schedulev2");
     res.json({
       total: 0,
     });
@@ -663,41 +694,47 @@ const mergeOneDayOfScheduleToS3 = async (sid, date, data) => {
 };
 
 const saveScheduleToS3 = async (data) => {
-  const sid = data.sid;
-  const start = moment.utc(data.start).startOf("day").format();
-  const end = moment(start).add(1, "days").format();
-  const date = moment.utc(start).format("YYYY-MM-DD");
-  if (data.items.length === 0) {
-    console.log(`empty schedule for ${sid} on ${date}, nothing saved`);
-    return saveOneDayOfScheduleToS3(sid, date, data);
-  }
-  const first = data.items[0].start;
-  const last = data.items[data.items.length - 1].end;
-  if (first === start && last === end) {
-    // full day schedule
-    console.log("one day");
-    return saveOneDayOfScheduleToS3(sid, date, data);
-  }
-  if (last > end) {
-    // more than one day
-    console.log("more than one day");
-    const day = moment.utc(date);
-    const lastday = moment.utc(last).startOf("day");
-    while (day <= lastday) {
-      const d = day.format("YYYY-MM-DD");
-      const items = data.items.filter((item) => item.start.startsWith(d));
-      await mergeOneDayOfScheduleToS3(sid, d, {
-        ...data,
-        start: items[0].start,
-        end: items[items.length - 1].end,
-        items,
-      });
-      day.add(1, "days");
+  try {
+    console.log("detect - in save schedule to s3");
+    const sid = data.sid;
+    const start = moment.utc(data.start).startOf("day").format();
+    const end = moment(start).add(1, "days").format();
+    const date = moment.utc(start).format("YYYY-MM-DD");
+    if (data.items.length === 0) {
+      console.log(`empty schedule for ${sid} on ${date}, nothing saved`);
+      return saveOneDayOfScheduleToS3(sid, date, data);
     }
-  } else {
-    // partial - we need to merge this with the current schedule, if it exists
-    console.log("merge schedule");
-    return mergeOneDayOfScheduleToS3(sid, date, data);
+    const first = data.items[0].start;
+    const last = data.items[data.items.length - 1].end;
+    if (first === start && last === end) {
+      // full day schedule
+      console.log("one day");
+      return saveOneDayOfScheduleToS3(sid, date, data);
+    }
+    if (last > end) {
+      // more than one day
+      console.log("more than one day");
+      const day = moment.utc(date);
+      const lastday = moment.utc(last).startOf("day");
+      while (day <= lastday) {
+        const d = day.format("YYYY-MM-DD");
+        const items = data.items.filter((item) => item.start.startsWith(d));
+        await mergeOneDayOfScheduleToS3(sid, d, {
+          ...data,
+          start: items[0].start,
+          end: items[items.length - 1].end,
+          items,
+        });
+        day.add(1, "days");
+      }
+    } else {
+      // partial - we need to merge this with the current schedule, if it exists
+      console.log("merge schedule");
+      return mergeOneDayOfScheduleToS3(sid, date, data);
+    }
+  } catch (error) {
+    console.log("detect - save schedule to s3 error");
+    console.log(error);
   }
 };
 
