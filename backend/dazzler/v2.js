@@ -158,68 +158,66 @@ function unavailableQuery(mid, after, before, search) {
  to ISO8601
 */
 const episode = async (req, res) => {
-  try {
-    console.log("detect - in episode");
-    const params = {
-      headers: { "Content-Type": "application/json" },
-    };
-    const _source = [
-      "pips.episode.pid",
-      "sonata.episode.aggregatedTitle",
-      "sonata.episode.release_date.date",
-      "pips.programme_availability.available_versions.available_version",
-      "sonata.episode.availabilities.av_pv10_pa4",
-      "pips.episode.crid.uri",
-    ];
-    const sid = req.query.sid || config.default_sid;
-    const mid = config[sid].mid;
-    console.log("config", config);
-    console.log("mid is", mid);
-    console.log("MID IS ", mid);
-    const size = req.query.page_size || 20;
-    let from = 0;
-    if (req.query.page) {
-      from = size * req.query.page;
-      console.log("from is episode ", from);
-    }
-    const after = req.query.from || "1970-01-01T00:00:00Z";
-    const before = req.query.to || moment.utc().add(1, "y");
-    const a = req.query.availability || "available";
-    const search = req.query.search;
-    console.log("from", after, "to", before);
-    const data = { _source, from, size };
-    if (a === "available") {
-      data.query = availableQuery(mid, after, before, search);
-    } else {
-      data.query = unavailableQuery(mid, after, before, search);
-    }
-
-    console.log("EPISODE!!!!", JSON.stringify(data, 2));
-    if (req.query.sort) {
-      let sortDirection = "desc";
-      if (req.query.sort_direction === "ascending") {
-        sortDirection = "asc";
-      }
-      const sortMap = {
-        release_date: "sonata.episode.release_date.date",
-        title: "sonata.episode.aggregatedTitle.keyword",
-      };
-      const sort = {};
-      sort[sortMap[req.query.sort]] = sortDirection;
-      data.sort = [sort];
-    }
-  } catch (error) {
-    console.log("detect epispode error");
-    console.log(error);
+  console.log("detect - in episode");
+  const params = {
+    headers: { "Content-Type": "application/json" },
+  };
+  const _source = [
+    "pips.episode.pid",
+    "sonata.episode.aggregatedTitle",
+    "sonata.episode.release_date.date",
+    "pips.programme_availability.available_versions.available_version",
+    "sonata.episode.availabilities.av_pv10_pa4",
+    "pips.episode.crid.uri",
+  ];
+  const sid = req.query.sid || config.default_sid;
+  const mid = config[sid].mid;
+  console.log("detect - config", config);
+  console.log("detect - mid is", mid);
+  console.log("detect - MID IS ", mid);
+  const size = req.query.page_size || 20;
+  let from = 0;
+  if (req.query.page) {
+    from = size * req.query.page;
+    console.log("from is episode ", from);
   }
+  const after = req.query.from || "1970-01-01T00:00:00Z";
+  const before = req.query.to || moment.utc().add(1, "y");
+  const a = req.query.availability || "available";
+  const search = req.query.search;
+  console.log("from", after, "to", before);
+  const data = { _source, from, size };
+  console.log("detect - fetching available or unavailable query");
+  if (a === "available") {
+    data.query = availableQuery(mid, after, before, search);
+  } else {
+    data.query = unavailableQuery(mid, after, before, search);
+  }
+  console.log("detect - fetched");
+  console.log("EPISODE!!!!", JSON.stringify(data, 2));
+  if (req.query.sort) {
+    let sortDirection = "desc";
+    if (req.query.sort_direction === "ascending") {
+      sortDirection = "asc";
+    }
+    const sortMap = {
+      release_date: "sonata.episode.release_date.date",
+      title: "sonata.episode.aggregatedTitle.keyword",
+    };
+    const sort = {};
+    sort[sortMap[req.query.sort]] = sortDirection;
+    data.sort = [sort];
+  }
+
   console.log("episode!!!!", data);
   try {
+    console.log("detect - making the episode call");
     const answer = await ax.post(
       `https://${host}/episode/_search`,
       data,
       params
     );
-
+    console.log("detect - received episode data");
     const result = answer.data;
 
     const items = [];
