@@ -54,7 +54,7 @@
       "Description": "The maximum number of instances to be killed at one time during an ASG update."
     },
     "InstanceType": {
-      "Default": "t2.micro",
+      "Default": "t2.xlarge",
       "Type": "String",
       "Description": "The size of the instances"
     },
