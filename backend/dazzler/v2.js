@@ -36,7 +36,17 @@ function availableQuery(mid, after, before, search) {
   console.log("mid!", mid);
   let filter;
   if (search !== "") {
-    filter = { match: { "pips.episode.title.$": search } };
+    filter = {
+      match: {
+        "pips.episode.title.$": {
+          query: search,
+          operator: "or",
+          analyzer: "search",
+          fuzziness: "2",
+          max_expansions: "1",
+        },
+      },
+    };
   }
   return {
     bool: {
