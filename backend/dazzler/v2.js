@@ -40,7 +40,7 @@ function availableQuery(mid, after, before, search) {
       match: {
         "pips.episode.title.$": {
           query: search,
-          operator: "or",
+          operator: "and",
           analyzer: "search",
           fuzziness: "2",
           max_expansions: "1",
@@ -200,6 +200,7 @@ const episode = async (req, res) => {
   console.log("detect - fetching available or unavailable query");
   if (a === "available") {
     data.query = availableQuery(mid, after, before, search);
+    console.log("query is ", JSON.stringify(data.query));
   } else {
     data.query = unavailableQuery(mid, after, before, search);
   }
@@ -318,8 +319,19 @@ const clip = async (req, res) => {
     }
     let filter;
     if (req.query.search !== "") {
-      filter = { match: { "pips.clip.title.$": req.query.search } };
+      filter = {
+        match: {
+          "pips.clip.title.$": {
+            query: req.query.search,
+            operator: "and",
+            analyzer: "search",
+            fuzziness: "2",
+            max_expansions: "1",
+          },
+        },
+      };
     }
+
     const query = {
       bool: {
         must: [
