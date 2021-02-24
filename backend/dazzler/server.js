@@ -114,6 +114,8 @@ app.use(
   })
 );
 
+app.set("etag", false);
+
 app.use(express.static(__dirname + "/../edit"));
 
 // /status is used by ELB health checkers to assert that the service is running OK
