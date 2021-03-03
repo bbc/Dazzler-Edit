@@ -7,17 +7,22 @@ const URLPrefix =
   process.env.NODE_ENV === "development" ? "http://localhost:8080" : "";
 
 class ScheduleDao {
-  static getLanguages(cb) {
-    try {
+  static getLanguages() {
+    return new Promise((resolve, reject) => {
       let url = `${URLPrefix}/api/v2/languageservices`;
-      axios.get(url).then((response) => {
-        console.log("we have", response);
-        cb(response.data);
-      });
-    } catch (error) {
-      console.log(error);
-    }
+      axios
+        .get(url)
+        .then((response) => {
+          console.log("we have", response);
+          resolve(response.data);
+        })
+        .catch((error) => {
+          console.log(error);
+          reject(error);
+        });
+    });
   }
+
   static getTitle(item, index) {
     let title = "";
     console.log("item is", item);

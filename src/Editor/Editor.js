@@ -178,25 +178,26 @@ class Editor extends React.Component {
     };
   }
 
-  componentDidMount() {
+  async componentDidMount() {
+    console.log("schedule obhect rein");
     try {
-      PlatformDao.getUser((user) => {
-        this.setState({ user: user });
+      let user = await PlatformDao.getUser();
+      let response = await getLanguages();
+      console.log("obhect-setting state");
+      this.setState({
+        user: user || "Anonymous",
+
+        languageList: Object.keys(response),
+        configObj: response,
+        language: localStorage.getItem("language") || "Hindi",
+        schedule: new ScheduleObject(
+          this.state.language,
+          moment().utc().startOf("day")
+        ),
       });
 
-      getLanguages((response) => {
-        this.setState({
-          languageList: Object.keys(response),
-          configObj: response,
-          language: localStorage.getItem("language") || "Hindi",
-          schedule: new ScheduleObject(
-            this.state.language,
-            moment().utc().startOf("day")
-          ),
-        });
-        this.handleRefresh();
-        localStorage.setItem("configObj", JSON.stringify(response));
-      });
+      localStorage.setItem("configObj", JSON.stringify(response));
+      this.reloadSchedule();
     } catch (error) {
       console.log(error);
     }
