@@ -194,7 +194,7 @@ class Editor extends React.Component {
             moment().utc().startOf("day")
           ),
         });
-        this.handleRefresh();
+        this.reloadSchedule();
         localStorage.setItem("configObj", JSON.stringify(response));
       });
     } catch (error) {
