@@ -409,7 +409,9 @@ class Editor extends React.Component {
       reader.onload = (e) => {
         try {
           let items = JSON.parse(e.target.result);
-          this.setState({ loop: items });
+          items.forEach((item) => {
+            this.pasteIntoLoop(item);
+          });
           console.log(e.target.result);
         } catch (err) {
           alert("Invalid format");
