@@ -1,10 +1,24 @@
-function isAuthorised(email) {
+function isAuthorised(req, config) {
+  let email = 'dazzler'; // for testing purposes
+  if (req.header("bbc-pp-oidc-id-token-email")) {
+    email = req.header("bbc-pp-oidc-id-token-email");
+  }
+  let groups = [];
+  if (req.header("bbc-pp-user-groups")) {
+    groups = JSON.parse(req.header("bbc-pp-oidc-id-token-email")).map((group) => group.id);
+    const sid = req.query.sid;
+    if (groups.includes(config[sid].edit_group)) {
+      return email;
+    }
+  }
   if (process.env.AUTHORISED_USERS) {
     const auth = "," + process.env.AUTHORISED_USERS.trim() + ",";
-    console.log("auth", auth, email);
-    return auth.toLowerCase().includes(`,${email.trim().toLowerCase()},`);
+    if(auth.toLowerCase().includes(`,${email.trim().toLowerCase()},`)) {
+      return email;
+    }
+    return undefined;
   } else {
-    return true; // allow saving in the local environment
+    return undefined;
   }
 }
 

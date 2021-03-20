@@ -391,14 +391,10 @@ const clip = async (req, res) => {
 
 const saveEmergencyPlayList = async function (req, res) {
   try {
-    console.log("detect in emergency platylist");
-
-    let user = "dazzler"; // assume local
-    if (req.header("bbc-pp-oidc-id-token-email")) {
-      user = req.header("bbc-pp-oidc-id-token-email");
-    }
-    if (auth.isAuthorised(user)) {
-      const sid = req.query.sid || config.default_sid;
+    console.log("detect in emergency playlist");
+    const user = auth.isAuthorised(req, config);
+    if (user) {
+      const sid = req.query.sid;
       var params = {
         Body: req.body,
         Bucket: config[sid].schedule_bucket,
@@ -554,40 +550,28 @@ const getEpisodeUri = async function (item) {
 
 const s3Save = async (req, res) => {
   console.log("detect in get s3 save");
-  const sid = req.query.sid || config.default_sid;
-  const date = req.query.date;
-  let user = "dazzler"; // assume local
   console.log("received", req.body);
-  language;
-  if (req.body.includes(config[sid].serviceIDRef)) {
-    if (req.header("bbc-pp-oidc-id-token-email")) {
-      user = req.header("bbc-pp-oidc-id-token-email");
-    }
-    if (auth.isAuthorised(user)) {
-      var params = {
-        Body: req.body,
-        Bucket: config[sid].schedule_bucket,
-        Key: `${sid}/schedule/${date}-schedule.json`,
-        ContentType: "application/json",
-      };
-      try {
-        await s3.putObject(params).promise();
-        res.send("Schedule Saved");
-        console.log("schedule saved");
-      } catch (e) {
-        console.log("error ", e);
-        console.log("detect - error saving schedule");
-        res.status(404).send("error");
-      }
-    } else {
-      const message = user + " is not authorised to save schedules";
-      console.log(message);
-      res.status(403).send(message);
+  const user = auth.isAuthorised(req, config);
+  if (user) {
+    const sid = req.query.sid;
+    var params = {
+      Body: req.body,
+      Bucket: config[sid].schedule_bucket,
+      Key: `${sid}/schedule/${req.query.date}-schedule.json`,
+      ContentType: "application/json",
+    };
+    try {
+      await s3.putObject(params).promise();
+      res.send("Schedule Saved");
+      console.log("schedule saved");
+    } catch (e) {
+      console.log("error ", e);
+      console.log("detect - error saving schedule");
+      res.status(500).send("error");
     }
   } else {
     const message = user + " is not authorised to save schedules";
     console.log(message);
-
     res.status(403).send(message);
   }
 };
@@ -884,15 +868,8 @@ const getSchedule = async (req, res) => {
 };
 
 const saveSchedule = async (req, res) => {
-  const sid = req.query.sid || config.default_sid;
-  let user = "dazzler";
-  if (req.header("bbc-pp-oidc-id-token-email")) {
-    console.log(("user is", user));
-    user = req.header("bbc-pp-oidc-id-token-email");
-  } else {
-    console.log("FAILURE TO GET USER");
-  }
-  if (auth.isAuthorised(user)) {
+  const user = auth.isAuthorised(req, config);
+  if (user) {
     const destination = process.env.SCHEDULE_DESTINATION || "s3";
     let response;
     if (destination === "pips") {
@@ -906,6 +883,7 @@ const saveSchedule = async (req, res) => {
       res.status(500).send("error");
     }
   } else {
+    const sid = req.query.sid;
     const message = `${user} is not authorised to save ${sid} schedules`;
     console.log(message);
     res.status(403).send(message);
