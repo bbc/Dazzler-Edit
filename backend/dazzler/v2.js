@@ -279,6 +279,11 @@ const episode = async (req, res) => {
   }
 };
 
+/*
+  if clip_brand is set then use that
+  otherwise if clip_language is set then use that 
+  otherwise all the clips in Alexandria?
+*/
 const clip = async (req, res) => {
   try {
     const params = {
@@ -286,15 +291,25 @@ const clip = async (req, res) => {
     };
     const _source = ["pips"];
     const sid = req.query.sid || config.default_sid;
-
+    const cfg = config[sid];
     const size = req.query.page_size || 20;
     let from = 0;
     if (req.query.page) {
       from = size * req.query.page;
     }
-    let filter;
+
+    const must = [
+        {
+          exists: {
+            field:
+              "pips.programme_availability.available_versions.available_version",
+          },
+        },
+        { match: { "pips.clip.media_type.value": "audio_video" } },
+    ];
+
     if (req.query.search !== "") {
-      filter = {
+      must.push({
         match: {
           "pips.clip.title.$": {
             query: req.query.search,
@@ -304,24 +319,16 @@ const clip = async (req, res) => {
             max_expansions: "1",
           },
         },
-      };
+      });
     }
 
-    const query = {
-      bool: {
-        must: [
-          {
-            exists: {
-              field:
-                "pips.programme_availability.available_versions.available_version",
-            },
-          },
-          filter,
-          { match: { "pips.clip.languages.language.$": config[sid].language } },
-          { match: { "pips.clip.media_type.value": "audio_video" } },
-        ],
-      },
-    };
+    if (cfg.clip_brand) {
+      must.push({ "terms": { "pips.clip.clip_of.link.pid": cfg.clip_brand } });
+    } else if (cfg.language) {
+      must.push({ match: { "pips.clip.languages.language.$": cfg.language } });
+    }
+
+    const query = { bool: { must } };
     const data = { _source, from, size, query };
     if (req.query.sort) {
       var sortDirection = "desc";
