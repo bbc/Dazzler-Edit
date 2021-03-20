@@ -41,7 +41,7 @@ export default function ClipList({
     rowsPerPage === currentRowsPerPage &&
     sort_direction === currentSortDirection &&
     type === currentType &&
-    search == currentSearch
+    search === currentSearch
   ) {
     console.log("cliplist no change", page, rowsPerPage);
   } else {

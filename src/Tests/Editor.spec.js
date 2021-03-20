@@ -1,7 +1,7 @@
 import React from "react";
 import * as enzyme from "enzyme";
 import Adapter from "enzyme-adapter-react-16";
-import { shallow, mount } from "enzyme";
+import { shallow } from "enzyme";
 import Editor from "../Editor/Editor";
 enzyme.configure({ adapter: new Adapter() });
 

@@ -16,7 +16,6 @@ const s3 = new aws.S3({ apiVersion: "2006-03-01" });
 const sqs = new aws.SQS({ apiVersion: "2012-11-05" });
 
 let config;
-let configV2;
 let ax;
 let host;
 
