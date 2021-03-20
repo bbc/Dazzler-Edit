@@ -33,7 +33,6 @@ ax = axios.create({
 });
 
 function availableQuery(mid, after, before, search) {
-  console.log("mid!", mid);
   let filter;
   if (search !== "") {
     filter = {
@@ -168,7 +167,6 @@ function unavailableQuery(mid, after, before, search) {
  to ISO8601
 */
 const episode = async (req, res) => {
-  console.log("detect - in episode");
   const params = {
     headers: { "Content-Type": "application/json" },
   };
@@ -182,30 +180,21 @@ const episode = async (req, res) => {
   ];
   const sid = req.query.sid || config.default_sid;
   const mid = config[sid].mid;
-  console.log("detect - config", config);
-  console.log("detect - mid is", mid);
-  console.log("detect - MID IS ", mid);
   const size = req.query.page_size || 20;
   let from = 0;
   if (req.query.page) {
     from = size * req.query.page;
-    console.log("from is episode ", from);
   }
   const after = req.query.from || "1970-01-01T00:00:00Z";
   const before = req.query.to || moment.utc().add(1, "y");
   const a = req.query.availability || "available";
   const search = req.query.search;
-  console.log("from", after, "to", before);
   const data = { _source, from, size };
-  console.log("detect - fetching available or unavailable query");
   if (a === "available") {
     data.query = availableQuery(mid, after, before, search);
-    console.log("query is ", JSON.stringify(data.query));
   } else {
     data.query = unavailableQuery(mid, after, before, search);
   }
-  console.log("detect - fetched");
-  console.log("EPISODE!!!!", JSON.stringify(data, 2));
   if (req.query.sort) {
     let sortDirection = "desc";
     if (req.query.sort_direction === "ascending") {
@@ -220,15 +209,12 @@ const episode = async (req, res) => {
     data.sort = [sort];
   }
 
-  console.log("episode!!!!", data);
   try {
-    console.log("detect - making the episode call");
     const answer = await ax.post(
       `https://${host}/episode/_search`,
       data,
       params
     );
-    console.log("detect - received episode data");
     const result = answer.data;
 
     const items = [];
@@ -242,7 +228,6 @@ const episode = async (req, res) => {
       const version = versions[0].version; // TODO pick a version
 
       const duration = moment.duration(version.duration.$);
-      console.log("duration is ", version.duration.$);
 
       const availability = {
         planned_start: se.availabilities
@@ -284,7 +269,6 @@ const episode = async (req, res) => {
       }
       items.push(item);
     });
-    console.log("item is ", items);
     res.json({
       page_size: req.query.page_size,
       page: req.query.page,
@@ -292,30 +276,22 @@ const episode = async (req, res) => {
       items,
     });
   } catch (e) {
-    console.log(e);
-    console.log("detect axios episode error");
     res.status(404).send("error");
   }
 };
 
 const clip = async (req, res) => {
   try {
-    console.log("detect - in clip");
-    console.log("in clip");
     const params = {
       headers: { "Content-Type": "application/json" },
     };
     const _source = ["pips"];
     const sid = req.query.sid || config.default_sid;
-    console.log("sid is clip", sid);
-    console.log("config here ", config);
-    console.log(config[sid].language);
 
     const size = req.query.page_size || 20;
     let from = 0;
     if (req.query.page) {
       from = size * req.query.page;
-      console.log("from is episode ", from);
     }
     let filter;
     if (req.query.search !== "") {
@@ -363,7 +339,6 @@ const clip = async (req, res) => {
     const sort = {};
     sort[sortMap[req.query.sort]] = sortDirection;
     data.sort = [sort];
-    console.log(data);
 
     try {
       const answer = await ax.post(
@@ -391,7 +366,6 @@ const clip = async (req, res) => {
 
 const saveEmergencyPlayList = async function (req, res) {
   try {
-    console.log("detect in emergency playlist");
     const user = auth.isAuthorised(req, config);
     if (user) {
       const sid = req.query.sid;
@@ -446,39 +420,32 @@ const queryepisode = async function (req, res) {
   try {
     let episodes = JSON.parse(req.body);
     let sid = req.query.sid;
-    console.log("detect - query episode called");
-    console.log("called");
 
     var s3params = {
       Bucket: config[sid].schedule_bucket,
     };
     episodes.forEach((item, index) => {
-      console.log("CALLED", index);
       s3params.Key = `${item.asset.vpid}.mp4`;
       s3.headObject(s3params, function (err, data) {
         if (err) {
           if (err.message === null) {
-            console.log(`Episode ${item.asset.vpid} doesn't exist`);
             sendSQSMessage(item);
           } else {
             console.error(err);
           }
         } else {
           //success
-          console.log("Episode exists", index);
-          console.log(data);
+          console.log('queryepisode', data);
         }
       });
     });
   } catch (error) {
-    console.log("detect - query episode error");
     console.error(error);
   }
 };
 
 const sendSQSMessage = async function (item) {
   try {
-    console.log("detect - in send sqs message");
     const sqsparams = {
       QueueUrl: process.env.ASSET_PUBLISH_QUEUE,
     };
@@ -549,8 +516,6 @@ const getEpisodeUri = async function (item) {
 };
 
 const s3Save = async (req, res) => {
-  console.log("detect in get s3 save");
-  console.log("received", req.body);
   const user = auth.isAuthorised(req, config);
   if (user) {
     const sid = req.query.sid;
@@ -580,7 +545,6 @@ const schedulev2 = async (req, res) => {
   try {
     const sid = req.query.sid || config.default_sid;
     const date = req.query.date;
-    console.log("key is", `${sid}/schedule/${date}-schedule.json`);
 
     var params = {
       Bucket: config[sid].schedule_bucket,
@@ -589,7 +553,6 @@ const schedulev2 = async (req, res) => {
     const s = await s3.getObject(params).promise();
     const data = JSON.parse(s.Body.toString("utf8"));
 
-    console.log("data is ", data.items);
     console.log("detect - waiting");
     await res.json({
       total: data.items.length,
@@ -643,11 +606,7 @@ const schedulev2 = async (req, res) => {
 */
 
 const getScheduleFromS3 = async (sid, date) => {
-  console.log("sid is ", sid);
   const key = `${sid}/schedule/${date}-schedule.json`;
-  console.log("key is", key);
-  console.log("bucket is ", config[sid].schedule_bucket);
-
   try {
     const s = await s3
       .getObject({
@@ -794,14 +753,13 @@ const getScheduleFromSPW = async (sid, date) => {
       end: items[items.length - 1].end,
       items,
     };
-    console.log(r);
     return r;
   } catch (e) {
-    r = {
+    console.log(e);
+    return {
       total: 0,
       items: [],
     };
-    return r;
   }
 };
 
@@ -854,7 +812,6 @@ const saveScheduleAsTVA = async (data) => {
 
 const getSchedule = async (req, res) => {
   const sid = req.query.sid || config.default_sid;
-  console.log("SID is ", sid);
   const date = req.query.date;
   const source = process.env.SCHEDULE_SOURCE || "s3";
   let r;
@@ -863,7 +820,6 @@ const getSchedule = async (req, res) => {
   } else {
     r = await getScheduleFromS3(sid, date);
   }
-  console.log("getSchedule", JSON.stringify(r));
   res.json(r);
 };
 
@@ -890,10 +846,26 @@ const saveSchedule = async (req, res) => {
   }
 };
 
+const user = async (req, res) => {
+  if (req.header("bbc-pp-oidc-id-token-email")) {
+    const email = req.header("bbc-pp-oidc-id-token-email");
+    res.json({
+      name: auth.getName(email),
+      auth: auth.isAuthorised(req, config) === email,
+      email: email,
+    });
+  } else {
+    res.json({
+      name: "Anonymous",
+      auth: true,
+    });
+  }
+};
+
 module.exports = {
   init(app, configObject) {
     config = configObject;
-    app.get("/api/v2/user", auth.user);
+    app.get("/api/v2/user", user);
     app.get("/api/v2/languageservices", languageServices);
     app.get("/api/v2/clip", clip);
     app.get("/api/v2/episode", episode);

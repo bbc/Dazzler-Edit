@@ -5,8 +5,12 @@ function isAuthorised(req, config) {
   }
   let groups = [];
   if (req.header("bbc-pp-user-groups")) {
-    groups = JSON.parse(req.header("bbc-pp-oidc-id-token-email")).map((group) => group.id);
-    const sid = req.query.sid;
+    const ppg = req.header("bbc-pp-user-groups");
+    console.log(ppg);
+    groups = JSON.parse(ppg).map((group) => group.id);
+    const sid = req.query.sid || config.default_sid;
+    console.log(sid, email, groups);
+    console.log(config[sid].edit_group);
     if (groups.includes(config[sid].edit_group)) {
       return email;
     }
@@ -48,23 +52,7 @@ function getName(email) {
   }
 }
 
-const user = function (req, res) {
-  if (req.header("bbc-pp-oidc-id-token-email")) {
-    let email = req.header("bbc-pp-oidc-id-token-email");
-    res.json({
-      name: getName(email),
-      auth: isAuthorised(email),
-      email: email,
-    });
-  } else {
-    res.json({
-      name: "Anonymous",
-      auth: true,
-    });
-  }
-};
-
 module.exports = {
   isAuthorised,
-  user,
+  getName,
 };
