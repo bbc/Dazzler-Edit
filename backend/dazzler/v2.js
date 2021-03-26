@@ -299,13 +299,10 @@ const clip = async (req, res) => {
     }
 
     const must = [
-        {
-          exists: {
-            field:
-              "pips.programme_availability.available_versions.available_version",
-          },
-        },
-        { match: { "pips.clip.media_type.value": "audio_video" } },
+      {
+        simple_query_string: { query: "video_streaming_noprot_1732" }
+      },
+      { match: { "pips.clip.media_type.value": "audio_video" } },
     ];
 
     if (req.query.search !== "") {
