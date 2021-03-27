@@ -299,11 +299,14 @@ const clip = async (req, res) => {
     }
 
     const must = [
-      {
-        simple_query_string: { query: "video_streaming_noprot_1732" }
-      },
-      { match: { "pips.clip.media_type.value": "audio_video" } },
+      { "match": { "download.broadcaster.link.sid": "video_streaming_noprot_1732" }},
     ];
+
+    if (req.query.duration !== "") {
+      must.push({
+        regexp: { "download.time.duration.keyword": req.query.duration },
+      });
+    }
 
     if (req.query.search !== "") {
       must.push({
