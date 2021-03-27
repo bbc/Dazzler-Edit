@@ -51,17 +51,13 @@ const ScheduleItem = ({row, index, data, selectedIndex, onDelete, onOccurenceDel
             case 'title':
             default:
                 if (row.insertionType === "overlap") {
-                    const overlap = moment
-                    .duration(row.asset_duration)
-                    .subtract(moment.duration(row.duration));
+                    console.log('overlap', row);
+                    const asset_duration = moment.duration(row.asset.duration);
+                    const overlap = moment.duration(asset_duration).subtract(moment.duration(row.duration));
                     return (<>{value}
                     <Typography fontStyle="italic">
-                      (asset duration is &nbsp;
-                      {moment
-                        .duration(this.props.asset_duration)
-                        .format("HH:mm:ss", { trim: false })}
-                      ,{moment.duration(overlap).format("HH:mm:ss", { trim: false })}{" "}
-                      will be lost )
+                      (clip is{" "}{asset_duration.humanize()},{" "}
+                      {overlap.humanize()}{" "}will be lost)
                     </Typography>
                     </>);
                 } else {
@@ -83,7 +79,7 @@ const ScheduleItem = ({row, index, data, selectedIndex, onDelete, onOccurenceDel
                         event.preventDefault();
                         setOpen(true);
                     }}        
-                    ><DeleteIcon/>
+                    ><DeleteIcon colour="primary"/>
                     </IconButton>
                 );
             } 
@@ -149,12 +145,10 @@ export default function ScheduleView({row, data, from, to, onDelete, onOccurence
 
     const rows = data.map((row) => {
         return {
-        utc: row.startTime.toISOString(),
-        local: row.startTime.toISOString(),
-        duration: row.duration,
-        title: row.title,
-        insertionType: row.insertionType,
-        hidden: !wanted(row, from, to),
+            ...row,
+            utc: row.startTime.toISOString(),
+            local: row.startTime.toISOString(),
+            hidden: !wanted(row, from, to),
         };
     });
     return (
