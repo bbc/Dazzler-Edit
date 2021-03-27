@@ -481,29 +481,24 @@ class Editor extends React.Component {
 
   handleFrom = (direction) => {
     let { from, to } = this.state;
-
     try {
-      switch (direction) {
-        case "back":
-          if (moment(to).diff(moment(from), "hours") < 24) {
-            this.setState({ from: moment(from).subtract(6, "hours") });
-
-            if (
-              moment(from).isAfter(moment(from).subtract(6, "hours"), "day")
-            ) {
-              this.handleDateChange(moment(from).subtract(6, "hours"));
-            }
+      if (direction === 'back') {
+        if (moment(to).diff(moment(from), "hours") < 24) {
+          this.setState({ from: moment(from).subtract(6, "hours") });
+          if (
+            moment(from).isAfter(moment(from).subtract(6, "hours"), "day")
+          ) {
+            this.handleDateChange(moment(from).subtract(6, "hours"));
           }
-          break;
-
-        case "forward":
-          if (!moment(from).isSameOrAfter(moment(to))) {
-            this.setState({ from: moment(from).add(6, "hours") });
-            if (moment(from).add(6, "hours").hour() === 0) {
-              this.handleDateChange(moment(from).add(6, "hours"));
-            }
+        }
+      }
+      if (direction === 'forward') {
+        if (!moment(from).isSameOrAfter(moment(to))) {
+          this.setState({ from: moment(from).add(6, "hours") });
+          if (moment(from).add(6, "hours").hour() === 0) {
+            this.handleDateChange(moment(from).add(6, "hours"));
           }
-          break;
+        }
       }
     } catch (error) {
       console.log(error);
@@ -513,18 +508,15 @@ class Editor extends React.Component {
   handleTo = (direction) => {
     let { to, from } = this.state;
     try {
-      switch (direction) {
-        case "back":
-          if (!moment(to).isSameOrBefore(moment(from))) {
-            this.setState({ to: moment(to).subtract(6, "hours") });
-          }
-          break;
-
-        case "forward":
-          if (moment(to).isBefore(moment(from).add(24, "hour"), "hour")) {
-            this.setState({ to: moment(to).add(6, "hours") });
-          }
-          break;
+      if (direction === 'back') {
+        if (!moment(to).isSameOrBefore(moment(from))) {
+          this.setState({ to: moment(to).subtract(6, "hours") });
+        }
+      }
+      if (direction === 'forward') {
+        if (moment(to).isBefore(moment(from).add(24, "hour"), "hour")) {
+          this.setState({ to: moment(to).add(6, "hours") });
+        }
       }
     } catch (error) {
       console.log(error);
@@ -533,19 +525,16 @@ class Editor extends React.Component {
 
   handleDayTo = (direction) => {
     let { to, from } = this.state;
-
     try {
-      switch (direction) {
-        case "back":
-          if (moment(to).isAfter(moment(from), "day")) {
-            this.setState({ to: moment(to).subtract(1, "day") });
-          }
-          break;
-        case "forward":
-          if (moment(to).isBefore(moment(from).add(24, "hour"), "hour")) {
-            this.setState({ to: moment(to).add(1, "day") });
-          }
-          break;
+      if (direction === 'back') {
+        if (moment(to).isAfter(moment(from), "day")) {
+          this.setState({ to: moment(to).subtract(1, "day") });
+        }
+      }
+      if (direction === 'forward') {
+        if (moment(to).isBefore(moment(from).add(24, "hour"), "hour")) {
+          this.setState({ to: moment(to).add(1, "day") });
+        }
       }
     } catch (error) {
       console.log(error);
@@ -554,27 +543,20 @@ class Editor extends React.Component {
 
   handleDayFrom = (direction) => {
     let { to, from } = this.state;
-
     try {
-      switch (direction) {
-        case "back":
-          console.log(
-            moment(from).subtract(24, "hour").diff(moment(to), "hours")
-          );
-          // if (moment(to).diff(moment(from), "hours") < 24) {
-          if (
-            moment(to).diff(moment(from).subtract(24, "hour"), "hours") <= 24
-          ) {
-            this.setState({ from: moment(from).subtract(1, "day") });
-            this.handleDateChange(moment(from).subtract(1, "day"));
-          }
-          break;
-        case "forward":
-          if (moment(from).isBefore(moment(to), "day")) {
-            this.setState({ from: moment(from).add(1, "day") });
-            this.handleDateChange(moment(from).add(1, "day"));
-          }
-          break;
+      if (direction === 'back') {
+        if (
+          moment(to).diff(moment(from).subtract(24, "hour"), "hours") <= 24
+        ) {
+          this.setState({ from: moment(from).subtract(1, "day") });
+          this.handleDateChange(moment(from).subtract(1, "day"));
+        }
+      }
+      if (direction === 'forward') {
+        if (moment(from).isBefore(moment(to), "day")) {
+          this.setState({ from: moment(from).add(1, "day") });
+          this.handleDateChange(moment(from).add(1, "day"));
+        }
       }
     } catch (error) {
       console.log(error);

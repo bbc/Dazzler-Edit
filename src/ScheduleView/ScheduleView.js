@@ -65,7 +65,7 @@ class ScheduleView extends React.Component {
   /* If schedule is not available and there is 30 mins left until schedule time,
   item becomes red*/
   checkStatus = (item) => {
-    if (item.asset && item.asset.status == "unavailable") {
+    if (item.asset && item.asset.status === "unavailable") {
       if (
         moment(item.startTime).isBetween(moment(), moment().add(30, "minutes"))
       ) {
@@ -149,6 +149,8 @@ class ScheduleView extends React.Component {
                   data={this.props.data}
                 />
               );
+            } else {
+              return '';
             }
           })}
         </tbody>

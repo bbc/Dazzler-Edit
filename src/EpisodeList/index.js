@@ -50,7 +50,7 @@ export default function EpisodeList({
     page === currentPage &&
     rowsPerPage === currentRowsPerPage &&
     sortDirection === currentSortDirection &&
-    search == currentSearch
+    search === currentSearch
   ) {
     console.log("episodelist no change", page, rowsPerPage);
   } else {

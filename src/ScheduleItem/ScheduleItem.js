@@ -55,7 +55,7 @@ class ScheduleItem extends React.Component {
   render() {
     let { open } = this.state;
     let rowStyle = this.props.insertionType;
-    var elementStyle = "";
+    let elementStyle = "";
 
     if (
       moment().isSameOrAfter(moment(this.props.startTime)) &&
@@ -63,7 +63,7 @@ class ScheduleItem extends React.Component {
         moment(this.props.startTime).add(moment.duration(this.props.duration))
       )
     ) {
-      var elementStyle = "current";
+      elementStyle = "current";
     }
     if (this.props.live === "true") rowStyle = "live";
     let arrowStyle = "bottomarrow";

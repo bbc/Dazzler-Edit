@@ -2,13 +2,8 @@ import React from "react";
 import Button from "@material-ui/core/Button";
 import { withStyles } from "@material-ui/core/styles";
 import moment from "moment";
-import AddIcon from "@material-ui/icons/Add";
 import ButtonGroup from "@material-ui/core/ButtonGroup";
-import RemoveIcon from "@material-ui/icons/Remove";
-import { Typography } from "@material-ui/core";
 import {
-  FaArrowLeft,
-  FaArrowRight,
   FaAngleDoubleRight,
   FaAngleDoubleLeft,
   FaMinus,
@@ -79,7 +74,7 @@ class Date extends React.Component {
   render() {
     console.log("time", moment.utc("00:00"));
     const { classes } = this.props;
-    const { hour } = this.state;
+    // const { hour } = this.state;
     let { from, to } = this.props;
     return (
       <div className={classes.root}>
