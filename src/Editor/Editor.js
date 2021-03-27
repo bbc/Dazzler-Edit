@@ -3,9 +3,7 @@ import PropTypes from "prop-types";
 import classNames from "classnames";
 import { Box } from "@material-ui/core";
 import ExpansionPanel from "@material-ui/core/ExpansionPanel";
-import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
-import FormHelperText from "@material-ui/core/FormHelperText";
 import Select from "@material-ui/core/Select";
 import FormControl from "@material-ui/core/FormControl";
 import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
@@ -19,8 +17,6 @@ import { withStyles } from "@material-ui/core/styles";
 import Drawer from "@material-ui/core/Drawer";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
-import IconButton from "@material-ui/core/IconButton";
-import MenuIcon from "@material-ui/icons/Menu";
 import moment from "moment";
 import "moment-duration-format";
 import Episode from "../Episode/Episode";
@@ -41,6 +37,7 @@ import {
 import TimeDisplay from "../TimeDisplay";
 import Refresh from "../Refresh";
 import PushControl from "../PushControl";
+import HamburgerMenu from "../HamburgerMenu";
 
 const drawerWidth = 240;
 
@@ -610,6 +607,13 @@ class Editor extends React.Component {
 
     const { classes } = this.props;
     const { open, languageList, language } = this.state;
+
+    let welcome = 'This is Dazzler!';
+
+    if (window.location.hostname.includes('test')) {
+      welcome = 'This is Dazzler Test!';
+    }
+
     //console.log('Editor.render');
     return (
       <div className={classes.root}>
@@ -620,15 +624,7 @@ class Editor extends React.Component {
           })}
         >
           <Toolbar disableGutters={!open}>
-            <IconButton
-              color="inherit"
-              aria-label="Open drawer"
-              onClick={this.handleDrawerOpen}
-              className={classNames(classes.menuButton, open && classes.hide)}
-            >
-              <MenuIcon />
-            </IconButton>
-
+            <HamburgerMenu classes={classes} open={open} />
             <Select
               id="demo-simple-select-outlined"
               labelId="demo-simple-select-outlined-label"
@@ -655,7 +651,7 @@ class Editor extends React.Component {
               color="inherit"
               noWrap
             >
-              This is Dazzler!
+              {welcome}
             </Typography>
             <Typography
               className={classes.appBarName}
