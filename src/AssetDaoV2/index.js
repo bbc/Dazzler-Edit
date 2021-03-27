@@ -5,7 +5,7 @@ const URLPrefix =
   process.env.NODE_ENV === "development" ? "http://localhost:8080" : "";
 
 class AssetDao {
-  static getClips(sid, type, page, rowsPerPage, sort, direction, cb, search) {
+  static getClips(sid, type, page, rowsPerPage, sort, direction, cb, search, searchField) {
     var sort_direction = direction === "desc" ? "descending" : "ascending";
     const url = `${URLPrefix}/api/v2/clip`;
     const params = {
@@ -15,7 +15,8 @@ class AssetDao {
       page_size: rowsPerPage,
       sort,
       sort_direction,
-      search: search,
+      search,
+      searchField,
     };
 
     axios
@@ -73,8 +74,8 @@ class AssetDao {
       page_size: rowsPerPage,
       from: mustBeAvailableBy,
       to: mustBeAvailableUntil,
-      availability: availability,
-      search: search,
+      availability,
+      search,
     };
     console.log("episode", params);
     axios

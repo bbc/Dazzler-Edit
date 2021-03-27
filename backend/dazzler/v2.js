@@ -302,24 +302,27 @@ const clip = async (req, res) => {
       { "match": { "download.broadcaster.link.sid": "video_streaming_noprot_1732" }},
     ];
 
-    if (req.query.duration) {
-      must.push({
-        regexp: { "download.time.duration.keyword": req.query.duration },
-      });
-    }
-
     if (req.query.search !== "") {
-      must.push({
-        match: {
-          "pips.clip.title.$": {
-            query: req.query.search,
-            operator: "and",
-            analyzer: "search",
-            fuzziness: "2",
-            max_expansions: "1",
-          },
-        },
-      });
+      switch (req.query.searchField) {
+        case 'duration':
+          must.push({
+            regexp: { "download.time.duration.keyword": req.query.search },
+          });
+          break;
+        case 'title':
+        default:
+          must.push({
+            match: {
+              "pips.clip.title.$": {
+                query: req.query.search,
+                operator: "and",
+                analyzer: "search",
+                fuzziness: "2",
+                max_expansions: "1",
+              },
+            },
+          });
+      }
     }
 
     if (cfg.clip_brand) {

@@ -1,6 +1,10 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
+import FormControl from "@material-ui/core/FormControl";
+import Radio from "@material-ui/core/Radio";
+import RadioGroup from "@material-ui/core/RadioGroup";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Table from "@material-ui/core/Table";
 import TableHead from "@material-ui/core/TableHead";
 import TableSortLabel from "@material-ui/core/TableSortLabel";
@@ -40,7 +44,7 @@ const headCells = [
 
 /*
  * Note: material-ui TablePagination is zero based.
- * Nitro and therefore our current API is one based.
+ * Nitro and therefore our old API is one based.
  */
 
 export class Clips extends React.Component {
@@ -56,6 +60,7 @@ export class Clips extends React.Component {
       sid: "",
       type: "web",
       search: "",
+      searchField: "title",
       orderBy: "title",
       order: "asc",
     };
@@ -104,6 +109,10 @@ export class Clips extends React.Component {
     this.setState({ page: 0, rowsPerPage: parseInt(event.target.value) });
   };
 
+  handleChangeSearchField = (event) => {
+    this.setState({ searchField: event.target.value });
+  }
+
   onPageLoaded = (_page, _rowsPerPage, totalRows) => {
     this.setState({ totalRows });
   };
@@ -122,6 +131,26 @@ export class Clips extends React.Component {
           onChange={this.handleChange}
           style={{ marginLeft: "5%" }}
         />
+        <FormControl component="fieldset" className={classes.formControl}>
+          <RadioGroup
+            aria-label="mode"
+            name="mode"
+            value={this.state.searchField}
+            onChange={this.handleChangeSearchField}
+            row
+          >
+            <FormControlLabel
+              value="title"
+              control={<Radio color="primary" />}
+              label="Title"
+            />
+            <FormControlLabel
+              value="duration"
+              control={<Radio color="primary" />}
+              label="Duration"
+            />
+          </RadioGroup>
+        </FormControl>
         <Paper className={classes.root}>
           <div className={classes.tableWrapper}>
             <Table className={classes.table} style={{ marginLeft: "2%" }}>
@@ -160,6 +189,7 @@ export class Clips extends React.Component {
                 sort={orderBy}
                 sort_direction={order}
                 search={this.state.search}
+                searchField={this.state.searchField}
                 flip={this.props.flip}
               />
               <TableFooter>

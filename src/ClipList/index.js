@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 import moment from "moment";
 import "moment-duration-format";
@@ -22,16 +22,16 @@ export default function ClipList({
   sort_direction = "desc",
   flip = false,
   search,
+  searchField = 'title',
 }) {
-  const [currentPage, setCurrentPage] = React.useState(-1);
-  const [currentRowsPerPage, setCurrentRowsPerPage] = React.useState(5);
-  const [currentType, setcurrentType] = React.useState("web");
-  const [currentSearch, setCurrentSearch] = React.useState("");
-  const [currentSortDirection, setcurrentSortDirection] = React.useState(
-    "desc"
-  );
-  const [rows, setRows] = React.useState([]);
-  const [side, setSide] = React.useState(true);
+  const [currentPage, setCurrentPage] = useState(-1);
+  const [currentRowsPerPage, setCurrentRowsPerPage] = useState(5);
+  const [currentType, setcurrentType] = useState("web");
+  const [currentSearch, setCurrentSearch] = useState("");
+  const [currentSearchField, setCurrentSearchField] = useState("title");
+  const [currentSortDirection, setcurrentSortDirection] = useState("desc");
+  const [rows, setRows] = useState([]);
+  const [side, setSide] = useState(true);
 
   // statements in the body of the function are called on rendering!!!
 
@@ -41,7 +41,8 @@ export default function ClipList({
     rowsPerPage === currentRowsPerPage &&
     sort_direction === currentSortDirection &&
     type === currentType &&
-    search === currentSearch
+    search === currentSearch &&
+    searchField === currentSearchField
   ) {
     console.log("cliplist no change", page, rowsPerPage);
   } else {
@@ -58,12 +59,14 @@ export default function ClipList({
         setRows(items);
         onPageLoaded(currentPage, currentRowsPerPage, total);
       },
-      search
+      search,
+      searchField
     );
     setCurrentPage(page);
     setCurrentRowsPerPage(rowsPerPage);
     setcurrentSortDirection(sort_direction);
     setCurrentSearch(search);
+    setCurrentSearchField(searchField);
     setSide(flip);
     setcurrentType(type);
   }
