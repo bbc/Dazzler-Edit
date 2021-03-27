@@ -302,7 +302,7 @@ const clip = async (req, res) => {
       { "match": { "download.broadcaster.link.sid": "video_streaming_noprot_1732" }},
     ];
 
-    if (req.query.duration !== "") {
+    if (req.query.duration) {
       must.push({
         regexp: { "download.time.duration.keyword": req.query.duration },
       });
