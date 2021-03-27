@@ -10,7 +10,8 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 
 export default function ScheduleDialog({open, row, data, index, onOccurenceDelete, onClose}) {
     const [value, setValue] = useState("deleteAll");
-    const count = data.reduce((acc, item) => (item.title === row.title)?0:1+acc, 0);
+    console.log('ScheduleDialog', row, data);
+    const count = data.reduce((a, item) => (item.title === row.title)?a+1:a, 0);
     return (
     <Dialog
     open={open}
@@ -28,7 +29,7 @@ export default function ScheduleDialog({open, row, data, index, onOccurenceDelet
         <FormControlLabel
           value="deleteAll"
           control={<Radio />}
-          label={`Delete all ${count} occurences`}
+          label={(count===1)?'Delete':`Delete all ${count} occurences`}
         />
         <FormControlLabel
           value="deleteAllPrev"
