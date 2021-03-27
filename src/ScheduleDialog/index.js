@@ -8,15 +8,16 @@ import Radio from "@material-ui/core/Radio";
 import RadioGroup from "@material-ui/core/RadioGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 
-export default function ScheduleDialog({open, title, count, index, onOccurenceDelete, onClose}) {
+export default function ScheduleDialog({open, row, data, index, onOccurenceDelete, onClose}) {
     const [value, setValue] = useState("deleteAll");
+    const count = data.reduce((acc, item) => (item.title === row.title)?0:1+acc, 0);
     return (
     <Dialog
     open={open}
     aria-labelledby="alert-dialog-title"
     aria-describedby="alert-dialog-description"
   >
-    <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
+    <DialogTitle id="alert-dialog-title">{row.title}</DialogTitle>
     <DialogContent>
       <RadioGroup
         aria-label="items"

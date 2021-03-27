@@ -15,29 +15,6 @@ import moment from "moment";
 import "moment-duration-format";
 import ScheduleDialog from '../ScheduleDialog';
 
-const Action = ({index, data, onDelete, onContextMenu}) => {
-    const insertionType = data[index].insertionType;
-    if(insertionType === '') return '';
-    if(insertionType === 'gap') return '';
-    if(insertionType === 'sentinel') return '';
-    return (
-        <IconButton
-        onClick={() => {
-            onDelete(data, index);
-          }}
-          onContextMenu={(event) => {
-            event.preventDefault();
-            let tally = 1;
-            if (insertionType !== "live") {
-              tally = data.reduce((acc, item) => (item.title === this.props.title)?0:1+acc, 0);
-            }
-            onContextMenu(data, tally);
-          }}        
-        ><DeleteIcon/>
-        </IconButton>
-    );
-}
-
 const useStyles = makeStyles({
   root: {
     width: '100%',
@@ -62,6 +39,8 @@ const ScheduleItem = ({row, index, data, selectedIndex, onDelete, onOccurenceDel
     const [open, setOpen] = useState(false);
     
     if(row.hidden) return '';
+
+    console.log('ScheduleItem', row);
 
     const contents = (column, value) => {
         switch(column.id) {
@@ -95,7 +74,18 @@ const ScheduleItem = ({row, index, data, selectedIndex, onDelete, onOccurenceDel
             case 'duration':
                 return moment.duration(value).format("HH:mm:ss", { trim: false });
             case 'action':
-                return (<Action index={index} data={data} onDelete={onDelete} onContextMenu={() => setOpen(true)}/>);
+                if(row.insertionType === 'gap') return '';
+                if(row.insertionType === 'sentinel') return '';
+                return (
+                    <IconButton
+                    onClick={() => onDelete(index)}
+                    onContextMenu={(event) => {
+                        event.preventDefault();
+                        setOpen(true);
+                    }}        
+                    ><DeleteIcon/>
+                    </IconButton>
+                );
             } 
     };
 
@@ -132,10 +122,8 @@ const ScheduleItem = ({row, index, data, selectedIndex, onDelete, onOccurenceDel
             row={row}
             data={data}
             index={index}
-            selectedIndex={selectedIndex}
-            onDelete={onDelete}
             onOccurenceDelete={onOccurenceDelete}
-            onRowSelected={onRowSelected}
+            onClose={() => setOpen(false)}
             />
     </>
     );
