@@ -178,7 +178,8 @@ class Editor extends React.Component {
 
   componentDidMount() {
     try {
-      PlatformDao.getUser((user) => {
+      
+      PlatformDao.getUser(this.state.language, (user) => {
         this.setState({ user: user });
       });
 
@@ -471,10 +472,12 @@ class Editor extends React.Component {
   };
 
   handleChangeLanguage = (event) => {
-    this.setState({ language: event.target.value }, () => {
-      PlatformDao.getUser((user) => {
+    const language = event.target.value;
+    const sid = this.state.configObj[language].sid;
+    this.setState({ language }, () => {
+      PlatformDao.getUser(sid, (user) => {
         this.setState({ user: user });
-        localStorage.setItem("language", event.target.value);
+        localStorage.setItem("language", language);
 
         // const sid = this.state.configObj[this.state.language].sid;
         this.reloadSchedule();
