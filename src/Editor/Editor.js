@@ -472,11 +472,14 @@ class Editor extends React.Component {
 
   handleChangeLanguage = (event) => {
     this.setState({ language: event.target.value }, () => {
-      localStorage.setItem("language", event.target.value);
+      PlatformDao.getUser((user) => {
+        this.setState({ user: user });
+        localStorage.setItem("language", event.target.value);
 
-      // const sid = this.state.configObj[this.state.language].sid;
-      this.reloadSchedule();
-      this.handleRefresh();
+        // const sid = this.state.configObj[this.state.language].sid;
+        this.reloadSchedule();
+        this.handleRefresh();
+      });
     });
   };
 
