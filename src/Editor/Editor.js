@@ -2,27 +2,15 @@ import React from "react";
 import PropTypes from "prop-types";
 import classNames from "classnames";
 import { Box } from "@material-ui/core";
-import ExpansionPanel from "@material-ui/core/ExpansionPanel";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
-import FormControl from "@material-ui/core/FormControl";
-import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
-import Radio from "@material-ui/core/Radio";
-import RadioGroup from "@material-ui/core/RadioGroup";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import FormLabel from "@material-ui/core/FormLabel";
 import Typography from "@material-ui/core/Typography";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { withStyles } from "@material-ui/core/styles";
 import Drawer from "@material-ui/core/Drawer";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import moment from "moment";
 import "moment-duration-format";
-import Episode from "../Episode/Episode";
-import Live from "../Live/Live";
-import Clips from "../Clips/Clips";
-import Specials from "../Specials/Specials";
 import SchedulePicker from "../SchedulePicker/SchedulePicker";
 import ScheduleToolbar from "../ScheduleToolbar/ScheduleToolbar";
 //import ScheduleView from "../ScheduleView/ScheduleView";
@@ -36,10 +24,9 @@ import {
   getLanguages,
 } from "../ScheduleDao/ScheduleDao";
 import TimeDisplay from "../TimeDisplay";
-import Refresh from "../Refresh";
 import PushControl from "../PushControl";
 import HamburgerMenu from "../HamburgerMenu";
-import { FaCreativeCommonsNcJp } from "react-icons/fa";
+import PickLists from "../PickLists";
 
 const drawerWidth = 240;
 
@@ -473,10 +460,13 @@ class Editor extends React.Component {
   };
 
   handleChangeLanguage = (event) => {
-    let language = 'Hindi';// event.target.dataset.value;
+    let language = 'Hindi';
     try{
-      console.log(JSON.stringify(event.target));
-      language = event.target.value;
+      const s = JSON.stringify(event.target);
+      console.log(s);
+      const v = JSON.parse(s);
+      console.log(v);
+      language = v.value;
     } catch (e) {
       console.log(e);
     }
@@ -591,20 +581,9 @@ class Editor extends React.Component {
   // upcoming episodes need to be still available to the end of the day being scheduled
 
   render() {
-    let { from, to } = this.state;
-    const mustBeAvailableBy = moment.utc().format();
-    const mustBeAvailableUntil = moment
-      .utc(this.state.schedule.date)
-      .add(1, "d")
-      .format();
-    const upcomingMustBeAvailableBy = mustBeAvailableUntil;
-    const upcomingMustBeAvailableUntil = moment
-      .utc(upcomingMustBeAvailableBy)
-      .add(1, "d")
-      .format();
 
     const { classes } = this.props;
-    const { open, languageList, language } = this.state;
+    const { from, to, open, languageList, language } = this.state;
 
     let welcome = 'This is Dazzler!';
 
@@ -689,120 +668,16 @@ class Editor extends React.Component {
               <Typography variant="h4" align="center">
                 Picklists
               </Typography>
-
-              <FormControl component="fieldset" className={classes.formControl}>
-                <FormLabel component="legend">Add non-live to</FormLabel>
-                <RadioGroup
-                  aria-label="mode"
-                  name="mode"
-                  value={this.state.mode}
-                  onChange={this.handleChangeMode}
-                  row
-                >
-                  <FormControlLabel
-                    value="loop"
-                    control={<Radio color="primary" />}
-                    label="Loop"
-                  />
-                  <FormControlLabel
-                    value="schedule"
-                    control={<Radio color="primary" />}
-                    label="Schedule"
-                  />
-                  <Refresh
-                    buttonClass={classes.button}
-                    onRefresh={this.handleRefresh}
-                  />
-                </RadioGroup>
-              </FormControl>
-
-              <ExpansionPanel>
-                <ExpansionPanelSummary
-                  expandIcon={<ExpandMoreIcon />}
-                  aria-controls="panel1bh-content"
-                  id="panel1bh-header"
-                >
-                  <Typography className={classes.heading}>Live</Typography>
-                </ExpansionPanelSummary>
-
-                <Live
-                  flip={this.state.side}
-                  date={this.state.schedule.date.utc().format("YYYY-MM-DD")}
-                  sid={this.state.configObj[language].sid}
-                  handleClick={this.handleAddLive}
-                />
-              </ExpansionPanel>
-              <ExpansionPanel>
-                <ExpansionPanelSummary
-                  expandIcon={<ExpandMoreIcon />}
-                  aria-controls="panel2bh-content"
-                  id="panel2bh-header"
-                >
-                  <Typography className={classes.heading}>
-                    Available Episodes
-                  </Typography>
-                </ExpansionPanelSummary>
-
-                <Episode
-                  flip={this.state.side}
-                  availability={"available"}
-                  mustBeAvailableBy={mustBeAvailableBy}
-                  mustBeAvailableUntil={mustBeAvailableUntil}
-                  sid={this.state.configObj[language].sid}
-                  handleClick={this.handleAddClipOrEpisode}
-                />
-              </ExpansionPanel>
-              <ExpansionPanel>
-                <ExpansionPanelSummary
-                  expandIcon={<ExpandMoreIcon />}
-                  aria-controls="panel2bh-content"
-                  id="panel2bh-header"
-                >
-                  <Typography className={classes.heading}>
-                    Upcoming Episodes
-                  </Typography>
-                </ExpansionPanelSummary>
-
-                <Episode
-                  flip={this.state.side}
-                  availability={"P1D"}
-                  mustBeAvailableBy={upcomingMustBeAvailableBy}
-                  mustBeAvailableUntil={upcomingMustBeAvailableUntil}
-                  sid={this.state.configObj[language].sid}
-                  handleClick={this.handleAddClipOrEpisode}
-                  // resultsFilter={this.filterUpcomingEpisodes}
-                />
-              </ExpansionPanel>
-              <ExpansionPanel>
-                <ExpansionPanelSummary
-                  expandIcon={<ExpandMoreIcon />}
-                  aria-controls="panel4bh-content"
-                  id="panel2bh-header"
-                >
-                  <Typography className={classes.heading}>Web Clips</Typography>
-                </ExpansionPanelSummary>
-
-                <Clips
-                  flip={this.state.side}
-                  type="web"
-                  sid={this.state.configObj[language].sid}
-                  handleClick={this.handleAddClipOrEpisode}
-                />
-              </ExpansionPanel>
-              <ExpansionPanel>
-                <ExpansionPanelSummary
-                  expandIcon={<ExpandMoreIcon />}
-                  aria-controls="panel5bh-content"
-                  id="panel2bh-header"
-                >
-                  <Typography className={classes.heading}>Specials</Typography>
-                </ExpansionPanelSummary>
-
-                <Specials
-                  sid={this.state.configObj[language].sid}
-                  handleClick={this.handleAddClipOrEpisode}
-                />
-              </ExpansionPanel>
+              <PickLists
+                classes={classes}
+                side={this.state.side}
+                sid={this.state.configObj[language].sid}
+                date={this.state.schedule.date}
+                pasteIntoSchedule={this.pasteIntoSchedule}
+                pasteIntoLoop={this.pasteIntoLoop}
+                handleAddLive={this.handleAddLive}
+                handleRefresh={this.handleRefresh}
+              />
             </Box>
             <Box mx="1rem" width="28%" flexGrow={1} flexDirection="column">
               <Typography variant="h4" align="center">

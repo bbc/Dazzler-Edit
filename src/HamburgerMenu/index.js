@@ -5,7 +5,7 @@ import Menu from '@material-ui/core/Menu';
 import MenuItem from "@material-ui/core/MenuItem";
 import classNames from "classnames";
 
-export default function HamburgerMenu({classes, open}) {
+export default function HamburgerMenu({classes}) {
     const [anchorEl, setAnchorEl] = React.useState(null);
   
     const handleClick = (event) => {
@@ -23,7 +23,7 @@ export default function HamburgerMenu({classes, open}) {
             aria-label="Open drawer"
             aria-controls="admin-menu" aria-haspopup="true"
             onClick={handleClick}
-            className={classNames(classes.menuButton, open && classes.hide)}
+            className={classNames(classes.menuButton)}
             >
             <MenuIcon />
         </IconButton>
