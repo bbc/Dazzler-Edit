@@ -189,7 +189,7 @@ class Editor extends React.Component {
             configObj: configObj,
             language: language,
             schedule: new ScheduleObject(
-              this.state.language,
+              this.state.configObj[language].sid,
               moment().utc().startOf("day")
             ),
           });
@@ -472,10 +472,7 @@ class Editor extends React.Component {
   };
 
   handleChangeLanguage = (event) => {
-    console.log(event);
-    console.log(event.target);
-    console.log(event.target.innerText);
-    const language = event.target.innerText;
+    const language = event.value;
     console.log(language);
     console.log(this.state.configObj);
     const sid = this.state.configObj[language].sid;
