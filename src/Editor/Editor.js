@@ -473,12 +473,13 @@ class Editor extends React.Component {
   };
 
   handleChangeLanguage = (event) => {
+    let language = 'Hindi';// event.target.dataset.value;
     try{
       console.log(JSON.stringify(event.target));
+      language = event.target.value;
     } catch (e) {
       console.log(e);
     }
-    const language = 'Hindi';// event.target.dataset.value;
     console.log(language);
     console.log(this.state.configObj);
     const sid = this.state.configObj[language].sid;
