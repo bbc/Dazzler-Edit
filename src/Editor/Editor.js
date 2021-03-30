@@ -178,8 +178,9 @@ class Editor extends React.Component {
 
   componentDidMount() {
     try {
-      
-      PlatformDao.getUser(this.state.language, (user) => {
+      const language = this.state.language;
+      const sid = this.state.configObj[language].sid;
+      PlatformDao.getUser(sid, (user) => {
         this.setState({ user: user });
       });
 
@@ -472,7 +473,7 @@ class Editor extends React.Component {
   };
 
   handleChangeLanguage = (event) => {
-    const language = event.target.value;
+    const language = event.target.innerText;
     const sid = this.state.configObj[language].sid;
     this.setState({ language }, () => {
       PlatformDao.getUser(sid, (user) => {
