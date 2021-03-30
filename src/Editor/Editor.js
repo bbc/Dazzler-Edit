@@ -39,6 +39,7 @@ import TimeDisplay from "../TimeDisplay";
 import Refresh from "../Refresh";
 import PushControl from "../PushControl";
 import HamburgerMenu from "../HamburgerMenu";
+import { FaCreativeCommonsNcJp } from "react-icons/fa";
 
 const drawerWidth = 240;
 
@@ -472,7 +473,11 @@ class Editor extends React.Component {
   };
 
   handleChangeLanguage = (event) => {
-    console.log(JSON.stringify(event));
+    try{
+      console.log(JSON.stringify(event.target));
+    } catch (e) {
+      console.log(e);
+    }
     const language = 'Hindi';// event.target.dataset.value;
     console.log(language);
     console.log(this.state.configObj);
