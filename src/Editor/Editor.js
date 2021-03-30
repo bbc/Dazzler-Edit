@@ -177,25 +177,24 @@ class Editor extends React.Component {
   }
 
   componentDidMount() {
+    const language = localStorage.getItem("language") || "Hindi";
     try {
-      const language = this.state.language;
-      const sid = this.state.configObj[language].sid;
-      PlatformDao.getUser(sid, (user) => {
-        this.setState({ user: user });
-      });
-
-      getLanguages((response) => {
-        this.setState({
-          languageList: Object.keys(response),
-          configObj: response,
-          language: localStorage.getItem("language") || "Hindi",
-          schedule: new ScheduleObject(
-            this.state.language,
-            moment().utc().startOf("day")
-          ),
-        });
-        this.reloadSchedule();
-        localStorage.setItem("configObj", JSON.stringify(response));
+      getLanguages((configObj) => {
+        localStorage.setItem("configObj", JSON.stringify(configObj));
+        const sid = configObj[language].sid;
+        PlatformDao.getUser(sid, (user) => {
+          this.setState({
+            user: user,
+            languageList: Object.keys(configObj),
+            configObj: configObj,
+            language: language,
+            schedule: new ScheduleObject(
+              this.state.language,
+              moment().utc().startOf("day")
+            ),
+          });
+          this.reloadSchedule();
+        });  
       });
     } catch (error) {
       console.log(error);
