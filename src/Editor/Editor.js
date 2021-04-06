@@ -111,6 +111,7 @@ class Editor extends React.Component {
     this.uploadLoop = this.uploadLoop.bind(this);
     this.saveLoop = this.saveLoop.bind(this);
     this.pasteIntoSchedule = this.pasteIntoSchedule.bind(this);
+    this.pasteIntoLoop = this.pasteIntoLoop.bind(this);
     this.handleDrawerOpen = this.handleDrawerOpen.bind(this);
     this.handleDrawerClose = this.handleDrawerClose.bind(this);
     this.handleDateChange = this.handleDateChange.bind(this);
