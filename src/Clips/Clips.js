@@ -129,7 +129,7 @@ export class Clips extends React.Component {
           label="Search"
           variant="outlined"
           onChange={this.handleChange}
-          style={{ marginLeft: "5%" }}
+          style={{ marginLeft: "5%", marginRight: "3%" }}
         />
         <FormControl component="fieldset" className={classes.formControl}>
           <RadioGroup
