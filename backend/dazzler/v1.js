@@ -87,7 +87,7 @@ const webcast = async (req, res) => {
   if (req.query.hasOwnProperty("sid")) {
     q.sid = config[req.query.sid].webcast_channels;
     if (!q.hasOwnProperty("descendants_of")) {
-      q.descendants_of = config[req.query.sid].live_brand[0];
+      q.descendants_of = config[req.query.sid].live_brand
     }
   }
   if (req.query.hasOwnProperty("page")) {
