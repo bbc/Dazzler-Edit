@@ -98,9 +98,9 @@ const ScheduleItem = ({row, index, data, selectedIndex, onDelete, onOccurenceDel
     }
 
     if (
-      moment().isSameOrAfter(moment(this.props.startTime)) &&
+      moment().isSameOrAfter(moment(row.startTime)) &&
       moment().isBefore(
-        moment(this.props.startTime).add(moment.duration(this.props.duration))
+        moment(row.startTime).add(moment.duration(row.duration))
       )
     ) {
       rowClass = "current";
