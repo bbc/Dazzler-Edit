@@ -306,7 +306,7 @@ const clip = async (req, res) => {
       switch (req.query.searchField) {
         case 'duration':
           must.push({
-            regexp: { "download.time.duration.keyword": req.query.search },
+            regexp: { "download.time.duration.keyword": `${req.query.search}.*` },
           });
           break;
         case 'title':
