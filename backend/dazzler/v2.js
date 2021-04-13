@@ -36,7 +36,7 @@ function availableQuery(mid, after, before, search) {
   if (search !== "") {
     filter = {
       match: {
-        "pips.episode.title.$": {
+        "sonata.episode.aggregatedTitle": {
           query: search,
           operator: "and",
           analyzer: "search",
@@ -90,7 +90,7 @@ function availableQuery(mid, after, before, search) {
 function unavailableQuery(mid, after, before, search) {
   let filter;
   if (search !== "") {
-    filter = { match_phrase: { "pips.episode.title.$": search } };
+    filter = { match_phrase: { "sonata.episode.aggregatedTitle": search } };
   }
   return {
     bool: {
