@@ -11,7 +11,7 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import moment from "moment";
 import "moment-duration-format";
 import Episode from "../Episode/Episode";
-import Live from "../Live/Live";
+import Live from "../Live";
 import Clips from "../Clips/Clips";
 import Specials from "../Specials/Specials";
 import Refresh from "../Refresh";
