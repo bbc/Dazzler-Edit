@@ -22,20 +22,3 @@ class Utils {
 
 export const episodeInfo = Utils.episodeInfo;
 export default Utils;
-
-class Group {
-  constructor(obj) {
-    this.data = [];
-    if (typeof obj[Symbol.iterator] === "function") {
-      for (let x of obj) {
-        if (x.asset.vpid && !JSON.stringify(this.data).includes(x.asset.vpid)) {
-          this.data.push(x);
-        }
-      }
-    }
-  }
-  get size() {
-    return this.data.length;
-  }
-}
-export const groupSet = Group;

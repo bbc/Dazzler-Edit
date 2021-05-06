@@ -1,7 +1,6 @@
 import moment from "moment";
 import axios from "axios";
 import ScheduleObject from "../ScheduleObject";
-import { groupSet } from "../Utils";
 
 const URLPrefix =
   process.env.NODE_ENV === "development" ? "http://localhost:8080" : "";
@@ -60,7 +59,7 @@ class ScheduleDao {
               startTime: item.start,
               title: item.title,
               duration: item.version.duration,
-              vpid: item.version.pid, //broadcast - broadcast of // version object  - version of  [version0.$.pid]
+              versionPid: item.version.pid, //broadcast - broadcast of // version object  - version of  [version0.$.pid]
               versionCrid: item.broadcast_of.crid,
               insertionType: item.live ? "live" : "",
               live: item.live,
@@ -104,8 +103,7 @@ class ScheduleDao {
       startTime: start,
       title: "Live programme at " + start.format("HH:mm:ss") + " local",
       duration: duration.toISOString(),
-      captureChannel: window.service.sid,
-      pics_raw_data: window.service.sid,
+      source: window.service.sid,
       insertionType: "live",
     };
     for (let i = 0; i < window.window_of.length; i++) {
@@ -149,28 +147,68 @@ class ScheduleDao {
     return item.insertionType !== "sentinel" && item.insertionType !== "gap";
   }
 
+  /* 
+  {
+  "title": "Live programme at 15:30:00 local",
+  "startTime": {
+    "_isAMomentObject": true,
+    "_i": "2021-05-06T14:30:00Z",
+    "_d": "2021-05-06T14:30:00.000Z",
+    "_isValid": true
+  },
+  "duration": "PT28M",
+  "insertionType": "live",
+  "asset": {
+    "live": true,
+    "entityType": "live",
+    "startTime": {
+      "_isAMomentObject": true,
+      "_i": "2021-05-06T14:30:00Z",
+      "_d": "2021-05-06T14:30:00.000Z",
+      "_isValid": true
+    },
+    "title": "Live programme at 15:30:00 local",
+    "duration": "PT28M",
+    "captureChannel": "world_service_stream_06",
+    "pics_raw_data": "world_service_stream_06",
+    "insertionType": "live",
+    "versionPid": "w1msj10325b0s69",
+    "versionCrid": "crid://bbc.co.uk/w/40006083211620311400",
+    "pid": "w172xtmg19rfyjf",
+    "crid": "crid://bbc.co.uk/w/30005629911620311400"
+  }
+}
+  */
+
   static createBroadcastItem(item) {
-    console.log("cb item is ", item);
+    console.log("createBroadcastItem item is ", item);
     const finish = moment(item.startTime).add(moment.duration(item.duration));
+    let entityType = item.asset.entityType;
+    if (entityType === 'live') {
+      entityType = 'episode';
+    }
+    const vpid = item.asset.versionPid || item.asset.vpid;
     const newItem = {
       title: item.title,
       start: item.startTime,
       end: finish,
       live: item.asset.live,
+      source: item.captureChannel,
       broadcast_of: {
-        pid: item.asset.vpid,
+        pid: vpid,
         crid: item.asset.versionCrid,
       },
       version: {
-        pid: item.asset.vpid,
+        pid: vpid,
         version_of: item.asset.pid,
         duration: item.duration,
-        entity_type: item.asset.entityType,
+      },
+      version_of: {
+        pid: item.asset.pid,
+        crid: item.asset.crid,
+        entity_type: entityType,
       },
     };
-    if (item.asset.live) {
-      newItem.source = item.asset.pics_raw_data || item.source;
-    }
     console.log("new item is ", newItem);
 
     return newItem;
@@ -203,42 +241,8 @@ class ScheduleDao {
         .catch((error) => {
           err(error);
         });
-      ScheduleDao.episodeBackfillCheck(items, sid);
     } catch (error) {
       console.log(error);
-    }
-  }
-  /*Method checks to see if episode asset exists in s3 bucket
-   when playlist saved. If episode missing, backfill process
-   begins.
-   */
-  static episodeBackfillCheck(data, sid) {
-    try {
-      //Filtering episodes and then extracting vpid
-      let episode = new groupSet(
-        data.filter((item) => {
-          if (
-            !item.asset ||
-            !item.asset.availability ||
-            !item.asset.availability.actual_start
-          ) {
-            return false;
-          } else {
-            return item.asset.entityType === "episode";
-          }
-        })
-      );
-      if (episode.size > 0) {
-        axios({
-          method: "post",
-          url: URLPrefix + "/api/v2/queryepisode?sid=" + sid,
-          data: Array.from(episode.data),
-        }).catch((error) => {
-          console.error(error);
-        });
-      }
-    } catch (error) {
-      console.error("FAILURE", error);
     }
   }
 }
