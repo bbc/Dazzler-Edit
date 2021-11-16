@@ -6,7 +6,7 @@
     "@material-ui/core": "^4.9.0",
     "@material-ui/icons": "^4.2.1",
     "@material-ui/lab": "^4.0.0-alpha.41",
-    "aws-sdk": "^2.613.0",
+    "aws-sdk": "^2.814.0",
     "axios": "^0.21.1",
     "big-integer": "^1.6.48",
     "create-react-app": "^3.3.0",
