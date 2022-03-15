@@ -52,7 +52,7 @@
   "devDependencies": {
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.14.0",
-    "lodash-es": "^4.17.15",
+    "lodash-es": "^4.17.21",
     "moment-duration-format": "^2.3.2",
     "react-pure-grid": "^2.1.1",
     "typescript": "^3.7.3"
