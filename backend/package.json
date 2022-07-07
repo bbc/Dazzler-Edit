@@ -16,7 +16,7 @@
     "default-gateway": "^5.0.4",
     "express": "*",
     "jest": "^24.9.0",
-    "moment": "^2.24.0",
+    "moment": "^2.29.4",
     "querystring": "^0.2.0",
     "serve-static": "^1.14.1",
     "moment-duration-format": "^2.3.2",
